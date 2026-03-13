@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Datapass;
+use App\Models\DataPass;
 use App\Models\Site;
 use App\Exports\DatapassExport;
 use App\Imports\DatapassImport;
@@ -14,17 +14,19 @@ class DatapasController extends Controller
     public function index(Request $request)
     {
         $search = $request->search;
-        
+
         $datapass = Datapass::with('site')
-            ->when($search, function($query) use ($search) {
-                $query->where(function($q) use ($search) { // Bungkus group where agar search tidak kacau
+            ->when($search, function ($query) use ($search) {
+            $query->where(function ($q) use ($search) { // Bungkus group where agar search tidak kacau
                     $q->where('nama_lokasi', 'like', "%{$search}%")
-                    ->orWhere('kabupaten', 'like', "%{$search}%")
-                    ->orWhereHas('site', function($sq) use ($search) {
-                        $sq->where('site_id', 'like', "%{$search}%");
-                    });
-                });
-            })
+                        ->orWhere('kabupaten', 'like', "%{$search}%")
+                        ->orWhereHas('site', function ($sq) use ($search) {
+                    $sq->where('site_id', 'like', "%{$search}%");
+                }
+                );
+            }
+            );
+        })
             ->get(); // <--- Pakai get() untuk ambil SEMUA data
 
         $sites = Site::all();
@@ -48,12 +50,12 @@ class DatapasController extends Controller
         return back()->with('success', 'Data berhasil ditambahkan!');
     }
 
-    public function export() 
+    public function export()
     {
         return Excel::download(new DatapassExport, 'Data_Password_Export.xlsx');
     }
 
-    public function import(Request $request) 
+    public function import(Request $request)
     {
         $request->validate([
             'file' => 'required|mimes:xlsx,xls'
@@ -62,7 +64,8 @@ class DatapasController extends Controller
         try {
             Excel::import(new DatapassImport, $request->file('file'));
             return back()->with('success', 'Data berhasil diimport!');
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }

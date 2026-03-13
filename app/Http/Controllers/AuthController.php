@@ -13,13 +13,15 @@ class AuthController extends Controller
 
     public function login(Request $request) {
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'email'    => ['required', 'email'],
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials)) {
+        $remember = $request->boolean('remember'); // true when "Remember Me" is checked
+
+        if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
-            return redirect()->intended('dashboard');
+            return redirect()->intended('landingpage');
         }
 
         return back()->withErrors([
@@ -28,9 +30,22 @@ class AuthController extends Controller
     }
 
     public function logout(Request $request) {
+        $user = Auth::user();
+        if ($user) {
+            // Force offline status directly in DB to bypass any middleware or model race conditions
+            \Illuminate\Support\Facades\DB::table('users')
+                ->where('id', $user->id)
+                ->update([
+                    'is_online' => false,
+                    'last_seen_at' => now()
+                ]);
+        }
+        
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/login');
+        
+        // Ensure redirect is immediate
+        return redirect('/login')->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     }
 }

@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
+    <link rel="stylesheet" href="{{ asset('css/password.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}">
+    <script src="{{ asset('js/nav-modal.js') }}"></script>
+    <script src="{{ asset('js/profile-dropdown.js') }}"></script>
     @include('components.nav-modal-structure')
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,14 +15,67 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/password.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}">
-    <script src="{{ asset('js/nav-modal.js') }}"></script>
-    <script src="{{ asset('js/profile-dropdown.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .status-badge {
+            background-color: #d1e7dd;
+            color: #0f5132;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .summary-badge {
+            font-size: 12px;
+            padding: 5px 15px;
+            border-radius: 50px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            margin-right: 10px;
+        }
+        .search-box {
+            display: flex;
+            align-items: center;
+        }
+        .tabs-section {
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .tabs-section .ms-auto {
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        @media (max-width: 768px) {
+            .tabs-section .ms-auto {
+                width: 100%;
+                margin-left: 0 !important;
+                justify-content: flex-start;
+            }
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .search-form, .search-box {
+                width: 100%;
+            }
+            .search-box input {
+                width: 100%;
+            }
+        }
+        .search-box input {
+            border: none;
+            outline: none;
+            padding: 20px;
+            background: transparent;
+        }
+        .filter-btn i {
+            color: #555;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-
 <header class="main-header">
         <div class="header-logo-container">
             <a href="javascript:void(0)" class="header-brand-link" onclick="openNavModal()" style="text-decoration: none !important; color: white !important;">
@@ -25,35 +84,54 @@
                 </div>
             </a>
         </div>
-
-        <div class="user-profile-wrapper" style="position: relative;">
-            <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
-                <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
-            </div>
-
-            <div id="profileDropdownMenu" class="hidden" style="position: absolute; right: 0; top: 100%; mt: 10px; width: 150px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; display: none; flex-direction: column; overflow: hidden;">
-                <div style="padding: 10px 15px; border-bottom: 1px solid #eee; font-size: 14px; font-weight: bold; color: #333;">
-                    {{ auth()->user()->name }}
+        <div class="d-flex align-items-center gap-3">
+            @if(auth()->check() && auth()->user()->role === 'superadmin')
+                <a href="{{ route('setting.index') }}" class="text-white opacity-75 hover-opacity-100" title="Settings">
+                    <i class="bi bi-gear-fill" style="font-size: 1.3rem;"></i>
+                </a>
+            @endif
+            <div class="user-profile-wrapper" style="position: relative;">
+                @if(auth()->check() && auth()->user()->role === 'superadmin')
+                    <a href="{{ route('setting.index') }}" class="user-profile-icon" title="Setting User" style="cursor: pointer; text-decoration: none; color: inherit;">
+                        @if(auth()->user()->photo)
+                            <img src="{{ Storage::url(auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                        @else
+                            <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
+                        @endif
+                    </a>
+                @else
+                    <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
+                        @if(auth()->check() && auth()->user()->photo)
+                            <img src="{{ Storage::url(auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                        @else
+                            <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
+                        @endif
+                    </div>
+                @endif
+                <div id="profileDropdownMenu" class="hidden" style="position: absolute; right: 0; top: 100%; mt: 10px; width: 150px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; display: none; flex-direction: column; overflow: hidden;">
+                    <div style="padding: 10px 15px; border-bottom: 1px solid #eee; font-size: 14px; font-weight: bold; color: #333;">
+                        {{ auth()->user()->name ?? 'User' }}
+                    </div>
+                    <a href="{{ route('profile.edit') }}" style="padding: 10px 15px; text-decoration: none; color: #333; font-size: 14px; display: flex; align-items: center; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#f5f5f5'" onmouseout="this.style.backgroundColor='transparent'">
+                        <i class="bi bi-person me-2"></i> Profile
+                    </a>
+                    <form action="{{ route('logout') }}" method="POST" id="logout-form">
+                        @csrf
+                        <button type="submit" style="width: 100%; text-align: left; padding: 10px 15px; background: none; border: none; font-size: 14px; color: #dc3545; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </button>
+                    </form>
                 </div>
-                
-                <form action="{{ route('logout') }}" method="POST" id="logout-form">
-                    @csrf
-                    <button type="submit" style="width: 100%; text-align: left; padding: 10px 15px; background: none; border: none; font-size: 14px; color: #dc3545; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                        <i class="bi bi-box-arrow-right"></i> Logout
-                    </button>
-                </form>
             </div>
         </div>
     </header>
-
     <div class="tabs-section">
         <a href="{{ url('/open-ticket') }}" class="tab {{ request()->is('open-ticket*') ? 'active' : '' }}" style="text-decoration: none; color: Black;">Open Tiket</a>
         <a href="{{ url('/close-ticket') }}" class="tab {{ request()->is('close-ticket*') ? 'active' : '' }}" style="text-decoration: none; color: Black;">Close Tiket</a>
         <a href="{{ url('/detailticket') }}" class="tab {{ request()->is('detailticket*') ? 'active' : '' }}" style="text-decoration: none; color: Black;">Detail Tiket</a>
         <a href="{{ url('/summaryticket') }}" class="tab {{ request()->is('summaryticket*') ? 'active' : '' }}" style="text-decoration: none; color: White;">Summary Tiket</a>
     </div>
-    </div>
-
+    <div class="p-4">
     <div class="grid grid-cols-2 gap-6 mb-6">
         <div class="card p-4">
             <h3 class="text-center font-bold text-header text-xl mb-4">Chart Open Ticket</h3>
@@ -64,8 +142,8 @@
             <canvas id="chartDurasi" height="150"></canvas>
         </div>
     </div>
-
     <div class="card overflow-hidden mb-6">
+        <div class="overflow-x-auto">
         <table class="w-full text-sm text-left">
             <thead>
                 <tr class="table-header">
@@ -93,10 +171,11 @@
                 </tr>
             </tbody>
         </table>
+        </div>
     </div>
-
     <div class="grid grid-cols-2 gap-6 mb-6">
         <div class="card overflow-hidden">
+            <div class="overflow-x-auto">
             <table class="w-full text-xs">
                 <thead class="table-header uppercase">
                     <tr>
@@ -120,8 +199,10 @@
                     </tr>
                 </tbody>
             </table>
+            </div>
         </div>
         <div class="card overflow-hidden">
+            <div class="overflow-x-auto">
             <table class="w-full text-xs h-full">
                 <thead class="table-header uppercase">
                     <tr>
@@ -142,10 +223,11 @@
                     </tr>
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
-
     <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
         <table class="w-full text-xs">
             <thead class="table-header uppercase">
                 <tr>
@@ -167,8 +249,8 @@
             </tbody>
         </table>
     </div>
-
-    <script>
+</div>
+<script>
         const chartOptions = {
             responsive: true,
             plugins: { legend: { display: false } },
@@ -177,7 +259,6 @@
                 x: { grid: { display: false } }
             }
         };
-
         // Chart Open Ticket
         new Chart(document.getElementById('chartOpen'), {
             type: 'bar',
@@ -191,7 +272,6 @@
             },
             options: chartOptions
         });
-
         // Chart Durasi
         new Chart(document.getElementById('chartDurasi'), {
             type: 'bar',
@@ -208,3 +288,4 @@
     </script>
 </body>
 </html>
+

@@ -35,45 +35,44 @@ class PiketController extends Controller
 
     return view('jadwalpiket', compact('daftarNama', 'dataPiket', 'jumlahHari', 'bulanSekarang', 'tahunSekarang', 'month', 'year'));
 }
-    public function updateShift(Request $request)
-{
-    try {
-        $namaPetugas = trim($request->nama);
-        $user = \App\Models\User::firstOrCreate(
-            ['name' => $namaPetugas],
-            [
-                'email' => str_replace(' ', '.', strtolower($namaPetugas)) . '@nustech.co.id',
-                'password' => bcrypt('Masuk123*#'),
-                'is_admin' => 1,
-            ]
-        );
+    public function batchUpdate(Request $request)
+    {
+        try {
+            $updates = $request->input('updates', []);
+            
+            foreach ($updates as $data) {
+                $namaPetugas = trim($data['nama']);
+                
+                // Cari user berdasarkan Nama (Case-Insensitive)
+                $user = \App\Models\User::where('name', 'LIKE', '%' . $namaPetugas . '%')->first();
+                
+                if (!$user) {
+                    continue; // Skip jika user tidak ditemukan
+                }
 
-        // JIKA KODE ADALAH 'OFF', HAPUS DATA JADWAL (KARENA LIBUR)
-        if ($request->shift_kode === 'OFF') {
-            \App\Models\JadwalPiket::where('user_id', $user->id)
-                ->where('tanggal', $request->tanggal)
-                ->delete();
+                // JIKA KODE ADALAH 'OFF', HAPUS DATA JADWAL
+                if ($data['shift_kode'] === 'OFF') {
+                    \App\Models\JadwalPiket::where('user_id', $user->id)
+                        ->where('tanggal', $data['tanggal'])
+                        ->delete();
+                    continue;
+                }
 
-            return response()->json(['status' => 'success', 'message' => 'Jadwal dikosongkan (OFF)']);
+                // CARI SHIFT BERDASARKAN KODE
+                $shift = \App\Models\Shift::where('kode', $data['shift_kode'])->first();
+
+                if ($shift) {
+                    \App\Models\JadwalPiket::updateOrCreate(
+                        ['user_id' => $user->id, 'tanggal' => $data['tanggal']],
+                        ['shift_id' => $shift->id, 'status' => 'aktif']
+                    );
+                }
+            }
+
+            return response()->json(['status' => 'success', 'message' => 'Semua jadwal berhasil diperbarui.']);
+
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Gagal: ' . $e->getMessage()], 500);
         }
-
-        // CARI SHIFT BERDASARKAN KODE
-        $shift = \App\Models\Shift::where('kode', $request->shift_kode)->first();
-
-        // VALIDASI JIKA SHIFT TIDAK DITEMUKAN DI DB
-        if (!$shift) {
-            return response()->json(['status' => 'error', 'message' => 'Master data Shift ' . $request->shift_kode . ' tidak ditemukan!'], 404);
-        }
-
-        \App\Models\JadwalPiket::updateOrCreate(
-            ['user_id' => $user->id, 'tanggal' => $request->tanggal],
-            ['shift_id' => $shift->id, 'status' => 'aktif']
-        );
-
-        return response()->json(['status' => 'success', 'message' => 'Berhasil update shift.']);
-
-    } catch (\Exception $e) {
-        return response()->json(['status' => 'error', 'message' => 'Gagal: ' . $e->getMessage()], 500);
     }
-}
 }

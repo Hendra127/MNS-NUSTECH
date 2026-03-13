@@ -8,24 +8,28 @@ use App\Models\PMLiberta; // Import model PMLiberta
 use Carbon\Carbon;
 use App\Models\Message; // Import model Message
 use App\Models\JadwalPiket; // Import model Piket
+use App\Models\LaporanCM; // Import model LaporanCM
 
 class MyDashboardController extends Controller
 {
     public function index()
 {
     // Ambil waktu sekarang (WITA)
-    $now = Carbon::now();
+    $now = Carbon::now('Asia/Makassar');
     $today = $now->format('Y-m-d');
     $currentTime = $now->format('H:i');
 
     // 1. Ambil data Tiket Open untuk tabel di dashboard
     $tickets = Ticket::where('status', 'open')
         ->latest()
-        ->paginate(10);
+        ->get();
 
     // 2. Hitung Statistik Utama (Ticket)
-    $todayCount = Ticket::whereDate('created_at', $today)->count();
+    $todayCount = Ticket::whereDate('created_at', $today)
+        ->where('status', 'open')
+        ->count();
     $totalOpen = Ticket::where('status', 'open')->count();
+    $todayDateLabel = $now->translatedFormat('d M');
     
     // 3. Statistik PM (Diambil dari Model PMLiberta)
     $pmBmnDone = PMLiberta::where('kategori', 'BMN')->where('status', 'DONE')->count();
@@ -33,6 +37,10 @@ class MyDashboardController extends Controller
 
     $pmSlDone = PMLiberta::where('kategori', 'SL')->where('status', 'DONE')->count();
     $pmSlTotal = PMLiberta::where('kategori', 'SL')->count();
+
+    // 3b. Statistik CM (Diambil dari Model LaporanCM)
+    $cmDone = LaporanCM::whereIn('laporan_cm', ['DONE', 'Done', 'done', 'Done '])->count();
+    $cmTotal = LaporanCM::count();
 
     // 4. Data untuk Sidebar (Group by Detail Problem)
     $sidebarTickets = Ticket::where('status', 'open')
@@ -44,7 +52,7 @@ class MyDashboardController extends Controller
     // 5. LOGIKA OTOMATIS SHIFT BERDASARKAN JAM (FIXED)
     // ==========================================================
     
-    // Tentukan Kode Shift Berdasarkan Jam Sekarang
+    // Kode Shift Berdasarkan Jam Sekarang
     $currentShiftCode = match (true) {
         $currentTime >= '07:30' && $currentTime < '15:30' => 'P', // Pagi
         $currentTime >= '15:30' && $currentTime < '23:30' => 'S', // Siang
@@ -52,13 +60,23 @@ class MyDashboardController extends Controller
         default => 'OFF',
     };
 
+    // Logika Tanggal Efektif: Jika Shift Malam dan jam antara 00:00 - 07:30, gunakan tanggal kemarin
+    $effectiveDate = ($currentShiftCode === 'M' && $currentTime < '07:30') 
+        ? $now->copy()->subDay()->format('Y-m-d') 
+        : $today;
+
     // Ambil Personil yang piket HANYA pada shift yang sedang aktif saat ini
     $piketHariIni = \App\Models\JadwalPiket::with(['user', 'shift'])
-        ->whereDate('tanggal', $today)
+        ->whereDate('tanggal', $effectiveDate)
         ->whereHas('shift', function($query) use ($currentShiftCode) {
-            $query->where('kode', $currentShiftCode);
+            $query->where('kode', 'LIKE', $currentShiftCode);
         })
-        ->get();
+        ->get()
+        ->filter(function($p) {
+            $name = $p->user?->name ?? $p->nama_petugas ?? null;
+            return !empty($name) && strtolower((string)$name) !== 'null';
+        })
+        ->values();
 
     // Tentukan Teks Jam Kerja untuk ditampilkan di Header Dashboard
     $jamTeks = match($currentShiftCode) {
@@ -68,7 +86,7 @@ class MyDashboardController extends Controller
         default => 'Libur'
     };
 
-    $shiftInfo = $now->translatedFormat('d M') . " " . $jamTeks . " WITA";
+    $shiftInfo = Carbon::parse($effectiveDate)->translatedFormat('d M') . " " . $jamTeks . " WITA";
 
     // 6. Kirim semua variabel ke view 'mydashboard'
     return view('mydashboard', compact(
@@ -81,14 +99,17 @@ class MyDashboardController extends Controller
         'pmSlTotal',
         'sidebarTickets',
         'piketHariIni',
-        'shiftInfo'
+        'shiftInfo',
+        'todayDateLabel',
+        'cmDone',
+        'cmTotal'
     ));
 }
-    public function getDetail($site_code)
+    public function getDetail($id)
     {
         try {
-            // Tambahkan with('site') untuk mengambil data dari tabel sites
-            $ticket = Ticket::with('site')->where('site_code', $site_code)->first();
+            // Fetch by ID to be more specific
+            $ticket = Ticket::with('site')->find($id);
 
             if (!$ticket) {
                 return response()->json(['error' => 'Data tidak ditemukan'], 404);
@@ -104,29 +125,33 @@ class MyDashboardController extends Controller
                 'durasi'    => $ticket->tanggal_rekap ? Carbon::parse($ticket->tanggal_rekap)->diffInDays(now()) : 0,
                 'detail_problem' => $ticket->detail_problem ?? '-',
                 'ce'        => $ticket->ce ?? '-',
+                'evidence'  => $ticket->evidence,
                 
                 // AMBIL DARI RELASI SITE
-                'latitude'  => $ticket->site->latitude ?? 0, 
-                'longitude' => $ticket->site->longitude ?? 0
+                'latitude'  => $ticket->site?->latitude ?? 0, 
+                'longitude' => $ticket->site?->longitude ?? 0
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-public function fetchMessages() {
+public function fetchMessages(Request $request) {
     $currentUserId = auth()->id();
-    $currentIp = request()->ip(); // Menggunakan IP sebagai penanda Guest
+    $currentGuestName = $request->get('guest_name');
 
     $messages = \App\Models\Message::with(['user', 'parent.user'])
         ->latest()
         ->take(50)
         ->get()
         ->reverse()
-        ->map(function ($msg) use ($currentUserId) {
-            $msg->is_me = auth()->check() ? ($msg->user_id === $currentUserId) : is_null($msg->user_id);
+        ->map(function ($msg) use ($currentUserId, $currentGuestName) {
+            if (auth()->check()) {
+                $msg->is_me = ($msg->user_id === $currentUserId);
+            } else {
+                // Untuk guest, kita cocokkan berdasarkan guest_name yang dikirim klien
+                $msg->is_me = is_null($msg->user_id) && !empty($currentGuestName) && ($msg->guest_name === $currentGuestName);
+            }
             
-            // Tambahkan baris ini untuk mendeteksi apakah pengirim adalah admin
-            // Kita cek dari relasi user-nya
             $msg->is_sender_admin = $msg->user ? (bool)$msg->user->is_admin : (bool)$msg->is_admin;
             
             return $msg;
@@ -161,57 +186,225 @@ public function storeMessage(Request $request)
 
     return response()->json($chat);
 }
-public function getFilteredTickets(Request $request)
-{
-    try {
-        $type = $request->get('type');
-        $label = "Ticket List";
-        $tickets = [];
+    public function getFilteredTickets(Request $request)
+    {
+        try {
+            $type = $request->get('type');
+            $label = "Ticket List";
+            $tickets = [];
 
-        if ($type == 'today' || $type == 'all_open') {
-            $query = \DB::table('tickets');
-            if ($type == 'today') {
-                $query->whereDate('created_at', now());
-                $label = "Tickets Today";
-            } else {
-                $query->where('status', 'open');
-                $label = "All Open Tickets";
-            }
-            
-            $tickets = $query->get()->map(function($item) {
-                return [
-                    'nama_site' => $item->nama_site,
-                    'site_code' => $item->site_code,
-                    'status'    => strtoupper($item->status),
-                    'display_date' => $item->durasi . " Hari"
-                ];
-            });
-        } 
-        elseif ($type == 'pm_bmn' || $type == 'pm_sl') {
-            $kategori = ($type == 'pm_bmn') ? 'BMN' : 'SL';
-            $label = "PM " . $kategori . " Done";
-
-            $tickets = \DB::table('pmliberta')
-                ->where('kategori', $kategori)
-                ->where('status', 'DONE')
-                ->get()
-                ->map(function($item) {
+            if ($type == 'today' || $type == 'all_open') {
+                $query = \App\Models\Ticket::query();
+                if ($type == 'today') {
+                    $query->whereDate('created_at', now());
+                    $label = "Tickets Today";
+                } else {
+                    $query->where('status', 'open');
+                    $label = "All Open Tickets";
+                }
+                
+                $tickets = $query->get()->map(function($item) {
+                    $durasiStr = "0 Hari";
+                    if ($item->tanggal_rekap) {
+                        $durasiStr = floor(\Carbon\Carbon::parse($item->tanggal_rekap)->diffInDays(now())) . " Hari";
+                    }
                     return [
-                        'nama_site' => $item->nama_lokasi ?? '-', // Mengambil dari field nama_lokasi
-                        'site_code' => $item->site_id ?? '-',
-                        'status'    => 'DONE',
-                        'display_date' => $item->date ?? '-' // Mengambil nilai field 'date' asli dari DB
+                        'nama_site' => $item->nama_site,
+                        'site_code' => $item->site_code,
+                        'status'    => strtoupper($item->status),
+                        'display_date' => $durasiStr
                     ];
                 });
-        }
+            } 
+            elseif ($type == 'pm_bmn' || $type == 'pm_sl') {
+                $kategori = ($type == 'pm_bmn') ? 'BMN' : 'SL';
+                $label = "PM " . $kategori . " Done";
 
-        return response()->json([
-            'success' => true,
-            'tickets' => $tickets,
-            'type_label' => $label
-        ]);
-    } catch (\Exception $e) {
-        return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+                $tickets = \App\Models\PMLiberta::where('kategori', $kategori)
+                    ->where('status', 'DONE')
+                    ->get()
+                    ->map(function($item) {
+                        return [
+                            'nama_site' => $item->nama_lokasi ?? '-', 
+                            'site_code' => $item->site_id ?? '-',
+                            'status'    => 'DONE',
+                            'display_date' => $item->date ? \Carbon\Carbon::parse($item->date)->format('Y-m-d') : '-'
+                        ];
+                    });
+            } 
+            elseif ($type == 'cm_all') {
+                $label = "CM (All) Done";
+                $tickets = \App\Models\LaporanCM::whereIn('laporan_cm', ['DONE', 'Done', 'done', 'Done '])
+                    ->latest()
+                    ->get()
+                    ->map(function($item) {
+                        return [
+                            'nama_site' => $item->nama_site ?? '-',
+                            'site_code' => $item->site_id ?? '-',
+                            'status'    => 'DONE',
+                            'display_date' => $item->tanggal_on_site ? \Carbon\Carbon::parse($item->tanggal_on_site)->format('Y-m-d') : '-'
+                        ];
+                    });
+            }
+
+            return response()->json([
+                'success' => true,
+                'tickets' => $tickets,
+                'type_label' => $label
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
-}
+
+    public function fetchStats()
+    {
+        try {
+            $now = Carbon::now('Asia/Makassar');
+            $today = $now->format('Y-m-d');
+            $currentTime = $now->format('H:i');
+
+            // 1. Stats
+            $todayCount = Ticket::whereDate('created_at', $today)
+                ->where('status', 'open')
+                ->count();
+            $totalOpen = Ticket::where('status', 'open')->count();
+            $todayDateLabel = $now->translatedFormat('d M');
+            $pmBmnDone = PMLiberta::where('kategori', 'BMN')->where('status', 'DONE')->count();
+            $pmBmnTotal = PMLiberta::where('kategori', 'BMN')->count();
+            $pmSlDone = PMLiberta::where('kategori', 'SL')->where('status', 'DONE')->count();
+            $pmSlTotal = PMLiberta::where('kategori', 'SL')->count();
+            $cmDone = LaporanCM::whereIn('laporan_cm', ['DONE', 'Done', 'done', 'Done '])->count();
+            $cmTotal = LaporanCM::count();
+
+            // 2. Piket
+            $currentShiftCode = match (true) {
+                $currentTime >= '07:30' && $currentTime < '15:30' => 'P',
+                $currentTime >= '15:30' && $currentTime < '23:30' => 'S',
+                ($currentTime >= '23:30' || $currentTime < '07:30') => 'M',
+                default => 'OFF',
+            };
+
+            // Logika Tanggal Efektif (Sama dengan index)
+            $effectiveDate = ($currentShiftCode === 'M' && $currentTime < '07:30') 
+                ? $now->copy()->subDay()->format('Y-m-d') 
+                : $today;
+
+            $piketHariIni = \App\Models\JadwalPiket::with(['user', 'shift'])
+                ->whereDate('tanggal', $effectiveDate)
+                ->whereHas('shift', function($query) use ($currentShiftCode) {
+                    $query->where('kode', 'LIKE', $currentShiftCode);
+                })
+                ->get()
+                ->filter(function($p) {
+                    $name = $p->user?->name ?? $p->nama_petugas ?? null;
+                    return !empty($name) && strtolower((string)$name) !== 'null';
+                })
+                ->values();
+            $jamTeks = match($currentShiftCode) {
+                'P' => '07:30 - 15:30',
+                'S' => '15:30 - 23:30',
+                'M' => '23:30 - 07:30',
+                default => 'Libur'
+            };
+            $shiftInfo = Carbon::parse($effectiveDate)->translatedFormat('d M') . " " . $jamTeks . " WITA";
+
+            // 3. Sidebar (Open Ticket Problem)
+            $sidebar = Ticket::where('status', 'open')
+                ->select('detail_problem', 'nama_site')
+                ->get()
+                ->groupBy('detail_problem');
+
+            // 4. Main Table (Dynamic based on selected filter)
+            $type = request('type', 'all_open');
+            $table = [];
+            $typeLabel = "All Open Tickets";
+
+            if ($type == 'today' || $type == 'all_open') {
+                $query = Ticket::query();
+                if ($type == 'today') {
+                    $query->whereDate('created_at', $today);
+                    $typeLabel = "Tickets Today";
+                } else {
+                    $query->where('status', 'open');
+                    $typeLabel = "All Open Tickets";
+                }
+                
+                $table = $query->latest()->get()->map(function($t) {
+                    $tglRekap = Carbon::parse($t->tanggal_rekap)->startOfDay();
+                    $tglAkhir = (in_array(strtolower($t->status), ['close', 'closed']) && $t->tanggal_close) 
+                        ? Carbon::parse($t->tanggal_close)->startOfDay() 
+                        : now()->startOfDay();
+                    
+                    return [
+                        'id'        => $t->id,
+                        'nama_site' => $t->nama_site,
+                        'site_code' => $t->site_code,
+                        'status'    => strtoupper($t->status),
+                        'durasi'    => floor($tglRekap->diffInDays($tglAkhir)) . " Hari"
+                    ];
+                });
+            } elseif ($type == 'pm_bmn' || $type == 'pm_sl') {
+                $kategori = ($type == 'pm_bmn') ? 'BMN' : 'SL';
+                $typeLabel = "PM " . $kategori . " Done";
+
+                $table = PMLiberta::where('kategori', $kategori)
+                    ->where('status', 'DONE')
+                    ->latest()
+                    ->get()
+                    ->map(function($item) {
+                        return [
+                            'nama_site' => $item->nama_lokasi ?? '-', 
+                            'site_code' => $item->site_id ?? '-',
+                            'status'    => 'DONE',
+                            'durasi'    => $item->date ? Carbon::parse($item->date)->format('Y-m-d') : '-'
+                        ];
+                    });
+            } elseif ($type == 'cm_all') {
+                $typeLabel = "CM (All) Done";
+                $table = LaporanCM::where('laporan_cm', 'DONE')
+                    ->latest()
+                    ->get()
+                    ->map(function($item) {
+                        return [
+                            'nama_site' => $item->nama_site ?? '-',
+                            'site_code' => $item->site_id ?? '-',
+                            'status'    => 'DONE',
+                            'durasi'    => $item->tanggal_on_site ? Carbon::parse($item->tanggal_on_site)->format('Y-m-d') : '-'
+                        ];
+                    });
+            }
+
+            return response()->json([
+                'success' => true,
+                'stats' => [
+                    'todayCount' => $todayCount,
+                    'totalOpen' => $totalOpen,
+                    'pmBmnDone' => $pmBmnDone,
+                    'pmBmnTotal' => $pmBmnTotal,
+                    'pmSlDone' => $pmSlDone,
+                    'pmSlTotal' => $pmSlTotal,
+                    'cmDone' => $cmDone,
+                    'cmTotal' => $cmTotal,
+                    'todayDateLabel' => $todayDateLabel,
+                ],
+                'piket' => [
+                    'status' => $piketHariIni->isNotEmpty() ? 'Shift On' : 'No Shift',
+                    'info' => $shiftInfo,
+                    'list' => $piketHariIni->map(function($p) {
+                        return [
+                            'name' => $p->user?->name ?? $p->nama_petugas ?? 'Unknown',
+                            'shift_kode' => $p->shift->kode ?? '?'
+                        ];
+                    })
+                ],
+                'sidebar' => $sidebar,
+                'table' => $table,
+                'type_label' => $typeLabel,
+                'type' => $type
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
 }

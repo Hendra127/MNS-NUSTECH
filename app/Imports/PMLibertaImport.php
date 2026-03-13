@@ -14,13 +14,22 @@ class PMLibertaImport implements ToModel, WithHeadingRow
         // Fungsi untuk menangani konversi tanggal Excel
         $tanggalTerformat = null;
         if (isset($row['date'])) {
-            if (is_numeric($row['date'])) {
-                // Jika berupa angka serial Excel (seperti 45699)
-                $tanggalTerformat = Date::excelToDateTimeObject($row['date'])->format('Y-m-d');
-            } else {
-                // Jika sudah berupa string tanggal (seperti 16/07/2025)
-                // Kita coba parse agar formatnya masuk ke DB sebagai Y-m-d
-                $tanggalTerformat = date('Y-m-d', strtotime(str_replace('/', '-', $row['date'])));
+            try {
+                if (is_numeric($row['date'])) {
+                    // Jika berupa angka serial Excel (seperti 45699)
+                    $tanggalTerformat = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['date'])->format('Y-m-d');
+                } else {
+                    // Ganti / dengan - agar Carbon/strtotime menganggapnya format d-m-Y (bukan m/d/Y)
+                    $cleanDate = str_replace('/', '-', $row['date']);
+                    $tanggalTerformat = \Carbon\Carbon::parse($cleanDate)->format('Y-m-d');
+                }
+            } catch (\Exception $e) {
+                // Jika masih gagal, coba format spesifik d-m-Y
+                try {
+                    $tanggalTerformat = \Carbon\Carbon::createFromFormat('d-m-Y', str_replace('/', '-', $row['date']))->format('Y-m-d');
+                } catch (\Exception $e2) {
+                    $tanggalTerformat = null;
+                }
             }
         }
 

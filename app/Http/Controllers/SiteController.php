@@ -44,7 +44,7 @@ class SiteController extends Controller
 
         // ----------------------------------------------------
 
-        $sites = $query->latest()->get();
+        $sites = $query->latest()->paginate(15)->withQueryString();
         return view('datasite', compact('sites'));
     }
 

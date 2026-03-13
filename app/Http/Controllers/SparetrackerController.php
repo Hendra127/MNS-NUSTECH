@@ -20,13 +20,42 @@ class SparetrackerController extends Controller
             $searchTerm = trim($request->search);
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('sn', 'like', "%{$searchTerm}%")
-                  ->orWhere('nama_perangkat', 'like', "%{$searchTerm}%");
+                  ->orWhere('nama_perangkat', 'like', "%{$searchTerm}%")
+                  ->orWhere('lokasi_realtime', 'like', "%{$searchTerm}%")
+                  ->orWhere('kabupaten', 'like', "%{$searchTerm}%");
             });
         }
 
-        $data = $query->latest()->paginate(20);
+        // Filter Kondisi
+        if ($request->kondisi) {
+            $query->where('kondisi', $request->kondisi);
+        }
 
-        return view('sparetracker', compact('data'));
+        // Filter Tanggal Masuk
+        if ($request->tgl_masuk_mulai) {
+            $query->whereDate('tanggal_masuk', '>=', $request->tgl_masuk_mulai);
+        }
+        if ($request->tgl_masuk_selesai) {
+            $query->whereDate('tanggal_masuk', '<=', $request->tgl_masuk_selesai);
+        }
+
+        // Filter Tanggal Keluar
+        if ($request->tgl_keluar_mulai) {
+            $query->whereDate('tanggal_keluar', '>=', $request->tgl_keluar_mulai);
+        }
+        if ($request->tgl_keluar_selesai) {
+            $query->whereDate('tanggal_keluar', '<=', $request->tgl_keluar_selesai);
+        }
+
+        // Statistik
+        $totalSpare = Sparetracker::count();
+        $countBaik  = Sparetracker::where('kondisi', 'BAIK')->count();
+        $countRusak = Sparetracker::where('kondisi', 'RUSAK')->count();
+        $countBaru  = Sparetracker::where('kondisi', 'BARU')->count();
+
+        $data = $query->latest()->get(); // Changed to get() as pagination might be removed or handled differently later
+
+        return view('sparetracker', compact('data', 'totalSpare', 'countBaik', 'countRusak', 'countBaru'));
     }
 
     public function import(Request $request)

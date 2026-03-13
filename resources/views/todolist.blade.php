@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
+    <link rel="stylesheet" href="{{ asset('css/password.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}">
+    <script src="{{ asset('js/nav-modal.js') }}"></script>
+    <script src="{{ asset('js/profile-dropdown.js') }}"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Management - To Do List</title>
-    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="{{ asset('css/password.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}">
-    
     <style>
         body { font-family: 'Poppins', sans-serif; background-color: #f0f2f5; color: #333; }
         .main-header { background-color: #1a202c; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-        
         /* Card Styling */
         .note-item { 
             background: #fff; padding: 20px; border-radius: 18px; border: 1px solid #e2e8f0; 
@@ -23,11 +23,9 @@
             display: flex; flex-direction: column; min-height: 250px;
         }
         .note-item:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.08); border-color: #8b5cf6; }
-        
         /* Progress Styling */
         .progress { background-color: #edf2f7; height: 8px; border-radius: 10px; }
         .progress-bar { transition: width 0.6s ease; border-radius: 10px; }
-
         /* Checklist */
         /* Update class ini di bagian <style> */
         .checklist-item { 
@@ -39,7 +37,6 @@
             transition: 0.2s;
             width: 100%; /* Pastikan mengambil lebar penuh */
         }
-
         /* Tambahkan ini untuk memaksa teks membungkus (wrap) */
         .checklist-item span {
             word-break: break-word; /* Memecah kata yang terlalu panjang */
@@ -47,7 +44,6 @@
             flex: 1;                /* Mengambil sisa ruang yang tersedia */
             line-height: 1.4;
         }
-
         /* Opsional: Jika judul project (h5) juga sering panjang, tambahkan ini */
         .note-item h5 {
             word-break: break-word;
@@ -56,19 +52,15 @@
         }
         .checklist-item:hover { background: #f8fafc; border-radius: 8px; }
         .strikethrough { text-decoration: line-through; color: #a0aec0; }
-        
         .subtask-input { border-radius: 10px !important; border: 1px dashed #cbd5e0 !important; background: #f8fafc !important; font-size: 13px !important; }
-        
         /* Done Column Styling */
         .done-column { background: #e2e8f0; border-radius: 20px; padding: 20px; min-height: 80vh; }
         .done-card { opacity: 0.85; filter: grayscale(0.5); border-left: 5px solid #2ecc71 !important; }
-        
         .cursor-pointer { cursor: pointer; }
     </style>
 </head>
 <body>
     @include('components.nav-modal-structure')
-
     <header class="main-header">
         <div class="header-logo-container">
             <a href="javascript:void(0)" class="header-brand-link" onclick="openNavModal()" style="text-decoration: none !important; color: white !important;">
@@ -77,31 +69,53 @@
                 </div>
             </a>
         </div>
-
-        <div class="user-profile-wrapper" style="position: relative;">
-            <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
-                <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
-            </div>
-
-            <div id="profileDropdownMenu" class="hidden" style="position: absolute; right: 0; top: 100%; mt: 10px; width: 150px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; display: none; flex-direction: column; overflow: hidden;">
-                <div style="padding: 10px 15px; border-bottom: 1px solid #eee; font-size: 14px; font-weight: bold; color: #333;">
-                    {{ auth()->user()->name }}
+        <div class="d-flex align-items-center gap-3">
+            @if(auth()->check() && auth()->user()->role === 'superadmin')
+                <a href="{{ route('setting.index') }}" class="text-white opacity-75 hover-opacity-100" title="Settings">
+                    <i class="bi bi-gear-fill" style="font-size: 1.3rem;"></i>
+                </a>
+            @endif
+            <div class="user-profile-wrapper" style="position: relative;">
+                @if(auth()->check() && auth()->user()->role === 'superadmin')
+                    <a href="{{ route('setting.index') }}" class="user-profile-icon" title="Setting User" style="cursor: pointer; text-decoration: none; color: inherit;">
+                        @if(auth()->user()->photo)
+                            <img src="{{ Storage::url(auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                        @else
+                            <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
+                        @endif
+                    </a>
+                @else
+                    <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
+                        @if(auth()->check() && auth()->user()->photo)
+                            <img src="{{ Storage::url(auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                        @else
+                            <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
+                        @endif
+                    </div>
+                @endif
+                <div id="profileDropdownMenu" class="hidden" style="position: absolute; right: 0; top: 100%; mt: 10px; width: 150px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; display: none; flex-direction: column; overflow: hidden;">
+                    <div style="padding: 10px 15px; border-bottom: 1px solid #eee; font-size: 14px; font-weight: bold; color: #333;">
+                        {{ auth()->user()->name ?? 'User' }}
+                    </div>
+                    <a href="{{ route('profile.edit') }}" style="padding: 10px 15px; text-decoration: none; color: #333; font-size: 14px; display: flex; align-items: center; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#f5f5f5'" onmouseout="this.style.backgroundColor='transparent'">
+                        <i class="bi bi-person me-2"></i> Profile
+                    </a>
+                    <form action="{{ route('logout') }}" method="POST" id="logout-form">
+                        @csrf
+                        <button type="submit" style="width: 100%; text-align: left; padding: 10px 15px; background: none; border: none; font-size: 14px; color: #dc3545; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </button>
+                    </form>
                 </div>
-                
-                <form action="{{ route('logout') }}" method="POST" id="logout-form">
-                    @csrf
-                    <button type="submit" style="width: 100%; text-align: left; padding: 10px 15px; background: none; border: none; font-size: 14px; color: #dc3545; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                        <i class="bi bi-box-arrow-right"></i> Logout
-                    </button>
-                </form>
             </div>
         </div>
     </header>
-
     <div class="tabs-section">
-        <a href="{{ url('/todolist') }}" class="tab {{ request()->is('todolist*') ? 'active' : '' }}" style="text-decoration: none; color: White;">To Do List</a>
+        <a href="{{ url('/todolist') }}" class="tab {{ request()->is('todolist*') ? 'active' : '' }}" style="text-decoration: none;">To Do List</a>
+        @if(auth()->check() && auth()->user()->role === 'superadmin')
+            <a href="{{ route('jadwalpiket') }}" class="tab {{ request()->is('jadwalpiket*') ? 'active' : '' }}" style="text-decoration: none;">Jadwal Piket</a>
+        @endif
     </div>
-
     <div class="container-fluid mt-4 px-4">
         <div class="row">
             <div class="col-lg-8">
@@ -117,7 +131,6 @@
                         </button>
                     </div>
                 </div>
-
                 <div class="notes-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
                     @forelse($todos as $todo)
                         @php
@@ -125,7 +138,6 @@
                             $completed = collect($todo->checklists ?? [])->where('completed', true)->count();
                             $percent = $total > 0 ? round(($completed / $total) * 100) : 0;
                         @endphp
-                        
                         <div class="note-item" id="todo-card-{{ $todo->id }}">
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <h5 style="font-weight: 700; margin: 0; color: #1e293b;" 
@@ -133,13 +145,11 @@
                                     onblur="updateProjectTitle({{ $todo->id }}, this.innerText)">
                                     {{ $todo->title }}
                                 </h5>
-                                
                                 <div class="d-flex gap-2">
                                     <i class="bi bi-check-circle-fill text-success fs-5 cursor-pointer" onclick="toggleStatus({{ $todo->id }})"></i>
                                     <i class="bi bi-trash text-danger cursor-pointer" onclick="deleteTodo({{ $todo->id }})"></i>
                                 </div>
                             </div>
-
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between mb-1" style="font-size: 11px; font-weight: 600;">
                                     <span>Progress</span>
@@ -149,14 +159,12 @@
                                     <div class="progress-bar" style="width: {{ $percent }}%; background-color: #8b5cf6;"></div>
                                 </div>
                             </div>
-
                             <div class="checklist-area mb-3" style="max-height: 250px; overflow-y: auto; overflow-x: hidden; flex-grow: 1;">
                                 @foreach($todo->checklists ?? [] as $item)
                                     <div class="checklist-item">
                                         <input type="checkbox" {{ $item['completed'] ? 'checked' : '' }} 
                                             onchange="toggleSubTask('{{ $todo->id }}', '{{ $item['id'] }}')" 
                                             class="form-check-input cursor-pointer" style="min-width: 18px;"> 
-                                        
                                         <span class="{{ $item['completed'] ? 'strikethrough' : '' }}" 
                                             style="font-size: 13px;" 
                                             contenteditable="true"
@@ -166,7 +174,6 @@
                                     </div>
                                 @endforeach
                             </div>
-
                             <input type="text" class="form-control form-control-sm subtask-input" 
                                    placeholder="+ Tambah sub-task..." 
                                    onkeypress="if(event.key === 'Enter') addSubTask('{{ $todo->id }}', this)">
@@ -176,11 +183,9 @@
                     @endforelse
                 </div>
             </div>
-
             <div class="col-lg-4">
                 <div class="done-column">
                     <h4 class="mb-4" style="font-weight: 700;"><i class="bi bi-check-all text-success"></i> Completed</h4>
-                    
                     @forelse($dones as $done)
                         <div class="note-item done-card mb-3" style="min-height: auto; padding: 15px;">
                             <div class="d-flex justify-content-between align-items-center">
@@ -202,14 +207,11 @@
             </div>
         </div>
     </div>
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="{{ asset('js/nav-modal.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     {{-- Script untuk dropdown profile dan CRUD To Do List --}}
     <script>
     $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } });
-
     // Konfigurasi Toast (Notifikasi kecil di pojok untuk auto-save)
     const Toast = Swal.mixin({
         toast: true,
@@ -218,21 +220,18 @@
         timer: 2000,
         timerProgressBar: true
     });
-
     // --- UI Logic ---
     $('#profileDropdownTrigger').on('click', function(e) {
         e.stopPropagation();
         $('#profileDropdownMenu').fadeToggle(200);
     });
     $(document).on('click', () => $('#profileDropdownMenu').fadeOut(200));
-
     function handleTextareaEnter(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             saveTodo();
         }
     }
-
     // --- CRUD Utama ---
     function saveTodo() {
         let title = $('#todoInput').val();
@@ -240,7 +239,6 @@
             Swal.fire({ icon: 'error', title: 'Oops...', text: 'Nama project tidak boleh kosong!' });
             return;
         }
-
         $.post("{{ route('todolist.store') }}", { title: title }, function() {
             Swal.fire({
                 icon: 'success',
@@ -251,14 +249,12 @@
             }).then(() => location.reload());
         });
     }
-
     function toggleStatus(id) {
         $.post("/todolist/toggle/" + id, () => {
             Toast.fire({ icon: 'success', title: 'Status berhasil diperbarui' })
             .then(() => location.reload());
         });
     }
-
     function deleteTodo(id) {
         Swal.fire({
             title: 'Hapus Project?',
@@ -282,7 +278,6 @@
             }
         });
     }
-
     // --- Edit In-Place (Auto-Save) ---
     function updateProjectTitle(id, newTitle) {
         if (!newTitle.trim()) return;
@@ -290,7 +285,6 @@
             Toast.fire({ icon: 'success', title: 'Judul disimpan' });
         });
     }
-
     function updateSubTaskText(todoId, subtaskId, newText) {
         if (!newText.trim()) return;
         $.post(`/todolist/subtask/update/${todoId}`, {
@@ -300,7 +294,6 @@
             Toast.fire({ icon: 'success', title: 'Perubahan disimpan' });
         });
     }
-
     // --- Sub-task Logic ---
     function addSubTask(todoId, inputElement) {
         let text = $(inputElement).val();
@@ -310,7 +303,6 @@
             .then(() => location.reload());
         });
     }
-
     function toggleSubTask(todoId, subtaskId) {
         $.post(`/todolist/subtask/toggle/${todoId}`, { subtask_id: subtaskId }, () => {
             // Reload tanpa alert untuk UX yang lebih cepat pada checkbox
@@ -320,3 +312,4 @@
 </script>
 </body>
 </html>
+

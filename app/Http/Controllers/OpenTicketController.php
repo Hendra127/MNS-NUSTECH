@@ -9,32 +9,37 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\TicketExport;
 use App\Imports\TicketImport;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class OpenTicketController extends Controller
 {
     public function index(Request $request)
     {
-        // Menghitung jumlah open dan open hari ini
+        // 1. Menghitung jumlah open dan open hari ini
         $openAllCount = Ticket::where('status', 'open')->count();
         $openTodayCount = Ticket::where('status', 'open')
-                                ->whereDate('created_at', Carbon::today())
+                                ->whereDate('created_at', \Carbon\Carbon::today())
                                 ->count();
-
-        // Menghitung jumlah open per kategori
-        $countBMN = Ticket::where('status', 'open')->where('kategori', 'BMN')->count();
-        $countSL = Ticket::where('status', 'open')->where('kategori', 'SL')->count();
-
-        // Mengambil semua input untuk filter & search
+    
+        // 2. PERBAIKAN DISINI: Menghitung jumlah menggunakan teks asli database
+        $countBMN = Ticket::where('status', 'open')
+                          ->where('kategori', 'BARANG MILIK NEGARA (BMN)')
+                          ->count();
+                          
+        $countSL = Ticket::where('status', 'open')
+                         ->where('kategori', 'SEWA LAYANAN')
+                         ->count();
+    
+        // 3. Mengambil semua input untuk filter & search
         $search = $request->q;
         $status_tiket = $request->status_tiket;
         $kategori = $request->kategori;
         $provinsi = $request->provinsi;
-
-        // Query dasar
+    
+        // 4. Query dasar
         $tickets = Ticket::with('site')
-            ->where('status', 'open') // Tetap memfilter status utama 'open'
+            ->where('status', 'open')
             
-            // Filter Search (Site Code, Nama, Kabupaten)
             ->when($search, function ($q) use ($search) {
                 $q->where(function($query) use ($search) {
                     $query->where('site_code', 'like', "%$search%")
@@ -42,29 +47,27 @@ class OpenTicketController extends Controller
                         ->orWhere('kabupaten', 'like', "%$search%");
                 });
             })
-
-            // Filter Status Tiket (dari Modal)
+    
             ->when($status_tiket, function ($q) use ($status_tiket) {
                 return $q->where('status_tiket', $status_tiket);
             })
-
-            // Filter Kategori (dari Modal)
+    
+            // Jika user memfilter kategori lewat modal, pastikan value di modal juga sesuai
             ->when($kategori, function ($q) use ($kategori) {
                 return $q->where('kategori', $kategori);
             })
-
-            // Filter Provinsi (dari Modal)
+    
             ->when($provinsi, function ($q) use ($provinsi) {
                 return $q->where('provinsi', 'like', "%$provinsi%");
             })
-
+    
             ->latest()
             ->paginate(20)
-            ->withQueryString(); // Sangat penting agar filter tidak hilang saat pindah halaman (pagination)
-
-        $sites = Site::orderBy('site_id', 'asc')->get();
-        $today = Ticket::whereDate('created_at', Carbon::today())->count();
-
+            ->withQueryString();
+    
+        $sites = \App\Models\Site::orderBy('site_id', 'asc')->get();
+        $today = Ticket::whereDate('created_at', \Carbon\Carbon::today())->count();
+    
         return view('open', compact('tickets', 'sites', 'search', 'today', 'openAllCount', 'openTodayCount', 'countBMN', 'countSL'));
     }
     public function store(Request $request)
@@ -84,7 +87,25 @@ class OpenTicketController extends Controller
             'status'         => 'required|string',
             'plan_actions'    => 'nullable|string',
             'ce'             => 'nullable|string',
+            'evidence'       => 'nullable|file|mimes:jpg,jpeg,png,mp4,mov,avi|max:20480',
         ]);
+
+
+        // Cek apakah sudah ada tiket OPEN untuk site tersebut
+        $existingTicket = Ticket::where('site_id', $request->site_id)
+                                ->where('status', 'open')
+                                ->first();
+
+        if ($existingTicket) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', "Gagal! Tiket untuk Site {$request->nama_site} sudah ada dan masih berstatus OPEN.");
+        }
+
+        // Handle File Upload
+        if ($request->hasFile('evidence')) {
+            $data['evidence'] = $request->file('evidence')->store('evidence', 'public');
+        }
 
         // Otomatisasi nama bulan berdasarkan tanggal rekap
         if ($request->filled('tanggal_rekap')) {
@@ -120,6 +141,7 @@ class OpenTicketController extends Controller
             'detail_problem' => 'required',
             'plan_actions'    => 'required',
             'ce'             => 'required',
+            'evidence'       => 'nullable|file|mimes:jpg,jpeg,png,mp4,mov,avi|max:20480',
         ]);
 
         $ticket = Ticket::findOrFail($id);
@@ -132,6 +154,15 @@ class OpenTicketController extends Controller
         $ticket->plan_actions    = $request->plan_actions;
         $ticket->ce             = $request->ce;
         
+        // Handle File Upload
+        if ($request->hasFile('evidence')) {
+            // Delete old file if exists
+            if ($ticket->evidence) {
+                Storage::disk('public')->delete($ticket->evidence);
+            }
+            $ticket->evidence = $request->file('evidence')->store('evidence', 'public');
+        }
+
         // Update bulan_open otomatis
         $ticket->bulan_open     = \Carbon\Carbon::parse($request->tanggal_rekap)->format('F');
 
@@ -150,25 +181,29 @@ class OpenTicketController extends Controller
     // Di dalam Controller Anda
     public function closeTicket(Request $request, $id)
     {
-        $ticket = Ticket::findOrFail($id);
-
-        // 1. Ambil waktu sekarang
-        $now = \Carbon\Carbon::now();
-        $tanggalOpen = \Carbon\Carbon::parse($ticket->tanggal_rekap);
-
-        // 2. Hitung durasi akhir (selisih hari dari open sampai hari ini)
-        $durasi = $tanggalOpen->diffInDays($now);
-
-        // 3. Update status menjadi 'closed' dan isi tanggal_close
-        $ticket->update([
-            'status'        => 'closed',      // Ubah status ke closed
-            'tanggal_close' => $now->toDateString(), // Isi tanggal hari ini (YYYY-MM-DD)
-            'durasi'        => $durasi,       // Update durasi final
-            'bulan_close'   => $now->format('F'), // Opsional: Isi nama bulan close
+        $request->validate([
+            'tanggal_close' => 'required|date',
+            'detail_problem' => 'required',
+            'plan_actions' => 'required',
         ]);
 
-        // Redirect dengan pesan sukses
-        return redirect()->back()->with('success', 'Tiket ' . $ticket->nama_site . ' berhasil dipindahkan ke Close Ticket.');
+        $ticket = Ticket::findOrFail($id);
+
+        $tanggalOpen = \Carbon\Carbon::parse($ticket->tanggal_rekap);
+        $tanggalClose = \Carbon\Carbon::parse($request->tanggal_close);
+
+        $durasi = $tanggalOpen->diffInDays($tanggalClose);
+
+        $ticket->update([
+            'status'        => 'closed',
+            'tanggal_close' => $request->tanggal_close,
+            'durasi'        => $durasi,
+            'bulan_close'   => $tanggalClose->format('F'),
+            'detail_problem'=> $request->detail_problem,
+            'plan_actions'  => $request->plan_actions,
+        ]);
+
+        return redirect()->back()->with('success', 'Tiket ' . $ticket->nama_site . ' berhasil dipindahkan ke Close Tiket.');
     }
     
 }
