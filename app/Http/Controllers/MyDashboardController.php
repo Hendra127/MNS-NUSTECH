@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use App\Models\Message; // Import model Message
 use App\Models\JadwalPiket; // Import model Piket
 use App\Models\LaporanCM; // Import model LaporanCM
+use Illuminate\Support\Facades\Log;
 
 class MyDashboardController extends Controller
 {
@@ -129,7 +130,10 @@ class MyDashboardController extends Controller
                 
                 // AMBIL DARI RELASI SITE
                 'latitude'  => $ticket->site?->latitude ?? 0, 
-                'longitude' => $ticket->site?->longitude ?? 0
+                'longitude' => $ticket->site?->longitude ?? 0,
+                'ip_router' => $ticket->site?->ip_router ?? '-',
+                'tipe'      => $ticket->site?->tipe ?? '-',
+                'wg_tunnel' => 'client_' . str_pad($ticket->site?->id ?? 0, 5, '0', STR_PAD_LEFT)
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -183,6 +187,41 @@ public function storeMessage(Request $request)
 
     // Tambahkan atribut tambahan agar JS bisa langsung baca label (ADMIN)
     $chat->is_sender_admin = $user ? (bool)$user->is_admin : false;
+
+    // === KIRIM NOTIFIKASI WHATSAPP VIA FONNTE ===
+    try {
+        $senderName = $user ? $user->name : ($request->guest_name ?? 'Guest');
+        $isAdmin = $user ? ($user->is_admin ? ' (Admin)' : '') : '';
+        $waMessage = "💬 *Chat Baru di Dashboard*\n\n"
+                   . "👤 *Dari:* {$senderName}{$isAdmin}\n"
+                   . "📝 *Pesan:* {$request->message}\n"
+                   . "🕐 *Waktu:* " . now()->timezone('Asia/Makassar')->format('d/m/Y H:i') . " WITA";
+
+        $fonteToken = env('FONNTE_TOKEN');
+        $targetNumber = env('WHATSAPP_NOTIFY_NUMBER', '6281332809923');
+
+        if ($fonteToken) {
+            $curl = curl_init();
+            curl_setopt_array($curl, [
+                CURLOPT_URL => 'https://api.fonnte.com/send',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_HTTPHEADER => [
+                    'Authorization: ' . $fonteToken,
+                ],
+                CURLOPT_POSTFIELDS => [
+                    'target' => $targetNumber,
+                    'message' => $waMessage,
+                ],
+                CURLOPT_TIMEOUT => 5,
+            ]);
+            $waResult = curl_exec($curl);
+            \Log::info('Fonnte WA Response: ' . $waResult);
+            curl_close($curl);
+        }
+    } catch (\Exception $e) {
+        \Log::error('Fonnte WA Error: ' . $e->getMessage());
+    }
 
     return response()->json($chat);
 }

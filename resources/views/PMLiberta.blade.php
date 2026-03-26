@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    @include('partials.pwa-head')
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="stylesheet" href="{{ asset('css/password.css') }}">
@@ -30,10 +31,28 @@
             padding: 20px;
             background: transparent;
         }
-        .filter-btn i {
-            color: #555;
-            font-size: 1.1rem;
+        .btn-filter-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(13,110,253,0.3);
+        }
+        .btn-filter-pill:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(13,110,253,0.4);
+        }
+        [data-bs-theme="dark"] .btn-filter-pill {
+            background: linear-gradient(135deg, #1a6fc4, #0d5dbc);
         }
         .summary-badge {
             font-size: 12px;
@@ -228,10 +247,11 @@
         <a href="{{ route('laporancm') }}" class="tab {{ request()->is('laporancm*') ? 'active' : '' }}" style="text-decoration: none;">Correctiv Maintenance</a>
         <a href="{{ route('pmliberta') }}" class="tab {{ request()->is('PMLiberta*') ? 'active' : '' }}" style="text-decoration: none;">Preventive Maintenance</a>
         <a href="{{ route('summarypm') }}" class="tab {{ request()->is('summarypm*') ? 'active' : '' }}" style="text-decoration: none;">PM Summary</a>
-        <div class="ms-auto d-flex align-items-center">
-            <span class="summary-badge text-black">Total BMN Done : <b>&nbsp;{{ $totalBMNDone }}</b></span>
-            <span class="summary-badge text-black">Total SL Done : <b>&nbsp;{{ $totalSLDone }}</b></span>
-            <span class="summary-badge text-dark">Pending Total : <b>&nbsp;{{ $totalPending }}</b></span>
+        <div class="ms-auto d-flex align-items-center flex-wrap gap-2">
+            <span class="summary-badge text-black">BMN Done: <b>&nbsp;{{ $totalBMNDone }}</b></span>
+            <span class="summary-badge text-black">SL Done: <b>&nbsp;{{ $totalSLDone }}</b></span>
+            <span class="summary-badge text-black">HOLD: <b>&nbsp;{{ $totalHold }}</b></span>
+            <span class="summary-badge text-dark">Pending: <b>&nbsp;{{ $totalPending }}</b></span>
         </div>
     </div>
     <!-- CARD -->
@@ -257,20 +277,22 @@
                     style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
                 </a>
             </div>
-            <form method="GET" action="{{ route('pmliberta') }}" class="search-form" id="searchForm">
-                <div class="search-box d-flex align-items-center">
-                    <button type="button" class="filter-btn" data-bs-toggle="modal" data-bs-target="#modalFilter" style="background: none; border: none; padding-left: 15px;">
-                        <i class="bi bi-sliders2"></i>
-                    </button>
-                    {{-- Hidden inputs untuk mempertahankan filter saat mencari --}}
-                    @if(request('kategori')) <input type="hidden" name="kategori" value="{{ request('kategori') }}"> @endif
-                    @if(request('status')) <input type="hidden" name="status" value="{{ request('status') }}"> @endif
-                    @if(request('tgl_mulai')) <input type="hidden" name="tgl_mulai" value="{{ request('tgl_mulai') }}"> @endif
-                    @if(request('tgl_selesai')) <input type="hidden" name="tgl_selesai" value="{{ request('tgl_selesai') }}"> @endif
-                    <input type="text" id="searchInput" name="q" placeholder="Search..." value="{{ request('q') }}" autocomplete="off" style="flex-grow: 1; border: none; outline: none;">
-                    <button type="submit" class="search-btn">🔍</button>
-                </div>
-            </form>
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn-filter-pill" data-bs-toggle="modal" data-bs-target="#modalFilter">
+                    <i class="bi bi-funnel"></i> Filter
+                </button>
+                <form method="GET" action="{{ route('pmliberta') }}" class="search-form" id="searchForm">
+                    <div class="search-box d-flex align-items-center">
+                        {{-- Hidden inputs untuk mempertahankan filter saat mencari --}}
+                        @if(request('kategori')) <input type="hidden" name="kategori" value="{{ request('kategori') }}"> @endif
+                        @if(request('status')) <input type="hidden" name="status" value="{{ request('status') }}"> @endif
+                        @if(request('tgl_mulai')) <input type="hidden" name="tgl_mulai" value="{{ request('tgl_mulai') }}"> @endif
+                        @if(request('tgl_selesai')) <input type="hidden" name="tgl_selesai" value="{{ request('tgl_selesai') }}"> @endif
+                        <input type="text" id="searchInput" name="q" placeholder="Search..." value="{{ request('q') }}" autocomplete="off" style="flex-grow: 1; border: none; outline: none; padding-left: 15px;">
+                        <button type="submit" class="search-btn">🔍</button>
+                    </div>
+                </form>
+            </div>
         </div>
         <div class="table-responsive-custom" style="overflow-x: auto; max-width: 100%;">
             <table class="table table-bordered">
@@ -303,8 +325,16 @@
                         <td class="text-center">{{ $item->month }}</td>
                         <td class="text-center">{{ \Carbon\Carbon::parse($item->date)->format('d/m/Y') }}</td>
                         <td class="text-center">
-                            <span class="badge text-black{{ $item->status == 'Done' }}">
-                                {{ $item->status }}
+                            @php
+                                $displayStatus = $item->status ?: 'PENDING';
+                                $badgeClass = 'bg-secondary';
+                                if (strtoupper($displayStatus) == 'DONE') $badgeClass = 'bg-success';
+                                elseif (strtoupper($displayStatus) == 'PENDING') $badgeClass = 'bg-warning';
+                                elseif (strtoupper($displayStatus) == 'ON PROGRESS') $badgeClass = 'bg-info';
+                                elseif (strtoupper($displayStatus) == 'HOLD') $badgeClass = 'bg-danger';
+                            @endphp
+                            <span class="badge {{ $badgeClass }} text-white">
+                                {{ $displayStatus }}
                             </span>
                         </td>
                         <td class="text-center">{{ $item->kategori }}</td>
@@ -404,6 +434,7 @@
                                 <option value="DONE">DONE</option>
                                 <option value="PENDING">PENDING</option>
                                 <option value="ON PROGRESS">ON PROGRESS</option>
+                                <option value="HOLD">HOLD</option>
                             </select>
                         </div>
                     </div>
@@ -487,6 +518,7 @@
                                 <option value="DONE">DONE</option>
                                 <option value="PENDING" selected>PENDING</option>
                                 <option value="ON PROGRESS">ON PROGRESS</option>
+                                <option value="HOLD">HOLD</option>
                             </select>
                         </div>
                         <div class="col-12">
@@ -529,6 +561,7 @@
                                 <option value="DONE" {{ request('status') == 'DONE' ? 'selected' : '' }}>DONE</option>
                                 <option value="PENDING" {{ request('status') == 'PENDING' ? 'selected' : '' }}>PENDING</option>
                                 <option value="ON PROGRESS" {{ request('status') == 'ON PROGRESS' ? 'selected' : '' }}>ON PROGRESS</option>
+                                <option value="HOLD" {{ request('status') == 'HOLD' ? 'selected' : '' }}>HOLD</option>
                             </select>
                         </div>
                         <div class="col-md-6">

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    @include('partials.pwa-head')
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="stylesheet" href="{{ asset('css/password.css') }}">
@@ -17,10 +18,28 @@
     <link rel="stylesheet" href="{{ asset('css/pergantianperangkat.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        .filter-btn i {
-            color: #555;
-            font-size: 1.1rem;
+        .btn-filter-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(13,110,253,0.3);
+        }
+        .btn-filter-pill:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(13,110,253,0.4);
+        }
+        [data-bs-theme="dark"] .btn-filter-pill {
+            background: linear-gradient(135deg, #1a6fc4, #0d5dbc);
         }
         .search-box {
             display: flex;
@@ -33,36 +52,7 @@
             background: transparent;
             flex-grow: 1;
         }
-        /* Sticky Columns CSS */
-        .table-responsive {
-            overflow-x: auto;
-            position: relative;
-        }
-        .table-custom thead th:nth-child(1), 
-        .table-custom thead th:nth-child(2), 
-        .table-custom thead th:nth-child(3) {
-            position: sticky;
-            z-index: 10;
-            background-color: var(--table-navy);
-        }
-        .table-custom tbody td:nth-child(1), 
-        .table-custom tbody td:nth-child(2), 
-        .table-custom tbody td:nth-child(3) {
-            position: sticky;
-            z-index: 5;
-        }
-        /* Column Offsets */
-        .table-custom th:nth-child(1), .table-custom td:nth-child(1) { left: 0; min-width: 50px; }
-        .table-custom th:nth-child(2), .table-custom td:nth-child(2) { left: 50px; min-width: 100px; }
-        .table-custom th:nth-child(3), .table-custom td:nth-child(3) { left: 150px; min-width: 180px; }
-        /* Background for sticky cells to prevent transparency */
-        .table-custom tbody tr:nth-child(odd) td:nth-child(-n+3) { background-color: white; }
-        .table-custom tbody tr:nth-child(even) td:nth-child(-n+3) { background-color: #f8f9fa; }
-        /* Separation shadow for sticky columns */
-        .table-custom th:nth-child(3), .table-custom td:nth-child(3) {
-            border-right: 2px solid #ddd !important;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
-        }
+
     </style>
 </head>
 <body>
@@ -144,27 +134,29 @@
                 @endif
                 <a href="{{ route('pergantianperangkat.export') }}" class="btn-action bi bi-download" title="Download Excel" style="text-decoration: none;"></a>
             </div>
-            <form method="GET" action="{{ route('pergantianperangkat') }}" class="search-form" id="filterForm">
-                <div class="search-box">
-                    <button type="button" class="filter-btn" data-bs-toggle="modal" data-bs-target="#modalFilter" style="background: none; border: none; padding-left: 15px;">
-                        <i class="bi bi-sliders2"></i>
-                    </button>
-                    <input type="text" name="search" id="searchInput" placeholder="Search" value="{{ request('search') }}">
-                    <button type="submit" class="search-btn">🔍</button>
-                </div>
-                <!-- Fields to keep filters active during search -->
-                @if(request('perangkat')) <input type="hidden" name="perangkat" value="{{ request('perangkat') }}"> @endif
-                @if(request('tgl_mulai')) <input type="hidden" name="tgl_mulai" value="{{ request('tgl_mulai') }}"> @endif
-                @if(request('tgl_selesai')) <input type="hidden" name="tgl_selesai" value="{{ request('tgl_selesai') }}"> @endif
-            </form>
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn-filter-pill" data-bs-toggle="modal" data-bs-target="#modalFilter">
+                    <i class="bi bi-funnel"></i> Filter
+                </button>
+                <form method="GET" action="{{ route('pergantianperangkat') }}" class="search-form" id="filterForm">
+                    <div class="search-box">
+                        <input type="text" name="search" id="searchInput" placeholder="Search" value="{{ request('search') }}" style="padding-left: 15px;">
+                        <button type="submit" class="search-btn">🔍</button>
+                    </div>
+                    <!-- Fields to keep filters active during search -->
+                    @if(request('perangkat')) <input type="hidden" name="perangkat" value="{{ request('perangkat') }}"> @endif
+                    @if(request('tgl_mulai')) <input type="hidden" name="tgl_mulai" value="{{ request('tgl_mulai') }}"> @endif
+                    @if(request('tgl_selesai')) <input type="hidden" name="tgl_selesai" value="{{ request('tgl_selesai') }}"> @endif
+                </form>
+            </div>
         </div>
-        <div class="table-responsive">
-            <table class="table-custom">
+        <div class="table-responsive-custom">
+            <table>
                 <thead>
                     <tr class="thead-dark">
-                        <th>NO</th>
-                        <th>SITE ID</th>
-                        <th>NAMA SITE</th>
+                        <th class="text-center sticky-col col-no">NO</th>
+                        <th class="sticky-col col-site-id">SITE ID</th>
+                        <th class="sticky-col col-nama_site">NAMA SITE</th>
                         <th>PERANGKAT</th>
                         <th>TANGGAL</th>
                         <th>SN LAMA</th>
@@ -178,9 +170,9 @@
                 <tbody>
                     @forelse($data as $index => $item)
                     <tr>
-                        <td class="text-center">{{ $index + 1 }}</td>
-                        <td>{{ $item->site->site_id ?? '-' }}</td>
-                        <td>{{ $item->site->sitename ?? '-' }}</td>
+                        <td class="text-center sticky-col col-no">{{ $index + 1 }}</td>
+                        <td class="sticky-col col-site-id">{{ $item->site->site_id ?? '-' }}</td>
+                        <td class="sticky-col col-nama_site">{{ $item->site->sitename ?? '-' }}</td>
                         <td>{{ $item->perangkat }}</td>
                         <td>{{ $item->tanggal_penggantian }}</td>
                         <td>{{ $item->sn_lama ?? '-' }}</td>

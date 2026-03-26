@@ -24,6 +24,7 @@ use App\Http\Controllers\SummaryPMController;
 use App\Http\Controllers\LandingpageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\RemoteLogController;
 
 /* |-------------------------------------------------------------------------- | Web Routes |-------------------------------------------------------------------------- */
 // --- MY DASHBOARD & CHAT ROUTES ---
@@ -33,6 +34,9 @@ Route::post('/chat/send', [MyDashboardController::class , 'storeMessage'])->name
 Route::get('/chat/fetch', [MyDashboardController::class , 'fetchMessages'])->name('chat.fetch');
 Route::get('/tickets/filter', [MyDashboardController::class , 'getFilteredTickets'])->name('tickets.filter');
 Route::get('/dashboard/stats', [MyDashboardController::class , 'fetchStats'])->name('dashboard.stats');
+
+// --- REMOTE LOG (AJAX store - harus login) ---
+Route::post('/remote-log/store', [RemoteLogController::class , 'store'])->name('remotelog.store')->middleware('auth');
 
 // Halaman Utama (Landing Page)
 Route::get('/', [LandingpageController::class , 'index'])->name('landingpage');
@@ -48,6 +52,9 @@ Route::post('/logout', [AuthController::class , 'logout'])->name('logout');
 
 // --- PROTECTED ROUTES (Harus login dulu) ---
 Route::middleware(['auth'])->group(function () {
+
+    // --- REMOTE LOG AUDIT TRAIL ---
+    Route::get('/remote-log', [RemoteLogController::class , 'index'])->name('remotelog')->middleware('role:superadmin');
 
     // --- SITES / DATASITE ROUTES ---
     Route::get('/sites/export', [SiteController::class , 'export'])->name('sites.export');

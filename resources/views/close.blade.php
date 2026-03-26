@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    @include('partials.pwa-head')
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="stylesheet" href="{{ asset('css/password.css') }}">
@@ -43,10 +44,28 @@
             padding: 20px;
             background: transparent;
         }
-        .filter-btn i {
-            color: #555;
-            font-size: 1.1rem;
+        .btn-filter-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(13,110,253,0.3);
+        }
+        .btn-filter-pill:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(13,110,253,0.4);
+        }
+        [data-bs-theme="dark"] .btn-filter-pill {
+            background: linear-gradient(135deg, #1a6fc4, #0d5dbc);
         }
         .tabs-section {
             flex-wrap: wrap;
@@ -74,42 +93,6 @@
                 width: 100%;
             }
         }
-        /* Sync with Open Page Table Style */
-        .table-container {
-            overflow-x: auto;
-            max-height: 600px;
-            overflow-y: auto;
-        }
-        .table-container table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .table-container thead th {
-            position: sticky;
-            top: 0;
-            background-color: #1B435D !important;
-            color: white !important;
-            z-index: 10;
-            padding: 10px 12px;
-            font-size: 12px;
-            text-align: center;
-            border: 1px solid #2c5a75;
-        }
-        .table-container tbody td {
-            padding: 8px 12px !important; /* More compact spacing */
-            font-size: 13px;
-            border: 1px solid #dee2e6;
-            vertical-align: middle;
-        }
-        .sticky-col {
-            position: sticky !important;
-            background-color: white;
-            z-index: 5;
-        }
-        .col-no { left: 0; min-width: 50px; }
-        .col-site-id { left: 50px; min-width: 100px; }
-        .col-nama_site { left: 150px; min-width: 200px; border-right: 2px solid #dee2e6 !important; }
-        thead th.sticky-col { z-index: 15 !important; background-color: #1B435D !important; }
     </style>
 </head>
 <body>
@@ -177,17 +160,20 @@
             <div class="actions">
                 <a href="{{ route('close.ticket.export') }}" class="btn-action bi bi-download" title="Download Excel" style="text-decoration: none; line-height: 1.8;"></a>
             </div>
-            <form method="GET" action="{{ route('close.ticket') }}" class="search-form">
-                <div class="search-box d-flex align-items-center">
-                    <button type="button" class="filter-btn" data-bs-toggle="modal" data-bs-target="#modalFilter" style="background: none; border: none; padding-left: 15px;">
-                        <i class="bi bi-sliders2"></i> </button>
-                    <input type="text" id="searchInput" name="q" placeholder="Search..." value="{{ request('q') }}" style="flex-grow: 1; border: none; outline: none;">
-                    <button type="submit" class="search-btn">🔍</button>
-                </div>
-            </form>
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn-filter-pill" data-bs-toggle="modal" data-bs-target="#modalFilter">
+                    <i class="bi bi-funnel"></i> Filter
+                </button>
+                <form method="GET" action="{{ route('close.ticket') }}" class="search-form">
+                    <div class="search-box d-flex align-items-center">
+                        <input type="text" id="searchInput" name="q" placeholder="Search..." value="{{ request('q') }}" style="flex-grow: 1; border: none; outline: none; padding-left: 15px;">
+                        <button type="submit" class="search-btn">🔍</button>
+                    </div>
+                </form>
+            </div>
         </div>
         {{-- TABLE --}}
-        <div class="table-container">
+        <div class="table-responsive-custom">
             <table>
                 <thead>
                     <tr>

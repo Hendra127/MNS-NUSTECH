@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    @include('partials.pwa-head')
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="stylesheet" href="{{ asset('css/password.css') }}">

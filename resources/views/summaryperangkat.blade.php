@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    @include('partials.pwa-head')
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="stylesheet" href="{{ asset('css/password.css') }}">
@@ -29,34 +30,7 @@
         .stat-card-gradient-2 { background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%); }
         .stat-card-gradient-3 { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
         .stat-card-gradient-4 { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
-        .table-custom {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 8px;
-        }
-        .table-custom thead th {
-            background: transparent;
-            color: #94a3b8;
-            font-weight: 800;
-            text-transform: uppercase;
-            font-size: 10px;
-            letter-spacing: 1px;
-            padding: 12px 20px;
-            border: none;
-        }
-        .table-custom tbody tr {
-            background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-            border-radius: 16px;
-        }
-        .table-custom td {
-            padding: 16px 20px;
-            border: none;
-            font-size: 13px;
-            font-weight: 600;
-        }
-        .table-custom td:first-child { border-radius: 16px 0 0 16px; color: #071152; font-weight: 800; }
-        .table-custom td:last-child { border-radius: 0 16px 16px 0; }
+
     </style>
 </head>
 <body>
@@ -206,8 +180,8 @@
                     </div>
                     <div class="bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider">LIVE STOCK</div>
                 </div>
-                <div class="table-responsive">
-                    <table class="table-custom">
+                <div class="table-responsive-custom">
+                    <table>
                         <thead>
                             <tr>
                                 <th>JENIS PERANGKAT</th>
@@ -275,8 +249,8 @@
                     </div>
                     <a href="{{ route('pergantianperangkat') }}" class="text-indigo-600 font-bold text-[10px] uppercase tracking-wider hover:underline">Lihat Semua</a>
                 </div>
-                <div class="table-responsive">
-                    <table class="table-custom">
+                <div class="table-responsive-custom">
+                    <table>
                         <thead>
                             <tr>
                                 <th>PERANGKAT</th>

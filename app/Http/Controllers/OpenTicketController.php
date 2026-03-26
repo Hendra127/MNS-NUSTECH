@@ -67,8 +67,9 @@ class OpenTicketController extends Controller
     
         $sites = \App\Models\Site::orderBy('site_id', 'asc')->get();
         $today = Ticket::whereDate('created_at', \Carbon\Carbon::today())->count();
+        $wgTunnels = config('wireguard.tunnels', []);
     
-        return view('open', compact('tickets', 'sites', 'search', 'today', 'openAllCount', 'openTodayCount', 'countBMN', 'countSL'));
+        return view('open', compact('tickets', 'sites', 'search', 'today', 'openAllCount', 'openTodayCount', 'countBMN', 'countSL', 'wgTunnels'));
     }
     public function store(Request $request)
     {

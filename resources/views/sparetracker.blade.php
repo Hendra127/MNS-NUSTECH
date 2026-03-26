@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    @include('partials.pwa-head')
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="stylesheet" href="{{ asset('css/password.css') }}">
@@ -70,10 +71,28 @@
             line-height: 1.2 !important;
             vertical-align: middle !important;
         }
-        .filter-btn i {
-            color: #555;
-            font-size: 1.1rem;
+        .btn-filter-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(13,110,253,0.3);
+        }
+        .btn-filter-pill:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(13,110,253,0.4);
+        }
+        [data-bs-theme="dark"] .btn-filter-pill {
+            background: linear-gradient(135deg, #1a6fc4, #0d5dbc);
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -156,21 +175,23 @@
                 <!-- Button Export -->
                 <a href="{{ route('sparetracker.export') }}" class="btn-action bi bi-download" title="Download" style="text-decoration: none;"></a>
             </div>
-            <form method="GET" action="{{ route('sparetracker') }}" class="search-form" id="filterForm">
-                <div class="search-box">
-                    <button type="button" class="filter-btn" data-bs-toggle="modal" data-bs-target="#modalFilter" style="background: none; border: none; padding-left: 15px;">
-                        <i class="bi bi-sliders2"></i>
-                    </button>
-                    <input type="text" name="search" id="searchInput" placeholder="Search..." value="{{ request('search') }}">
-                    <button type="submit" class="search-btn">🔍</button>
-                </div>
-                <!-- Fields to keep filters active during search -->
-                @if(request('kondisi')) <input type="hidden" name="kondisi" value="{{ request('kondisi') }}"> @endif
-                @if(request('tgl_masuk_mulai')) <input type="hidden" name="tgl_masuk_mulai" value="{{ request('tgl_masuk_mulai') }}"> @endif
-                @if(request('tgl_masuk_selesai')) <input type="hidden" name="tgl_masuk_selesai" value="{{ request('tgl_masuk_selesai') }}"> @endif
-                @if(request('tgl_keluar_mulai')) <input type="hidden" name="tgl_keluar_mulai" value="{{ request('tgl_keluar_mulai') }}"> @endif
-                @if(request('tgl_keluar_selesai')) <input type="hidden" name="tgl_keluar_selesai" value="{{ request('tgl_keluar_selesai') }}"> @endif
-            </form>
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn-filter-pill" data-bs-toggle="modal" data-bs-target="#modalFilter">
+                    <i class="bi bi-funnel"></i> Filter
+                </button>
+                <form method="GET" action="{{ route('sparetracker') }}" class="search-form" id="filterForm">
+                    <div class="search-box">
+                        <input type="text" name="search" id="searchInput" placeholder="Search..." value="{{ request('search') }}" style="padding-left: 15px;">
+                        <button type="submit" class="search-btn">🔍</button>
+                    </div>
+                    <!-- Fields to keep filters active during search -->
+                    @if(request('kondisi')) <input type="hidden" name="kondisi" value="{{ request('kondisi') }}"> @endif
+                    @if(request('tgl_masuk_mulai')) <input type="hidden" name="tgl_masuk_mulai" value="{{ request('tgl_masuk_mulai') }}"> @endif
+                    @if(request('tgl_masuk_selesai')) <input type="hidden" name="tgl_masuk_selesai" value="{{ request('tgl_masuk_selesai') }}"> @endif
+                    @if(request('tgl_keluar_mulai')) <input type="hidden" name="tgl_keluar_mulai" value="{{ request('tgl_keluar_mulai') }}"> @endif
+                    @if(request('tgl_keluar_selesai')) <input type="hidden" name="tgl_keluar_selesai" value="{{ request('tgl_keluar_selesai') }}"> @endif
+                </form>
+            </div>
             <!-- Modal Filter -->
             <div class="modal fade" id="modalFilter" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">

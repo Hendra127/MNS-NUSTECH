@@ -31,6 +31,13 @@ class PMLibertaController extends Controller
 
         // 3. Filter Status
         $query->when($request->status, function ($q) use ($request) {
+            if ($request->status === 'PENDING') {
+                return $q->where(function ($sub) {
+                    $sub->where('status', 'PENDING')
+                        ->orWhereNull('status')
+                        ->orWhere('status', '');
+                });
+            }
             return $q->where('status', $request->status);
         });
 
@@ -48,12 +55,17 @@ class PMLibertaController extends Controller
         // Hitung Statistik untuk Pill Badges
         $totalBMNDone = (clone $query)->where('kategori', 'BMN')->where('status', 'DONE')->count();
         $totalSLDone = (clone $query)->where('kategori', 'SL')->where('status', 'DONE')->count();
-        $totalPending = (clone $query)->where('status', 'PENDING')->count();
+        $totalHold = (clone $query)->where('status', 'HOLD')->count();
+        $totalPending = (clone $query)->where(function ($q) {
+            $q->where('status', 'PENDING')
+              ->orWhereNull('status')
+              ->orWhere('status', '');
+        })->count();
 
         // Ambil data dan pertahankan filter saat pindah halaman
         $data = $query->orderBy('date', 'desc')->paginate(15)->withQueryString();
 
-        return view('PMLiberta', compact('data', 'totalBMNDone', 'totalSLDone', 'totalPending', 'sites'));
+        return view('PMLiberta', compact('data', 'totalBMNDone', 'totalSLDone', 'totalHold', 'totalPending', 'sites'));
     }
 
     public function store(Request $request)

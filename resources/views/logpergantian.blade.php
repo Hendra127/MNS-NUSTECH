@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    @include('partials.pwa-head')
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="stylesheet" href="{{ asset('css/password.css') }}">
@@ -88,13 +89,13 @@
                 </div>
             </form>
         </div>
-        <div class="table-responsive">
+        <div class="table-responsive-custom">
             <table>
                 <thead>
                     <tr>
-                        <th>NO.</th>
-                        <th>SITE ID</th>
-                        <th>SITE NAME</th>
+                        <th class="text-center sticky-col col-no">NO.</th>
+                        <th class="sticky-col col-site-id">SITE ID</th>
+                        <th class="sticky-col col-nama_site">SITE NAME</th>
                         <th>TIPE</th>
                         <th>BATCH</th>
                         <th>LATITUDE</th>

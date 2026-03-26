@@ -64,6 +64,9 @@
                     @if(auth()->check() && auth()->user()->role === 'superadmin')
                         <li><a href="{{ route('jadwalpiket') }}"><i class="bi bi-calendar-event me-2"></i> Jadwal Piket</a></li>
                     @endif
+                @if(auth()->check() && auth()->user()->role === 'superadmin')
+                    <li><a href="{{ route('remotelog') }}"><i class="bi bi-shield-lock me-2"></i> Log Remote</a></li>
+                @endif
                 </ul>
             </div>
             

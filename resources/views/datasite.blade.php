@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    @include('partials.pwa-head')
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="stylesheet" href="{{ asset('css/password.css') }}">
@@ -13,7 +14,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/password.css') }}?v={{ filemtime(public_path('css/password.css')) }}">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -44,10 +44,36 @@
             padding: 20px;
             background: transparent;
         }
-        .filter-btn i {
-            color: #555;
-            font-size: 1.1rem;
+        .btn-filter-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(13,110,253,0.3);
+        }
+        .btn-filter-pill:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(13,110,253,0.4);
+        }
+        [data-bs-theme="dark"] .btn-filter-pill {
+            background: linear-gradient(135deg, #1a6fc4, #0d5dbc);
+            box-shadow: 0 2px 8px rgba(13,110,253,0.2);
+        }
+        /* Remote icon dark mode — sama dengan edit & hapus */
+        .btn-remote-action {
+            color: #000;
+        }
+        [data-bs-theme="dark"] .btn-remote-action {
+            color: #7ec8e3 !important; /* cyan-teal sesuai ikon edit di dark mode */
         }
         .tabs-section {
             display: flex;
@@ -91,7 +117,7 @@
                 @if(auth()->check() && auth()->user()->role === 'superadmin')
                     <a href="{{ route('setting.index') }}" class="user-profile-icon" title="Setting User" style="cursor: pointer; text-decoration: none; color: inherit;">
                         @if(auth()->user()->photo)
-                            <img src="{{ Storage::url(auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                         @else
                             <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
                         @endif
@@ -99,7 +125,7 @@
                 @else
                     <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
                         @if(auth()->check() && auth()->user()->photo)
-                            <img src="{{ Storage::url(auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                         @else
                             <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
                         @endif
@@ -142,22 +168,31 @@
                         </button>
                     </form>
                 @endif
-               <a href="{{ route('sites.export', ['search' => request('search')]) }}" 
-               <a href="{{ route('sites.export', ['search' => request('search')]) }}" 
+               <a href="{{ route('sites.export', request()->all()) }}" 
                     class="btn-action bi bi-download" 
                     title="Download" 
                     style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
                 </a>
             </div>
-            <form method="GET" action="{{ route('datasite') }}" class="search-form">
-                <div class="search-box d-flex align-items-center">
-                    <button type="button" class="filter-btn" data-bs-toggle="modal" data-bs-target="#modalFilter" style="background: none; border: none; padding-left: 15px;">
-                        <i class="bi bi-sliders2"></i> </button>
-                    <input type="text" id="searchInput" name="q" placeholder="Search..." value="{{ request('q') }}" style="flex-grow: 1; border: none; outline: none;">
-                    <button type="submit" class="search-btn">🔍</button>
-                </div>
-            </form>
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn-filter-pill" data-bs-toggle="modal" data-bs-target="#modalFilter">
+                    <i class="bi bi-funnel"></i> Filter
+                </button>
+                <form method="GET" action="{{ route('datasite') }}" class="search-form" id="search-form">
+                    <div class="search-box d-flex align-items-center">
+                        {{-- Hidden inputs to persist modal filters when searching globally --}}
+                        @if(request('tipe')) <input type="hidden" name="tipe" value="{{ request('tipe') }}"> @endif
+                        @if(request('provinsi')) <input type="hidden" name="provinsi" value="{{ request('provinsi') }}"> @endif
+                        @if(request('kab')) <input type="hidden" name="kab" value="{{ request('kab') }}"> @endif
+                        <input type="text" id="search-input" name="search" placeholder="Search..." value="{{ request('search') }}" style="flex-grow: 1; border: none; outline: none; padding-left: 15px;">
+                        <button type="submit" class="search-btn">🔍</button>
+                    </div>
+                </form>
+            </div>
         </div>
+        
+
+
         <div class="table-responsive-custom" style="overflow-x: auto; max-width: 100%;">
             <table class="table table-bordered">
                 <thead>
@@ -238,8 +273,15 @@
                         <td>
                             <div class="btn-group" role="group">
                                 {{-- JANGAN pakai <a> ke route edit, tapi pakai button onclick --}}
-                                <button type="button" class="btn btn-sm bi bi-pencil" onclick="editSite({{ $site->toJson() }})"></button>
-                                <form action="{{ route('sites.destroy', $site->site_id) }}" method="POST" class="d-inline">
+                                 <button type="button" class="btn btn-sm bi bi-pencil" onclick="editSite({{ $site->toJson() }})"></button>
+                                 @if($site->ip_router && in_array(auth()->user()->role ?? '', ['admin', 'superadmin']))
+                                 <button type="button" class="btn btn-sm btn-remote-action" 
+                                         title="Remote Mikrotik"
+                                         onclick="remoteMikrotik('{{ $site->ip_router }}', '{{ $site->tipe }}', '{{ $site->sitename }}', '{{ $site->site_id }}')">
+                                     <i class="bi bi-broadcast"></i>
+                                 </button>
+                                 @endif
+                                 <form action="{{ route('sites.destroy', $site->site_id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="button" 
@@ -361,7 +403,8 @@
                 <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="GET" action="{{ route('datasite') }}"> 
-                <div class="modal-body">
+                {{-- Hidden input to persist global search when applying modal filters --}}
+                @if(request('search')) <input type="hidden" name="search" value="{{ request('search') }}"> @endif                <div class="modal-body">
                     <div class="row g-3">
                         <div class="col-12">
                             <label class="form-label small fw-bold">Tipe</label>
@@ -474,6 +517,173 @@
             });
         });
     });
+</script>
+{{-- Script Remote Mikrotik --}}
+<script>
+    // Daftar tunnel WireGuard dari config/wireguard.php
+    const wgTunnels = @json($wgTunnels ?? []);
+
+    function remoteMikrotik(ip, tipe, namaSite, siteCode) {
+        // Tentukan kredensial berdasarkan kategori/tipe
+        let username = 'admin';
+        let password = 'SLAPRO2024'; // Default SL
+        let tipeLabel = 'SEWA LAYANAN';
+
+        if (tipe && (tipe.toUpperCase().includes('BMN') || tipe.toUpperCase().includes('BARANG MILIK NEGARA'))) {
+            password = 'KAPLBR2024';
+            tipeLabel = 'BMN';
+        } else {
+            tipeLabel = 'SL';
+        }
+
+        // Cek tunnel terakhir dari localStorage
+        const lastTunnel = localStorage.getItem('last_wg_tunnel');
+
+        // Build select options dari daftar tunnel
+        let tunnelOptions = '<option value="">-- Pilih Tunnel --</option>';
+        wgTunnels.forEach(t => {
+            const selected = (t === lastTunnel) ? 'selected' : '';
+            tunnelOptions += `<option value="${t}" ${selected}>${t}</option>`;
+        });
+
+        // Tampilkan SweetAlert dengan info koneksi + input tunnel name
+        Swal.fire({
+            title: '<i class="bi bi-broadcast"></i> Remote Mikrotik',
+            html: `
+                <div style="text-align: left; font-size: 14px; line-height: 2;">
+                    <div style="background: linear-gradient(135deg, #e8f4fd, #f0f7ff); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid #0d6efd;">
+                        <div style="font-weight: 700; font-size: 16px; color: #071152; margin-bottom: 5px;">
+                            ${namaSite}
+                        </div>
+                        <div style="font-size: 12px; color: #666;">Site ID: ${siteCode} | Tipe: ${tipeLabel}</div>
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                            <td style="padding: 8px 0; color: #666; width: 120px;"><i class="bi bi-globe2 me-2"></i>IP Router</td>
+                            <td style="padding: 8px 0; font-weight: 700; font-family: monospace; font-size: 15px; color: #0d6efd;">${ip}</td>
+                            <td style="padding: 8px 0; width: 30px;"><button class="btn btn-sm btn-outline-primary" onclick="copyText('${ip}')" title="Copy IP"><i class="bi bi-clipboard"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; color: #666;"><i class="bi bi-person-fill me-2"></i>Username</td>
+                            <td style="padding: 8px 0; font-weight: 600;">${username}</td>
+                            <td style="padding: 8px 0;"><button class="btn btn-sm btn-outline-primary" onclick="copyText('${username}')" title="Copy"><i class="bi bi-clipboard"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; color: #666;"><i class="bi bi-key-fill me-2"></i>Password</td>
+                            <td style="padding: 8px 0; font-weight: 600; font-family: monospace;">${password}</td>
+                            <td style="padding: 8px 0;"><button class="btn btn-sm btn-outline-primary" onclick="copyText('${password}')" title="Copy"><i class="bi bi-clipboard"></i></button></td>
+                        </tr>
+                    </table>
+                    <hr style="margin: 12px 0;">
+                    <div style="margin-top: 5px;">
+                        <label style="font-size: 13px; font-weight: 600; color: #333; display: block; margin-bottom: 5px;">
+                            <i class="bi bi-shield-lock-fill me-1" style="color: #0d6efd;"></i> Pilih Tunnel WireGuard
+                        </label>
+                        <select id="swal-tunnel-name" class="form-select" 
+                               style="font-size: 14px; border: 2px solid #dee2e6; border-radius: 8px; padding: 8px 12px; cursor: pointer;">
+                            ${tunnelOptions}
+                        </select>
+                        <small style="color: #888; font-size: 11px;">Pilih tunnel VPN yang sesuai untuk site ini</small>
+                    </div>
+                    <div style="margin-top: 12px; background: #f8f9fa; border-radius: 10px; padding: 12px; border: 1px dashed #dee2e6;">
+                        <div style="font-size: 12px; color: #555; margin-bottom: 8px;">
+                            <i class="bi bi-info-circle-fill me-1" style="color: #0d6efd;"></i>
+                            <b>Pertama kali?</b> Download & jalankan installer sekali saja:
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <a href="/tools/install-remote-v5.bat" download
+                               style="display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(135deg, #198754, #157347); color: white; text-decoration: none; padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;">
+                                <i class="bi bi-download"></i> Download Installer v9
+                            </a>
+                            <span style="font-size: 11px; color: #888;">→ Klik kanan → Run as Administrator</span>
+                        </div>
+                    </div>
+                </div>
+            `,
+            showCancelButton: true,
+            showDenyButton: true,
+            confirmButtonText: '<i class="bi bi-rocket-takeoff-fill me-1"></i> Remote Otomatis',
+            denyButtonText: '<i class="bi bi-box-arrow-up-right me-1"></i> Buka WebFig',
+            cancelButtonText: 'Tutup',
+            confirmButtonColor: '#198754',
+            denyButtonColor: '#0d6efd',
+            cancelButtonColor: '#6c757d',
+            width: 540,
+            customClass: {
+                popup: 'rounded-4'
+            },
+            preConfirm: () => {
+                const tunnelName = document.getElementById('swal-tunnel-name').value.trim();
+                if (!tunnelName) {
+                    Swal.showValidationMessage('<i class="bi bi-exclamation-triangle me-1"></i> Pilih tunnel WireGuard terlebih dahulu!');
+                    return false;
+                }
+                return tunnelName;
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                localStorage.setItem('last_wg_tunnel', result.value);
+                launchRemote(ip, username, password, result.value, namaSite, siteCode);
+            } else if (result.isDenied) {
+                window.open('http://' + ip, '_blank');
+            }
+        });
+    }
+
+    function launchRemote(ip, user, pass, tunnelName, siteName, siteCode) {
+        const remoteUrl = `nusa-remote://${tunnelName}___${ip}___${user}___${pass}`;
+        
+        // Gunakan assign agar lebih reliabel dalam memicu protokol
+        window.location.assign(remoteUrl);
+
+        // Log ke audit trail (status success karena ping sudah OK sebelumnya)
+        fetch('/remote-log/store', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({
+                site_name: siteName,
+                site_code: siteCode || '',
+                ip_router: ip,
+                tunnel_name: tunnelName,
+                source_page: 'datasite',
+                status: 'success'
+            })
+        }).catch(e => console.log('Log remote:', e));
+
+        Swal.fire({
+            icon: 'info',
+            title: 'Remote Berjalan',
+            html: `
+                <div style="font-size: 14px;">
+                    Sedang mengaktifkan VPN <b>${tunnelName}</b> dan membuka WinBox ke <b>${siteName}</b>...
+                </div>
+                <div style="margin-top: 15px; font-size: 11px; color: #888;">
+                    Pastikan Anda sudah menginstall handler remote v5 di PC ini.
+                </div>
+            `,
+            timer: 5000,
+            showConfirmButton: false,
+            timerProgressBar: true,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+    }
+
+    function copyText(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 1500
+            });
+            Toast.fire({ icon: 'success', title: 'Berhasil dicopy!' });
+        });
+    }
 </script>
 </body>
 </html>

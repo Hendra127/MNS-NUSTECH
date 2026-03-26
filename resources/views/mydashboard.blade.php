@@ -2,6 +2,7 @@
 <html lang="id">
 
 <head>
+    @include('partials.pwa-head')
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <meta charset="UTF-8">
@@ -813,7 +814,7 @@ loadMessages();
                                       data.evidence.includes('.');
 
                     if (hasEvidence) {
-                        const baseUrl = "{{ asset('storage') }}";
+                        const baseUrl = "{{ asset('storage_public') }}";
                         evidenceEl.innerHTML = `<a href="javascript:void(0)" onclick="viewEvidence('${baseUrl}/${data.evidence}')" class="text-primary fw-bold" style="text-decoration: none;"><i class="ph ph-eye"></i> ADA (Klik untuk lihat)</a>`;
                     } else {
                         evidenceEl.innerText = 'TIDAK ADA';

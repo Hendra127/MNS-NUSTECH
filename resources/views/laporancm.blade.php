@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    @include('partials.pwa-head')
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="stylesheet" href="{{ asset('css/password.css') }}">
@@ -38,18 +39,28 @@
                 width: 100%;
             }
         }
-        .filter-btn {
-            background: none;
-            border: none;
-            padding-left: 15px;
-            display: flex;
+        .btn-filter-pill {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-        }
-        .filter-btn i {
-            color: #555;
-            font-size: 1.1rem;
+            gap: 6px;
+            background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(13,110,253,0.3);
+        }
+        .btn-filter-pill:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(13,110,253,0.4);
+        }
+        [data-bs-theme="dark"] .btn-filter-pill {
+            background: linear-gradient(135deg, #1a6fc4, #0d5dbc);
         }
         /* Select2 Custom Styling to match User Design */
         .select2-container--bootstrap-5 .select2-selection {
@@ -211,17 +222,17 @@
                style="text-decoration: none;">
             </a>
         </div>
-        <!-- search -->
-        <form method="GET" action="{{ route('laporancm') }}" class="search-form" id="searchForm">
-            <div class="search-box d-flex align-items-center">
-                <!-- tombol filter -->
-                <button type="button" class="filter-btn" data-bs-toggle="modal" data-bs-target="#modalFilter">
-                    <i class="bi bi-sliders2"></i>
-                </button>
-                <input type="text" name="search" id="searchInput" placeholder="Search..." value="{{ request('search') }}" style="flex-grow: 1; border: none; outline: none; background: transparent; padding-left: 15px;">
-                <button type="submit" class="search-btn">🔍</button>
-            </div>
-        </form>
+        <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn-filter-pill" data-bs-toggle="modal" data-bs-target="#modalFilter">
+                <i class="bi bi-funnel"></i> Filter
+            </button>
+            <form method="GET" action="{{ route('laporancm') }}" class="search-form" id="searchForm">
+                <div class="search-box d-flex align-items-center">
+                    <input type="text" name="search" id="searchInput" placeholder="Search..." value="{{ request('search') }}" style="flex-grow: 1; border: none; outline: none; background: transparent; padding-left: 15px;">
+                    <button type="submit" class="search-btn">🔍</button>
+                </div>
+            </form>
+        </div>
     </div>
     <div class="table-responsive-custom" style="overflow-x: auto; max-width: 100%;">
         <table class="table table-bordered">
