@@ -74,109 +74,7 @@
             50%       { transform: translateY(-8px); }
         }
 
-        .n-left-pillar {
-            position: absolute;
-            left: 12px; top: 14px;
-            width: 42px; height: 115px;
-            border-radius: 12px 12px 8px 8px;
-            background: linear-gradient(160deg, #40e0d0 0%, #00bcd4 40%, #2979ff 100%);
-            box-shadow: inset -4px -4px 12px rgba(0,0,0,0.18), inset 3px 3px 8px rgba(255,255,255,0.35), 0 8px 24px rgba(0,188,212,0.35);
-            animation: pillarGlow 3s ease-in-out infinite;
-        }
-
-        @keyframes pillarGlow {
-            0%,100% { box-shadow: inset -4px -4px 12px rgba(0,0,0,0.18), inset 3px 3px 8px rgba(255,255,255,0.35), 0 8px 24px rgba(0,188,212,0.35); }
-            50%     { box-shadow: inset -4px -4px 12px rgba(0,0,0,0.18), inset 3px 3px 8px rgba(255,255,255,0.35), 0 12px 32px rgba(0,188,212,0.55); }
-        }
-
-        .n-right-pillar {
-            position: absolute;
-            right: 12px; top: 14px;
-            width: 42px; height: 115px;
-            border-radius: 12px 12px 8px 8px;
-            background: linear-gradient(160deg, #4488ff 0%, #2962ff 60%, #1a3fbf 100%);
-            box-shadow: inset -4px -4px 12px rgba(0,0,0,0.22), inset 3px 3px 8px rgba(255,255,255,0.25), 0 8px 24px rgba(41,98,255,0.35);
-            animation: pillarGlowR 3s ease-in-out infinite;
-        }
-
-        @keyframes pillarGlowR {
-            0%,100% { box-shadow: inset -4px -4px 12px rgba(0,0,0,0.22), inset 3px 3px 8px rgba(255,255,255,0.25), 0 8px 24px rgba(41,98,255,0.35); }
-            50%     { box-shadow: inset -4px -4px 12px rgba(0,0,0,0.22), inset 3px 3px 8px rgba(255,255,255,0.25), 0 14px 36px rgba(41,98,255,0.55); }
-        }
-
-        .n-diag-top {
-            position: absolute;
-            left: 50px; top: 14px;
-            width: 62px; height: 38px;
-            border-radius: 8px 10px 10px 8px;
-            background: linear-gradient(100deg, #40e0d0 0%, #00bcd4 50%, #2979ff 100%);
-            box-shadow: inset -3px -3px 8px rgba(0,0,0,0.15), inset 2px 2px 6px rgba(255,255,255,0.3), 0 4px 12px rgba(0,188,212,0.3);
-            transform-origin: left center;
-            transform: skewY(26deg);
-        }
-
-        .n-node-top {
-            position: absolute;
-            right: 6px; top: 49px;
-            width: 20px; height: 20px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #40e0d0, #00bcd4);
-            border: 3px solid #f0f4f8;
-            box-shadow: 0 0 12px rgba(0,188,212,0.7);
-            animation: nodePulse 2s ease-in-out infinite;
-        }
-
-        .n-diag-bot {
-            position: absolute;
-            left: 43px;
-            bottom: 28px;
-            width: 62px; height: 38px;
-            border-radius: 8px 10px 10px 8px;
-            background: linear-gradient(100deg, #4488ff 0%, #2962ff 60%, #1a3fbf 100%);
-            box-shadow: inset -3px -3px 8px rgba(0,0,0,0.18), inset 2px 2px 6px rgba(255,255,255,0.2), 0 4px 12px rgba(41,98,255,0.3);
-            transform-origin: right center;
-            transform: skewY(26deg);
-        }
-
-        .n-node-bot {
-            position: absolute;
-            left: 40px; bottom: 46px;
-            width: 20px; height: 20px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #4488ff, #2962ff);
-            border: 3px solid #f0f4f8;
-            box-shadow: 0 0 12px rgba(41,98,255,0.7);
-            animation: nodePulse 2s ease-in-out infinite 0.5s;
-        }
-
-        @keyframes nodePulse {
-            0%,100% { transform: scale(1); opacity: 1; }
-            50%     { transform: scale(1.25); opacity: 0.85; }
-        }
-
-        .n-shimmer {
-            position: absolute;
-            inset: 0;
-            border-radius: 12px;
-            background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.18) 50%, transparent 70%);
-            background-size: 200% 100%;
-            animation: shimmerMove 2.5s linear infinite;
-        }
-
-        @keyframes shimmerMove {
-            0%   { background-position: -100% 0; }
-            100% { background-position: 200% 0; }
-        }
-
         .logo-text-area { font-family: 'Outfit', sans-serif; }
-
-        .logo-text-top {
-            font-size: 3.5rem;
-            font-weight: 800;
-            color: #1e2b4b;
-            line-height: 1;
-            letter-spacing: -2px;
-        }
 
         .logo-subtext {
             font-size: 1.1rem;
@@ -742,20 +640,12 @@
         <div class="left-section">
             <div class="logo-container">
 
-                <!-- CSS N-LOGO -->
+                <!-- NUSTECH LOGO -->
                 <div class="n-logo-wrap">
-                    <div class="n-left-pillar"><div class="n-shimmer"></div></div>
-                    <div class="n-right-pillar"><div class="n-shimmer"></div></div>
-                    <div class="n-diag-top"><div class="n-shimmer"></div></div>
-                    <div class="n-diag-bot"><div class="n-shimmer"></div></div>
-                    <div class="n-node-top"></div>
-                    <div class="n-node-bot"></div>
+                    <img src="{{ asset('assets/img/logonustech.png') }}" alt="NUSTECH Logo" class="w-full h-full object-contain">
                 </div>
 
-                <div class="logo-text-area">
-                    <div class="flex items-center justify-center">
-                        <span class="logo-text-top">NUSTECH</span>
-                    </div>
+                <div class="logo-text-area" style="margin-top: -10px;">
                     <div class="logo-subtext">MAINFRAME</div>
                 </div>
 

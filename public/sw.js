@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nustech-v1';
+const CACHE_NAME = 'nustech-v2';
 
 // Install event - cache essential assets
 self.addEventListener('install', (event) => {
@@ -44,8 +44,8 @@ self.addEventListener('fetch', (event) => {
                 return response;
             })
             .catch(() => {
-                // Fallback to cache if offline
-                return caches.match(event.request);
+                // Fallback to cache if offline (ignore query params spt ?standalone=true)
+                return caches.match(event.request, { ignoreSearch: true });
             })
     );
 });

@@ -4,18 +4,60 @@
     @include('partials.pwa-head')
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
-    <link rel="stylesheet" href="{{ asset('css/password.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/password.css') }}?v=3.0">
+    <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}?v=1.1">
     <script src="{{ asset('js/nav-modal.js') }}"></script>
     <script src="{{ asset('js/profile-dropdown.js') }}"></script>
     @include('components.nav-modal-structure')
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Operasional</title>
+    <title>Pergantian Perangkat | Project Operational</title>
+    <style>
+        /* Modern Table Sticky Header */
+        .table-responsive-custom table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: #f5f6fa !important;
+            color: #555 !important;
+            font-weight: 700 !important;
+            text-transform: uppercase;
+            font-size: 11px;
+            padding: 12px 15px !important;
+            border-bottom: 2px solid #e0e0e0 !important;
+            box-shadow: 0 1px 0 #e0e0e0;
+        }
+        
+        .sticky-col {
+            position: sticky !important;
+            background-color: #fff !important;
+            z-index: 5 !important;
+            background-clip: padding-box;
+        }
+        
+        thead th.sticky-col {
+            z-index: 20 !important;
+            background-color: #f5f6fa !important;
+        }
+
+        .col-no { left: 0; min-width: 50px; }
+        .col-site-id { left: 50px; min-width: 135px; }
+        .col-nama_site { left: 185px; min-width: 250px; }
+        
+        /* Striped background for sticky columns */
+        tbody tr:nth-child(even) .sticky-col {
+            background-color: #fafbfc !important;
+        }
+        
+        /* Hover effect */
+        tbody tr:hover td {
+            background-color: #f0f5fb !important;
+        }
+    </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/pergantianperangkat.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/pergantianperangkat.css') }}?v=1.2">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .btn-filter-pill {
@@ -74,7 +116,7 @@
                 @if(auth()->check() && auth()->user()->role === 'superadmin')
                     <a href="{{ route('setting.index') }}" class="user-profile-icon" title="Setting User" style="cursor: pointer; text-decoration: none; color: inherit;">
                         @if(auth()->user()->photo)
-                            <img src="{{ Storage::url(auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                         @else
                             <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
                         @endif
@@ -82,7 +124,7 @@
                 @else
                     <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
                         @if(auth()->check() && auth()->user()->photo)
-                            <img src="{{ Storage::url(auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                         @else
                             <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
                         @endif
@@ -120,10 +162,10 @@
             });
         </script>
     @endif
-    <!-- CARD -->
-    <div class="card">
-        <div class="card-header">
-            <div class="actions">
+    <!-- CONTENT -->
+    <div class="content-container">
+        <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3" style="margin-bottom: 20px;">
+            <div class="actions flex-shrink-0">
                 @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                     <button class="btn-action bi bi-plus" title="Tambah Data" data-bs-toggle="modal" data-bs-target="#modalTambahPergantian"></button>
                     <form action="{{ route('pergantianperangkat.import') }}" method="POST" enctype="multipart/form-data" id="importForm" class="m-0">
@@ -134,19 +176,40 @@
                 @endif
                 <a href="{{ route('pergantianperangkat.export') }}" class="btn-action bi bi-download" title="Download Excel" style="text-decoration: none;"></a>
             </div>
-            <div class="d-flex align-items-center gap-2">
-                <button type="button" class="btn-filter-pill" data-bs-toggle="modal" data-bs-target="#modalFilter">
-                    <i class="bi bi-funnel"></i> Filter
-                </button>
-                <form method="GET" action="{{ route('pergantianperangkat') }}" class="search-form" id="filterForm">
-                    <div class="search-box">
-                        <input type="text" name="search" id="searchInput" placeholder="Search" value="{{ request('search') }}" style="padding-left: 15px;">
-                        <button type="submit" class="search-btn">🔍</button>
+            <div class="w-100 mt-2 mt-lg-0">
+                <form method="GET" action="{{ route('pergantianperangkat') }}" class="search-form row g-2 align-items-center w-100 m-0 justify-content-lg-end" id="filterForm">
+                    <div class="col-12 col-md-auto">
+                        <select name="perangkat" class="form-select form-select-sm w-100">
+                            <option value="">Semua Perangkat</option>
+                            <option value="MODEM" {{ request('perangkat') == 'MODEM' ? 'selected' : '' }}>MODEM</option>
+                            <option value="ROUTER" {{ request('perangkat') == 'ROUTER' ? 'selected' : '' }}>ROUTER</option>
+                            <option value="SWITCH" {{ request('perangkat') == 'SWITCH' ? 'selected' : '' }}>SWITCH</option>
+                            <option value="AP1" {{ request('perangkat') == 'AP1' ? 'selected' : '' }}>AP1</option>
+                            <option value="AP2" {{ request('perangkat') == 'AP2' ? 'selected' : '' }}>AP2</option>
+                            <option value="STAVOL" {{ request('perangkat') == 'STAVOL' ? 'selected' : '' }}>STAVOL</option>
+                            <option value="LAINNYA" {{ request('perangkat') == 'LAINNYA' ? 'selected' : '' }}>LAINNYA</option>
+                        </select>
                     </div>
-                    <!-- Fields to keep filters active during search -->
-                    @if(request('perangkat')) <input type="hidden" name="perangkat" value="{{ request('perangkat') }}"> @endif
-                    @if(request('tgl_mulai')) <input type="hidden" name="tgl_mulai" value="{{ request('tgl_mulai') }}"> @endif
-                    @if(request('tgl_selesai')) <input type="hidden" name="tgl_selesai" value="{{ request('tgl_selesai') }}"> @endif
+                    <div class="col-12 col-md-auto">
+                        <input type="date" name="tgl_mulai" class="form-control form-control-sm w-100" value="{{ request('tgl_mulai') }}" title="Dari Tanggal">
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <input type="date" name="tgl_selesai" class="form-control form-control-sm w-100" value="{{ request('tgl_selesai') }}" title="Sampai Tanggal">
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn-filter-pill w-100 justify-content-center">
+                            <i class="bi bi-funnel"></i> Filter
+                        </button>
+                    </div>
+                    <div class="col-auto">
+                        <a href="{{ route('pergantianperangkat') }}" class="btn btn-light btn-sm rounded-pill border d-flex align-items-center justify-content-center h-100" title="Reset Filter"><i class="bi bi-arrow-repeat"></i></a>
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <div class="search-box d-flex align-items-center w-100">
+                            <input type="text" name="search" id="searchInput" placeholder="Search" value="{{ request('search') }}" style="flex-grow: 1; border: none; outline: none; padding-left: 15px;">
+                            <button type="submit" class="search-btn">🔍</button>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>
@@ -168,7 +231,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($data as $index => $item)
+                    @forelse($pergantian_data as $index => $item)
                     <tr>
                         <td class="text-center sticky-col col-no">{{ $index + 1 }}</td>
                         <td class="sticky-col col-site-id">{{ $item->site->site_id ?? '-' }}</td>
@@ -207,50 +270,17 @@
                 </tbody>
             </table>
         </div>
-    </div>
-    <!-- Modal Filter -->
-    <div class="modal fade" id="modalFilter" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg rounded-4">
-                <div class="modal-header text-white d-flex justify-content-center position-relative" style="background-color: #071152; border-radius: 15px 15px 0 0;">
-                    <h5 class="modal-title w-100 text-center fw-bold">Filter Data Pergantian Perangkat</h5>
-                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form method="GET" action="{{ route('pergantianperangkat') }}">
-                    @if(request('search')) <input type="hidden" name="search" value="{{ request('search') }}"> @endif
-                    <div class="modal-body pt-3">
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label class="form-label small fw-bold">Perangkat</label>
-                                <select name="perangkat" class="form-select">
-                                    <option value="">Semua Perangkat</option>
-                                    <option value="MODEM" {{ request('perangkat') == 'MODEM' ? 'selected' : '' }}>MODEM</option>
-                                    <option value="ROUTER" {{ request('perangkat') == 'ROUTER' ? 'selected' : '' }}>ROUTER</option>
-                                    <option value="SWITCH" {{ request('perangkat') == 'SWITCH' ? 'selected' : '' }}>SWITCH</option>
-                                    <option value="AP1" {{ request('perangkat') == 'AP1' ? 'selected' : '' }}>AP1</option>
-                                    <option value="AP2" {{ request('perangkat') == 'AP2' ? 'selected' : '' }}>AP2</option>
-                                    <option value="STAVOL" {{ request('perangkat') == 'STAVOL' ? 'selected' : '' }}>STAVOL</option>
-                                    <option value="LAINNYA" {{ request('perangkat') == 'LAINNYA' ? 'selected' : '' }}>LAINNYA</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold">Dari Tanggal</label>
-                                <input type="date" name="tgl_mulai" class="form-control" value="{{ request('tgl_mulai') }}">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold">Sampai Tanggal</label>
-                                <input type="date" name="tgl_selesai" class="form-control" value="{{ request('tgl_selesai') }}">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer border-0">
-                        <a href="{{ route('pergantianperangkat') }}" class="btn btn-light border px-4 rounded-3">Reset</a>
-                        <button type="submit" class="btn btn-primary px-4 rounded-3">Terapkan Filter</button>
-                    </div>
-                </form>
-            </div>
+        <div class="pagination-wrapper">
+            <span class="pagination-info">
+                Showing {{ $pergantian_data->firstItem() ?? 0 }} to {{ $pergantian_data->lastItem() ?? 0 }} 
+                of&nbsp;<strong>{{ $pergantian_data->total() }}</strong>&nbsp;results
+            </span>
+            <nav>
+                {{ $pergantian_data->appends(request()->query())->links("pagination::bootstrap-5") }}
+            </nav>
         </div>
     </div>
+
     <!-- Modal Tambah Pergantian -->
     <div class="modal fade" id="modalTambahPergantian" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
@@ -324,7 +354,7 @@
             </div>
         </div>
     </div>
-    @foreach($data as $item)
+    @foreach($pergantian_data as $item)
     <!-- Modal Edit Pergantian -->
     <div class="modal fade" id="modalEditPergantian{{ $item->id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
@@ -396,102 +426,7 @@
         </div>
     </div>
     @endforeach
-    <script>
-        @if(session('success'))
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil',
-                text: "{{ session('success') }}",
-                timer: 2000,
-                showConfirmButton: false
-            });
-        @endif
-        @if(session('error'))
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal',
-                text: "{{ session('error') }}",
-            });
-        @endif
-        function updateSiteId(input) {
-            const val = input.value;
-            const options = document.querySelectorAll('#siteList option');
-            let found = false;
-            for (let i = 0; i < options.length; i++) {
-                if (options[i].value === val) {
-                    document.getElementById('selected_site_id').value = options[i].getAttribute('data-id');
-                    document.getElementById('display_site_id').value = options[i].getAttribute('data-siteid');
-                    document.getElementById('display_site_name').value = options[i].getAttribute('data-sitename');
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                document.getElementById('selected_site_id').value = '';
-                document.getElementById('display_site_id').value = '';
-                document.getElementById('display_site_name').value = '';
-            }
-        }
-        function updateSiteIdEdit(input, id) {
-            const val = input.value;
-            const options = document.querySelectorAll('#siteList option');
-            let found = false;
-            for (let i = 0; i < options.length; i++) {
-                if (options[i].value === val) {
-                    document.getElementById('selected_site_id_edit_' + id).value = options[i].getAttribute('data-id');
-                    document.getElementById('display_site_id_edit_' + id).value = options[i].getAttribute('data-siteid');
-                    document.getElementById('display_site_name_edit_' + id).value = options[i].getAttribute('data-sitename');
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                document.getElementById('selected_site_id_edit_' + id).value = '';
-                document.getElementById('display_site_id_edit_' + id).value = '';
-                document.getElementById('display_site_name_edit_' + id).value = '';
-            }
-        }
-        // SWAL Delete Confirmation
-        document.querySelectorAll('.btn-delete').forEach(button => {
-            button.addEventListener('click', function() {
-                const perangkat = this.getAttribute('data-perangkat');
-                const site = this.getAttribute('data-site');
-                const form = this.closest('.form-delete');
-                Swal.fire({
-                    title: 'Apakah anda yakin?',
-                    text: `Data pergantian ${perangkat} di ${site} akan dihapus!`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Ya, hapus!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
-                });
-            });
-        });
-        // Script pencarian otomatis
-        let timeout = null;
-        const searchInput = document.getElementById('searchInput');
-        const filterForm = document.getElementById('filterForm');
-        if(searchInput && filterForm) {
-            searchInput.addEventListener('input', function() {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => {
-                    filterForm.submit();
-                }, 500); 
-            });
-            // Fokus kursor ke akhir teks
-            searchInput.focus();
-            const val = searchInput.value;
-            searchInput.value = '';
-            searchInput.value = val;
-        }
-    </script>
-</div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

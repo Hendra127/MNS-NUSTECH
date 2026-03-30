@@ -53,9 +53,15 @@ class SparetrackerController extends Controller
         $countRusak = Sparetracker::where('kondisi', 'RUSAK')->count();
         $countBaru  = Sparetracker::where('kondisi', 'BARU')->count();
 
-        $data = $query->latest()->get(); // Changed to get() as pagination might be removed or handled differently later
+        $spare_data = $query->latest()->paginate(50)->withQueryString();
 
-        return view('sparetracker', compact('data', 'totalSpare', 'countBaik', 'countRusak', 'countBaru'));
+        return view('sparetracker', [
+            'spare_data' => $spare_data,
+            'totalSpare' => $totalSpare,
+            'countBaik' => $countBaik,
+            'countRusak' => $countRusak,
+            'countBaru' => $countBaru
+        ]);
     }
 
     public function import(Request $request)

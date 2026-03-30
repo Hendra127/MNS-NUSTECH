@@ -35,7 +35,7 @@ class RemoteLogController extends Controller
             $query->whereDate('created_at', '<=', $request->tgl_selesai);
         }
 
-        $logs = $query->paginate(25)->withQueryString();
+        $logs = $query->paginate(50)->withQueryString();
 
         // Stats
         $totalToday = RemoteLog::whereDate('created_at', Carbon::today())->count();

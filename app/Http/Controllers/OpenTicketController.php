@@ -21,13 +21,13 @@ class OpenTicketController extends Controller
                                 ->whereDate('created_at', \Carbon\Carbon::today())
                                 ->count();
     
-        // 2. PERBAIKAN DISINI: Menghitung jumlah menggunakan teks asli database
+        // 2. Menghitung jumlah menggunakan teks asli database (mendukung variasi penulisan)
         $countBMN = Ticket::where('status', 'open')
-                          ->where('kategori', 'BARANG MILIK NEGARA (BMN)')
+                          ->whereIn('kategori', ['BMN', 'BARANG MILIK NEGARA (BMN)'])
                           ->count();
                           
         $countSL = Ticket::where('status', 'open')
-                         ->where('kategori', 'SEWA LAYANAN')
+                         ->whereIn('kategori', ['SL', 'SEWA LAYANAN'])
                          ->count();
     
         // 3. Mengambil semua input untuk filter & search
@@ -54,15 +54,41 @@ class OpenTicketController extends Controller
     
             // Jika user memfilter kategori lewat modal, pastikan value di modal juga sesuai
             ->when($kategori, function ($q) use ($kategori) {
+                if ($kategori === 'BMN') {
+                    return $q->whereIn('kategori', ['BMN', 'BARANG MILIK NEGARA (BMN)']);
+                } elseif ($kategori === 'SL') {
+                    return $q->whereIn('kategori', ['SL', 'SEWA LAYANAN']);
+                }
                 return $q->where('kategori', $kategori);
             })
     
             ->when($provinsi, function ($q) use ($provinsi) {
                 return $q->where('provinsi', 'like', "%$provinsi%");
-            })
+            });
     
-            ->latest()
-            ->paginate(20)
+        // 5. Sorting
+        $sortBy = $request->get('sort', 'tanggal_rekap');
+        $sortOrder = $request->get('order', 'desc');
+        
+        // Allowed sort columns
+        $allowedSorts = ['tanggal_rekap', 'durasi'];
+        if (!in_array($sortBy, $allowedSorts)) {
+            $sortBy = 'tanggal_rekap';
+        }
+
+        $actualSortBy = 'tanggal_rekap';
+        $actualSortOrder = $sortOrder;
+
+        if ($sortBy === 'durasi') {
+            // Durasi ASC (Kecil ke Besar) = Tanggal Rekap DESC (Terbaru ke Lama)
+            // Durasi DESC (Besar ke Kecil) = Tanggal Rekap ASC (Lama ke Terbaru)
+            $actualSortOrder = ($sortOrder === 'asc') ? 'desc' : 'asc';
+        }
+
+        $perPage = $request->get('per_page', 50);
+
+        $tickets = $tickets->orderBy($actualSortBy, $actualSortOrder)
+            ->paginate($perPage)
             ->withQueryString();
     
         $sites = \App\Models\Site::orderBy('site_id', 'asc')->get();

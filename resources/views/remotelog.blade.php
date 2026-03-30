@@ -4,7 +4,7 @@
     @include('partials.pwa-head')
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
-    <link rel="stylesheet" href="{{ asset('css/password.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/password.css') }}?v=3.0">
     <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}">
     <script src="{{ asset('js/nav-modal.js') }}"></script>
     <script src="{{ asset('js/profile-dropdown.js') }}"></script>
@@ -240,6 +240,13 @@
         </div>
     </div>
 </header>
+<div class="tabs-section">
+    <a href="{{ url('/todolist') }}" class="tab {{ request()->is('todolist*') ? 'active' : '' }}" style="text-decoration: none;">To Do List</a>
+    @if(auth()->check() && auth()->user()->role === 'superadmin')
+        <a href="{{ route('jadwalpiket') }}" class="tab {{ request()->is('jadwalpiket*') ? 'active' : '' }}" style="text-decoration: none;">Jadwal Piket</a>
+        <a href="{{ route('remotelog') }}" class="tab {{ request()->is('remote-log*') ? 'active' : '' }}" style="text-decoration: none;">Log Remote</a>
+    @endif
+</div>
 
 <div style="max-width: 1200px; margin: 0 auto; padding: 25px 20px;">
 
@@ -281,7 +288,7 @@
 
     {{-- Table Card --}}
     <div class="log-table-card">
-        <div class="log-table-header">
+        <div class="log-table-header" style="padding-bottom: 20px;">
             <h2><i class="bi bi-list-columns-reverse" style="color: #4facfe;"></i> Log Riwayat Remote</h2>
             <form method="GET" action="{{ route('remotelog') }}" class="search-filter-bar">
                 <input type="text" name="search" placeholder="🔍 Cari user, site, IP..." value="{{ request('search') }}" style="min-width: 200px;">
@@ -383,11 +390,15 @@
         </div>
 
         {{-- Pagination --}}
-        @if($logs->hasPages())
-        <div style="padding: 15px 25px; border-top: 1px solid #f0f0f0;">
-            {{ $logs->links('pagination::bootstrap-5') }}
+        <div class="pagination-wrapper">
+            <span class="pagination-info">
+                Showing {{ $logs->firstItem() ?? 0 }} to {{ $logs->lastItem() ?? 0 }} 
+                of&nbsp;<strong>{{ $logs->total() }}</strong>&nbsp;results
+            </span>
+            <nav>
+                {{ $logs->links('pagination::bootstrap-5') }}
+            </nav>
         </div>
-        @endif
     </div>
 </div>
 

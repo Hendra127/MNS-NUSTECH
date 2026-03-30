@@ -41,11 +41,14 @@ class PergantianController extends Controller
             $query->whereDate('tanggal_penggantian', '<=', $request->tgl_selesai);
         }
 
-        $data = $query->latest()->get();
+        $pergantian_data = $query->latest()->paginate(50)->withQueryString();
         // Fetch sites for "Add" modal search/dropdown
         $sites = Site::all();
 
-        return view('pergantianperangkat', compact('data', 'sites'));
+        return view('pergantianperangkat', [
+            'pergantian_data' => $pergantian_data,
+            'sites' => $sites
+        ]);
     }
 
     public function store(Request $request)

@@ -4,14 +4,57 @@
     @include('partials.pwa-head')
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
-    <link rel="stylesheet" href="{{ asset('css/password.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/password.css') }}?v=3.0">
+    <link rel="stylesheet" href="{{ asset('css/pergantianperangkat.css') }}?v=1.2">
+    <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}?v=1.1">
     <script src="{{ asset('js/nav-modal.js') }}"></script>
     <script src="{{ asset('js/profile-dropdown.js') }}"></script>
     @include('components.nav-modal-structure')
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spare Tracker</title>
+    <title>Spare Tracker | Project Operational</title>
+    <style>
+        /* Modern Table Sticky Header */
+        .table-responsive-custom table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: #f5f6fa !important;
+            color: #555 !important;
+            font-weight: 700 !important;
+            text-transform: uppercase;
+            font-size: 11px;
+            padding: 12px 15px !important;
+            border-bottom: 2px solid #e0e0e0 !important;
+            box-shadow: 0 1px 0 #e0e0e0;
+        }
+        
+        .sticky-col {
+            position: sticky !important;
+            background-color: #fff !important;
+            z-index: 5 !important;
+            background-clip: padding-box;
+        }
+        
+        thead th.sticky-col {
+            z-index: 20 !important;
+            background-color: #f5f6fa !important;
+        }
+
+        .col-no { left: 0; min-width: 50px; }
+        .col-sn { left: 50px; min-width: 150px; }
+        .col-nama-perangkat { left: 200px; min-width: 250px; }
+        
+        /* Striped background for sticky columns */
+        tbody tr:nth-child(even) .sticky-col {
+            background-color: #fafbfc !important;
+        }
+        
+        /* Hover effect */
+        tbody tr:hover td {
+            background-color: #f0f5fb !important;
+        }
+    </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap" rel="stylesheet">
@@ -61,15 +104,18 @@
                 width: 100%;
             }
         }
-        /* Mengatur padding pada semua sel tabel agar lebih rapat - Sesuai open.blade */
-        .table-responsive-custom table thead th,
-        .table-responsive-custom table tbody td {
-            padding-top: 4px !important;
-            padding-bottom: 4px !important;
-            padding-left: 8px !important;
-            padding-right: 8px !important;
-            line-height: 1.2 !important;
-            vertical-align: middle !important;
+        /* Sticky col shadow untuk kolom NAMA PERANGKAT */
+        th.col-nama-perangkat, td.col-nama-perangkat {
+            border-right: 2px solid #e8ecf0 !important;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.06) !important;
+        }
+        .col-sn {
+            left: 50px;
+            min-width: 130px;
+        }
+        .col-nama-perangkat {
+            left: 180px;
+            min-width: 160px;
         }
         .btn-filter-pill {
             display: inline-flex;
@@ -116,7 +162,7 @@
                 @if(auth()->check() && auth()->user()->role === 'superadmin')
                     <a href="{{ route('setting.index') }}" class="user-profile-icon" title="Setting User" style="cursor: pointer; text-decoration: none; color: inherit;">
                         @if(auth()->user()->photo)
-                            <img src="{{ Storage::url(auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                         @else
                             <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
                         @endif
@@ -124,7 +170,7 @@
                 @else
                     <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
                         @if(auth()->check() && auth()->user()->photo)
-                            <img src="{{ Storage::url(auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                         @else
                             <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
                         @endif
@@ -159,10 +205,10 @@
             <span class="summary-badge text-primary">Baru: <b>{{ $countBaru }}</b></span>
         </div>
     </div>
-    <!-- CARD -->
-    <div class="card">
-        <div class="card-header">
-            <div class="actions">
+    <!-- CONTENT -->
+    <div class="content-container">
+        <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3" style="margin-bottom: 20px;">
+            <div class="actions flex-shrink-0">
                 @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                     <button type="button" class="btn-action bi bi-plus" title="Tambah Data" data-bs-toggle="modal" data-bs-target="#modalTambahSpare"></button>
                     <!-- Form Import -->
@@ -175,70 +221,48 @@
                 <!-- Button Export -->
                 <a href="{{ route('sparetracker.export') }}" class="btn-action bi bi-download" title="Download" style="text-decoration: none;"></a>
             </div>
-            <div class="d-flex align-items-center gap-2">
-                <button type="button" class="btn-filter-pill" data-bs-toggle="modal" data-bs-target="#modalFilter">
-                    <i class="bi bi-funnel"></i> Filter
-                </button>
-                <form method="GET" action="{{ route('sparetracker') }}" class="search-form" id="filterForm">
-                    <div class="search-box">
-                        <input type="text" name="search" id="searchInput" placeholder="Search..." value="{{ request('search') }}" style="padding-left: 15px;">
-                        <button type="submit" class="search-btn">🔍</button>
+            <div class="w-100 mt-2 mt-lg-0">
+                <form method="GET" action="{{ route('sparetracker') }}" class="search-form row g-2 align-items-center w-100 m-0 justify-content-lg-end" id="filterForm">
+                    <div class="col-12 col-md-auto">
+                        <select name="kondisi" class="form-select form-select-sm w-100">
+                            <option value="">Semua Kondisi</option>
+                            <option value="BAIK" {{ request('kondisi') == 'BAIK' ? 'selected' : '' }}>BAIK</option>
+                            <option value="RUSAK" {{ request('kondisi') == 'RUSAK' ? 'selected' : '' }}>RUSAK</option>
+                            <option value="BARU" {{ request('kondisi') == 'BARU' ? 'selected' : '' }}>BARU</option>
+                        </select>
                     </div>
-                    <!-- Fields to keep filters active during search -->
-                    @if(request('kondisi')) <input type="hidden" name="kondisi" value="{{ request('kondisi') }}"> @endif
-                    @if(request('tgl_masuk_mulai')) <input type="hidden" name="tgl_masuk_mulai" value="{{ request('tgl_masuk_mulai') }}"> @endif
-                    @if(request('tgl_masuk_selesai')) <input type="hidden" name="tgl_masuk_selesai" value="{{ request('tgl_masuk_selesai') }}"> @endif
-                    @if(request('tgl_keluar_mulai')) <input type="hidden" name="tgl_keluar_mulai" value="{{ request('tgl_keluar_mulai') }}"> @endif
-                    @if(request('tgl_keluar_selesai')) <input type="hidden" name="tgl_keluar_selesai" value="{{ request('tgl_keluar_selesai') }}"> @endif
+
+                    <div class="col-12 col-md-auto">
+                        <div class="d-flex align-items-center gap-1 w-100">
+                            <input type="date" name="tgl_masuk_mulai" class="form-control form-control-sm w-100" value="{{ request('tgl_masuk_mulai') }}" title="Tgl Masuk Dari">
+                            <input type="date" name="tgl_masuk_selesai" class="form-control form-control-sm w-100" value="{{ request('tgl_masuk_selesai') }}" title="Tgl Masuk Sampai">
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-auto">
+                        <div class="d-flex align-items-center gap-1 w-100">
+                            <input type="date" name="tgl_keluar_mulai" class="form-control form-control-sm w-100" value="{{ request('tgl_keluar_mulai') }}" title="Tgl Keluar Dari">
+                            <input type="date" name="tgl_keluar_selesai" class="form-control form-control-sm w-100" value="{{ request('tgl_keluar_selesai') }}" title="Tgl Keluar Sampai">
+                        </div>
+                    </div>
+
+                    <div class="col-auto">
+                        <button type="submit" class="btn-filter-pill w-100 justify-content-center">
+                            <i class="bi bi-funnel"></i> Filter
+                        </button>
+                    </div>
+                    <div class="col-auto">
+                        <a href="{{ route('sparetracker') }}" class="btn btn-light btn-sm rounded-pill border d-flex align-items-center justify-content-center h-100" title="Reset Filter"><i class="bi bi-arrow-repeat"></i></a>
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <div class="search-box d-flex align-items-center w-100">
+                            <input type="text" name="search" id="searchInput" placeholder="Search Data" value="{{ request('search') }}" style="flex-grow: 1; border: none; outline: none; padding-left: 15px;">
+                            <button type="submit" class="search-btn">🔍</button>
+                        </div>
+                    </div>
                 </form>
             </div>
-            <!-- Modal Filter -->
-            <div class="modal fade" id="modalFilter" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content border-0 shadow-lg rounded-4">
-                        <div class="modal-header text-white d-flex justify-content-center position-relative" style="background-color: #071152; border-radius: 15px 15px 0 0;">
-                            <h5 class="modal-title w-100 text-center fw-bold">Filter Data Spare Tracker</h5>
-                            <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <form method="GET" action="{{ route('sparetracker') }}">
-                            @if(request('search')) <input type="hidden" name="search" value="{{ request('search') }}"> @endif
-                            <div class="modal-body pt-3">
-                                <div class="row g-3">
-                                    <div class="col-12">
-                                        <label class="form-label small fw-bold label-blue">Kondisi</label>
-                                        <select name="kondisi" class="form-select input-custom">
-                                            <option value="">Semua Kondisi</option>
-                                            <option value="BAIK" {{ request('kondisi') == 'BAIK' ? 'selected' : '' }}>BAIK</option>
-                                            <option value="RUSAK" {{ request('kondisi') == 'RUSAK' ? 'selected' : '' }}>RUSAK</option>
-                                            <option value="BARU" {{ request('kondisi') == 'BARU' ? 'selected' : '' }}>BARU</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label small fw-bold label-blue">Tgl Masuk Dari</label>
-                                        <input type="date" name="tgl_masuk_mulai" class="form-control input-custom" value="{{ request('tgl_masuk_mulai') }}">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label small fw-bold label-blue">Sampai Tgl</label>
-                                        <input type="date" name="tgl_masuk_selesai" class="form-control input-custom" value="{{ request('tgl_masuk_selesai') }}">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label small fw-bold label-blue">Tgl Keluar Dari</label>
-                                        <input type="date" name="tgl_keluar_mulai" class="form-control input-custom" value="{{ request('tgl_keluar_mulai') }}">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label small fw-bold label-blue">Sampai Tgl</label>
-                                        <input type="date" name="tgl_keluar_selesai" class="form-control input-custom" value="{{ request('tgl_keluar_selesai') }}">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-footer border-0">
-                                <a href="{{ route('sparetracker') }}" class="btn btn-light border px-4 rounded-3">Reset</a>
-                                <button type="submit" class="btn btn-primary px-4 rounded-3">Terapkan Filter</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+
             <div class="modal fade" id="modalTambahSpare" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content rounded-4 border-0 shadow-lg">
@@ -346,13 +370,13 @@
     </div>
 </div>
         </div>
-        <div class="table-responsive-custom" style="overflow-x: auto; max-width: 100%;">
-        <table class="table table-bordered">
-            <thead class="table-dark">
-                <tr>
-                    <th>NO</th>
-                    <th>SN</th>
-                    <th>NAMA PERANGKAT</th>
+        <div class="table-responsive-custom">
+        <table>
+            <thead>
+                <tr class="thead-dark">
+                    <th class="text-center sticky-col col-no">NO</th>
+                    <th class="sticky-col col-sn">SN</th>
+                    <th class="sticky-col col-nama-perangkat">NAMA PERANGKAT</th>
                     <th>JENIS</th>
                     <th>TYPE</th>
                     <th>KONDISI</th>
@@ -372,11 +396,11 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($data as $item)
+                @foreach ($spare_data as $item)
                 <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $item->sn }}</td>
-                    <td>{{ $item->nama_perangkat }}</td>
+                    <td class="text-center sticky-col col-no">{{ $loop->iteration }}</td>
+                    <td class="sticky-col col-sn">{{ $item->sn }}</td>
+                    <td class="sticky-col col-nama-perangkat">{{ $item->nama_perangkat }}</td>
                     <td>{{ $item->jenis }}</td>
                     <td>{{ $item->type }}</td>
                     <td class="text-center">
@@ -519,8 +543,9 @@
                                 </div>
                             </div>
                         </div>
-                    </td>
-                </tr>
+                    </div>
+                </div>
+            </div>
                 <form id="delete-form-{{ $item->id }}" action="{{ route('sparetracker.destroy', $item->id) }}" method="POST" style="display: none;">
                     @csrf
                     @method('DELETE')
@@ -532,52 +557,17 @@
             </tbody>
         </table>
         </div>
+        <div class="pagination-wrapper">
+            <span class="pagination-info">
+                Showing {{ $spare_data->firstItem() ?? 0 }} to {{ $spare_data->lastItem() ?? 0 }} 
+                of&nbsp;<strong>{{ $spare_data->total() }}</strong>&nbsp;results
+            </span>
+            <nav>
+                {{ $spare_data->appends(request()->query())->links("pagination::bootstrap-5") }}
+            </nav>
+        </div>
     </div>
 </div>
-<script>
-    function confirmDelete(id) {
-        Swal.fire({
-            title: 'Apakah Anda yakin?',
-            text: "Data spare part akan dihapus permanen!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, Hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('delete-form-' + id).submit();
-            }
-        });
-    }
-    @if(session('success'))
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: "{{ session('success') }}",
-            timer: 3000,
-            showConfirmButton: false
-        });
-    @endif
-    // Script pencarian otomatis
-    let timeout = null;
-    const searchInput = document.getElementById('searchInput');
-    const filterForm = document.getElementById('filterForm');
-    if(searchInput && filterForm) {
-        searchInput.addEventListener('input', function() {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-                filterForm.submit();
-            }, 500); 
-        });
-        // Fokus kursor ke akhir teks
-        searchInput.focus();
-        const val = searchInput.value;
-        searchInput.value = '';
-        searchInput.value = val;
-    }
-</script>
 </body>
 </html>
 

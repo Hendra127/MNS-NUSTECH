@@ -4,14 +4,56 @@
     @include('partials.pwa-head')
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
-    <link rel="stylesheet" href="{{ asset('css/password.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/password.css') }}?v=3.0">
+    <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}?v=1.1">
     <script src="{{ asset('js/nav-modal.js') }}"></script>
     <script src="{{ asset('js/profile-dropdown.js') }}"></script>
     @include('components.nav-modal-structure')
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Operasional</title>
+    <title>Log Perangkat | Project Operational</title>
+    <style>
+        /* Modern Table Sticky Header */
+        .table-responsive-custom table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: #f5f6fa !important;
+            color: #555 !important;
+            font-weight: 700 !important;
+            text-transform: uppercase;
+            font-size: 11px;
+            padding: 12px 15px !important;
+            border-bottom: 2px solid #e0e0e0 !important;
+            box-shadow: 0 1px 0 #e0e0e0;
+        }
+        
+        .sticky-col {
+            position: sticky !important;
+            background-color: #fff !important;
+            z-index: 5 !important;
+            background-clip: padding-box;
+        }
+        
+        thead th.sticky-col {
+            z-index: 20 !important;
+            background-color: #f5f6fa !important;
+        }
+
+        .col-no { left: 0; min-width: 50px; }
+        .col-site-id { left: 50px; min-width: 135px; }
+        .col-nama_site { left: 185px; min-width: 250px; }
+        
+        /* Striped background for sticky columns */
+        tbody tr:nth-child(even) .sticky-col {
+            background-color: #fafbfc !important;
+        }
+        
+        /* Hover effect */
+        tbody tr:hover td {
+            background-color: #f0f5fb !important;
+        }
+    </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap" rel="stylesheet">
@@ -35,7 +77,7 @@
                 @if(auth()->check() && auth()->user()->role === 'superadmin')
                     <a href="{{ route('setting.index') }}" class="user-profile-icon" title="Setting User" style="cursor: pointer; text-decoration: none; color: inherit;">
                         @if(auth()->user()->photo)
-                            <img src="{{ Storage::url(auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                         @else
                             <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
                         @endif
@@ -43,7 +85,7 @@
                 @else
                     <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
                         @if(auth()->check() && auth()->user()->photo)
-                            <img src="{{ Storage::url(auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                         @else
                             <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
                         @endif
@@ -72,22 +114,24 @@
         <a href="{{ url('/sparetracker') }}" class="tab {{ request()->is('sparetracker*') ? 'active' : '' }}" style="text-decoration: none; color: Black;">Spare Tracker</a>
         <a href="{{ url('/pm-summary') }}" class="tab {{ request()->is('pm-summary*') ? 'active' : '' }}" style="text-decoration: none; color: Black;">Summary</a>
     </div>
-    <!-- CARD -->
-    <div class="card">
-        <div class="card-header">
-            <div class="actions">
+    <!-- CONTENT -->
+    <div class="content-container">
+        <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3" style="margin-bottom: 20px;">
+            <div class="actions flex-shrink-0">
                 @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                     <button class="btn-action bi bi-plus" title="Add" id="addDataModall"></button>
                     <button class="btn-action bi bi-upload" title="Upload"></button>
                 @endif
                 <button class="btn-action bi bi-download" title="Download"></button>
             </div>
-            <form method="GET" action="{{ route('datapas') }}" class="search-form">
-                <div class="search-box">
-                    <input type="text" name="search" placeholder="Search" value="{{ request('search') }}">
-                    <button type="submit" class="search-btn">🔍</button>
-                </div>
-            </form>
+            <div class="w-100 mt-2 mt-lg-0 d-flex justify-content-lg-end">
+                <form method="GET" action="{{ route('datapas') }}" class="search-form m-0" style="max-width: 320px; width: 100%;">
+                    <div class="search-box d-flex align-items-center w-100">
+                        <input type="text" name="search" placeholder="Search" value="{{ request('search') }}" style="flex-grow: 1; border: none; outline: none; padding-left: 15px; background: transparent;">
+                        <button type="submit" class="search-btn">🔍</button>
+                    </div>
+                </form>
+            </div>
         </div>
         <div class="table-responsive-custom">
             <table>

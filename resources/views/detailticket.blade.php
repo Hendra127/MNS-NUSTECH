@@ -4,8 +4,8 @@
     @include('partials.pwa-head')
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
-    <link rel="stylesheet" href="{{ asset('css/password.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/password.css') }}?v=3.0">
+    <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}?v=1.1">
     <script src="{{ asset('js/nav-modal.js') }}"></script>
     <script src="{{ asset('js/profile-dropdown.js') }}"></script>
     @include('components.nav-modal-structure')
@@ -50,12 +50,26 @@
                 justify-content: flex-start;
                 margin-top: 10px;
             }
+            .insight-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .card-header-actions {
+                flex-direction: column;
+                align-items: stretch !important;
+                width: 100%;
+            }
+            .card-header-actions > div {
+                margin-left: 0 !important;
+                width: 100%;
+                justify-content: space-between;
+            }
         }
         /* Integrated Filter Styling inside Cards */
         .card-header-actions {
             display: flex;
             align-items: center;
             gap: 12px;
+            flex-wrap: wrap;
         }
         .filter-input-card {
             background: #ffffff;
@@ -132,7 +146,7 @@
                 @if(auth()->check() && auth()->user()->role === 'superadmin')
                     <a href="{{ route('setting.index') }}" class="user-profile-icon" title="Setting User" style="cursor: pointer; text-decoration: none; color: inherit;">
                         @if(auth()->user()->photo)
-                            <img src="{{ Storage::url(auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                         @else
                             <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
                         @endif
@@ -140,7 +154,7 @@
                 @else
                     <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
                         @if(auth()->check() && auth()->user()->photo)
-                            <img src="{{ Storage::url(auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                         @else
                             <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
                         @endif
@@ -202,7 +216,7 @@
     </div>
     {{-- CARD 2: LINE CHART WITH INTEGRATED FILTER --}}
     <div class="premium-card">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
             <h2 class="card-title mb-0">
                 <i class="bi bi-graph-up"></i>
                 <span>Monthly Progress Trend</span>

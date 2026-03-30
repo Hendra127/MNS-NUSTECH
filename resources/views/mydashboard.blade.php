@@ -155,7 +155,7 @@
     </style>
 </head>
 
-<body>
+<body data-force-light="true">
     <!-- Header -->
     <header class="header">
         <div class="header-bg-layer"></div>

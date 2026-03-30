@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-    @include('partials.pwa-head')
+  @include('partials.pwa-head')
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Landing Page Nustech</title>
@@ -9,7 +10,9 @@
   <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Roboto+Slab:wght@400;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Roboto+Slab:wght@400;600;700&display=swap"
+    rel="stylesheet">
 
   <style>
     body {
@@ -19,9 +22,10 @@
       overflow: hidden;
       height: 100vh;
       width: 100vw;
-      background-color: #4c1d95; /* fallback color */
+      background-color: #4c1d95;
+      /* fallback color */
     }
-    
+
     #bgVideo {
       position: fixed;
       top: 0;
@@ -33,24 +37,52 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     @keyframes float {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-15px); }
-      100% { transform: translateY(0px); }
+      0% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-15px);
+      }
+
+      100% {
+        transform: translateY(0px);
+      }
     }
 
     @keyframes glow {
-      0% { text-shadow: 0 0 10px rgba(14, 165, 233, 0.5); }
-      50% { text-shadow: 0 0 25px rgba(14, 165, 233, 0.8), 0 0 40px rgba(14, 165, 233, 0.4); }
-      100% { text-shadow: 0 0 10px rgba(14, 165, 233, 0.5); }
+      0% {
+        text-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+      }
+
+      50% {
+        text-shadow: 0 0 25px rgba(14, 165, 233, 0.8), 0 0 40px rgba(14, 165, 233, 0.4);
+      }
+
+      100% {
+        text-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+      }
     }
 
-    .fade-in { animation: fadeIn 2s ease-out both; }
-    .animate-float { animation: float 6s ease-in-out infinite; }
+    .fade-in {
+      animation: fadeIn 2s ease-out both;
+    }
+
+    .animate-float {
+      animation: float 6s ease-in-out infinite;
+    }
 
     .hero-glass-v2 {
       background: rgba(255, 255, 255, 0.05);
@@ -68,7 +100,7 @@
       background: linear-gradient(to bottom, #ffffff 0%, #7dd3fc 45%, #0ea5e9 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0px 8px 10px rgba(0,0,0,0.3)) drop-shadow(0px 0px 35px rgba(56, 189, 248, 0.7));
+      filter: drop-shadow(0px 8px 10px rgba(0, 0, 0, 0.3)) drop-shadow(0px 0px 35px rgba(56, 189, 248, 0.7));
       letter-spacing: 2px;
     }
 
@@ -96,7 +128,7 @@
       border-radius: 9999px;
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    
+
     .nav-glass:hover {
       background: rgba(255, 255, 255, 0.08);
       border-color: rgba(255, 255, 255, 0.3);
@@ -104,7 +136,7 @@
     }
 
     /* Dropdown Desktop */
-    .group > .dropdown-menu {
+    .group>.dropdown-menu {
       opacity: 0;
       visibility: hidden;
       transform: translateY(15px) scale(0.95);
@@ -112,7 +144,19 @@
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
     }
-    .group:hover > .dropdown-menu {
+
+    /* Bridge gap for hover */
+    .group>.dropdown-menu::before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      left: 0;
+      width: 100%;
+      height: 20px;
+      background: transparent;
+    }
+
+    .group:hover>.dropdown-menu {
       opacity: 1;
       visibility: visible;
       transform: translateY(0) scale(1);
@@ -127,6 +171,7 @@
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       font-weight: 500;
     }
+
     .dropdown-item i {
       width: 24px;
       margin-right: 12px;
@@ -135,28 +180,43 @@
       opacity: 0.7;
       transition: all 0.25s ease;
     }
+
     .dropdown-item:hover {
       background: #f0f9ff;
       color: #0369a1;
       padding-left: 28px;
     }
+
     .dropdown-item:hover i {
       opacity: 1;
       transform: scale(1.2) rotate(5deg);
     }
 
     /* Nav Link Hover Underline */
-    .nav-link { 
-      position: relative; 
+    .nav-link {
+      position: relative;
       transition: color 0.3s ease;
     }
+
     .nav-link::after {
-      content: ''; position: absolute; bottom: 0; left: 50%; width: 0;
-      height: 2px; background: #0ea5e9; transition: all 0.3s ease;
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: #0ea5e9;
+      transition: all 0.3s ease;
       transform: translateX(-50%);
     }
-    .nav-link:hover::after { width: 70%; }
-    .nav-link:hover { color: #0ea5e9; }
+
+    .nav-link:hover::after {
+      width: 70%;
+    }
+
+    .nav-link:hover {
+      color: #0ea5e9;
+    }
 
     .brand-glow {
       text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
@@ -164,10 +224,10 @@
   </style>
 </head>
 
-<body class="relative flex flex-col justify-center items-center text-gray-100">
+<body class="relative flex flex-col justify-center items-center text-gray-100" data-force-light="true">
 
   <video autoplay muted loop playsinline id="bgVideo">
-    <source src="{{ asset('assets/video/coba.mp4') }}" type="video/mp4" />
+    <source src="{{ asset('assets/video/videobackgroundweb.mp4') }}" type="video/mp4" />
   </video>
 
   <div class="absolute z-10 animate-slide-in-left w-full max-w-4xl px-8" style="top: 35%; left: 5%;">
@@ -178,9 +238,10 @@
       <p class="text-xl md:text-2xl text-white font-normal mb-10">
         <span class="font-bold underline underline-offset-[10px] decoration-white/50">Nustech Indonesia.</span>
       </p>
-      
+
       <div class="flex flex-wrap mt-2">
-        <a href="{{ route('mydashboard') }}" class="btn-simple px-8 py-3.5 flex items-center space-x-3 group text-white no-underline">
+        <a href="{{ route('mydashboard') }}"
+          class="btn-simple px-8 py-3.5 flex items-center space-x-3 group text-white no-underline">
           <span class="font-bold text-[15px]">Explore Dashboard</span>
           <i class="fa-solid fa-circle-arrow-right text-[1.1rem] group-hover:translate-x-1 transition-transform"></i>
         </a>
@@ -190,11 +251,12 @@
 
   <nav id="mainNav" class="w-full fixed top-0 left-0 z-50 py-6 transition-all duration-300">
     <div class="max-w-[95%] xl:max-w-7xl mx-auto px-6 flex items-center justify-between nav-glass py-2">
-      
+
       <!-- Brand Logo Section -->
       <a href="/" class="flex items-center space-x-3 group">
         <div class="flex items-center justify-center">
-          <img src="{{ asset('assets/img/logonustech.png') }}" alt="Nustech Logo" class="h-11 w-auto drop-shadow-lg transform transition-transform group-hover:scale-105" />
+          <img src="{{ asset('assets/img/logonustech.png') }}" alt="Nustech Logo"
+            class="h-11 w-auto drop-shadow-lg transform transition-transform group-hover:scale-105" />
         </div>
         <span class="text-xl font-bold tracking-tight brand-glow">
           NUS<span class="text-blue-400">TECH</span>
@@ -203,12 +265,13 @@
 
       <!-- Desktop Navigation -->
       <ul class="hidden lg:flex items-center space-x-1 font-medium text-white">
-        
+
         <li class="relative group">
           <a href="#" class="nav-link px-4 py-2 flex items-center">
             Data Site
           </a>
-          <div class="dropdown-menu absolute top-full left-0 mt-3 w-60 bg-white rounded-2xl shadow-2xl z-50 overflow-hidden py-2 border border-blue-50">
+          <div
+            class="dropdown-menu absolute top-full left-0 mt-3 w-60 bg-white rounded-2xl shadow-2xl z-50 overflow-hidden py-2 border border-blue-50">
             <a href="{{ route('datasite') }}" class="dropdown-item">
               <i class="fa-solid fa-server"></i> Data Site
             </a>
@@ -231,7 +294,8 @@
           <a href="#" class="nav-link px-4 py-2 flex items-center">
             Tiket
           </a>
-          <div class="dropdown-menu absolute top-full left-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl z-50 overflow-hidden py-2 border border-blue-50">
+          <div
+            class="dropdown-menu absolute top-full left-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl z-50 overflow-hidden py-2 border border-blue-50">
             <a href="{{ route('open.ticket') }}" class="dropdown-item">
               <i class="fa-solid fa-ticket"></i> Open Tiket
             </a>
@@ -254,7 +318,8 @@
           <a href="#" class="nav-link px-4 py-2 flex items-center">
             Log Perangkat
           </a>
-          <div class="dropdown-menu absolute top-full left-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl z-50 overflow-hidden py-2 border border-blue-50">
+          <div
+            class="dropdown-menu absolute top-full left-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl z-50 overflow-hidden py-2 border border-blue-50">
             <a href="{{ route('pergantianperangkat') }}" class="dropdown-item">
               <i class="fa-solid fa-recycle"></i> Pergantian Perangkat
             </a>
@@ -274,7 +339,8 @@
           <a href="#" class="nav-link px-4 py-2 flex items-center">
             Jadwal Piket
           </a>
-          <div class="dropdown-menu absolute top-full left-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl z-50 overflow-hidden py-2 border border-blue-50">
+          <div
+            class="dropdown-menu absolute top-full left-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl z-50 overflow-hidden py-2 border border-blue-50">
             <a href="{{ route('jadwalpiket') }}" class="dropdown-item">
               <i class="fa-solid fa-calendar-days"></i> Lihat Jadwal
             </a>
@@ -288,7 +354,8 @@
               <a href="#" class="nav-link px-4 py-2 flex items-center">
                 SLA
               </a>
-              <div class="dropdown-menu absolute top-full left-0 mt-3 w-52 bg-white rounded-2xl shadow-2xl z-50 overflow-hidden py-2 border border-blue-50">
+              <div
+                class="dropdown-menu absolute top-full left-0 mt-3 w-52 bg-white rounded-2xl shadow-2xl z-50 overflow-hidden py-2 border border-blue-50">
                 <a href="{{ url('rekap-bmn') }}" class="dropdown-item">
                   <i class="fa-solid fa-file-export"></i> Rekap BMN
                 </a>
@@ -301,25 +368,28 @@
         @endauth
 
         <li><a href="{{ route('todolist') }}" class="nav-link px-4 py-2">To Do List</a></li>
-        
+
         @auth
           @if (Auth::user()->role === 'superadmin')
             <li><a href="{{ url('users') }}" class="nav-link px-4 py-2 text-cyan-200 hover:text-cyan-400">Users</a></li>
           @endif
-          
+
           <div class="h-6 w-px bg-white/20 mx-2"></div>
 
           <li class="flex items-center space-x-3 pl-2">
-            <a href="{{ route('profile.edit') }}" class="flex items-center space-x-2 text-white/90 hover:text-white transition group">
-              <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-400/30 group-hover:bg-blue-500/40 transition-all">
+            <a href="{{ route('profile.edit') }}"
+              class="flex items-center space-x-2 text-white/90 hover:text-white transition group">
+              <div
+                class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-400/30 group-hover:bg-blue-500/40 transition-all">
                 <i class="fa-solid fa-user text-xs"></i>
               </div>
               <span class="text-sm font-semibold">Profile</span>
             </a>
-            
+
             <form action="{{ route('logout') }}" method="POST" class="inline">
               @csrf
-              <button type="submit" class="bg-red-500/20 hover:bg-red-500/80 border border-red-500/50 hover:border-red-500 text-red-200 hover:text-white px-5 py-1.5 rounded-full text-xs font-bold transition-all duration-300 backdrop-blur-sm flex items-center">
+              <button type="submit"
+                class="bg-red-500/20 hover:bg-red-500/80 border border-red-500/50 hover:border-red-500 text-red-200 hover:text-white px-5 py-1.5 rounded-full text-xs font-bold transition-all duration-300 backdrop-blur-sm flex items-center">
                 <i class="fa-solid fa-right-from-bracket mr-2"></i> LOGOUT
               </button>
             </form>
@@ -334,29 +404,67 @@
 
     </div>
 
-    <div id="mobile-menu" class="hidden md:hidden bg-white text-gray-800 w-full absolute top-full left-0 shadow-2xl border-t border-gray-100">
+    <div id="mobile-menu"
+      class="hidden md:hidden bg-white text-gray-800 w-full absolute top-full left-0 shadow-2xl border-t border-gray-100 max-h-[80vh] overflow-y-auto">
       <ul class="flex flex-col p-4 space-y-1">
-        <li><a href="{{ route('datasite') }}" class="block p-3 border-b border-gray-50">Data Site</a></li>
-        <li><a href="{{ route('open.ticket') }}" class="block p-3 border-b border-gray-50">Open Tiket</a></li>
-        <li><a href="{{ route('close.ticket') }}" class="block p-3 border-b border-gray-50">Close Tiket</a></li>
-        <li><a href="{{ route('summaryticket') }}" class="block p-3 border-b border-gray-50">Summary Tiket</a></li>
-        <li><a href="{{ route('detailticket') }}" class="block p-3 border-b border-gray-50">Detail Tiket</a></li>
-        <li><a href="{{ route('todolist') }}" class="block p-3 border-b border-gray-50">To Do List</a></li>
+        <!-- Data Site -->
+        <li class="font-bold px-3 pt-3 text-blue-600 text-sm">DATA SITE</li>
+        <li><a href="{{ route('datasite') }}" class="block px-3 py-2 border-b border-gray-50">Data Site</a></li>
+        <li><a href="{{ route('datapas') }}" class="block px-3 py-2 border-b border-gray-50">Manajemen Password</a></li>
+        <li><a href="{{ route('laporancm') }}" class="block px-3 py-2 border-b border-gray-50">Corrective
+            Maintenance</a></li>
+        <li><a href="{{ route('pmliberta') }}" class="block px-3 py-2 border-b border-gray-50">Preventive
+            Maintenance</a></li>
+        <li><a href="{{ route('summarypm') }}" class="block px-3 py-2 border-b border-gray-50">Summary PM</a></li>
+
+        <!-- Tiket -->
+        <li class="font-bold px-3 pt-4 text-blue-600 text-sm">TIKET</li>
+        <li><a href="{{ route('open.ticket') }}" class="block px-3 py-2 border-b border-gray-50">Open Tiket</a></li>
+        <li><a href="{{ route('close.ticket') }}" class="block px-3 py-2 border-b border-gray-50">Close Tiket</a></li>
+        <li><a href="{{ route('summaryticket') }}" class="block px-3 py-2 border-b border-gray-50">Summary Tiket</a>
+        </li>
+        <li><a href="{{ route('detailticket') }}" class="block px-3 py-2 border-b border-gray-50">Detail Tiket</a></li>
+
+        <!-- Log Perangkat -->
+        <li class="font-bold px-3 pt-4 text-blue-600 text-sm">LOG PERANGKAT</li>
+        <li><a href="{{ route('pergantianperangkat') }}" class="block px-3 py-2 border-b border-gray-50">Pergantian
+            Perangkat</a></li>
+        <li><a href="{{ route('logpergantian') }}" class="block px-3 py-2 border-b border-gray-50">Log Pergantian</a>
+        </li>
+        <li><a href="{{ route('sparetracker') }}" class="block px-3 py-2 border-b border-gray-50">Spare Tracker</a></li>
+        <li><a href="{{ route('summaryperangkat') }}" class="block px-3 py-2 border-b border-gray-50">PM Summary</a>
+        </li>
+
+        <!-- Operasional -->
+        <li class="font-bold px-3 pt-4 text-blue-600 text-sm">LAINNYA</li>
+        <li><a href="{{ route('jadwalpiket') }}" class="block px-3 py-2 border-b border-gray-50">Jadwal Piket</a></li>
+        <li><a href="{{ route('todolist') }}" class="block px-3 py-2 border-b border-gray-50">To Do List</a></li>
+
         @auth
-            <li><a href="{{ route('profile.edit') }}" class="block p-3 border-b border-gray-50">Profile</a></li>
-            <li>
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button class="w-full text-left p-3 text-red-600">Logout</button>
-                </form>
-            </li>
+          @if (in_array(Auth::user()->role, ['admin', 'superadmin']))
+            <li class="font-bold px-3 pt-4 text-slate-500 text-sm">SLA / REPORT</li>
+            <li><a href="{{ url('rekap-bmn') }}" class="block px-3 py-2 border-b border-gray-50">Rekap BMN</a></li>
+            <li><a href="{{ url('rekap-sl') }}" class="block px-3 py-2 border-b border-gray-50">Rekap SL</a></li>
+          @endif
+        @endauth
+
+        @auth
+          <li class="mt-4"><a href="{{ route('profile.edit') }}"
+              class="block px-3 py-2 border-t border-gray-100 font-bold">Profile</a></li>
+          <li>
+            <form action="{{ route('logout') }}" method="POST">
+              @csrf
+              <button class="w-full text-left px-3 py-2 text-red-600 font-bold">Logout</button>
+            </form>
+          </li>
         @endauth
       </ul>
     </div>
   </nav>
 
   <footer class="w-full absolute bottom-0 left-0 py-6 text-sm text-center fade-in text-white/60">
-    &copy; <script>document.write(new Date().getFullYear())</script> Nustech Indonesia. All rights reserved.
+    &copy;
+    <script>document.write(new Date().getFullYear())</script> Nustech Indonesia. All rights reserved.
   </footer>
 
   <script>
@@ -378,30 +486,31 @@
     });
 
     // Auto Logout Script based on Inactivity
-    (function() {
-        let timeout;
-        const maxIdleTime = 3600000; // 1 jam (3.600.000 ms)
+    (function () {
+      let timeout;
+      const maxIdleTime = 3600000; // 1 jam (3.600.000 ms)
 
-        function resetTimer() {
-            clearTimeout(timeout);
-            timeout = setTimeout(logoutUser, maxIdleTime);
+      function resetTimer() {
+        clearTimeout(timeout);
+        timeout = setTimeout(logoutUser, maxIdleTime);
+      }
+
+      function logoutUser() {
+        const logoutBtn = document.querySelector('form[action="{{ route('logout') }}"]');
+        if (logoutBtn) {
+          logoutBtn.submit();
         }
+      }
 
-        function logoutUser() {
-            const logoutBtn = document.querySelector('form[action="{{ route('logout') }}"]');
-            if (logoutBtn) {
-                logoutBtn.submit();
-            }
-        }
-
-        window.onload = resetTimer;
-        window.onmousemove = resetTimer;
-        window.onmousedown = resetTimer; 
-        window.ontouchstart = resetTimer;
-        window.onclick = resetTimer;     
-        window.onkeydown = resetTimer;   
-        window.addEventListener('scroll', resetTimer, true);
+      window.onload = resetTimer;
+      window.onmousemove = resetTimer;
+      window.onmousedown = resetTimer;
+      window.ontouchstart = resetTimer;
+      window.onclick = resetTimer;
+      window.onkeydown = resetTimer;
+      window.addEventListener('scroll', resetTimer, true);
     })();
   </script>
 </body>
+
 </html>

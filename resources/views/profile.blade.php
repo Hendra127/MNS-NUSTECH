@@ -4,7 +4,7 @@
     @include('partials.pwa-head')
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
-    <link rel="stylesheet" href="{{ asset('css/password.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/password.css') }}?v=3.0">
     <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}">
     <script src="{{ asset('js/nav-modal.js') }}"></script>
     <script src="{{ asset('js/profile-dropdown.js') }}"></script>
@@ -296,23 +296,13 @@
                 </a>
             @endif
             <div class="user-profile-wrapper" style="position: relative;">
-                @if(auth()->check() && auth()->user()->role === 'superadmin')
-                    <a href="{{ route('setting.index') }}" class="user-profile-icon" title="Setting User" style="cursor: pointer; text-decoration: none; color: inherit;">
-                        @if(auth()->user()->photo)
-                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
-                        @else
-                            <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
-                        @endif
-                    </a>
-                @else
-                    <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
-                        @if(auth()->check() && auth()->user()->photo)
-                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
-                        @else
-                            <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
-                        @endif
-                    </div>
-                @endif
+                <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer; text-decoration: none; color: inherit;">
+                    @if(auth()->check() && auth()->user()->photo)
+                        <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                    @else
+                        <i class="bi bi-person-circle" style="font-size: 1.5rem; color: white;"></i>
+                    @endif
+                </div>
                 <div id="profileDropdownMenu" class="hidden" style="position: absolute; right: 0; top: 100%; mt: 10px; width: 150px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; display: none; flex-direction: column; overflow: hidden;">
                     <div style="padding: 10px 15px; border-bottom: 1px solid #eee; font-size: 14px; font-weight: bold; color: #333;">
                         {{ auth()->user()->name ?? 'User' }}
@@ -344,7 +334,7 @@
                     @else
                         <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=random&size=200" alt="Default Avatar" class="profile-photo-preview" id="photoPreview" onclick="openPhotoViewer(this.src)">
                     @endif
-                    <div class="camera-badge" onclick="document.getElementById('photoInput').click()">
+                    <div class="camera-badge" onclick="showPhotoSourceOptions()">
                         <i class="bi bi-camera"></i>
                     </div>
                 </div>
@@ -420,8 +410,136 @@
             <img src="" id="fullPhoto" class="viewer-image">
         </div>
     </div>
+
+    <!-- Camera Modal -->
+    <div class="modal fade" id="cameraModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="modal-header border-0 bg-dark text-white p-4">
+                    <h5 class="modal-title fw-bold mb-0 text-center w-100"><i class="bi bi-camera-fill me-2"></i> Ambil Foto Profil</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" onclick="stopCamera()"></button>
+                </div>
+                <div class="modal-body p-0 bg-black position-relative" style="aspect-ratio: 1/1; min-height: 320px;">
+                    <video id="cameraStream" autoplay playsinline class="w-100 h-100" style="object-fit: cover;"></video>
+                    <canvas id="cameraCanvas" style="display: none;"></canvas>
+                    <div id="captureCountdown" class="position-absolute top-50 left-50 translate-middle text-white display-1 fw-bold" style="display: none;"></div>
+                </div>
+                <div class="modal-footer border-0 p-4 bg-white d-flex justify-content-center gap-3">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal" onclick="stopCamera()">Batal</button>
+                    <button type="button" class="btn btn-primary rounded-circle p-0 d-flex align-items-center justify-content-center shadow-lg" id="captureBtn" onclick="takePhoto()" style="width: 70px; height: 70px; font-size: 1.8rem; background: #0f3b56; border: none;">
+                        <i class="bi bi-camera"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        let stream = null;
+        const cameraModal = new bootstrap.Modal(document.getElementById('cameraModal'));
+
+        function showPhotoSourceOptions() {
+            Swal.fire({
+                title: 'Pilih Sumber Foto',
+                text: 'Bagaimana Anda ingin mengganti foto profil?',
+                icon: 'question',
+                showCancelButton: true,
+                showDenyButton: true,
+                confirmButtonText: '<i class="bi bi-folder-fill me-2"></i> Pilih File',
+                denyButtonText: '<i class="bi bi-camera-fill me-2"></i> Buka Kamera',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#0f3b56',
+                denyButtonColor: '#3498db',
+                customClass: {
+                    popup: 'rounded-5',
+                    confirmButton: 'rounded-pill px-4',
+                    denyButton: 'rounded-pill px-4',
+                    cancelButton: 'rounded-pill px-4'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('photoInput').click();
+                } else if (result.isDenied) {
+                    startCamera();
+                }
+            });
+        }
+
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user", aspectRatio: 1/1 }, 
+                    audio: false 
+                });
+                const video = document.getElementById('cameraStream');
+                video.srcObject = stream;
+                cameraModal.show();
+            } catch (err) {
+                console.error("Camera access error:", err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kamera Gagal Akses',
+                    text: 'Pastikan Anda telah memberikan izin akses kamera pada browser.',
+                    confirmButtonColor: '#0f3b56',
+                    customClass: { popup: 'rounded-5' }
+                });
+            }
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+        }
+
+        function takePhoto() {
+            const video = document.getElementById('cameraStream');
+            const canvas = document.getElementById('cameraCanvas');
+            const context = canvas.getContext('2d');
+            
+            // Set canvas size to match video
+            const size = Math.min(video.videoWidth, video.videoHeight);
+            canvas.width = size;
+            canvas.height = size;
+            
+            // Center crop to square
+            const startX = (video.videoWidth - size) / 2;
+            const startY = (video.videoHeight - size) / 2;
+            
+            context.drawImage(video, startX, startY, size, size, 0, 0, size, size);
+            
+            // Convert to data URL for preview
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+            document.getElementById('photoPreview').src = dataUrl;
+            
+            // Convert to BLOB and set to Input File
+            canvas.toBlob((blob) => {
+                const file = new File([blob], "profile_photo.jpg", { type: "image/jpeg" });
+                
+                // Use DataTransfer to set file to input
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                document.getElementById('photoInput').files = dataTransfer.files;
+                
+                cameraModal.hide();
+                stopCamera();
+                
+                // Show success toast
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true
+                });
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Foto kamera berhasil diambil'
+                });
+            }, 'image/jpeg', 0.9);
+        }
+
         function openPhotoViewer(src) {
             const modal = document.getElementById('photoViewerModal');
             const fullImg = document.getElementById('fullPhoto');

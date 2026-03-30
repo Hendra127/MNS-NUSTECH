@@ -4,14 +4,15 @@
     @include('partials.pwa-head')
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
-    <link rel="stylesheet" href="{{ asset('css/password.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/password.css') }}?v=3.0">
+    <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}?v=1.1">
     <script src="{{ asset('js/nav-modal.js') }}"></script>
     <script src="{{ asset('js/profile-dropdown.js') }}"></script>
     @include('components.nav-modal-structure')
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Open Ticket | Project Operational</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
      <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -103,6 +104,61 @@
         [data-bs-theme="dark"] .btn-remote-action {
             color: #7ec8e3 !important; /* cyan-teal sesuai ikon edit di dark mode */
         }
+        /* Sorting Styles */
+        thead th a {
+            color: #555 !important;
+            font-size: 11px;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        thead th a:hover {
+            color: #0b5ed7 !important;
+        }
+        thead th:has(a):hover {
+            background-color: #f1f3f7 !important;
+        }
+        
+        /* Active Sorting Style — Jauh lebih jelas */
+        thead th.sorting-active {
+            background-color: #e8f4ff !important; /* Biru muda sangat halus */
+            border-bottom: 2px solid #007bff !important;
+        }
+        thead th.sorting-active a {
+            color: #007bff !important;
+        }
+        thead th.sorting-active i {
+            font-size: 1rem !important;
+            font-weight: 800 !important;
+            opacity: 1 !important;
+        }
+
+        .bi-chevron-expand {
+            font-size: 0.75rem;
+            opacity: 0.4;
+        }
+
+        /* Sorting Caret Stack — Sesuai permintaan gambar */
+        .sort-icon-stack {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            line-height: 1;
+            margin-left: 4px;
+        }
+        .sort-icon-stack i {
+            font-size: 0.65rem !important;
+            margin: -2px 0;
+            transition: color 0.2s;
+        }
+        .sort-icon-stack i.active {
+            color: #007bff !important;
+            opacity: 1 !important;
+        }
+        .sort-icon-stack i.inactive {
+            color: #ccc !important;
+            opacity: 0.5;
+        }
     </style>
 </head>
 <body>
@@ -163,24 +219,24 @@
         <a href="{{ url('/close-ticket') }}" class="tab {{ request()->is('close-ticket*') ? 'active' : '' }}" style="text-decoration: none; color: Black;">Close Tiket</a>
         <a href="{{ url('/detailticket') }}" class="tab {{ request()->is('detailticket*') ? 'active' : '' }}" style="text-decoration: none; color: Black;">Detail Tiket</a>
         <a href="{{ url('/summaryticket') }}" class="tab {{ request()->is('summaryticket*') ? 'active' : '' }}" style="text-decoration: none; color: Black;">Summary Tiket</a>
-        <div class="ms-auto d-flex align-items-center">
+        <div id="summary-badges" class="ms-auto d-flex align-items-center">
             <span class="summary-badge text-black">Total Open: <b>{{ $openAllCount }}</b></span>
             <span class="summary-badge text-black">Open Hari Ini: <b>{{ $openTodayCount }}</b></span>
             <span class="summary-badge text-dark">BMN: <b>{{ $countBMN }}</b></span>
             <span class="summary-badge text-dark">SL: <b>{{ $countSL }}</b></span>
         </div>
     </div>
-    <!-- CARD -->
-    <div class="card">
-        <div class="card-header">
-            <div class="actions">
+    <!-- CONTENT -->
+    <div class="content-container">
+        <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3" style="margin-bottom: 20px;">
+            <div class="actions flex-shrink-0">
                 @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                     <button class="btn-action bi bi-plus" 
                             title="Add" 
                             data-bs-toggle="modal" 
                             data-bs-target="#modalTambahTicket">
                     </button>
-                    <form action="{{ route('open.ticket.import') }}" method="POST" enctype="multipart/form-data" id="importForm">
+                    <form action="{{ route('open.ticket.import') }}" method="POST" enctype="multipart/form-data" id="importForm" class="m-0">
                         @csrf
                         <input type="file" name="file" id="fileInput" style="display: none;" onchange="document.getElementById('importForm').submit();">
                         <button type="button" class="btn-action bi bi-upload" title="Upload" onclick="document.getElementById('fileInput').click();">
@@ -189,14 +245,45 @@
                 @endif
                 <button class="btn-action bi bi-download" title="Download"></button>
             </div>
-            <div class="d-flex align-items-center gap-2">
-                <button type="button" class="btn-filter-pill" data-bs-toggle="modal" data-bs-target="#modalFilter">
-                    <i class="bi bi-funnel"></i> Filter
-                </button>
-                <form method="GET" action="{{ route('open.ticket') }}" class="search-form">
-                    <div class="search-box d-flex align-items-center">
-                        <input type="text" id="searchInput" name="q" placeholder="Search..." value="{{ request('q') }}" style="flex-grow: 1; border: none; outline: none; padding-left: 15px;">
-                        <button type="submit" class="search-btn">🔍</button>
+            <div class="w-100 mt-2 mt-lg-0">
+                <form id="filterForm" method="GET" action="{{ route('open.ticket') }}" class="search-form row g-2 align-items-center w-100 m-0 justify-content-lg-end">
+                    {{-- Hidden inputs to preserve sorting when filtering/searching --}}
+                    <input type="hidden" name="sort" value="{{ request('sort', 'tanggal_rekap') }}">
+                    <input type="hidden" name="order" value="{{ request('order', 'desc') }}">
+
+                    <div class="col-auto">
+                        <input type="number" name="per_page" class="form-control form-control-sm text-center" min="1" placeholder="Data" value="{{ request('per_page', 50) }}" title="Jumlah data" style="width: 70px;">
+                    </div>
+
+                    <div class="col-12 col-md-auto">
+                        <select name="kategori" class="form-select form-select-sm w-100">
+                            <option value="">Semua Kategori</option>
+                            <option value="BMN" {{ request('kategori') == 'BMN' ? 'selected' : '' }}>BMN</option>
+                            <option value="SL" {{ request('kategori') == 'SL' ? 'selected' : '' }}>SL</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-12 col-md-auto">
+                        <input type="date" name="tgl_mulai" class="form-control form-control-sm w-100" value="{{ request('tgl_mulai') }}" title="Dari Tanggal">
+                    </div>
+                    
+                    <div class="col-12 col-md-auto">
+                        <input type="date" name="tgl_selesai" class="form-control form-control-sm w-100" value="{{ request('tgl_selesai') }}" title="Sampai Tanggal">
+                    </div>
+
+                    <div class="col-auto">
+                        <button type="submit" class="btn-filter-pill w-100 justify-content-center">
+                            <i class="bi bi-funnel"></i> Filter
+                        </button>
+                    </div>
+                    <div class="col-auto">
+                        <a href="{{ route('open.ticket') }}" class="btn btn-light btn-sm rounded-pill border d-flex align-items-center justify-content-center h-100" title="Reset Filter"><i class="bi bi-arrow-repeat"></i></a>
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <div class="search-box d-flex align-items-center w-100">
+                            <input type="text" id="searchInput" name="q" placeholder="Search..." value="{{ request('q') }}" style="flex-grow: 1; border: none; outline: none; padding-left: 15px;">
+                            <button type="submit" class="search-btn">🔍</button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -205,6 +292,8 @@
 
 
         {{-- TABLE --}}
+        {{-- TABLE CONTAINER UNTUK AJAX RELOAD --}}
+        <div id="table-container">
         <div class="table-responsive-custom">
             <table>
                 <thead>
@@ -212,8 +301,26 @@
                         <th class="sticky-col col-no">NO</th>
                         <th class="sticky-col col-site-id">SITE ID</th>
                         <th class="sticky-col col-nama_site">NAMA SITE</th>
-                        <th>DURASI</th>
-                        <th>TANGGAL OPEN</th>
+                        <th class="text-center {{ request('sort') == 'durasi' ? 'sorting-active' : '' }}" style="min-width: 120px; cursor: pointer;">
+                            <a href="{{ request()->fullUrlWithQuery(['sort' => 'durasi', 'order' => (request('sort') == 'durasi' && request('order') == 'asc') ? 'desc' : 'asc']) }}" 
+                               class="text-decoration-none d-flex align-items-center justify-content-center gap-1">
+                                DURASI
+                                <div class="sort-icon-stack">
+                                    <i class="bi bi-caret-up-fill {{ request('sort') == 'durasi' && request('order') == 'asc' ? 'active' : 'inactive' }}"></i>
+                                    <i class="bi bi-caret-down-fill {{ request('sort') == 'durasi' && request('order') == 'desc' ? 'active' : 'inactive' }}"></i>
+                                </div>
+                            </a>
+                        </th>
+                        <th class="text-center {{ request('sort') == 'tanggal_rekap' || !request('sort') ? 'sorting-active' : '' }}" style="min-width: 150px; cursor: pointer;">
+                            <a href="{{ request()->fullUrlWithQuery(['sort' => 'tanggal_rekap', 'order' => (request('sort') == 'tanggal_rekap' && request('order') == 'asc') ? 'desc' : 'asc']) }}" 
+                               class="text-decoration-none d-flex align-items-center justify-content-center gap-1">
+                                TANGGAL OPEN
+                                <div class="sort-icon-stack">
+                                    <i class="bi bi-caret-up-fill {{ (request('sort') == 'tanggal_rekap' || !request('sort')) && request('order') == 'asc' ? 'active' : 'inactive' }}"></i>
+                                    <i class="bi bi-caret-down-fill {{ (request('sort') == 'tanggal_rekap' || !request('sort')) && request('order', 'desc') == 'desc' ? 'active' : 'inactive' }}"></i>
+                                </div>
+                            </a>
+                        </th>
                         <th>PROVINSI</th>
                         <th>KABUPATEN</th>
                         <th>KATEGORI</th>
@@ -249,9 +356,9 @@
                         <td>{{ $t->provinsi }}</td>
                         <td>{{ $t->kabupaten }}</td>
                         <td class="text-center">
-                            @if($t->kategori == 'BARANG MILIK NEGARA (BMN)')
+                            @if(in_array($t->kategori, ['BMN', 'BARANG MILIK NEGARA (BMN)']))
                                 BMN
-                            @elseif($t->kategori == 'SEWA LAYANAN')
+                            @elseif(in_array($t->kategori, ['SL', 'SEWA LAYANAN']))
                                 SL
                             @else
                                 {{ $t->kategori }}
@@ -295,6 +402,137 @@
                                 <i class="bi bi-broadcast"></i>
                             </button>
                             @endif
+
+                            {{-- MODAL EDIT TICKET --}}
+                            <div class="modal fade" id="modalEditTicket{{ $t->id }}" tabindex="-1">
+                                <div class="modal-dialog modal-xl modal-dialog-centered text-start">
+                                    <form method="POST" action="{{ route('open.ticket.update', $t->id) }}" class="modal-content" enctype="multipart/form-data">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="modal-header text-white d-flex justify-content-center position-relative" style="background-color: #071152;">
+                                            <h5 class="modal-title w-100 text-center"><i class="bi bi-pencil-square"></i> Edit Tiket - {{ $t->nama_site }}</h5>
+                                            <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row g-3">
+                                                <div class="col-md-4">
+                                                    <label class="form-label fw-bold">Site ID / Code</label>
+                                                    <input type="text" class="form-control bg-light" value="{{ $t->site_code }}" readonly>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Nama Site</label>
+                                                    <input type="text" class="form-control bg-light" value="{{ $t->nama_site }}" readonly>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Durasi Berjalan (Hari)</label>
+                                                    @php
+                                                        $tanggalRekapEdit = \Carbon\Carbon::parse($t->tanggal_rekap)->startOfDay();
+                                                        $hariAkhirEdit = (in_array(strtolower($t->status), ['close', 'closed']) && $t->tanggal_close) 
+                                                                        ? \Carbon\Carbon::parse($t->tanggal_close)->startOfDay() 
+                                                                        : now()->startOfDay();
+                                                        $durasiEdit = $tanggalRekapEdit->diffInDays($hariAkhirEdit);
+                                                    @endphp
+                                                    <input type="text" class="form-control bg-light" value="{{ floor($durasiEdit) }}" readonly>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Provinsi</label>
+                                                    <input type="text" class="form-control bg-light" value="{{ $t->provinsi }}" readonly>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Kabupaten</label>
+                                                    <input type="text" class="form-control bg-light" value="{{ $t->kabupaten }}" readonly>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label fw-bold text-primary">Kategori</label>
+                                                    <select name="kategori" class="form-select" required>
+                                                        <option value="BMN" {{ in_array($t->kategori, ['BMN', 'BARANG MILIK NEGARA (BMN)']) ? 'selected' : '' }}>BMN</option>
+                                                        <option value="SL" {{ in_array($t->kategori, ['SL', 'SEWA LAYANAN']) ? 'selected' : '' }}>SL</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label fw-bold text-primary">Tanggal Open/Rekap</label>
+                                                    <input type="date" name="tanggal_rekap" class="form-control" value="{{ $t->tanggal_rekap }}" required>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <label class="form-label fw-bold text-primary">Kendala</label>
+                                                    <input type="text" name="kendala" class="form-control" value="{{ $t->kendala }}" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-bold text-primary">Detail Problem</label>
+                                                    <textarea name="detail_problem" class="form-control" rows="3" required>{{ $t->detail_problem }}</textarea>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-bold text-primary">Action Plan</label>
+                                                    <textarea name="plan_actions" class="form-control" rows="3" required>{{ $t->plan_actions }}</textarea>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label fw-bold text-primary">CE (Customer Engineer)</label>
+                                                    <select name="ce" class="form-select" required>
+                                                        <option value="">-- Pilih CE --</option>
+                                                        <option value="Eka Mahatva Yudha" {{ $t->ce == 'Eka Mahatva Yudha' ? 'selected' : '' }}>Eka Mahatva Yudha</option>
+                                                        <option value="Herman Seprianto" {{ $t->ce == 'Herman Seprianto' ? 'selected' : '' }}>Herman Seprianto</option>
+                                                        <option value="Moh. Walangadi" {{ $t->ce == 'Moh. Walangadi' ? 'selected' : '' }}>Moh. Walangadi</option>
+                                                        <option value="Ahmad Suhaini" {{ $t->ce == 'Ahmad Suhaini' ? 'selected' : '' }}>Ahmad Suhaini</option>
+                                                        <option value="Hasrul Fandi Serang" {{ $t->ce == 'Hasrul Fandi Serang' ? 'selected' : '' }}>Hasrul Fandi Serang</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label fw-bold text-primary">Evidence (Foto/Video)</label>
+                                                    <input type="file" name="evidence" class="form-control" accept="image/*,video/*">
+                                                    @if($t->evidence)
+                                                        <div class="mt-1">
+                                                            <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage/' . $t->evidence) }}')" class="text-info small">
+                                                                <i class="bi bi-eye"></i> Lihat Evidence saat ini
+                                                            </a>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                            <button type="submit" class="btn btn-secondary px-4">Update Data Tiket</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            {{-- MODAL CLOSE TICKET --}}
+                            <div class="modal fade" id="modalCloseTicket{{ $t->id }}" tabindex="-1">
+                                <div class="modal-dialog modal-dialog-centered text-start">
+                                    <form method="POST" action="{{ route('open.ticket.close', $t->id) }}" class="modal-content">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="modal-header text-white position-relative" style="background-color: #198754; padding: 1rem 3rem;">
+                                            <div class="w-100 text-center">
+                                                <div class="fw-bold" style="font-size: 1.05rem; line-height: 1.3;">
+                                                    <i class="bi bi-x-circle me-1"></i> Close Tiket
+                                                </div>
+                                                <div class="mt-1 text-white text-opacity-90" style="font-size: 0.8rem; line-height: 1.4; word-break: break-word; white-space: normal;">{{ $t->nama_site }}</div>
+                                            </div>
+                                            <button type="button" class="btn-close btn-close-white position-absolute top-50 end-0 translate-middle-y me-3" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">Tanggal Close</label>
+                                                <input type="date" name="tanggal_close" class="form-control" value="{{ date('Y-m-d') }}" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">Problem (Detail Masalah)</label>
+                                                <textarea name="detail_problem" class="form-control" rows="3" required>{{ $t->detail_problem }}</textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">Action Plan (Tindakan)</label>
+                                                <textarea name="plan_actions" class="form-control" rows="3" required>{{ $t->plan_actions }}</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                            <button type="submit" class="btn btn-success px-4">Simpan & Close Tiket</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                             <!-- Modal Info -->
                             <div class="modal fade" id="modalInfo{{ $t->id }}" tabindex="-1" aria-labelledby="label{{ $t->id }}" aria-hidden="true">
                                 <div class="modal-dialog modal-xl modal-dialog-centered">
@@ -449,7 +687,15 @@
                 </tbody>
             </table>
         </div>
-        <div class="mt-3">{{ $tickets->links() }}</div>
+        <div class="pagination-wrapper">
+            <span class="pagination-info">
+                Showing {{ $tickets->firstItem() ?? 0 }} to {{ $tickets->lastItem() ?? 0 }} 
+                of&nbsp;<strong>{{ $tickets->total() }}</strong>&nbsp;results
+            </span>
+            <nav>
+                {{ $tickets->links() }}
+            </nav>
+        </div> {{-- End of #table-container --}}
     </div>
 </div>
 {{-- MODAL TAMBAH TICKET --}}
@@ -545,175 +791,6 @@
         </form>
     </div>
 </div>
-{{-- MODAL FILTER --}}
-<div class="modal fade" id="modalFilter" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header text-white d-flex justify-content-center position-relative" style="background-color: #071152;">
-                <h5 class="modal-title w-100 text-center">Filter Data Tiket</h5>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form method="GET" action="{{ route('open.ticket') }}">
-                <div class="modal-body">
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <label class="form-label small fw-bold">Kategori</label>
-                            <select name="kategori" class="form-select">
-                                <option value="">Semua Kategori</option>
-                                <option value="BMN" {{ request('kategori') == 'BMN' ? 'selected' : '' }}>BMN</option>
-                                <option value="SL" {{ request('kategori') == 'SL' ? 'selected' : '' }}>SL</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold">Dari Tanggal</label>
-                            <input type="date" name="tgl_mulai" class="form-control" value="{{ request('tgl_mulai') }}">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold">Sampai Tanggal</label>
-                            <input type="date" name="tgl_selesai" class="form-control" value="{{ request('tgl_selesai') }}">
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <a href="{{ route('open.ticket') }}" class="btn btn-light border">Reset</a>
-                    <button type="submit" class="btn btn-primary">Terapkan Filter</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-{{-- MODAL EDIT TICKET (Dibuat untuk setiap tiket yang ada) --}}
-@foreach($tickets as $t)
-<div class="modal fade" id="modalEditTicket{{ $t->id }}" tabindex="-1">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-        <form method="POST" action="{{ route('open.ticket.update', $t->id) }}" class="modal-content" enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
-            <div class="modal-header text-white d-flex justify-content-center position-relative" style="background-color: #071152;">
-                <h5 class="modal-title w-100 text-center"><i class="bi bi-pencil-square"></i> Edit Tiket - {{ $t->nama_site }}</h5>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row g-3">
-                    {{-- Info Site (Read Only saat Edit) --}}
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Site ID / Code</label>
-                        <input type="text" class="form-control bg-light" value="{{ $t->site_code }}" readonly>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Nama Site</label>
-                        <input type="text" class="form-control bg-light" value="{{ $t->nama_site }}" readonly>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Durasi Berjalan (Hari)</label>
-                        @php
-                            $tanggalRekapEdit = \Carbon\Carbon::parse($t->tanggal_rekap)->startOfDay();
-                            if (in_array(strtolower($t->status), ['close', 'closed']) && $t->tanggal_close) {
-                                $hariAkhirEdit = \Carbon\Carbon::parse($t->tanggal_close)->startOfDay();
-                            } else {
-                                $hariAkhirEdit = now()->startOfDay();
-                            }
-                            $durasiEdit = $tanggalRekapEdit->diffInDays($hariAkhirEdit);
-                        @endphp
-                        <input type="text" class="form-control bg-light" value="{{ floor($durasiEdit) }}" readonly>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Provinsi</label>
-                        <input type="text" class="form-control bg-light" value="{{ $t->provinsi }}" readonly>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Kabupaten</label>
-                        <input type="text" class="form-control bg-light" value="{{ $t->kabupaten }}" readonly>
-                    </div>
-                    {{-- Data yang Bisa Diedit --}}
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold text-primary">Kategori</label>
-                        <select name="kategori" class="form-select" required>
-                            <option value="BMN" {{ $t->kategori == 'BMN' ? 'selected' : '' }}>BMN</option>
-                            <option value="SL" {{ $t->kategori == 'SL' ? 'selected' : '' }}>SL</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold text-primary">Tanggal Open/Rekap</label>
-                        <input type="date" name="tanggal_rekap" class="form-control" value="{{ $t->tanggal_rekap }}" required>
-                    </div>
-                    <div class="col-md-8">
-                        <label class="form-label fw-bold text-primary">Kendala</label>
-                        <input type="text" name="kendala" class="form-control" value="{{ $t->kendala }}" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold text-primary">Detail Problem</label>
-                        <textarea name="detail_problem" class="form-control" rows="3" required>{{ $t->detail_problem }}</textarea>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold text-primary">Action Plan</label>
-                        <textarea name="plan_actions" class="form-control" rows="3" required>{{ $t->plan_actions }}</textarea>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold text-primary">CE (Customer Engineer)</label>
-                        <select name="ce" class="form-select" required>
-                            <option value="">-- Pilih CE --</option>
-                            <option value="Eka Mahatva Yudha" {{ $t->ce == 'Eka Mahatva Yudha' ? 'selected' : '' }}>Eka Mahatva Yudha</option>
-                            <option value="Herman Seprianto" {{ $t->ce == 'Herman Seprianto' ? 'selected' : '' }}>Herman Seprianto</option>
-                            <option value="Moh. Walangadi" {{ $t->ce == 'Moh. Walangadi' ? 'selected' : '' }}>Moh. Walangadi</option>
-                            <option value="Ahmad Suhaini" {{ $t->ce == 'Ahmad Suhaini' ? 'selected' : '' }}>Ahmad Suhaini</option>
-                            <option value="Hasrul Fandi Serang" {{ $t->ce == 'Hasrul Fandi Serang' ? 'selected' : '' }}>Hasrul Fandi Serang</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold text-primary">Evidence (Foto/Video)</label>
-                        <input type="file" name="evidence" class="form-control" accept="image/*,video/*">
-                        @if($t->evidence)
-                            <div class="mt-1">
-                                <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage/' . $t->evidence) }}')" class="text-info small">
-                                    <i class="bi bi-eye"></i> Lihat Evidence saat ini
-                                </a>
-                            </div>
-                        @else
-                            <small class="text-muted">Tidak ada evidence sebelumnya.</small>
-                        @endif
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="submit" class="btn btn-secondary px-4">Update Data Tiket</button>
-            </div>
-        </form>
-    </div>
-</div>
-{{-- MODAL CLOSE TICKET --}}
-<div class="modal fade" id="modalCloseTicket{{ $t->id }}" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <form method="POST" action="{{ route('open.ticket.close', $t->id) }}" class="modal-content">
-            @csrf
-            @method('PUT')
-            <div class="modal-header text-white d-flex justify-content-center position-relative" style="background-color: #071152;">
-                <h5 class="modal-title w-100 text-center"> Close Tiket - {{ $t->nama_site }}</h5>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Tanggal Close</label>
-                    <input type="date" name="tanggal_close" class="form-control" value="{{ date('Y-m-d') }}" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Problem (Detail Masalah)</label>
-                    <textarea name="detail_problem" class="form-control" rows="3" required>{{ $t->detail_problem }}</textarea>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Action Plan (Tindakan)</label>
-                    <textarea name="plan_actions" class="form-control" rows="3" required>{{ $t->plan_actions }}</textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="submit" class="btn btn-success px-4">Simpan & Close Tiket</button>
-            </div>
-        </form>
-    </div>
-</div>
-@endforeach
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 {{-- Script Remote Mikrotik --}}
 <script>
@@ -966,48 +1043,26 @@
         hitungDurasi();
     });
 </script>
-{{-- Script untuk submit form pencarian otomatis setelah user berhenti mengetik selama 500ms --}}
-<script>
-    let timeout = null;
-    const searchInput = document.getElementById('searchInput');
-    const form = searchInput.closest('form');
-    searchInput.addEventListener('input', function() {
-        // Hapus timeout sebelumnya jika user masih mengetik
-        clearTimeout(timeout);
-        // Setel waktu tunggu 500ms setelah ketikan terakhir
-        timeout = setTimeout(() => {
-            form.submit();
-        }, 100); 
-    });
-    // Pindahkan kursor ke akhir teks setelah refresh halaman
-    searchInput.focus();
-    const val = searchInput.value;
-    searchInput.value = '';
-    searchInput.value = val;
-</script>
 {{-- Script untuk konfirmasi delete dengan SweetAlert2 --}}
 <script>
-    // SCRIPT KONFIRMASI DELETE DENGAN SWEETALERT2
-    document.querySelectorAll('.btn-delete').forEach(button => {
-        button.addEventListener('click', function(e) {
-            // Ambil data nama site dari attribute data-name yang sudah Abang buat
-            const siteName = this.getAttribute('data-name');
-            const form = this.closest('form'); // Cari form pembungkusnya
-            Swal.fire({
-                title: 'Apakah Anda yakin?',
-                text: "Tiket untuk " + siteName + " akan dihapus permanen!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Jika user klik Ya, jalankan submit form
-                    form.submit();
-                }
-            });
+    // SCRIPT KONFIRMASI DELETE DENGAN SWEETALERT2 (Menggunakan Delegasi agar tetap jalan setelah AJAX search)
+    $(document).on('click', '.btn-delete', function(e) {
+        const siteName = $(this).data('name');
+        const $form = $(this).closest('form');
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Tiket untuk " + siteName + " akan dihapus permanen!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal',
+            customClass: { popup: 'rounded-4' }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $form.submit();
+            }
         });
     });
 </script>
@@ -1108,6 +1163,105 @@ $(document).ready(function() {
         var myModal = new bootstrap.Modal(document.getElementById('modalViewerEvidence'));
         myModal.show();
     }
+</script>
+<script>
+    $(document).ready(function() {
+        /**
+         * Fungsi Utama AJAX Reload Tabel
+         */
+        function loadTable(url) {
+            // Efek pemuatan (loading)
+            $('#table-container').addClass('opacity-50');
+            
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                
+                // Perbarui Tabel
+                const newTable = doc.querySelector('#table-container')?.innerHTML;
+                if (newTable) {
+                    $('#table-container').html(newTable);
+                }
+                
+                // Perbarui Badge Summary (Total Open, BMN, SL)
+                const newBadges = doc.querySelector('#summary-badges')?.innerHTML;
+                if (newBadges) {
+                    $('#summary-badges').html(newBadges);
+                }
+
+                // SINKRONISASI HIDDEN INPUTS (Agar sort tidak hilang saat ganti kategori)
+                const urlObj = new URL(url, window.location.origin);
+                const sort = urlObj.searchParams.get('sort');
+                const order = urlObj.searchParams.get('order');
+                if (sort) $('input[name="sort"]').val(sort);
+                if (order) $('input[name="order"]').val(order);
+                
+                $('#table-container').removeClass('opacity-50');
+                
+                // Perbarui URL di address bar tanpa reload halaman
+                window.history.pushState({ path: url }, '', url);
+            })
+            .catch(error => {
+                console.error('AJAX Error:', error);
+                $('#table-container').removeClass('opacity-50');
+                // Fallback: Reload normal jika AJAX gagal
+                // window.location.href = url;
+            });
+        }
+
+        /**
+         * 1. Submit Form via AJAX (Pencarian & Filter Kategori/Provinsi)
+         */
+        $(document).on('submit', '#filterForm', function(e) {
+            e.preventDefault();
+            const action = $(this).attr('action') || window.location.pathname;
+            const params = $(this).serialize();
+            const url = action + (action.includes('?') ? '&' : '?') + params;
+            loadTable(url);
+        });
+
+        /**
+         * 2. Trigger Otomatis saat Select/Input diubah
+         */
+        $(document).on('change', '#filterForm select, #filterForm input[type="date"], #filterForm input[type="number"]', function() {
+            $('#filterForm').trigger('submit');
+        });
+
+        /**
+         * 3. Live Search (Opsional: Trigger saat mengetik - beri delay agar tidak lambat)
+         */
+        let searchTimer;
+        $(document).on('keyup', '#searchInput', function() {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
+                $('#filterForm').trigger('submit');
+            }, 600); // Tunggu 0.6 detik setelah berhenti mengetik
+        });
+
+        /**
+         * 4. Pagination & Sorting Links via AJAX
+         */
+        $(document).on('click', '#table-container .pagination a, #table-container thead th a', function(e) {
+            e.preventDefault();
+            const url = $(this).attr('href');
+            if (url && url !== '#') {
+                loadTable(url);
+            }
+        });
+
+        /**
+         * 5. Sinkronisasi dengan tombol BACK browser
+         */
+        window.onpopstate = function() {
+            loadTable(window.location.href);
+        };
+    });
 </script>
 </body>
 </html>

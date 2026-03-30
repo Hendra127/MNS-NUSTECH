@@ -38,11 +38,15 @@ Route::get('/dashboard/stats', [MyDashboardController::class , 'fetchStats'])->n
 // --- REMOTE LOG (AJAX store - harus login) ---
 Route::post('/remote-log/store', [RemoteLogController::class , 'store'])->name('remotelog.store')->middleware('auth');
 
-// Halaman Utama (Landing Page)
-Route::get('/', [LandingpageController::class , 'index'])->name('landingpage');
+// Halaman Utama (Landing Page) via mns.nustech.co.id
+Route::domain('mns.nustech.co.id')->group(function () {
+    Route::get('/', [LandingpageController::class, 'index'])->name('landingpage');
+});
 
-// Halaman Utama (Home)
-Route::get('/home', [HomeController::class , 'index'])->name('home');
+// Halaman Utama (Home) via nustech.co.id
+Route::domain('nustech.co.id')->group(function () {
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+});
 
 // Auth Routes
 Route::get('/login', [AuthController::class , 'showLogin'])->name('login');

@@ -218,3 +218,37 @@
         position: fixed;
     }
 }
+
+/* Profile Dropdown Dark Mode Support */
+[data-bs-theme="dark"] #profileDropdownMenu {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-bs-theme="dark"] #profileDropdownMenu div,
+[data-bs-theme="dark"] #profileDropdownMenu a,
+[data-bs-theme="dark"] #profileDropdownMenu button,
+[data-bs-theme="dark"] #profileDropdownMenu i,
+[data-bs-theme="dark"] #profileDropdownMenu span,
+[data-bs-theme="dark"] #profileDropdownMenu * {
+    color: #f8fafc !important;
+}
+
+/* Tetap pertahankan warna merah untuk tombol Logout */
+[data-bs-theme="dark"] #profileDropdownMenu .text-danger,
+[data-bs-theme="dark"] #profileDropdownMenu button[style*="color: #dc3545"],
+[data-bs-theme="dark"] #profileDropdownMenu button[style*="color:#dc3545"],
+[data-bs-theme="dark"] #profileDropdownMenu i.bi-box-arrow-right {
+    color: #ff6b6b !important;
+}
+
+[data-bs-theme="dark"] #profileDropdownMenu div {
+    border-bottom-color: #334155 !important;
+}
+
+[data-bs-theme="dark"] #profileDropdownMenu a:hover,
+[data-bs-theme="dark"] #profileDropdownMenu button:hover {
+    background-color: #334155 !important;
+    color: #ffffff !important;
+}

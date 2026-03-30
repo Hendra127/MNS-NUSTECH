@@ -4,8 +4,8 @@
     @include('partials.pwa-head')
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
-    <link rel="stylesheet" href="{{ asset('css/password.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/password.css') }}?v=3.0">
+    <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}?v=1.1">
     <script src="{{ asset('js/nav-modal.js') }}"></script>
     <script src="{{ asset('js/profile-dropdown.js') }}"></script>
     @include('components.nav-modal-structure')
@@ -77,6 +77,7 @@
         }
         .tabs-section {
             display: flex;
+            align-items: center;
             flex-wrap: wrap;
             gap: 10px;
         }
@@ -155,13 +156,13 @@
         <a href="{{ route('pmliberta') }}" class="tab {{ request()->is('PMLiberta*') ? 'active' : '' }}" style="text-decoration: none;">Preventive Maintenance</a>
         <a href="{{ route('summarypm') }}" class="tab {{ request()->is('summarypm*') ? 'active' : '' }}" style="text-decoration: none;">PM Summary</a>
     </div>
-    <!-- CARD -->
-    <div class="card">
-        <div class="card-header">
-            <div class="actions">
+    <!-- CONTENT -->
+    <div class="content-container">
+        <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3" style="margin-bottom: 20px;">
+            <div class="actions flex-shrink-0">
                 @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                     <button type="button" class="btn-action bi bi-plus" title="Add" data-toggle="modal" data-target="#modalSite" onclick="addSite()"></button>
-                    <form action="{{ route('sites.import') }}" method="POST" enctype="multipart/form-data" id="importForm">
+                    <form action="{{ route('sites.import') }}" method="POST" enctype="multipart/form-data" id="importForm" class="m-0">
                         @csrf
                         <input type="file" name="file" id="fileInput" style="display: none;" accept=".xlsx, .xls, .csv" onchange="this.form.submit()">
                         <button type="button" class="btn-action bi bi-upload" title="Upload" onclick="document.getElementById('fileInput').click();">
@@ -174,18 +175,47 @@
                     style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
                 </a>
             </div>
-            <div class="d-flex align-items-center gap-2">
-                <button type="button" class="btn-filter-pill" data-bs-toggle="modal" data-bs-target="#modalFilter">
-                    <i class="bi bi-funnel"></i> Filter
-                </button>
-                <form method="GET" action="{{ route('datasite') }}" class="search-form" id="search-form">
-                    <div class="search-box d-flex align-items-center">
-                        {{-- Hidden inputs to persist modal filters when searching globally --}}
-                        @if(request('tipe')) <input type="hidden" name="tipe" value="{{ request('tipe') }}"> @endif
-                        @if(request('provinsi')) <input type="hidden" name="provinsi" value="{{ request('provinsi') }}"> @endif
-                        @if(request('kab')) <input type="hidden" name="kab" value="{{ request('kab') }}"> @endif
-                        <input type="text" id="search-input" name="search" placeholder="Search..." value="{{ request('search') }}" style="flex-grow: 1; border: none; outline: none; padding-left: 15px;">
-                        <button type="submit" class="search-btn">🔍</button>
+            <div class="w-100 mt-2 mt-lg-0">
+                <form method="GET" action="{{ route('datasite') }}" class="search-form row g-2 align-items-center w-100 m-0 justify-content-lg-end" id="search-form">
+                    <div class="col-12 col-md-auto">
+                        <select name="tipe" class="form-select form-select-sm w-100">
+                            <option value="">Semua Tipe</option>
+                            <option value="BARANG MILIK NEGARA (BMN)" {{ request('tipe') == 'BARANG MILIK NEGARA (BMN)' ? 'selected' : '' }}>BMN</option>
+                            <option value="SEWA LAYANAN" {{ request('tipe') == 'SEWA LAYANAN' ? 'selected' : '' }}>SL</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <select name="provinsi" id="filter-provinsi" class="form-select form-select-sm w-100">
+                            <option value="">Provinsi...</option>
+                            @foreach($provinsiList as $p)
+                                <option value="{{ $p }}" {{ request('provinsi') == $p ? 'selected' : '' }}>{{ $p }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <select name="kab" id="filter-kab" class="form-select form-select-sm w-100">
+                            <option value="">Kabupaten...</option>
+                            @if(request('provinsi') && isset($provinsiKabMap[request('provinsi')]))
+                                @foreach($provinsiKabMap[request('provinsi')] as $k)
+                                    <option value="{{ $k }}" {{ request('kab') == $k ? 'selected' : '' }}>{{ $k }}</option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
+
+                    <div class="col-auto">
+                        <button type="submit" class="btn-filter-pill w-100 justify-content-center">
+                            <i class="bi bi-funnel"></i> Filter
+                        </button>
+                    </div>
+                    <div class="col-auto">
+                        <a href="{{ route('datasite') }}" class="btn btn-light btn-sm rounded-pill border d-flex align-items-center justify-content-center h-100" title="Reset Filter"><i class="bi bi-arrow-repeat"></i></a>
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <div class="search-box d-flex align-items-center w-100">
+                            <input type="text" id="search-input" name="search" placeholder="Search..." value="{{ request('search') }}" style="flex-grow: 1; border: none; outline: none; padding-left: 15px;">
+                            <button type="submit" class="search-btn">🔍</button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -193,8 +223,8 @@
         
 
 
-        <div class="table-responsive-custom" style="overflow-x: auto; max-width: 100%;">
-            <table class="table table-bordered">
+        <div class="table-responsive-custom">
+            <table>
                 <thead>
                     <tr>
                         <th class="sticky-col col-no">NO</th>
@@ -299,8 +329,14 @@
             </tbody>
         </table>
     </div>
-    <div class="mt-3">
-        {{ $sites->links('pagination::bootstrap-5') }}
+    <div class="pagination-wrapper">
+        <span class="pagination-info">
+            Showing {{ $sites->firstItem() ?? 0 }} to {{ $sites->lastItem() ?? 0 }} 
+            of&nbsp;<strong>{{ $sites->total() }}</strong>&nbsp;results
+        </span>
+        <nav>
+            {{ $sites->links() }}
+        </nav>
     </div>
 </div>
 <script>
@@ -352,8 +388,21 @@
                             <div class="row">
                                 <div class="col-md-3"><label>LATITUDE</label><input type="text" name="latitude" id="latitude" class="form-control mb-2"></div>
                                 <div class="col-md-3"><label>LONGITUDE</label><input type="text" name="longitude" id="longitude" class="form-control mb-2"></div>
-                                <div class="col-md-3"><label>PROVINSI</label><input type="text" name="provinsi" id="provinsi" class="form-control mb-2"></div>
-                                <div class="col-md-3"><label>KABUPATEN</label><input type="text" name="kab" id="kab" class="form-control mb-2"></div>
+                                <div class="col-md-3">
+                                    <label>PROVINSI</label>
+                                    <select name="provinsi" id="provinsi" class="form-select mb-2" onchange="updateKabupatenDropdown(this.value, 'kab')">
+                                        <option value="">-- Pilih Provinsi --</option>
+                                        @foreach($provinsiList as $p)
+                                            <option value="{{ $p }}">{{ $p }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label>KABUPATEN</label>
+                                    <select name="kab" id="kab" class="form-select mb-2">
+                                        <option value="">-- Pilih Kabupaten --</option>
+                                    </select>
+                                </div>
                                 <div class="col-md-3"><label>KECAMATAN</label><input type="text" name="kecamatan" id="kecamatan" class="form-control mb-2"></div>
                                 <div class="col-md-3"><label>KELURAHAN</label><input type="text" name="kelurahan" id="kelurahan" class="form-control mb-2"></div>
                                 <div class="col-md-6"><label>ALAMAT LOKASI</label><input type="text" name="alamat_lokasi" id="alamat_lokasi" class="form-control mb-2"></div>
@@ -395,43 +444,7 @@
         </div>
     </div>
 </div>
-<div class="modal fade" id="modalFilter" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header text-white d-flex justify-content-center position-relative" style="background-color: #071152;">
-                <h5 class="modal-title w-100 text-center">Filter Data Site</h5>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form method="GET" action="{{ route('datasite') }}"> 
-                {{-- Hidden input to persist global search when applying modal filters --}}
-                @if(request('search')) <input type="hidden" name="search" value="{{ request('search') }}"> @endif                <div class="modal-body">
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <label class="form-label small fw-bold">Tipe</label>
-                            <select name="tipe" class="form-select">
-                                <option value="">Semua Tipe</option>
-                                <option value="BARANG MILIK NEGARA (BMN)" {{ request('tipe') == 'BARANG MILIK NEGARA (BMN)' ? 'selected' : '' }}>BMN</option>
-                                <option value="SEWA LAYANAN" {{ request('tipe') == 'SEWA LAYANAN' ? 'selected' : '' }}>SL</option>
-                            </select>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label small fw-bold">Provinsi</label>
-                            <input type="text" name="provinsi" class="form-control" placeholder="Nama Provinsi..." value="{{ request('provinsi') }}">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label small fw-bold">Kabupaten</label>
-                            <input type="text" name="kab" class="form-control" placeholder="Nama Kabupaten..." value="{{ request('kab') }}">
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <a href="{{ route('datasite') }}" class="btn btn-light border">Reset</a>
-                    <button type="submit" class="btn btn-primary">Terapkan Filter</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 {{-- Script untuk handling modal dan SweetAlert --}}
 <script>
@@ -454,12 +467,34 @@
             });
         @endif
     });
+    // Mapping data dari controller
+    const provinsiKabMap = @json($provinsiKabMap);
+
+    function updateKabupatenDropdown(provinsi, targetId, selectedKab = '') {
+        const kabDropdown = $(`#${targetId}`);
+        kabDropdown.empty();
+        kabDropdown.append('<option value="">-- Pilih Kabupaten --</option>');
+        
+        if (provinsi && provinsiKabMap[provinsi]) {
+            provinsiKabMap[provinsi].forEach(kab => {
+                const isSelected = kab === selectedKab ? 'selected' : '';
+                kabDropdown.append(`<option value="${kab}" ${isSelected}>${kab}</option>`);
+            });
+        }
+    }
+
+    // Event listener untuk filter bar
+    $('#filter-provinsi').on('change', function() {
+        updateKabupatenDropdown($(this).val(), 'filter-kab');
+    });
+
     // Fungsi Tambah Data
     function addSite() {
         $('#modalTitle').text('Tambah Data Site Baru');
         $('#formSite').attr('action', "{{ route('sites.store') }}");
         $('#methodField').empty(); 
         $('#formSite')[0].reset();
+        $('#kab').empty().append('<option value="">-- Pilih Kabupaten --</option>');
         $('#modalSite').modal('show');
     }
     // Fungsi Edit Data
@@ -468,29 +503,18 @@
         $('#formSite').attr('action', "/sites/" + data.site_id);
         $('#methodField').html('@method("PUT")');
         Object.keys(data).forEach(key => {
-            $(`#${key}`).val(data[key]);
+            if (key !== 'kab') { // Handle kab separately after provinsi is set
+                $(`#${key}`).val(data[key]);
+            }
         });
+        
+        // Update kabupaten dropdown based on provinces and select correct value
+        if (data.provinsi) {
+            updateKabupatenDropdown(data.provinsi, 'kab', data.kab);
+        }
+        
         $('#modalSite').modal('show');
     }
-</script>
-{{-- Script untuk auto-submit form pencarian dengan debounce --}}
-<script>
-    $(document).ready(function() {
-    let timeout = null;
-    $('#search-input').on('keyup', function() {
-        clearTimeout(timeout);
-        timeout = setTimeout(function() {
-            // Submit form secara otomatis
-            $('#search-form').submit();
-        }, 100); // Jeda 800ms setelah berhenti mengetik
-    });
-    // Opsional: Posisikan kursor di akhir teks setelah reload
-    const input = $('#search-input');
-    const val = input.val();
-    if (val) {
-        input.focus().val('').val(val);
-    }
-});
 </script>
 {{-- Script untuk konfirmasi hapus dengan SweetAlert --}}
 <script>

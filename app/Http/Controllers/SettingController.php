@@ -7,16 +7,39 @@ use Illuminate\Support\Facades\Hash;
 
 class SettingController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
+        $query = User::query();
+
+        // Calculate stats from the full user list
+        $allUsers = User::all();
         $stats = [
-            'total' => $users->count(),
-            'superadmin' => $users->where('role', 'superadmin')->count(),
-            'admin' => $users->where('role', 'admin')->count(),
-            'user' => $users->where('role', 'user')->count(),
-            'online' => $users->where('is_online', true)->count(),
+            'total' => $allUsers->count(),
+            'superadmin' => $allUsers->where('role', 'superadmin')->count(),
+            'admin' => $allUsers->where('role', 'admin')->count(),
+            'user' => $allUsers->where('role', 'user')->count(),
+            'online' => $allUsers->where('is_online', true)->count(),
         ];
+
+        // Apply filters
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('role')) {
+            $query->where('role', $request->role);
+        }
+
+        if ($request->filled('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+
+        if ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        $users = $query->get();
+        
         return view('setting', compact('users', 'stats'));
     }
 

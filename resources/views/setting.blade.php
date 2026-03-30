@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     @include('partials.pwa-head')
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
-    <link rel="stylesheet" href="{{ asset('css/password.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/password.css') }}?v=3.0">
     <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}">
     <script src="{{ asset('js/nav-modal.js') }}"></script>
     <script src="{{ asset('js/profile-dropdown.js') }}"></script>
@@ -24,9 +25,16 @@
             --premium-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
             --transition-smooth: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
         }
+
+        [data-bs-theme="dark"] {
+            --primary-navy: #e2e8f0;
+            --glass-bg: rgba(26, 31, 38, 0.85);
+            --premium-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
         body {
             background: #f8fafc;
-            background-image: 
+            background-image:
                 radial-gradient(at 0% 0%, rgba(52, 152, 219, 0.15) 0px, transparent 50%),
                 radial-gradient(at 100% 0%, rgba(142, 68, 173, 0.15) 0px, transparent 50%),
                 radial-gradient(at 100% 100%, rgba(15, 59, 86, 0.1) 0px, transparent 50%),
@@ -35,7 +43,18 @@
             min-height: 100vh;
             font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
             overflow-x: hidden;
+            transition: background-color 0.3s ease;
         }
+
+        [data-bs-theme="dark"] body {
+            background-color: #0f172a;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(52, 152, 219, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(142, 68, 173, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(15, 59, 86, 0.05) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(52, 152, 219, 0.05) 0px, transparent 50%);
+        }
+
         /* Ambient background shapes */
         .ambient-shape {
             position: fixed;
@@ -44,15 +63,23 @@
             opacity: 0.4;
             animation: float 20s infinite alternate ease-in-out;
         }
+
         @keyframes float {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            100% { transform: translate(100px, 50px) rotate(15deg); }
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(100px, 50px) rotate(15deg);
+            }
         }
+
         .setting-container {
             max-width: 1200px;
             margin: 40px auto;
             padding: 0 30px 60px;
         }
+
         /* Stats Section */
         .stats-grid {
             display: grid;
@@ -61,6 +88,7 @@
             margin-bottom: 40px;
             perspective: 1000px;
         }
+
         .stat-card {
             background: var(--glass-bg);
             backdrop-filter: blur(20px) saturate(180%);
@@ -75,9 +103,23 @@
             gap: 20px;
             animation: revealUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) backwards;
         }
+
+        [data-bs-theme="dark"] .stat-card {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
         .stat-card:hover {
             transform: translateY(-10px) rotateX(5deg);
-            /* Modal Premium Redesign */
+            background: rgba(255, 255, 255, 0.9);
+            border-color: var(--accent-blue);
+        }
+
+        [data-bs-theme="dark"] .stat-card:hover {
+            background: rgba(30,35,45, 0.9);
+            border-color: var(--accent-blue);
+        }
+
+        /* Modal Premium Redesign */
         .modal-content-premium {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(40px) saturate(200%);
@@ -88,10 +130,25 @@
             overflow: hidden;
             animation: modalFadeIn 0.5s cubic-bezier(0.23, 1, 0.32, 1);
         }
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: scale(0.9) translateY(30px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
+
+        [data-bs-theme="dark"] .modal-content-premium {
+            background: rgba(26, 31, 38, 0.85);
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
         }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
         .modal-header-premium {
             background: linear-gradient(135deg, var(--primary-navy), var(--accent-blue));
             border: none;
@@ -99,6 +156,7 @@
             color: white;
             position: relative;
         }
+
         .modal-header-premium::after {
             content: '';
             position: absolute;
@@ -108,6 +166,7 @@
             height: 4px;
             background: rgba(255, 255, 255, 0.1);
         }
+
         .form-control-premium {
             border-radius: 18px;
             padding: 14px 22px;
@@ -117,12 +176,25 @@
             font-weight: 500;
             color: var(--primary-navy);
         }
+
+        [data-bs-theme="dark"] .form-control-premium {
+            border-color: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+            color: #e2e8f0;
+        }
+
         .form-control-premium:focus {
             background: white;
             border-color: var(--accent-blue);
             box-shadow: 0 0 0 6px rgba(52, 152, 219, 0.1);
             transform: translateY(-2px);
         }
+
+        [data-bs-theme="dark"] .form-control-premium:focus {
+            background: #252b31;
+            box-shadow: 0 0 0 6px rgba(52, 152, 219, 0.2);
+        }
+
         .btn-add-premium {
             background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
             color: white;
@@ -135,17 +207,20 @@
             box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
             transition: var(--transition-smooth);
         }
+
         .btn-add-premium:hover {
             transform: translateY(-5px) scale(1.02);
             box-shadow: 0 15px 35px rgba(52, 152, 219, 0.4);
             color: white;
         }
+
         .modal-body-premium {
             position: relative;
             z-index: 1;
         }
+
         .modal-body-premium::before {
-            content: "\F4CB"; /* bi-person-fill */
+            content: "\F4CB";
             font-family: "bootstrap-icons";
             position: absolute;
             top: 50%;
@@ -156,9 +231,11 @@
             z-index: -1;
             pointer-events: none;
         }
-            background: rgba(255, 255, 255, 0.9);
-            border-color: var(--accent-blue);
+
+        [data-bs-theme="dark"] .modal-body-premium::before {
+            opacity: 0.01;
         }
+
         .stat-icon {
             width: 60px;
             height: 60px;
@@ -169,6 +246,7 @@
             font-size: 1.5rem;
             flex-shrink: 0;
         }
+
         .stat-info h4 {
             font-size: 0.85rem;
             font-weight: 700;
@@ -177,18 +255,21 @@
             letter-spacing: 1px;
             margin-bottom: 5px;
         }
+
         .stat-info div {
             font-size: 1.75rem;
             font-weight: 850;
             color: var(--primary-navy);
             line-height: 1;
         }
+
         .user-table {
             border-collapse: separate;
             border-spacing: 0 15px;
             width: 100%;
             border: none;
         }
+
         .user-table thead th {
             border: none;
             color: #64748b;
@@ -199,40 +280,251 @@
             padding: 15px 25px;
             background: rgba(15, 59, 86, 0.03);
         }
-        .user-table thead th:first-child { border-radius: 12px 0 0 12px; }
-        .user-table thead th:last-child { border-radius: 0 12px 12px 0; }
+
+        .user-table thead th:first-child {
+            border-radius: 12px 0 0 12px;
+        }
+
+        .user-table thead th:last-child {
+            border-radius: 0 12px 12px 0;
+        }
+
         /* Table Design */
         .glass-card {
             background: var(--glass-bg);
-            backdrop-filter: blur(25px) saturate(190%);
-            -webkit-backdrop-filter: blur(25px) saturate(190%);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-radius: 32px;
-            padding: 35px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
             box-shadow: var(--premium-shadow);
-            border: 1px solid rgba(255, 255, 255, 0.6);
             animation: revealUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) 0.2s backwards;
         }
+
+        [data-bs-theme="dark"] .glass-card {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .search-filter-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-left: auto;
+            margin-right: 20px;
+        }
+
+        @media (max-width: 992px) {
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 20px;
+            }
+
+            .search-filter-wrapper {
+                margin-left: 0;
+                margin-right: 0;
+                width: 100%;
+                flex-wrap: wrap;
+            }
+        }
+
+        .input-luxury-group {
+            position: relative;
+            min-width: 200px;
+        }
+
+        @media (max-width: 1200px) {
+            .search-filter-wrapper {
+                flex-wrap: wrap;
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .input-luxury-group {
+                min-width: 100%;
+            }
+        }
+
+        .input-luxury-group i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7ec8e3;
+            font-size: 1.1rem;
+            pointer-events: none;
+            transition: var(--transition-smooth);
+        }
+
+        .input-luxury {
+            width: 100%;
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 12px !important;
+            padding: 10px 15px 10px 45px;
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: #334155 !important;
+            transition: var(--transition-smooth);
+        }
+
+        [data-bs-theme="dark"] .input-luxury {
+            background: #252b31 !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #cbd5e1 !important;
+        }
+
+        .input-luxury::placeholder {
+            color: #94a3b8;
+        }
+
+        [data-bs-theme="dark"] .input-luxury::placeholder {
+            color: #64748b;
+        }
+
+        /* Styling for Date Type */
+        .input-luxury[type="date"] {
+            padding-left: 15px;
+            padding-right: 40px;
+            /* For the calendar icon */
+            position: relative;
+        }
+
+        /* Custom Calendar Icon Style */
+        .input-luxury::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+        }
+
+        [data-bs-theme="dark"] .input-luxury::-webkit-calendar-picker-indicator {
+            filter: invert(0.8);
+        }
+
+        .input-luxury:focus {
+            background: #ffffff !important;
+            border-color: #3498db !important;
+            box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.15);
+            outline: none;
+        }
+
+        [data-bs-theme="dark"] .input-luxury:focus {
+            background: #2d353c !important;
+        }
+
+        .select-luxury {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 12px !important;
+            padding: 10px 35px 10px 15px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #334155 !important;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            min-width: 140px;
+        }
+
+        [data-bs-theme="dark"] .select-luxury {
+            background: #252b31 !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #cbd5e1 !important;
+        }
+
+        .btn-filter-luxury {
+            background: #0d6efd !important;
+            color: white !important;
+            border: none !important;
+            padding: 10px 22px !important;
+            border-radius: 12px !important;
+            font-weight: 600 !important;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+        }
+
+        .btn-filter-luxury:hover {
+            background: #0b5ed7 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(13, 110, 253, 0.3);
+        }
+
+        .btn-reset-luxury-outline {
+            background: transparent !important;
+            color: #64748b !important;
+            border: 1px solid #e2e8f0 !important;
+            padding: 10px 18px !important;
+            border-radius: 12px !important;
+            font-weight: 500 !important;
+            transition: var(--transition-smooth);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        [data-bs-theme="dark"] .btn-reset-luxury-outline {
+            color: #94a3b8 !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .btn-reset-luxury-outline:hover {
+            background: #f1f5f9 !important;
+            color: #0f3b56 !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        [data-bs-theme="dark"] .btn-reset-luxury-outline:hover {
+            background: rgba(255, 255, 255, 0.05) !important;
+            color: white !important;
+            border-color: rgba(255, 255, 255, 0.2) !important;
+        }
+
         .user-row {
             transition: var(--transition-smooth);
             background: rgba(255, 255, 255, 0.4);
             border: none !important;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
         }
+
+        [data-bs-theme="dark"] .user-row {
+            background: rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
         .user-row td {
             padding: 24px 25px;
             border: none !important;
             vertical-align: middle;
             background: transparent;
         }
-        .user-row td:first-child { border-radius: 20px 0 0 20px; }
-        .user-row td:last-child { border-radius: 0 20px 20px 0; }
+
+        .user-row td:first-child {
+            border-radius: 20px 0 0 20px;
+        }
+
+        .user-row td:last-child {
+            border-radius: 0 20px 20px 0;
+        }
+
         .user-row:hover {
             background: white !important;
             transform: scale(1.015) translateY(-2px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
             z-index: 5;
             position: relative;
         }
+
+        [data-bs-theme="dark"] .user-row:hover {
+            background: rgba(255, 255, 255, 0.05) !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+
         .user-avatar-premium {
             width: 64px;
             height: 64px;
@@ -242,7 +534,9 @@
             box-shadow: 0 8px 16px rgba(52, 152, 219, 0.2);
             flex-shrink: 0;
         }
-        .user-avatar-premium img, .user-avatar-premium .placeholder {
+
+        .user-avatar-premium img,
+        .user-avatar-premium .placeholder {
             width: 100%;
             height: 100%;
             border-radius: 13px;
@@ -252,6 +546,7 @@
             align-items: center;
             justify-content: center;
         }
+
         .role-pill {
             padding: 10px 18px;
             border-radius: 14px;
@@ -264,9 +559,25 @@
             gap: 6px;
             border: 1px solid transparent;
         }
-        .role-superadmin { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
-        .role-admin { background: #e0f2fe; color: #075985; border-color: #7dd3fc; }
-        .role-user { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+
+        .role-superadmin {
+            background: #fee2e2;
+            color: #991b1b;
+            border-color: #fca5a5;
+        }
+
+        .role-admin {
+            background: #e0f2fe;
+            color: #075985;
+            border-color: #7dd3fc;
+        }
+
+        .role-user {
+            background: #f1f5f9;
+            color: #475569;
+            border-color: #cbd5e1;
+        }
+
         .btn-action-premium {
             width: 42px;
             height: 42px;
@@ -279,10 +590,31 @@
             cursor: pointer;
             font-size: 1.1rem;
         }
-        .btn-edit { background: #f0f9ff; color: #0369a1; }
-        .btn-edit:hover { background: #0369a1; color: white; transform: translateY(-3px); box-shadow: 0 8px 15px rgba(3, 105, 161, 0.2); }
-        .btn-delete { background: #fff1f2; color: #9f1239; }
-        .btn-delete:hover { background: #9f1239; color: white; transform: translateY(-3px); box-shadow: 0 8px 15px rgba(159, 18, 57, 0.2); }
+
+        .btn-edit {
+            background: #f0f9ff;
+            color: #0369a1;
+        }
+
+        .btn-edit:hover {
+            background: #0369a1;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(3, 105, 161, 0.2);
+        }
+
+        .btn-delete {
+            background: #fff1f2;
+            color: #9f1239;
+        }
+
+        .btn-delete:hover {
+            background: #9f1239;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(159, 18, 57, 0.2);
+        }
+
         /* Luxury Buttons */
         .btn-luxury {
             background: linear-gradient(135deg, var(--primary-navy), #1a5c85);
@@ -297,30 +629,93 @@
             align-items: center;
             gap: 12px;
         }
+
         .btn-luxury:hover {
             transform: translateY(-4px);
             box-shadow: 0 15px 30px rgba(15, 59, 86, 0.3);
             color: white;
         }
+
         @keyframes revealUp {
-            from { opacity: 0; transform: translateY(40px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        .stagger-1 { animation-delay: 0.1s; }
-        .stagger-2 { animation-delay: 0.2s; }
-        .stagger-3 { animation-delay: 0.3s; }
-        .stagger-4 { animation-delay: 0.4s; }
-        .text-navy { color: var(--primary-navy); }
-        .bg-blue-soft { background: #e0f2fe; color: #0369a1; }
-        .bg-purple-soft { background: #f5f3ff; color: #6d28d9; }
-        .bg-green-soft { background: #f0fdf4; color: #15803d; }
+
+        .stagger-1 {
+            animation-delay: 0.1s;
+        }
+
+        .stagger-2 {
+            animation-delay: 0.2s;
+        }
+
+        .stagger-3 {
+            animation-delay: 0.3s;
+        }
+
+        .stagger-4 {
+            animation-delay: 0.4s;
+        }
+
+        .text-navy {
+            color: var(--primary-navy);
+        }
+
+        [data-bs-theme="dark"] .text-navy {
+            color: #e2e8f0;
+        }
+
+        .bg-blue-soft {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        [data-bs-theme="dark"] .bg-blue-soft {
+            background: rgba(3, 105, 161, 0.2);
+            color: #38bdf8;
+        }
+
+        .bg-purple-soft {
+            background: #f5f3ff;
+            color: #6d28d9;
+        }
+
+        [data-bs-theme="dark"] .bg-purple-soft {
+            background: rgba(109, 40, 217, 0.2);
+            color: #c084fc;
+        }
+
+        .bg-green-soft {
+            background: #f0fdf4;
+            color: #15803d;
+        }
+
+        [data-bs-theme="dark"] .bg-green-soft {
+            background: rgba(21, 128, 61, 0.2);
+            color: #4ade80;
+        }
+
+        [data-bs-theme="dark"] .user-table thead th {
+            color: #cbd5e1;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <header class="main-header">
         <div class="header-logo-container">
-            <a href="javascript:void(0)" class="header-brand-link" onclick="openNavModal()" style="text-decoration: none !important; color: white !important;">
+            <a href="javascript:void(0)" class="header-brand-link" onclick="openNavModal()"
+                style="text-decoration: none !important; color: white !important;">
                 <div class="header-brand" style="display: flex; align-items: center; gap: 8px; font-weight: bold;">
                     Project <span style="opacity: 0.5;">|</span> Operational
                 </div>
@@ -333,23 +728,27 @@
                 </a>
             @endif
             <div class="user-profile-wrapper" style="position: relative;">
-                <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
+                <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer; text-decoration: none; color: inherit;">
                     @if(auth()->user()->photo)
-                        <img src="{{ Storage::url(auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                        <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                     @else
                         <i class="bi bi-person-circle" style="font-size: 1.5rem; color: white;"></i>
                     @endif
                 </div>
-                <div id="profileDropdownMenu" class="hidden" style="position: absolute; right: 0; top: 100%; mt: 10px; width: 150px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; display: none; flex-direction: column; overflow: hidden;">
-                    <div style="padding: 10px 15px; border-bottom: 1px solid #eee; font-size: 14px; font-weight: bold; color: #333;">
+                <div id="profileDropdownMenu" class="hidden"
+                    style="position: absolute; right: 0; top: 100%; mt: 10px; width: 150px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; display: none; flex-direction: column; overflow: hidden;">
+                    <div
+                        style="padding: 10px 15px; border-bottom: 1px solid #eee; font-size: 14px; font-weight: bold; color: #333;">
                         {{ auth()->user()->name }}
                     </div>
-                    <a href="{{ route('profile.edit') }}" style="padding: 10px 15px; text-decoration: none; color: #333; font-size: 14px; display: flex; align-items: center;">
+                    <a href="{{ route('profile.edit') }}"
+                        style="padding: 10px 15px; text-decoration: none; color: #333; font-size: 14px; display: flex; align-items: center;">
                         <i class="bi bi-person me-2"></i> Profile
                     </a>
                     <form action="{{ route('logout') }}" method="POST" id="logout-form">
                         @csrf
-                        <button type="submit" style="width: 100%; text-align: left; padding: 10px 15px; background: none; border: none; font-size: 14px; color: #dc3545; cursor: pointer;">
+                        <button type="submit"
+                            style="width: 100%; text-align: left; padding: 10px 15px; background: none; border: none; font-size: 14px; color: #dc3545; cursor: pointer;">
                             <i class="bi bi-box-arrow-right"></i> Logout
                         </button>
                     </form>
@@ -357,8 +756,11 @@
             </div>
         </div>
     </header>
-    <div class="ambient-shape" style="width: 400px; height: 400px; background: var(--accent-blue); top: -100px; left: -100px;"></div>
-    <div class="ambient-shape" style="width: 300px; height: 300px; background: var(--accent-purple); bottom: -50px; right: -50px; animation-delay: -5s;"></div>
+    <div class="ambient-shape"
+        style="width: 400px; height: 400px; background: var(--accent-blue); top: -100px; left: -100px;"></div>
+    <div class="ambient-shape"
+        style="width: 300px; height: 300px; background: var(--accent-purple); bottom: -50px; right: -50px; animation-delay: -5s;">
+    </div>
     <div class="setting-container">
         <!-- STATS GRID -->
         <div class="stats-grid">
@@ -384,7 +786,8 @@
                 </div>
             </div>
             <div class="stat-card stagger-4">
-                <div class="stat-icon" style="background: #fff7ed; color: #c2410c;"><i class="bi bi-broadcast"></i></div>
+                <div class="stat-icon" style="background: #fff7ed; color: #c2410c;"><i class="bi bi-broadcast"></i>
+                </div>
                 <div class="stat-info">
                     <h4>Online Users</h4>
                     <div style="color: #c2410c;">{{ $stats['online'] }}</div>
@@ -398,8 +801,33 @@
                     <span class="d-none d-sm-inline-block"><i class="bi bi-ui-checks"></i> Manajemen User</span>
                     <span class="d-sm-none">Users</span>
                 </h3>
-                <button class="btn-luxury" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                    <i class="bi bi-plus-lg"></i> Tambah User Baru
+
+                <form action="{{ route('setting.index') }}" method="GET" class="search-filter-wrapper m-0">
+                    <div class="input-luxury-group">
+                        <input type="text" name="search" class="input-luxury" placeholder="Cari user, site, IP..."
+                            value="{{ request('search') }}">
+                        <i class="bi bi-search text-primary"></i>
+                    </div>
+
+                    <select name="role" class="select-luxury" onchange="this.form.submit()">
+                        <option value="">Role</option>
+                        <option value="superadmin" {{ request('role') == 'superadmin' ? 'selected' : '' }}>Superadmin</option>
+                        <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                        <option value="user" {{ request('role') == 'user' ? 'selected' : '' }}>User</option>
+                    </select>
+
+                    <button type="submit" class="btn-filter-luxury">
+                        <i class="bi bi-funnel"></i> Filter
+                    </button>
+
+                    <a href="{{ route('setting.index') }}" class="btn-reset-luxury-outline">
+                        Reset
+                    </a>
+                </form>
+
+                <button class="btn-filter-luxury ms-2" data-bs-toggle="modal" data-bs-target="#addUserModal" 
+                        title="Tambah User Baru" style="width: 44px; height: 44px; padding: 0 !important; justify-content: center;">
+                    <i class="bi bi-plus-lg" style="font-size: 1.2rem;"></i>
                 </button>
             </div>
             <div class="table-responsive">
@@ -414,67 +842,79 @@
                     </thead>
                     <tbody>
                         @foreach($users as $user)
-                        <tr class="user-row">
-                            <td>
-                                <div class="user-info">
-                                    <div class="user-avatar-premium">
-                                        @if($user->photo)
-                                            <img src="{{ Storage::url($user->photo) }}">
-                                        @else
-                                            <div class="placeholder"><i class="bi bi-person text-navy"></i></div>
-                                        @endif
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold text-navy mb-1" style="font-size: 1.15rem; letter-spacing: -0.02em;">{{ $user->name }}</div>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="badge bg-light text-dark border fw-normal px-2 py-1" style="font-size: 0.7rem; border-radius: 6px;">
-                                                <span class="opacity-50">UID:</span> #{{ 1000 + $user->id }}
-                                            </div>
-                                            @if($user->is_online)
-                                                <span class="badge bg-success-subtle text-success border border-success-subtle fw-bold px-2 py-1" style="font-size: 0.65rem; border-radius: 6px;">
-                                                    <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i> ONLINE
-                                                </span>
+                            <tr class="user-row">
+                                <td>
+                                    <div class="user-info">
+                                        <div class="user-avatar-premium">
+                                            @if($user->photo)
+                                                <img src="{{ asset('storage_public/' . $user->photo) }}" alt="Profile">
                                             @else
-                                                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle fw-bold px-2 py-1" style="font-size: 0.65rem; border-radius: 6px;">
-                                                    OFFLINE
-                                                </span>
+                                                <div class="placeholder"><i class="bi bi-person text-navy"></i></div>
                                             @endif
                                         </div>
+                                        <div>
+                                            <div class="fw-bold text-navy mb-1"
+                                                style="font-size: 1.15rem; letter-spacing: -0.02em;">{{ $user->name }}</div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="badge bg-light text-dark border fw-normal px-2 py-1"
+                                                    style="font-size: 0.7rem; border-radius: 6px;">
+                                                    <span class="opacity-50">UID:</span> #{{ 1000 + $user->id }}
+                                                </div>
+                                                @if($user->is_online)
+                                                    <span
+                                                        class="badge bg-success-subtle text-success border border-success-subtle fw-bold px-2 py-1"
+                                                        style="font-size: 0.65rem; border-radius: 6px;">
+                                                        <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i> ONLINE
+                                                    </span>
+                                                @else
+                                                    <span
+                                                        class="badge bg-secondary-subtle text-secondary border border-secondary-subtle fw-bold px-2 py-1"
+                                                        style="font-size: 0.65rem; border-radius: 6px;">
+                                                        OFFLINE
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="role-pill role-{{ $user->role }}">
-                                    <i class="bi bi-patch-check-fill me-1"></i> {{ $user->role }}
-                                </span>
-                            </td>
-                            <td>
-                                <div class="text-navy fw-semibold opacity-75">{{ $user->email }}</div>
-                                @if($user->is_online)
-                                    <div class="text-success small fw-bold"><i class="bi bi-activity me-1"></i> Sedang Aktif</div>
-                                @elseif($user->last_seen_at)
-                                    <div class="text-muted small"><i class="bi bi-eye me-1"></i> Terakhir terlihat {{ $user->last_seen_at->diffForHumans() }}</div>
-                                @else
-                                    <div class="text-muted small"><i class="bi bi-clock me-1"></i> Bergabung {{ $user->created_at->diffForHumans() }}</div>
-                                @endif
-                            </td>
-                            <td>
-                                <div class="d-flex justify-content-end align-items-center gap-3">
-                                    <button class="btn-action-premium btn-edit" onclick="editUser({{ $user }})">
-                                        <i class="bi bi-pencil-fill"></i>
-                                    </button>
-                                    @if($user->id !== auth()->id())
-                                        <form action="{{ route('setting.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Hapus user ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn-action-premium btn-delete">
-                                                <i class="bi bi-trash3-fill"></i>
-                                            </button>
-                                        </form>
+                                </td>
+                                <td>
+                                    <span class="role-pill role-{{ $user->role }}">
+                                        <i class="bi bi-patch-check-fill me-1"></i> {{ $user->role }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="text-navy fw-semibold opacity-75">{{ $user->email }}</div>
+                                    @if($user->is_online)
+                                        <div class="text-success small fw-bold"><i class="bi bi-activity me-1"></i> Sedang Aktif
+                                        </div>
+                                    @elseif($user->last_seen_at)
+                                        <div class="text-muted small"><i class="bi bi-eye me-1"></i> Terakhir terlihat
+                                            {{ $user->last_seen_at->diffForHumans() }}
+                                        </div>
+                                    @else
+                                        <div class="text-muted small"><i class="bi bi-clock me-1"></i> Bergabung
+                                            {{ $user->created_at->diffForHumans() }}
+                                        </div>
                                     @endif
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-end align-items-center gap-3">
+                                        <button class="btn-action-premium btn-edit" onclick="editUser({{ $user }})">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </button>
+                                        @if($user->id !== auth()->id())
+                                            <form action="{{ route('setting.destroy', $user->id) }}" method="POST"
+                                                onsubmit="return confirm('Hapus user ini?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn-action-premium btn-delete">
+                                                    <i class="bi bi-trash3-fill"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -486,26 +926,34 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content modal-content-premium">
                 <div class="modal-header modal-header-premium">
-                    <h5 class="modal-title fw-extrabold"><i class="bi bi-person-plus-fill me-2"></i> Tambah User Baru</h5>
+                    <h5 class="modal-title fw-extrabold"><i class="bi bi-person-plus-fill me-2"></i> Tambah User Baru
+                    </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <form action="{{ route('setting.store') }}" method="POST">
                     @csrf
                     <div class="modal-body p-5">
                         <div class="mb-4">
-                            <label class="form-label small fw-bold text-navy"><i class="bi bi-person me-1"></i> Nama Lengkap</label>
-                            <input type="text" name="name" class="form-control form-control-premium" required placeholder="Ex: John Doe">
+                            <label class="form-label small fw-bold text-navy"><i class="bi bi-person me-1"></i> Nama
+                                Lengkap</label>
+                            <input type="text" name="name" class="form-control form-control-premium" required
+                                placeholder="Ex: John Doe">
                         </div>
                         <div class="mb-4">
-                            <label class="form-label small fw-bold text-navy"><i class="bi bi-envelope me-1"></i> Alamat Email</label>
-                            <input type="email" name="email" class="form-control form-control-premium" required placeholder="john@example.com">
+                            <label class="form-label small fw-bold text-navy"><i class="bi bi-envelope me-1"></i> Alamat
+                                Email</label>
+                            <input type="email" name="email" class="form-control form-control-premium" required
+                                placeholder="john@example.com">
                         </div>
                         <div class="mb-4">
-                            <label class="form-label small fw-bold text-navy"><i class="bi bi-key me-1"></i> Password</label>
-                            <input type="password" name="password" class="form-control form-control-premium" required placeholder="Min. 8 characters">
+                            <label class="form-label small fw-bold text-navy"><i class="bi bi-key me-1"></i>
+                                Password</label>
+                            <input type="password" name="password" class="form-control form-control-premium" required
+                                placeholder="Min. 8 characters">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label small fw-bold text-navy"><i class="bi bi-shield-check me-1"></i> Role Hak Akses</label>
+                            <label class="form-label small fw-bold text-navy"><i class="bi bi-shield-check me-1"></i>
+                                Role Hak Akses</label>
                             <select name="role" class="form-select form-control-premium" required>
                                 <option value="user">User</option>
                                 <option value="admin">Admin</option>
@@ -514,7 +962,8 @@
                         </div>
                     </div>
                     <div class="modal-footer border-0 p-5 pt-0">
-                        <button type="button" class="btn btn-light rounded-4 px-4 fw-bold" data-bs-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-light rounded-4 px-4 fw-bold"
+                            data-bs-dismiss="modal">Batal</button>
                         <button type="submit" class="btn btn-add-premium px-5">Buat User Baru</button>
                     </div>
                 </form>
@@ -526,7 +975,8 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content modal-content-premium">
                 <div class="modal-header modal-header-premium">
-                    <h5 class="modal-title fw-extrabold"><i class="bi bi-pencil-square me-2"></i> Edit Informasi User</h5>
+                    <h5 class="modal-title fw-extrabold"><i class="bi bi-pencil-square me-2"></i> Edit Informasi User
+                    </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <form id="editUserForm" method="POST">
@@ -534,19 +984,26 @@
                     @method('PUT')
                     <div class="modal-body p-5">
                         <div class="mb-4">
-                            <label class="form-label small fw-bold text-navy"><i class="bi bi-person me-1"></i> Nama Lengkap</label>
-                            <input type="text" name="name" id="edit_name" class="form-control form-control-premium" required>
+                            <label class="form-label small fw-bold text-navy"><i class="bi bi-person me-1"></i> Nama
+                                Lengkap</label>
+                            <input type="text" name="name" id="edit_name" class="form-control form-control-premium"
+                                required>
                         </div>
                         <div class="mb-4">
-                            <label class="form-label small fw-bold text-navy"><i class="bi bi-envelope me-1"></i> Alamat Email</label>
-                            <input type="email" name="email" id="edit_email" class="form-control form-control-premium" required>
+                            <label class="form-label small fw-bold text-navy"><i class="bi bi-envelope me-1"></i> Alamat
+                                Email</label>
+                            <input type="email" name="email" id="edit_email" class="form-control form-control-premium"
+                                required>
                         </div>
                         <div class="mb-4">
-                            <label class="form-label small fw-bold text-navy"><i class="bi bi-key me-1"></i> Password <span class="opacity-50 fw-normal">(Opsional)</span></label>
-                            <input type="password" name="password" class="form-control form-control-premium" placeholder="Biarkan kosong jika tetap">
+                            <label class="form-label small fw-bold text-navy"><i class="bi bi-key me-1"></i> Password
+                                <span class="opacity-50 fw-normal">(Opsional)</span></label>
+                            <input type="password" name="password" class="form-control form-control-premium"
+                                placeholder="Biarkan kosong jika tetap">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label small fw-bold text-navy"><i class="bi bi-shield-check me-1"></i> Role Hak Akses</label>
+                            <label class="form-label small fw-bold text-navy"><i class="bi bi-shield-check me-1"></i>
+                                Role Hak Akses</label>
                             <select name="role" id="edit_role" class="form-select form-control-premium" required>
                                 <option value="user">User</option>
                                 <option value="admin">Admin</option>
@@ -555,7 +1012,8 @@
                         </div>
                     </div>
                     <div class="modal-footer border-0 p-5 pt-0">
-                        <button type="button" class="btn btn-light rounded-4 px-4 fw-bold" data-bs-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-light rounded-4 px-4 fw-bold"
+                            data-bs-dismiss="modal">Batal</button>
                         <button type="submit" class="btn btn-add-premium px-5">Simpan Perubahan</button>
                     </div>
                 </form>
@@ -580,5 +1038,5 @@
         @endif
     </script>
 </body>
-</html>
 
+</html>

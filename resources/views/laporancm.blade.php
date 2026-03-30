@@ -4,12 +4,69 @@
     @include('partials.pwa-head')
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
-    <link rel="stylesheet" href="{{ asset('css/password.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/password.css') }}?v=3.0">
+    <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}?v=1.1">
     <script src="{{ asset('js/nav-modal.js') }}"></script>
     <script src="{{ asset('js/profile-dropdown.js') }}"></script>
     @include('components.nav-modal-structure')
-    <title>Correctiv Maintenance</title>
+    <title>Corrective Maintenance | Project Operational</title>
+    <style>
+        /* Modern Table Sticky Header */
+        .table-responsive-custom table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: #f5f6fa !important;
+            color: #555 !important;
+            font-weight: 700 !important;
+            text-transform: uppercase;
+            font-size: 11px;
+            padding: 12px 15px !important;
+            border-bottom: 2px solid #e0e0e0 !important;
+            box-shadow: 0 1px 0 #e0e0e0;
+        }
+        
+        .sticky-col {
+            position: sticky !important;
+            background-color: #fff !important;
+            z-index: 5 !important;
+        }
+        
+        thead th.sticky-col {
+            z-index: 20 !important;
+            background-color: #f5f6fa !important;
+        }
+
+        .col-no { left: 0; min-width: 50px; }
+        .col-site-id { left: 50px; min-width: 135px; }
+        .col-nama_site { left: 185px; min-width: 200px; }
+        
+        /* Striped background for sticky columns */
+        tbody tr:nth-child(even) .sticky-col {
+            background-color: #fafbfc !important;
+        }
+        
+        /* Hover effect */
+        tbody tr:hover td {
+            background-color: #f0f5fb !important;
+        }
+        
+        /* Custom scrollbar */
+        .table-responsive-custom::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .table-responsive-custom::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .table-responsive-custom::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+        .table-responsive-custom::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+    </style>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -23,6 +80,7 @@
     <style>
         .tabs-section {
             display: flex;
+            align-items: center;
             flex-wrap: wrap;
             gap: 10px;
         }
@@ -97,45 +155,7 @@
             background-color: #f0f4f8 !important;
             color: #000 !important;
         }
-        /* STICKY COLUMNS CSS */
-        .table-responsive-custom {
-            overflow-x: auto;
-            max-width: 100%;
-            position: relative;
-        }
-        .sticky-col {
-            position: sticky !important;
-            background-color: white !important; /* Prevents overlap transparency */
-            z-index: 5;
-            border-right: 1px solid #dee2e6 !important;
-        }
-        thead th.sticky-col {
-            z-index: 10 !important; /* Higher than body sticky columns */
-            background-color: #f8f9fa !important; /* Standard header bg */
-        }
-        /* specific positions */
-        .col-no {
-            left: 0;
-            min-width: 50px;
-            max-width: 50px;
-        }
-        .col-site-id {
-            left: 50px;
-            min-width: 100px;
-            max-width: 100px;
-        }
-        .col-nama_site {
-            left: 150px;
-            min-width: 200px;
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        /* Shadow effect on the last sticky column */
-        th.col-nama_site, td.col-nama_site {
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-        }
+
     </style>
 </head>
 <body>
@@ -157,7 +177,7 @@
                 @if(auth()->check() && auth()->user()->role === 'superadmin')
                     <a href="{{ route('setting.index') }}" class="user-profile-icon" title="Setting User" style="cursor: pointer; text-decoration: none; color: inherit;">
                         @if(auth()->user()->photo)
-                            <img src="{{ Storage::url(auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                         @else
                             <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
                         @endif
@@ -165,7 +185,7 @@
                 @else
                     <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
                         @if(auth()->check() && auth()->user()->photo)
-                            <img src="{{ Storage::url(auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                         @else
                             <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
                         @endif
@@ -195,47 +215,70 @@
         <a href="{{ route('pmliberta') }}" class="tab {{ request()->is('PMLiberta*') ? 'active' : '' }}" style="text-decoration: none;">Preventive Maintenance</a>
         <a href="{{ route('summarypm') }}" class="tab {{ request()->is('summarypm*') ? 'active' : '' }}" style="text-decoration: none;">Summary PM</a>
     </div>
-<!-- CARD -->
-<div class="card">
-    <div class="card-header">
-        <div class="actions">
-            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
-                <!-- tombol plus (Add) -->
-                <button type="button"
-                        class="btn-action bi bi-plus"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modalLaporanPM"
-                        title="Tambah Data">
-                </button>
-                <!-- tombol upload (Import) -->
-                <button type="button" 
-                        class="btn-action bi bi-upload" 
-                        title="Upload Data" 
-                        data-bs-toggle="modal" 
-                        data-bs-target="#modalImportLaporan">
-                </button>
-            @endif
-            <!-- tombol download (Export) -->
-            <a href="{{ route('laporancm.export') }}" 
-               class="btn-action bi bi-download" 
-               title="Download Excel"
-               style="text-decoration: none;">
-            </a>
+    <!-- CONTENT -->
+    <div class="content-container">
+        <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3" style="margin-bottom: 20px;">
+            <div class="actions flex-shrink-0">
+                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                    <!-- tombol plus (Add) -->
+                    <button type="button"
+                            class="btn-action bi bi-plus"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalLaporanPM"
+                            title="Tambah Data">
+                    </button>
+                    <!-- tombol upload (Import) -->
+                    <button type="button" 
+                            class="btn-action bi bi-upload" 
+                            title="Upload Data" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#modalImportLaporan">
+                    </button>
+                @endif
+                <!-- tombol download (Export) -->
+                <a href="{{ route('laporancm.export') }}" 
+                   class="btn-action bi bi-download" 
+                   title="Download Excel"
+                   style="text-decoration: none;">
+                </a>
+            </div>
+            <div class="w-100 mt-2 mt-lg-0">
+                <form method="GET" action="{{ route('laporancm') }}" class="search-form row g-2 align-items-center w-100 m-0 justify-content-lg-end" id="searchForm">
+                    <div class="col-12 col-md-auto">
+                        <select name="laporan_cm" class="form-select form-select-sm w-100">
+                            <option value="">Semua Laporan CM</option>
+                            @foreach($uniqueReports ?? [] as $report)
+                                <option value="{{ $report }}" {{ request('laporan_cm') == $report ? 'selected' : '' }}>
+                                    {{ $report }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <input type="date" name="tgl_mulai" class="form-control form-control-sm w-100" value="{{ request('tgl_mulai') }}" title="Dari Tanggal">
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <input type="date" name="tgl_selesai" class="form-control form-control-sm w-100" value="{{ request('tgl_selesai') }}" title="Sampai Tanggal">
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn-filter-pill w-100 justify-content-center">
+                            <i class="bi bi-funnel"></i> Filter
+                        </button>
+                    </div>
+                    <div class="col-auto">
+                        <a href="{{ route('laporancm') }}" class="btn btn-light btn-sm rounded-pill border d-flex align-items-center justify-content-center h-100" title="Reset Filter"><i class="bi bi-arrow-repeat"></i></a>
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <div class="search-box d-flex align-items-center w-100">
+                            <input type="text" name="search" id="searchInput" placeholder="Search..." value="{{ request('search') }}" style="flex-grow: 1; border: none; outline: none; background: transparent; padding-left: 15px;">
+                            <button type="submit" class="search-btn">🔍</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="d-flex align-items-center gap-2">
-            <button type="button" class="btn-filter-pill" data-bs-toggle="modal" data-bs-target="#modalFilter">
-                <i class="bi bi-funnel"></i> Filter
-            </button>
-            <form method="GET" action="{{ route('laporancm') }}" class="search-form" id="searchForm">
-                <div class="search-box d-flex align-items-center">
-                    <input type="text" name="search" id="searchInput" placeholder="Search..." value="{{ request('search') }}" style="flex-grow: 1; border: none; outline: none; background: transparent; padding-left: 15px;">
-                    <button type="submit" class="search-btn">🔍</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    <div class="table-responsive-custom" style="overflow-x: auto; max-width: 100%;">
-        <table class="table table-bordered">
+    <div class="table-responsive-custom">
+        <table>
             <thead>
                 <tr>
                 <th class="sticky-col col-no">NO</th>
@@ -254,7 +297,7 @@
             </tr>
             </thead>
             <tbody>
-            @forelse($data as $item)
+            @forelse($cm_data as $item)
                 <tr class="text-center">
                     <td class="text-center sticky-col col-no">{{ $loop->iteration }}</td>
                     <td class="sticky-col col-site-id">{{ $item->site_id }}</td>
@@ -314,6 +357,15 @@
             @endforelse
             </tbody>
         </table>
+    </div>
+    <div class="pagination-wrapper mt-3">
+        <span class="pagination-info">
+            Showing {{ $cm_data->firstItem() ?? 0 }} to {{ $cm_data->lastItem() ?? 0 }} 
+            of&nbsp;<strong>{{ $cm_data->total() }}</strong>&nbsp;results
+        </span>
+        <nav>
+            {{ $cm_data->appends(request()->query())->links("pagination::bootstrap-5") }}
+        </nav>
     </div>
 </div>
 <!-- ===================== MODAL TAMBAH LAPORAN PM ===================== -->
@@ -515,48 +567,7 @@
         </div>
     </div>
 </div>
-{{-- ===================== MODAL FILTER LAPORAN CM ===================== --}}
-<div class="modal fade" id="modalFilter" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow-lg rounded-4 border-0">
-            <div class="modal-header border-0 px-4 pt-4" style="background-color: #071152; color: white;">
-                <h5 class="modal-title fw-bold text-center w-100">Filter Data Correctiv Maintenance</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form method="GET" action="{{ route('laporancm') }}">
-                <div class="modal-body px-4 pb-4">
-                    <div class="row g-3">
-                        <!-- Laporan CM Dropdown -->
-                        <div class="col-12">
-                            <label class="form-label small fw-bold">Correctiv Maintenance</label>
-                            <select name="laporan_cm" class="form-select rounded-3">
-                                <option value="">Semua Laporan</option>
-                                @foreach($uniqueReports as $report)
-                                    <option value="{{ $report }}" {{ request('laporan_cm') == $report ? 'selected' : '' }}>
-                                        {{ $report }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <!-- Date Range -->
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold">Dari Tanggal</label>
-                            <input type="date" name="tgl_mulai" class="form-control rounded-3" value="{{ request('tgl_mulai') }}">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold">Sampai Tanggal</label>
-                            <input type="date" name="tgl_selesai" class="form-control rounded-3" value="{{ request('tgl_selesai') }}">
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer border-0 px-4 pb-4">
-                    <a href="{{ route('laporancm') }}" class="btn btn-light border px-4 rounded-3">Reset</a>
-                    <button type="submit" class="btn btn-primary px-4 rounded-3" style="background-color: #071152; border: none;">Terapkan Filter</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+
 <!-- Bootstrap JS (WAJIB biar modal jalan) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -645,28 +656,6 @@ function confirmDelete(id, lokasi) {
 @endif
 </script>
 <!-- SCRIPT UNTUK SEARCH OTOMATIS -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('searchInput');
-        const searchForm = document.getElementById('searchForm');
-        let timer;
-        if (searchInput) {
-            searchInput.addEventListener('input', function() {
-                clearTimeout(timer);
-                timer = setTimeout(() => {
-                    searchForm.submit();
-                }, 500); // Jeda 500ms agar tidak terlalu berat
-            });
-            // Fokuskan kembali ke input setelah refresh dan taruh kursor di akhir
-            if (searchInput.value.length > 0) {
-                searchInput.focus();
-                const val = searchInput.value;
-                searchInput.value = '';
-                searchInput.value = val;
-            }
-        }
-    });
-</script>
 </body>
 </html>
 

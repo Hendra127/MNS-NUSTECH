@@ -15,19 +15,17 @@ class DatapasController extends Controller
     {
         $search = $request->search;
 
-        $datapass = Datapass::with('site')
+        $datapass = DataPass::with('site')
             ->when($search, function ($query) use ($search) {
-            $query->where(function ($q) use ($search) { // Bungkus group where agar search tidak kacau
+                $query->where(function ($q) use ($search) {
                     $q->where('nama_lokasi', 'like', "%{$search}%")
                         ->orWhere('kabupaten', 'like', "%{$search}%")
                         ->orWhereHas('site', function ($sq) use ($search) {
-                    $sq->where('site_id', 'like', "%{$search}%");
-                }
-                );
-            }
-            );
-        })
-            ->get(); // <--- Pakai get() untuk ambil SEMUA data
+                            $sq->where('site_id', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->paginate(50)->withQueryString();
 
         $sites = Site::all();
 
@@ -45,7 +43,7 @@ class DatapasController extends Controller
             'pass_ap2' => 'required',
         ]);
 
-        Datapass::create($request->all());
+        DataPass::create($request->all());
 
         return back()->with('success', 'Data berhasil ditambahkan!');
     }
@@ -80,7 +78,7 @@ class DatapasController extends Controller
             'pass_ap2' => 'required',
         ]);
 
-        $data = Datapass::findOrFail($id);
+        $data = DataPass::findOrFail($id);
         $data->update($request->all());
 
         return back()->with('success', 'Data berhasil diperbarui!');
@@ -88,7 +86,7 @@ class DatapasController extends Controller
 
     public function destroy($id)
     {
-        $data = Datapass::findOrFail($id);
+        $data = DataPass::findOrFail($id);
         $data->delete();
 
         return back()->with('success', 'Data berhasil dihapus!');

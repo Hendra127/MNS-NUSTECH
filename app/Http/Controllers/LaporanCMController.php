@@ -40,12 +40,25 @@ class LaporanCMController extends Controller
             $query->whereDate('tanggal_on_site', '<=', $request->tgl_selesai);
         }
 
-        $data = $query->get();
+        // Count totals based on the filtered query BEFORE paginating
+        $totalDone = (clone $query)->where('laporan_cm', 'DONE')->count();
+        $totalPending = (clone $query)->where('laporan_cm', 'PENDING')->count();
+        $totalCount = (clone $query)->count();
+        $totalOthers = $totalCount - ($totalDone + $totalPending);
+
+        $cm_data = $query->paginate(50)->withQueryString();
         
         // Fetch unique laporan_cm for filter options
         $uniqueReports = LaporanCM::select('laporan_cm')->whereNotNull('laporan_cm')->distinct()->pluck('laporan_cm')->toArray();
 
-        return view('laporancm', compact('sites', 'data', 'uniqueReports'));
+        return view('laporancm', [
+            'sites' => $sites,
+            'cm_data' => $cm_data,
+            'uniqueReports' => $uniqueReports,
+            'totalDone' => $totalDone,
+            'totalPending' => $totalPending,
+            'totalOthers' => $totalOthers
+        ]);
     }
 
     public function store(Request $request)

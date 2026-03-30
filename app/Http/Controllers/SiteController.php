@@ -44,9 +44,26 @@ class SiteController extends Controller
 
         // ----------------------------------------------------
 
-        $wgTunnels = config('wireguard.tunnels', []);
-        $sites = $query->latest()->paginate(15)->withQueryString();
-        return view('datasite', compact('sites', 'wgTunnels'));
+        $wgTunnels    = config('wireguard.tunnels', []);
+        $sites        = $query->latest()->paginate(50)->withQueryString();
+
+        // Daftar unik Provinsi & Kabupaten untuk dropdown filter
+        $provinsiList  = Site::whereNotNull('provinsi')->where('provinsi', '!=', '')
+                            ->distinct()->orderBy('provinsi')->pluck('provinsi');
+        $kabupatenList = Site::whereNotNull('kab')->where('kab', '!=', '')
+                            ->distinct()->orderBy('kab')->pluck('kab');
+
+        // Mapping provinsi → list kabupaten (untuk cascading filter)
+        $provinsiKabMap = Site::whereNotNull('provinsi')->where('provinsi', '!=', '')
+                            ->whereNotNull('kab')->where('kab', '!=', '')
+                            ->select('provinsi', 'kab')
+                            ->distinct()
+                            ->orderBy('provinsi')->orderBy('kab')
+                            ->get()
+                            ->groupBy('provinsi')
+                            ->map(fn($items) => $items->pluck('kab')->values());
+
+        return view('datasite', compact('sites', 'wgTunnels', 'provinsiList', 'kabupatenList', 'provinsiKabMap'));
     }
 
     public function import(Request $request)

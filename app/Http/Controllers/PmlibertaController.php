@@ -15,14 +15,16 @@ class PMLibertaController extends Controller
         $sites = \App\Models\Site::orderBy('site_id', 'asc')->get();
         $query = PMLiberta::query();
 
-        // 1. Filter Search Box (Nama Lokasi atau Site ID)
-        $query->when($request->q, function ($q) use ($request) {
-            return $q->where(function ($sub) use ($request) {
-                    $sub->where('nama_lokasi', 'like', '%' . $request->q . '%')
-                        ->orWhere('site_id', 'like', '%' . $request->q . '%');
-                }
-                );
+        // 1. Filter Search Box (Nama Lokasi, Site ID, atau PIC CE)
+        $searchTerm = $request->search ?? $request->q;
+        $query->when($searchTerm, function ($q) use ($searchTerm) {
+            return $q->where(function ($sub) use ($searchTerm) {
+                $sub->where('nama_lokasi', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('site_id', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('pic_ce', 'like', '%' . $searchTerm . '%');
             });
+        });
+
 
         // 2. Filter Kategori
         $query->when($request->kategori, function ($q) use ($request) {
@@ -63,9 +65,16 @@ class PMLibertaController extends Controller
         })->count();
 
         // Ambil data dan pertahankan filter saat pindah halaman
-        $data = $query->orderBy('date', 'desc')->paginate(15)->withQueryString();
+        $pm_data = $query->orderBy('date', 'desc')->paginate(50)->withQueryString();
 
-        return view('PMLiberta', compact('data', 'totalBMNDone', 'totalSLDone', 'totalHold', 'totalPending', 'sites'));
+        return view('PMLiberta', [
+            'pm_data' => $pm_data,
+            'totalBMNDone' => $totalBMNDone,
+            'totalSLDone' => $totalSLDone,
+            'totalHold' => $totalHold,
+            'totalPending' => $totalPending,
+            'sites' => $sites
+        ]);
     }
 
     public function store(Request $request)

@@ -2,11 +2,12 @@
     "name": "MNS-NUSTECH",
     "short_name": "MNS-NUSTECH",
     "description": "Sistem Manajemen Jaringan & Tiket NUSTECH",
-    "start_url": "/",
+    "start_url": "/?standalone=true",
+    "scope": "/",
     "display": "standalone",
     "background_color": "#071152",
     "theme_color": "#071152",
-    "orientation": "any",
+    "orientation": "portrait-primary",
     "icons": [
         {
             "src": "/assets/img/logonustech.png",
@@ -18,7 +19,7 @@
             "src": "/assets/img/logonustech.png",
             "sizes": "512x512",
             "type": "image/png",
-            "purpose": "any maskable"
+            "purpose": "maskable"
         }
     ]
 }

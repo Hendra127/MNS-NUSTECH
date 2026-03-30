@@ -33,7 +33,13 @@ class CloseTicketController extends Controller
 
         // 2. Filter Kategori (Dari Modal)
         if ($kategori) {
-            $query->where('kategori', $kategori);
+            if ($kategori === 'BMN') {
+                $query->whereIn('kategori', ['BMN', 'BARANG MILIK NEGARA (BMN)']);
+            } elseif ($kategori === 'SL') {
+                $query->whereIn('kategori', ['SL', 'SEWA LAYANAN']);
+            } else {
+                $query->where('kategori', $kategori);
+            }
         }
 
         // 3. Filter Range Tanggal (Berdasarkan tanggal_close)
@@ -41,8 +47,21 @@ class CloseTicketController extends Controller
             $query->whereBetween('tanggal_close', [$tgl_mulai, $tgl_selesai]);
         }
 
+        // 4. Sorting dinamis
+        $sortBy = $request->get('sort', 'tanggal_close');
+        $sortOrder = $request->get('order', 'desc');
+        
+        $allowedSorts = ['durasi', 'tanggal_close', 'tanggal_rekap'];
+        if (!in_array($sortBy, $allowedSorts)) {
+            $sortBy = 'tanggal_close';
+        }
+
         // Ambil data dengan pagination dan pertahankan parameter query di URL
-        $tickets = $query->latest('updated_at')->paginate(20)->withQueryString();
+        $perPage = $request->get('per_page', 50);
+
+        $tickets = $query->orderBy($sortBy, $sortOrder)
+            ->paginate($perPage)
+            ->withQueryString();
 
         // Hitungan untuk badge
         $closeAllCount = Ticket::where('status', 'closed')->count();
