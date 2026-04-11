@@ -25,6 +25,7 @@ use App\Http\Controllers\LandingpageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\RemoteLogController;
+use App\Http\Controllers\MikrotikController;
 
 /* |-------------------------------------------------------------------------- | Web Routes |-------------------------------------------------------------------------- */
 // --- MY DASHBOARD & CHAT ROUTES ---
@@ -34,6 +35,14 @@ Route::post('/chat/send', [MyDashboardController::class , 'storeMessage'])->name
 Route::get('/chat/fetch', [MyDashboardController::class , 'fetchMessages'])->name('chat.fetch');
 Route::get('/tickets/filter', [MyDashboardController::class , 'getFilteredTickets'])->name('tickets.filter');
 Route::get('/dashboard/stats', [MyDashboardController::class , 'fetchStats'])->name('dashboard.stats');
+
+// --- SPAREPART NEEDED DASHBOARD ROUTES ---
+Route::get('/sparepart-needed', [\App\Http\Controllers\SparepartNeededController::class, 'index'])->name('sparepart.needed.index');
+Route::post('/sparepart-needed/store', [\App\Http\Controllers\SparepartNeededController::class, 'store'])->name('sparepart.needed.store');
+Route::put('/sparepart-needed/update/{id}', [\App\Http\Controllers\SparepartNeededController::class, 'update'])->name('sparepart.needed.update');
+Route::delete('/sparepart-needed/delete/{id}', [\App\Http\Controllers\SparepartNeededController::class, 'destroy'])->name('sparepart.needed.destroy');
+Route::patch('/sparepart-needed/status/{id}', [\App\Http\Controllers\SparepartNeededController::class, 'updateStatus'])->name('sparepart.needed.status');
+Route::post('/sparepart-needed/print', [\App\Http\Controllers\SparepartNeededController::class, 'printPengajuan'])->name('sparepart.needed.print');
 
 // --- REMOTE LOG (AJAX store - harus login) ---
 Route::post('/remote-log/store', [RemoteLogController::class , 'store'])->name('remotelog.store')->middleware('auth');
@@ -53,12 +62,20 @@ Route::get('/login', [AuthController::class , 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class , 'login']);
 Route::post('/logout', [AuthController::class , 'logout'])->name('logout');
 
+// CSRF Token Refresh — dipanggil JS di semua halaman agar session tidak expire
+Route::get('/csrf-refresh', function () {
+    return response()->json(['token' => csrf_token()]);
+})->name('csrf.refresh');
+
 
 // --- PROTECTED ROUTES (Harus login dulu) ---
 Route::middleware(['auth'])->group(function () {
 
     // --- REMOTE LOG AUDIT TRAIL ---
     Route::get('/remote-log', [RemoteLogController::class , 'index'])->name('remotelog')->middleware('role:superadmin');
+
+    // --- ACTIVITY LOG ---
+
 
     // --- SITES / DATASITE ROUTES ---
     Route::get('/sites/export', [SiteController::class , 'export'])->name('sites.export');
@@ -174,4 +191,124 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/destroy/{id}', [SettingController::class , 'destroy'])->name('setting.destroy');
         }
         );
+
+        // ============================================================
+        // --- MIKROTIK MANAGER ROUTES ---
+        // ============================================================
+        Route::prefix('mikrotik')->name('mikrotik.')->group(function () {
+            // Halaman Utama
+            Route::get('/', [MikrotikController::class, 'index'])->name('index');
+
+            // Credentials
+            Route::get('/credentials/{siteId}',  [MikrotikController::class, 'getCredentials'])->name('credentials.get');
+            Route::post('/credentials/save',      [MikrotikController::class, 'saveCredentials'])->name('credentials.save');
+            Route::post('/credentials/test',      [MikrotikController::class, 'testConnection'])->name('credentials.test');
+
+            // System Info
+            Route::get('/system/{siteId}',             [MikrotikController::class, 'getSystemInfo'])->name('system.info');
+            Route::post('/system/{siteId}/identity',   [MikrotikController::class, 'setSystemIdentity'])->name('system.identity');
+            Route::get('/system/{siteId}/log',         [MikrotikController::class, 'getSystemLog'])->name('system.log');
+            Route::get('/system/{siteId}/ntp',         [MikrotikController::class, 'getSystemNtp'])->name('system.ntp');
+            Route::post('/system/{siteId}/ntp',        [MikrotikController::class, 'setSystemNtp'])->name('system.ntp.set');
+            Route::post('/system/{siteId}/reboot',     [MikrotikController::class, 'systemReboot'])->name('system.reboot');
+
+            // Interface
+            Route::get('/interface/{siteId}',          [MikrotikController::class, 'getInterfaces'])->name('interface.list');
+            Route::post('/interface/{siteId}/set',     [MikrotikController::class, 'setInterface'])->name('interface.set');
+            Route::post('/interface/{siteId}/toggle',  [MikrotikController::class, 'toggleInterface'])->name('interface.toggle');
+            Route::get('/vlan/{siteId}',               [MikrotikController::class, 'getVlans'])->name('vlan.list');
+            Route::post('/vlan/{siteId}/add',          [MikrotikController::class, 'addVlan'])->name('vlan.add');
+            Route::delete('/vlan/{siteId}/remove',     [MikrotikController::class, 'removeVlan'])->name('vlan.remove');
+            Route::get('/bridge/{siteId}',             [MikrotikController::class, 'getBridges'])->name('bridge.list');
+            Route::get('/bridge/{siteId}/ports',       [MikrotikController::class, 'getBridgePorts'])->name('bridge.ports');
+
+            // IP Address
+            Route::get('/ip/{siteId}',                 [MikrotikController::class, 'getIpAddresses'])->name('ip.list');
+            Route::post('/ip/{siteId}/add',            [MikrotikController::class, 'addIpAddress'])->name('ip.add');
+            Route::post('/ip/{siteId}/set',            [MikrotikController::class, 'setIpAddress'])->name('ip.set');
+            Route::delete('/ip/{siteId}/remove',       [MikrotikController::class, 'removeIpAddress'])->name('ip.remove');
+
+            // Routes
+            Route::get('/routes/{siteId}',             [MikrotikController::class, 'getRoutes'])->name('route.list');
+            Route::post('/routes/{siteId}/add',        [MikrotikController::class, 'addRoute'])->name('route.add');
+            Route::delete('/routes/{siteId}/remove',   [MikrotikController::class, 'removeRoute'])->name('route.remove');
+
+            // DHCP
+            Route::get('/dhcp/{siteId}/servers',       [MikrotikController::class, 'getDhcpServers'])->name('dhcp.servers');
+            Route::get('/dhcp/{siteId}/leases',        [MikrotikController::class, 'getDhcpLeases'])->name('dhcp.leases');
+            Route::post('/dhcp/{siteId}/lease/add',    [MikrotikController::class, 'addDhcpLease'])->name('dhcp.lease.add');
+            Route::delete('/dhcp/{siteId}/lease',      [MikrotikController::class, 'removeDhcpLease'])->name('dhcp.lease.remove');
+            Route::post('/dhcp/{siteId}/lease/static', [MikrotikController::class, 'makeDhcpLeaseStatic'])->name('dhcp.lease.static');
+            Route::get('/dhcp/{siteId}/networks',      [MikrotikController::class, 'getDhcpNetworks'])->name('dhcp.networks');
+
+            // DNS
+            Route::get('/dns/{siteId}',                [MikrotikController::class, 'getDns'])->name('dns.info');
+            Route::post('/dns/{siteId}/set',           [MikrotikController::class, 'setDns'])->name('dns.set');
+            Route::get('/dns/{siteId}/static',         [MikrotikController::class, 'getDnsStatic'])->name('dns.static');
+            Route::post('/dns/{siteId}/static/add',    [MikrotikController::class, 'addDnsStatic'])->name('dns.static.add');
+            Route::delete('/dns/{siteId}/static',      [MikrotikController::class, 'removeDnsStatic'])->name('dns.static.remove');
+
+            // Firewall
+            Route::get('/firewall/{siteId}/filter',          [MikrotikController::class, 'getFirewallFilter'])->name('firewall.filter');
+            Route::post('/firewall/{siteId}/filter/add',     [MikrotikController::class, 'addFirewallFilter'])->name('firewall.filter.add');
+            Route::post('/firewall/{siteId}/filter/toggle',  [MikrotikController::class, 'toggleFirewallFilter'])->name('firewall.filter.toggle');
+            Route::delete('/firewall/{siteId}/filter',       [MikrotikController::class, 'removeFirewallFilter'])->name('firewall.filter.remove');
+            Route::get('/firewall/{siteId}/nat',             [MikrotikController::class, 'getFirewallNat'])->name('firewall.nat');
+            Route::post('/firewall/{siteId}/nat/add',        [MikrotikController::class, 'addFirewallNat'])->name('firewall.nat.add');
+            Route::delete('/firewall/{siteId}/nat',          [MikrotikController::class, 'removeFirewallNat'])->name('firewall.nat.remove');
+            Route::get('/firewall/{siteId}/mangle',          [MikrotikController::class, 'getFirewallMangle'])->name('firewall.mangle');
+            Route::get('/firewall/{siteId}/address-list',    [MikrotikController::class, 'getFirewallAddressLists'])->name('firewall.addresslist');
+            Route::post('/firewall/{siteId}/address-list',   [MikrotikController::class, 'addFirewallAddressList'])->name('firewall.addresslist.add');
+
+            // Wireless
+            Route::get('/wireless/{siteId}',           [MikrotikController::class, 'getWireless'])->name('wireless.info');
+            Route::post('/wireless/{siteId}/set',      [MikrotikController::class, 'setWireless'])->name('wireless.set');
+
+            // Users MikroTik
+            Route::get('/users/{siteId}',              [MikrotikController::class, 'getUsers'])->name('users.list');
+            Route::post('/users/{siteId}/add',         [MikrotikController::class, 'addUser'])->name('users.add');
+            Route::delete('/users/{siteId}/remove',    [MikrotikController::class, 'removeUser'])->name('users.remove');
+
+            // Queue
+            Route::get('/queue/{siteId}',              [MikrotikController::class, 'getQueues'])->name('queue.list');
+            Route::post('/queue/{siteId}/add',         [MikrotikController::class, 'addSimpleQueue'])->name('queue.add');
+            Route::delete('/queue/{siteId}/remove',    [MikrotikController::class, 'removeSimpleQueue'])->name('queue.remove');
+            Route::post('/queue/{siteId}/toggle',      [MikrotikController::class, 'toggleQueue'])->name('queue.toggle');
+
+            // PPP & VPN
+            Route::get('/ppp/{siteId}',                [MikrotikController::class, 'getPpp'])->name('ppp.list');
+            Route::post('/ppp/{siteId}/secret/add',    [MikrotikController::class, 'addPppSecret'])->name('ppp.secret.add');
+            Route::delete('/ppp/{siteId}/secret',      [MikrotikController::class, 'removePppSecret'])->name('ppp.secret.remove');
+
+            // Hotspot
+            Route::get('/hotspot/{siteId}',            [MikrotikController::class, 'getHotspot'])->name('hotspot.list');
+            Route::post('/hotspot/{siteId}/user/add',  [MikrotikController::class, 'addHotspotUser'])->name('hotspot.user.add');
+            Route::delete('/hotspot/{siteId}/user',    [MikrotikController::class, 'removeHotspotUser'])->name('hotspot.user.remove');
+
+            // IP Services
+            Route::get('/services/{siteId}',           [MikrotikController::class, 'getIpServices'])->name('services.list');
+            Route::post('/services/{siteId}/set',      [MikrotikController::class, 'setIpService'])->name('services.set');
+            Route::post('/services/{siteId}/toggle',   [MikrotikController::class, 'toggleIpService'])->name('services.toggle');
+
+            // ARP & Neighbor
+            Route::get('/arp/{siteId}',                [MikrotikController::class, 'getArp'])->name('arp.list');
+
+            // Scripts & Scheduler
+            Route::get('/scripts/{siteId}',            [MikrotikController::class, 'getScripts'])->name('scripts.list');
+            Route::post('/scripts/{siteId}/add',       [MikrotikController::class, 'addScript'])->name('scripts.add');
+            Route::post('/scripts/{siteId}/run',       [MikrotikController::class, 'runScript'])->name('scripts.run');
+            Route::post('/scheduler/{siteId}/add',     [MikrotikController::class, 'addScheduler'])->name('scheduler.add');
+
+            // Backup & Files
+            Route::post('/backup/{siteId}',            [MikrotikController::class, 'createBackup'])->name('backup.create');
+            Route::get('/files/{siteId}',              [MikrotikController::class, 'getFiles'])->name('files.list');
+
+            // Tools
+            Route::post('/tools/{siteId}/ping',        [MikrotikController::class, 'ping'])->name('tools.ping');
+            Route::post('/tools/{siteId}/traffic',     [MikrotikController::class, 'getTrafficMonitor'])->name('tools.traffic');
+
+            // Audit Log
+            Route::get('/logs/{siteId}',               [MikrotikController::class, 'getCommandLogs'])->name('logs');
+        });
     });
+

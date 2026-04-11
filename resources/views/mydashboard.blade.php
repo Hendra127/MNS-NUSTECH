@@ -24,6 +24,35 @@
     <!-- Styles -->
     <link rel="stylesheet" href="{{ asset('css/mydashboard.css') }}?v={{ time() }}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        /* Custom Select2 Styling for Modern Look */
+        .select2-container--default .select2-selection--single {
+            height: 42px !important;
+            padding: 6px 12px;
+            border: 1px solid #ddd !important;
+            border-radius: 6px !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 40px !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 28px !important;
+            font-size: 0.85rem !important;
+            color: #444 !important;
+        }
+        .select2-dropdown {
+            border: 1px solid #ddd !important;
+            border-radius: 6px !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+            z-index: 9999 !important;
+        }
+        .select2-search__field {
+            border-radius: 4px !important;
+            padding: 6px !important;
+        }
+    </style>
     <style>
         /* Modern Chat Enhancements */
         @keyframes chatMessageIn {
@@ -166,10 +195,13 @@
                 <div class="blob blob-3"></div>
             </div>
             <div class="logo-section">
+                <a href="{{ url('/landingpage') }}" class="header-logo-link" title="Kembali ke Landing Page">
+                    <img src="{{ asset('assets/img/logonustech_new.jpg') }}" alt="NUSTECH Logo" class="header-logo-img">
+                </a>
                 <div class="logo-text">
                     <h1>
                         <i class="ph-fill ph-broadcast"></i>
-                        <span class="bold-title">NUSTECH</span>
+                        <a href="{{ route('login') }}" style="text-decoration: none; color: inherit;"><span class="bold-title">NUSTECH</span></a>
                         <span class="regular-title">Monitoring Dashboard</span>
                     </h1>
                     <p>Real-Time Network & Site Operation Center</p>
@@ -311,14 +343,74 @@
                     </div>
                 </div>
                 <!-- Menu Item 3: Sparepart Needed (Collapsed) -->
-                <div class="card menu-item collapsed">
-                    <div class="menu-header">
-                        <span class="menu-title">Sparepart Needed</span>
+                <div class="card menu-item collapsed sparepart-menu">
+                    <div class="menu-header d-flex justify-content-between align-items-center w-100">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="menu-title" style="margin-right: auto;">Sparepart Needed ({{ \App\Models\SparepartNeeded::where('status', '!=', 'Completed')->count() }})</span>
+                        </div>
                         <i class="ph-fill ph-caret-right arrow-icon"></i>
                     </div>
 
-                    <div class="menu-content">
-                        <p style="">Belum ada sparepart</p>
+                    <div class="menu-content" style="padding: 10px 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                            <span style="font-size: 0.85rem; font-weight: 600; color: #555;">Daftar Kebutuhan</span>
+                            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin', 'user']))
+                            <button class="btn btn-sm" onclick="openSparepartModal('add')" style="background: transparent; border: none; padding: 0; color: #0d6efd; display: flex; align-items: center; justify-content: center;" title="Tambah Kebutuhan">
+                                <i class="ph ph-plus-circle" style="font-size: 1.35rem; transition: color 0.2s;" onmouseover="this.style.color='#0b5ed7'" onmouseout="this.style.color='#0d6efd'"></i>
+                            </button>
+                            @endif
+                        </div>
+
+                        <div class="spareparts-list" style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px;">
+                            @forelse($sparepartsNeeded as $sp)
+                            <div class="sparepart-item" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.1); padding: 12px; border-radius: 8px; margin-bottom: 10px; position: relative; transition: all 0.2s;">
+                                
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <div style="font-size: 0.8rem; font-weight: 700; color: #333; display: flex; align-items: center; flex-wrap: wrap; gap: 4px; line-height: 1.4;">
+                                        <i class="ph-fill ph-map-pin" style="color: #e74c3c;"></i>
+                                        <span>{{ $sp->site ? $sp->site->sitename : $sp->site_id }}</span>
+                                        <i class="ph ph-arrow-right" style="color: #888; font-size: 0.75rem;"></i>
+                                        <span style="color: #0d6efd;">{{ $sp->sparepart_name }}</span>
+                                        <span style="background: #f1f3f5; padding: 1px 5px; border-radius: 4px; font-size: 0.7rem; color: #555; border: 1px solid #eaeaea; font-weight: 600;">x{{ $sp->quantity }}</span>
+                                    </div>
+                                    
+                                    @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin', 'user']))
+                                    <div class="actions d-flex gap-2 flex-shrink-0 ms-2">
+                                        <button class="btn btn-sm p-0" onclick="openSparepartModal('edit', {{ $sp->id }}, '{{ $sp->site_id }}', '{{ htmlspecialchars($sp->sparepart_name) }}', {{ $sp->quantity }}, '{{ htmlspecialchars($sp->description) }}', '{{ $sp->status }}')" style="border: none; background: transparent; color: #6c757d;" title="Edit" onmouseover="this.style.color='#0d6efd'" onmouseout="this.style.color='#6c757d'">
+                                            <i class="ph ph-pencil-simple" style="font-size: 1rem;"></i>
+                                        </button>
+                                        <form action="{{ route('sparepart.needed.destroy', $sp->id) }}" method="POST" style="display:inline; margin: 0;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kebutuhan ini?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm p-0" style="border: none; background: transparent; color: #6c757d;" title="Hapus" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='#6c757d'">
+                                                <i class="ph ph-trash" style="font-size: 1rem;"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                    @endif
+                                </div>
+                                
+                                <div style="font-size: 0.75rem; color: #666; display: flex; align-items: center; gap: 6px; margin-top: 4px;">
+                                    <span style="font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; white-space: nowrap;
+                                        @if($sp->status == 'Pending') background: rgba(243, 156, 18, 0.1); color: #e67e22;
+                                        @elseif($sp->status == 'Completed') background: rgba(46, 204, 113, 0.1); color: #27ae60;
+                                        @else background: rgba(52, 152, 219, 0.1); color: #2980b9; @endif">
+                                        {{ $sp->status }}
+                                    </span>
+                                    @if($sp->description)
+                                    <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                                        Ket: <span style="font-style: italic;">{{ $sp->description }}</span>
+                                    </span>
+                                    @endif
+                                </div>
+                            </div>
+                            @empty
+                            <div style="text-align: center; padding: 20px 0; color: #aaa;">
+                                <i class="ph ph-package" style="font-size: 2rem; margin-bottom: 5px; opacity: 0.5;"></i>
+                                <p style="margin: 0; font-size: 0.8rem;">Belum ada sparepart yg dibutuhkan</p>
+                            </div>
+                            @endforelse
+                        </div>
                     </div>
                 </div>
 
@@ -446,6 +538,67 @@
         </div>
     </div>
 </div>
+    </div>
+</div>
+
+<!-- Sparepart Modal Form -->
+<div id="sparepartModal" class="custom-modal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1050; background: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
+    <div class="modal-content" style="background: #fff; width: 90%; max-width: 500px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeInUp 0.3s ease;">
+        <div class="modal-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #0d6efd, #0b5ed7); color: white; padding: 15px 20px;">
+            <h5 class="modal-title" id="sparepartModalTitle" style="margin: 0; font-weight: 600; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+                <i class="ph ph-package"></i> <span>Tambah Kebutuhan Sparepart</span>
+            </h5>
+            <button type="button" class="btn-close" onclick="closeSparepartModal()" style="background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; transition: opacity 0.2s;">
+                <i class="ph ph-x"></i>
+            </button>
+        </div>
+        <form id="sparepartForm" method="POST" action="{{ route('sparepart.needed.store') }}" style="padding: 20px;">
+            @csrf
+            <input type="hidden" name="_method" id="sparepartFormMethod" value="POST">
+            
+            <div class="mb-3">
+                <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 5px; display: block;">Site Tujuan <span style="color:red;">*</span></label>
+                <select name="site_id" id="sparepart_site_id" class="select2-site" required style="width: 100%;">
+                    <option value="">-- Cari Nama atau ID Site --</option>
+                    @foreach(\App\Models\Site::orderBy('sitename')->get() as $s)
+                        <option value="{{ $s->site_id }}">{{ $s->site_id }} - {{ $s->sitename }}</option>
+                    @endforeach
+                </select>
+            </div>
+            
+            <div class="row" style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <div class="col" style="flex: 2;">
+                    <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 5px; display: block;">Nama Sparepart <span style="color:red;">*</span></label>
+                    <input type="text" name="sparepart_name" id="sparepart_name" required placeholder="Contoh: Kabel FO / Switch / Modem" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd; font-size: 0.85rem; outline: none; transition: border-color 0.2s;">
+                </div>
+                <div class="col" style="flex: 1;">
+                    <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 5px; display: block;">Quantity <span style="color:red;">*</span></label>
+                    <input type="number" name="quantity" id="sparepart_quantity" required min="1" value="1" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd; font-size: 0.85rem; outline: none; transition: border-color 0.2s;">
+                </div>
+            </div>
+            
+            <div class="mb-3" id="statusGroup" style="margin-bottom: 15px;">
+                <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 5px; display: block;">Status Kebutuhan</label>
+                <input type="text" name="status" id="sparepart_status" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd; font-size: 0.85rem; outline: none;" placeholder="Contoh: Pending" value="Pending">
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 5px; display: block;">Keterangan / Deskripsi</label>
+                <textarea name="description" id="sparepart_description" rows="3" placeholder="Alasan membutuhkan sparepart atau catatan tambahan..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd; font-size: 0.85rem; outline: none; transition: border-color 0.2s; resize: vertical;"></textarea>
+            </div>
+            
+            <div class="d-flex justify-content-end gap-2" style="display: flex; gap: 10px; border-top: 1px solid #eee; padding-top: 15px;">
+                <button type="button" class="btn btn-light" onclick="closeSparepartModal()" style="padding: 8px 16px; border-radius: 6px; background: #f8f9fa; border: 1px solid #ddd; font-weight: 600; font-size: 0.85rem; color: #444; cursor: pointer;">
+                    Batal
+                </button>
+                <button type="submit" class="btn btn-primary" style="padding: 8px 16px; border-radius: 6px; background: linear-gradient(135deg, #0d6efd, #0b5ed7); border: none; font-weight: 600; font-size: 0.85rem; color: #fff; cursor: pointer; box-shadow: 0 4px 10px rgba(13,110,253,0.3);">
+                    Simpan Data
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
     </main>
 
     <!-- Footer -->
@@ -457,8 +610,20 @@
         </div>
     </footer>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+    // Initialize Select2 when document is ready
+    $(document).ready(function() {
+        $('.select2-site').select2({
+            dropdownParent: $('#sparepartModal'),
+            placeholder: "-- Cari Nama atau ID Site --",
+            allowClear: true,
+            width: '100%'
+        });
+    });
+
     function getGuestName() {
         // Jika sudah login, tidak perlu nama guest
         if (@json(auth()->check())) return null;
@@ -1177,6 +1342,69 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('modalViewerEvidence').style.display = 'none';
         };
     }
+
+    function openSparepartModal(mode, id = null, site_id = '', name = '', qty = 1, desc = '', status = 'Pending') {
+        const modal = document.getElementById('sparepartModal');
+        const form = document.getElementById('sparepartForm');
+        const titleSpan = document.getElementById('sparepartModalTitle').querySelector('span');
+        const methodInput = document.getElementById('sparepartFormMethod');
+        const statusGroup = document.getElementById('statusGroup');
+        
+        form.querySelectorAll('input, select, textarea').forEach(el => el.style.borderColor = '#ddd');
+
+        if(mode === 'add') {
+            titleSpan.innerText = 'Tambah Kebutuhan Sparepart';
+            form.action = "{{ route('sparepart.needed.store') }}";
+            methodInput.value = 'POST';
+            
+            // Trigger Select2 update
+            $('#sparepart_site_id').val('').trigger('change');
+            document.getElementById('sparepart_name').value = '';
+            document.getElementById('sparepart_quantity').value = '1';
+            document.getElementById('sparepart_description').value = '';
+            
+            statusGroup.style.display = 'none';
+            
+        } else if(mode === 'edit') {
+            titleSpan.innerText = 'Edit Kebutuhan Sparepart';
+            form.action = `/sparepart-needed/update/${id}`;
+            methodInput.value = 'PUT';
+            
+            // Trigger Select2 update
+            $('#sparepart_site_id').val(site_id).trigger('change');
+            document.getElementById('sparepart_name').value = name;
+            document.getElementById('sparepart_quantity').value = qty;
+            document.getElementById('sparepart_description').value = desc;
+            document.getElementById('sparepart_status').value = status;
+            
+            statusGroup.style.display = 'block';
+        }
+        
+        modal.style.display = 'flex';
+        // Give time for Select2 to initialize before focusing
+        setTimeout(() => $('.select2-site').select2('open'), 200);
+    }
+    
+    function closeSparepartModal() {
+        document.getElementById('sparepartModal').style.display = 'none';
+    }
+    
+    document.getElementById('sparepartModal').addEventListener('click', function(e) {
+        if(e.target === this) closeSparepartModal();
+    });
+    
+    const styleSheet = document.createElement("style");
+    styleSheet.innerText = `
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .sparepart-item:hover {
+            border-color: #3498db !important;
+            transform: translateY(-2px);
+        }
+    `;
+    document.head.appendChild(styleSheet);
 </script>
 </body>
 </html>

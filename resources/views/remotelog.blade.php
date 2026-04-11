@@ -246,6 +246,7 @@
         <a href="{{ route('jadwalpiket') }}" class="tab {{ request()->is('jadwalpiket*') ? 'active' : '' }}" style="text-decoration: none;">Jadwal Piket</a>
         <a href="{{ route('remotelog') }}" class="tab {{ request()->is('remote-log*') ? 'active' : '' }}" style="text-decoration: none;">Log Remote</a>
     @endif
+
 </div>
 
 <div style="max-width: 1200px; margin: 0 auto; padding: 25px 20px;">

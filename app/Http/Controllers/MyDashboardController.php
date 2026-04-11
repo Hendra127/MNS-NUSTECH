@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Ticket;
 use App\Models\PMLiberta; // Import model PMLiberta
+use App\Models\SparepartNeeded; // Import model
 use Carbon\Carbon;
 use App\Models\Message; // Import model Message
 use App\Models\JadwalPiket; // Import model Piket
@@ -48,6 +49,10 @@ class MyDashboardController extends Controller
         ->select('detail_problem', 'nama_site') 
         ->get()
         ->groupBy('detail_problem');
+
+    // 4b. Data Spareparts Needed
+    $sparepartsNeeded = SparepartNeeded::with('site')->orderBy('created_at', 'desc')->get();
+
 
     // ==========================================================
     // 5. LOGIKA OTOMATIS SHIFT BERDASARKAN JAM (FIXED)
@@ -103,7 +108,8 @@ class MyDashboardController extends Controller
         'shiftInfo',
         'todayDateLabel',
         'cmDone',
-        'cmTotal'
+        'cmTotal',
+        'sparepartsNeeded'
     ));
 }
     public function getDetail($id)

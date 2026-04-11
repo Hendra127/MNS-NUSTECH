@@ -4,9 +4,16 @@ $url = $args[0]
 
 # Auto-elevate ke Administrator
 if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Start-Process powershell.exe -ArgumentList "-WindowStyle Hidden -ExecutionPolicy Bypass -File `"$PSCommandPath`" `"$url`"" -Verb RunAs -WindowStyle Hidden
+    Start-Process powershell.exe -ArgumentList "-WindowStyle Hidden -ExecutionPolicy Bypass -NonInteractive -File `"$PSCommandPath`" `"$url`"" -Verb RunAs -WindowStyle Hidden
     exit
 }
+
+# Sembunyikan jendela PowerShell saat ini agar tidak terlihat oleh user
+Add-Type -Name 'Win' -Namespace 'NativeMethods' -MemberDefinition @'
+    [DllImport("user32.dll")]
+    public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+'@ -ErrorAction SilentlyContinue
+try { [NativeMethods.Win]::ShowWindow((Get-Process -Id $PID).MainWindowHandle, 0) } catch {}
 
 try {
     $clean = $url -replace 'nusa-remote://', '' -replace 'nusa-remote:', ''
@@ -73,5 +80,7 @@ try {
     }
 } catch {
     # Silent exit on error
+} finally {
+    # Otomatis tutup jendela PowerShell ini setelah selesai (berhasil maupun gagal)
     exit
 }

@@ -4,9 +4,13 @@ $url = $args[0]
 
 # Auto-elevate ke Administrator
 if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Start-Process powershell.exe -ArgumentList "-NoExit -ExecutionPolicy Bypass -File `"$PSCommandPath`" `"$url`"" -Verb RunAs
+    Start-Process powershell.exe -ArgumentList "-WindowStyle Hidden -ExecutionPolicy Bypass -NonInteractive -File `"$PSCommandPath`" `"$url`"" -Verb RunAs -WindowStyle Hidden
     exit
 }
+
+# Sembunyikan jendela PowerShell ini secepatnya
+Add-Type -Name 'WinHide' -Namespace 'NM' -MemberDefinition '[DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);' -ErrorAction SilentlyContinue
+try { [NM.WinHide]::ShowWindow((Get-Process -Id $PID).MainWindowHandle, 0) | Out-Null } catch {}
 
 $logFile = "C:\NUSTECH\remote.log"
 function Log($msg) { Add-Content -Path $logFile -Value "$(Get-Date -Format 'HH:mm:ss') - $msg" }
@@ -196,5 +200,7 @@ try {
     Log "Script finished correctly."
 } catch {
     Log "ERROR: $_"
+} finally {
+    # Selalu tutup jendela PowerShell setelah selesai (berhasil maupun gagal)
     exit
 }

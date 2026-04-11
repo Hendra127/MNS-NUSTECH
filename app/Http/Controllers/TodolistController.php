@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Todo;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 
 class TodolistController extends Controller
@@ -37,6 +38,14 @@ class TodolistController extends Controller
             'type' => 'note'
         ]);
 
+        ActivityLog::record([
+            'action' => 'create',
+            'module' => 'To Do List',
+            'description' => 'Membuat project baru: ' . $request->title,
+            'record_id' => $todo->id,
+            'record_label' => $request->title,
+        ]);
+
         return response()->json([
             'success' => true,
             'data' => $todo
@@ -46,7 +55,19 @@ class TodolistController extends Controller
     public function toggle($id)
     {
         $todo = Todo::where('user_id', auth()->id())->findOrFail($id);
-        $todo->update(['is_done' => !$todo->is_done]);
+        $newStatus = !$todo->is_done;
+        $todo->update(['is_done' => $newStatus]);
+
+        ActivityLog::record([
+            'action' => 'update',
+            'module' => 'To Do List',
+            'description' => $newStatus ? 'Menyelesaikan project: ' . $todo->title : 'Mengembalikan project ke Ongoing: ' . $todo->title,
+            'record_id' => $todo->id,
+            'record_label' => $todo->title,
+            'field_changed' => 'is_done',
+            'old_value' => !$newStatus ? 'Completed' : 'Ongoing',
+            'new_value' => $newStatus ? 'Completed' : 'Ongoing',
+        ]);
 
         return response()->json(['success' => true]);
     }
@@ -65,7 +86,16 @@ class TodolistController extends Controller
     public function destroy($id)
     {
         $todo = Todo::where('user_id', auth()->id())->findOrFail($id);
+        $title = $todo->title;
         $todo->delete();
+
+        ActivityLog::record([
+            'action' => 'delete',
+            'module' => 'To Do List',
+            'description' => 'Menghapus project: ' . $title,
+            'record_id' => $id,
+            'record_label' => $title,
+        ]);
 
         return response()->json(['success' => true]);
     }
@@ -81,6 +111,15 @@ class TodolistController extends Controller
         ];
 
         $todo->update(['checklists' => $checklists]);
+
+        ActivityLog::record([
+            'action' => 'create',
+            'module' => 'To Do List',
+            'description' => 'Menambah sub-task "' . $request->text . '" pada project ' . $todo->title,
+            'record_id' => $todo->id,
+            'record_label' => $todo->title,
+        ]);
+
         return back();
     }
 
@@ -101,7 +140,20 @@ class TodolistController extends Controller
     // Update Judul Project
     public function updateTitle(Request $request, $id) {
         $todo = Todo::where('user_id', auth()->id())->findOrFail($id);
+        $oldTitle = $todo->title;
         $todo->update(['title' => $request->title]);
+
+        ActivityLog::record([
+            'action' => 'update',
+            'module' => 'To Do List',
+            'description' => 'Mengubah judul project',
+            'record_id' => $todo->id,
+            'record_label' => $request->title,
+            'field_changed' => 'title',
+            'old_value' => $oldTitle,
+            'new_value' => $request->title,
+        ]);
+
         return response()->json(['success' => true]);
     }
 

@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Site; // Added this line
+use App\Models\Site;
 
 class LaporanCM extends Model
 {
