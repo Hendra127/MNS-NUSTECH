@@ -37,7 +37,7 @@ class OpenTicketController extends Controller
         $provinsi = $request->provinsi;
     
         // 4. Query dasar
-        $tickets = Ticket::with('site')
+        $tickets = Ticket::with(['site', 'evidences'])
             ->where('status', 'open')
             
             ->when($search, function ($q) use ($search) {
@@ -114,7 +114,8 @@ class OpenTicketController extends Controller
             'status'         => 'required|string',
             'plan_actions'    => 'nullable|string',
             'ce'             => 'nullable|string',
-            'evidence'       => 'nullable|file|mimes:jpg,jpeg,png,mp4,mov,avi|max:20480',
+            'evidence'       => 'nullable|array',
+            'evidence.*'     => 'file|mimes:jpg,jpeg,png,mp4,mov,avi|max:20480',
         ]);
 
 
@@ -129,17 +130,27 @@ class OpenTicketController extends Controller
                 ->with('error', "Gagal! Tiket untuk Site {$request->nama_site} sudah ada dan masih berstatus OPEN.");
         }
 
-        // Handle File Upload
-        if ($request->hasFile('evidence')) {
-            $data['evidence'] = $request->file('evidence')->store('evidence', 'public');
-        }
+        // Handle File Upload (Support Multiple)
+        $files = $request->file('evidence');
+        if ($files) {
+            if (!is_array($files)) {
+                $files = [$files];
+            }
+            
+            // Hapus evidence dari array data utama agar tidak error saat create (karena disimpan di tabel berbeda)
+            unset($data['evidence']);
+            $ticket = Ticket::create($data);
 
-        // Otomatisasi nama bulan berdasarkan tanggal rekap
-        if ($request->filled('tanggal_rekap')) {
-            $data['bulan_open'] = Carbon::parse($request->tanggal_rekap)->format('F');
+            foreach ($files as $file) {
+                $path = $file->store('evidence', 'public');
+                \App\Models\TicketEvidence::create([
+                    'ticket_id' => $ticket->id,
+                    'path' => $path
+                ]);
+            }
+        } else {
+            Ticket::create($data);
         }
-
-        Ticket::create($data);
 
         return redirect()->back()->with('success', 'Ticket berhasil ditambahkan secara permanen.');
     }
@@ -168,7 +179,8 @@ class OpenTicketController extends Controller
             'detail_problem' => 'required',
             'plan_actions'    => 'required',
             'ce'             => 'required',
-            'evidence'       => 'nullable|file|mimes:jpg,jpeg,png,mp4,mov,avi|max:20480',
+            'evidence'       => 'nullable|array',
+            'evidence.*'     => 'file|mimes:jpg,jpeg,png,mp4,mov,avi|max:20480',
         ]);
 
         $ticket = Ticket::findOrFail($id);
@@ -181,13 +193,20 @@ class OpenTicketController extends Controller
         $ticket->plan_actions    = $request->plan_actions;
         $ticket->ce             = $request->ce;
         
-        // Handle File Upload
-        if ($request->hasFile('evidence')) {
-            // Delete old file if exists
-            if ($ticket->evidence) {
-                Storage::disk('public')->delete($ticket->evidence);
+        // Handle File Upload (Append Multiple)
+        $files = $request->file('evidence');
+        if ($files) {
+            if (!is_array($files)) {
+                $files = [$files];
             }
-            $ticket->evidence = $request->file('evidence')->store('evidence', 'public');
+            
+            foreach ($files as $file) {
+                $path = $file->store('evidence', 'public');
+                \App\Models\TicketEvidence::create([
+                    'ticket_id' => $ticket->id,
+                    'path' => $path
+                ]);
+            }
         }
 
         // Update bulan_open otomatis

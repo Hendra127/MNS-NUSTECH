@@ -159,6 +159,48 @@
         }
     }
 
+    // --- Dynamic Nav Logo Injection ---
+    function initNavLogo() {
+        const logoContainer = document.querySelector('.header-logo-container');
+        if (logoContainer && !document.getElementById('nav-nustech-logo')) {
+            // Apply flex to container for side-by-side layout
+            logoContainer.style.display = 'flex';
+            logoContainer.style.alignItems = 'center';
+            logoContainer.style.gap = '15px';
+
+            const logoLink = document.createElement('a');
+            logoLink.id = 'nav-nustech-logo';
+            logoLink.href = '{{ route("landingpage") }}';
+            logoLink.style.display = 'flex';
+            logoLink.style.alignItems = 'center';
+            logoLink.style.textDecoration = 'none';
+            logoLink.style.transition = 'all 0.3s ease';
+            logoLink.title = 'Back to Landing Page';
+            
+            const img = document.createElement('img');
+            img.src = '{{ asset("assets/img/logonustech.png") }}';
+            img.alt = 'Nustech Logo';
+            img.style.height = '35px';
+            img.style.width = 'auto';
+            img.style.filter = 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))';
+            img.style.transition = 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            
+            logoLink.onmouseover = () => {
+                img.style.transform = 'scale(1.15) rotate(-5deg)';
+                img.style.filter = 'drop-shadow(0 4px 8px rgba(255,255,255,0.3))';
+            };
+            logoLink.onmouseout = () => {
+                img.style.transform = 'scale(1) rotate(0)';
+                img.style.filter = 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))';
+            };
+            
+            logoLink.appendChild(img);
+            
+            // Perpend before the existing brand link
+            logoContainer.insertBefore(logoLink, logoContainer.firstChild);
+        }
+    }
+
     function updateChartsTheme(theme) {
         if (typeof Chart !== 'undefined') {
             const textColor = theme === 'dark' ? '#e0e0e0' : '#666';
@@ -187,11 +229,13 @@
         document.addEventListener('DOMContentLoaded', () => {
             showInstallButton();
             initDarkMode();
+            initNavLogo();
             updateChartsTheme(localStorage.getItem('theme') || 'light');
         });
     } else {
         showInstallButton();
         initDarkMode();
+        initNavLogo();
         updateChartsTheme(localStorage.getItem('theme') || 'light');
     }
 </script>

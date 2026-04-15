@@ -354,7 +354,7 @@
                         <th>STATUS</th>
                         <th>KATEGORI</th>
                         @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
-                            <th>AKSI</th>
+                            <th class="sticky-col-right">AKSI</th>
                         @endif
                     </tr>
                 </thead>
@@ -388,7 +388,7 @@
                         </td>
                         <td class="text-center">{{ $item->kategori }}</td>
                         @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
-                            <td class="text-center">
+                            <td class="text-center sticky-col-right">
                                 <div class="btn-group btn-group-sm">
                                     <button type="button" class="btn bi bi-pencil btn-edit" data-id="{{ $item->id }}"
                                         data-site_id="{{ $item->site_id }}" data-nama_lokasi="{{ $item->nama_lokasi }}"

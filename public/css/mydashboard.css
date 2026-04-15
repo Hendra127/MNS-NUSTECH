@@ -89,32 +89,18 @@ body {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 16px;
-}
-
-/* Header Logo Image */
-.header-logo-link {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-    border-radius: 10px;
-    overflow: hidden;
-    border: 2px solid rgba(255, 255, 255, 0.25);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-    transition: all 0.25s ease;
-}
-
-.header-logo-link:hover {
-    border-color: rgba(255, 255, 255, 0.7);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
-    transform: scale(1.04);
+    gap: 1.25rem;
 }
 
 .header-logo-img {
-    width: 64px;
-    height: 64px;
-    object-fit: cover;
-    display: block;
+    height: 58px;
+    width: auto;
+    filter: drop-shadow(0 2px 5px rgba(0,0,0,0.15));
+    transition: transform 0.3s ease;
+}
+
+.header-logo-img:hover {
+    transform: scale(1.05);
 }
 
 .logo-section .logo-icon {
@@ -987,6 +973,21 @@ tbody td:last-child {
     font-weight: 600;
     color: #2c3e50;
     flex-shrink: 0;
+}
+
+.detail-colon {
+    width: 15px;
+    text-align: center;
+    color: #444;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.detail-row span:last-child {
+    flex: 1;
+    padding-left: 5px; /* Memberikan jarak agar text tidak menempel ke titik dua */
+    color: #444;
+    word-break: break-word;
 }
 
 /* 5. Map */

@@ -112,12 +112,13 @@
                 width: 100%;
             }
         }
+
         /* Sticky Right Columns */
         .col-sticky-right {
             position: sticky !important;
             z-index: 10 !important;
             background-color: #ffffff !important;
-            box-shadow: -2px 0 5px rgba(0,0,0,0.08);
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.08);
         }
 
         thead th.col-sticky-right {
@@ -133,11 +134,31 @@
             background-color: #f0f5fb !important;
         }
 
-        .col-ip-modem { right: 480px; min-width: 120px; }
-        .col-ip-router { right: 360px; min-width: 120px; }
-        .col-ip-ap1 { right: 240px; min-width: 120px; }
-        .col-ip-ap2 { right: 120px; min-width: 120px; }
-        .col-aksi { right: 0; min-width: 120px; text-align: center !important; }
+        .col-ip-modem {
+            right: 480px;
+            min-width: 120px;
+        }
+
+        .col-ip-router {
+            right: 360px;
+            min-width: 120px;
+        }
+
+        .col-ip-ap1 {
+            right: 240px;
+            min-width: 120px;
+        }
+
+        .col-ip-ap2 {
+            right: 120px;
+            min-width: 120px;
+        }
+
+        .col-aksi {
+            right: 0;
+            min-width: 120px;
+            text-align: center !important;
+        }
 
         @media (max-width: 768px) {
             .col-sticky-right {
@@ -418,18 +439,18 @@
     </div>
     <script>
         @if(session('success'))
-                    < div class="alert alert-success mt-2" >
+            < div class="alert alert-success mt-2" >
                 {{ session('success') }}
             </div >
         @endif
             @if($errors->any())
-                        < div class="alert alert-danger mt-2" >
-                            <ul>
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                </div >
+                < div class="alert alert-danger mt-2" >
+                    <ul>
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    </div >
             @endif
     </script>
     <!-- MODAL ADD DATA -->

@@ -195,8 +195,8 @@
                 <div class="blob blob-3"></div>
             </div>
             <div class="logo-section">
-                <a href="{{ url('/landingpage') }}" class="header-logo-link" title="Kembali ke Landing Page">
-                    <img src="{{ asset('assets/img/logonustech_new.jpg') }}" alt="NUSTECH Logo" class="header-logo-img">
+                <a href="{{ route('login') }}" class="header-logo-link">
+                    <img src="{{ asset('assets/img/logonustech.png') }}" alt="NUSTECH Logo" class="header-logo-img">
                 </a>
                 <div class="logo-text">
                     <h1>
@@ -239,7 +239,7 @@
 
                 <div class="card stat-card white-card clickable-card" data-type="pm_bmn" style="cursor: pointer;">
                     <div class="card-inner">
-                        <div class="label-side"><span class="label-text">PM<br>BMN<br>Done</span></div>
+                        <div class="label-side"><span class="label-text">DOC<br>PM<br>BMN</span></div>
                         <div class="vertical-divider"></div>
                         <div class="value-side">
                             <div class="value-group">
@@ -252,7 +252,7 @@
 
                 <div class="card stat-card white-card clickable-card" data-type="pm_sl" style="cursor: pointer;">
                     <div class="card-inner">
-                        <div class="label-side"><span class="label-text">PM<br>SL<br>Done</span></div>
+                        <div class="label-side"><span class="label-text">DOC<br>PM<br>SL</span></div>
                         <div class="vertical-divider"></div>
                         <div class="value-side">
                             <div class="value-group">
@@ -265,7 +265,7 @@
 
                 <div class="card stat-card white-card clickable-card" data-type="cm_all" style="cursor: pointer; grid-column: span 2;">
                     <div class="card-inner">
-                        <div class="label-side"><span class="label-text">CM<br>Done</span></div>
+                        <div class="label-side"><span class="label-text">DOC<br>CM</span></div>
                         <div class="vertical-divider"></div>
                         <div class="value-side">
                             <div class="value-group">
@@ -515,15 +515,15 @@
                 <div class="modal-body">
             <div class="modal-detail-wrapper">
                 <div class="detail-info-list">
-                    <div class="detail-row"><span>Site ID</span> : <span id="m-site-id"></span></div>
-                    <div class="detail-row"><span>Kategori</span> : <span id="m-kategori"></span></div>
-                    <div class="detail-row"><span>Provinsi</span> : <span id="m-provinsi"></span></div>
-                    <div class="detail-row"><span>Kabupaten</span> : <span id="m-kabupaten"></span></div>
-                    <div class="detail-row"><span>Sumber Listrik</span> : <span id="m-listrik"></span></div>
-                    <div class="detail-row"><span>Durasi</span> : <span id="m-durasi"></span></div>
-                    <div class="detail-row"><span>Detail Problem</span> : <span id="m-problem"></span></div>
-                    <div class="detail-row"><span>CE</span> : <span id="m-ce"></span></div>
-                    <div class="detail-row"><span>Evidence</span> : <span id="m-evidence" class="text-primary fw-bold"></span></div>
+                    <div class="detail-row"><span>Site ID</span> <span class="detail-colon">:</span> <span id="m-site-id"></span></div>
+                    <div class="detail-row"><span>Kategori</span> <span class="detail-colon">:</span> <span id="m-kategori"></span></div>
+                    <div class="detail-row"><span>Provinsi</span> <span class="detail-colon">:</span> <span id="m-provinsi"></span></div>
+                    <div class="detail-row"><span>Kabupaten</span> <span class="detail-colon">:</span> <span id="m-kabupaten"></span></div>
+                    <div class="detail-row"><span>Sumber Listrik</span> <span class="detail-colon">:</span> <span id="m-listrik"></span></div>
+                    <div class="detail-row"><span>Durasi</span> <span class="detail-colon">:</span> <span id="m-durasi"></span></div>
+                    <div class="detail-row"><span>Detail Problem</span> <span class="detail-colon">:</span> <span id="m-problem"></span></div>
+                    <div class="detail-row"><span>CE</span> <span class="detail-colon">:</span> <span id="m-ce"></span></div>
+                    <div class="detail-row"><span>Evidence</span> <span class="detail-colon">:</span> <span id="m-evidence" class="text-primary fw-bold"></span></div>
                 </div>
 
                 <div class="map-container-small" style="position: relative;">

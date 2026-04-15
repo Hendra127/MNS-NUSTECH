@@ -146,11 +146,14 @@
                         <th>LONGITUDE</th>
                         <th>PROVINSI</th>
                         <th>KABUPATEN</th>
+                        @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                            <th class="sticky-col-right">AKSI</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td colspan="9" class="empty text-center">
+                        <td colspan="10" class="empty text-center">
                             <!-- Empty State Content -->
                             Showing 0 of 0 results
                         </td>

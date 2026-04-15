@@ -391,7 +391,7 @@
                     <th>LAYANAN AI</th>
                     <th>KETERANGAN</th>
                     @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
-                        <th>AKSI</th>
+                        <th class="sticky-col-right">AKSI</th>
                     @endif
                 </tr>
             </thead>
@@ -425,7 +425,7 @@
                     <td>{{ $item->layanan_ai }}</td>
                     <td>{{ $item->keterangan }}</td>
                     @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
-                    <td class="text-center">
+                    <td class="text-center sticky-col-right">
                         <div class="d-flex gap-2 justify-content-center align-items-center">
                             <button class="btn btn-sm bi bi-pencil text-dark p-0 border-0 shadow-none" 
                                     data-bs-toggle="modal" 

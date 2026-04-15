@@ -162,7 +162,7 @@
                         <th>PASS AP1</th>
                         <th>PASS AP2</th>
                         @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
-                            <th>Aksi</th>
+                            <th class="sticky-col-right">Aksi</th>
                         @endif
                     </tr>
                 </thead>
@@ -176,7 +176,7 @@
                             <td>{{ $row->pass_ap1 }}</td>
                             <td>{{ $row->pass_ap2 }}</td>
                             @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
-                                <td class="text-center">
+                                <td class="text-center sticky-col-right">
                                     <button class="btn btn-sm bi bi-pencil" onclick="editData({{ json_encode($row) }})"
                                         title="Edit">
                                     </button>

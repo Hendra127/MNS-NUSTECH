@@ -226,7 +226,7 @@
                         <th>SN BARU</th>
                         <th>KETERANGAN</th>
                         @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
-                            <th>AKSI</th>
+                            <th class="sticky-col-right">AKSI</th>
                         @endif
                     </tr>
                 </thead>
@@ -242,7 +242,7 @@
                         <td>{{ $item->sn_baru ?? '-' }}</td>
                         <td>{{ $item->keterangan ?? '-' }}</td>
                         @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
-                        <td class="text-center">
+                        <td class="text-center sticky-col-right">
                             <div class="d-flex justify-content-center gap-1">
                                 <button type="button" class="btn btn-sm bi bi-pencil" 
                                         data-bs-toggle="modal" 

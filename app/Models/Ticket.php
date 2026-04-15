@@ -29,6 +29,11 @@ class Ticket extends Model
     {
         return $this->belongsTo(Site::class, 'site_code', 'site_code');
     }
+
+    public function evidences()
+    {
+        return $this->hasMany(TicketEvidence::class);
+    }
     public function getDurasiAttribute()
     {
         if (!$this->tanggal_rekap) return 0;

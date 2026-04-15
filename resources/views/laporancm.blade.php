@@ -292,7 +292,7 @@
                 <th>FOTO ON SITE</th>
                 <th>BUKTI TRANSFER</th>
                 @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
-                    <th>AKSI</th>
+                    <th class="sticky-col-right">AKSI</th>
                 @endif
             </tr>
             </thead>
@@ -322,7 +322,7 @@
                         @endif
                     </td>
                     @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
-                    <td class="text-center">
+                    <td class="text-center sticky-col-right">
                         <button class="btn btn-sm btn-edit" 
                                 data-bs-toggle="modal" 
                                 data-bs-target="#modalEditLaporanPM"
