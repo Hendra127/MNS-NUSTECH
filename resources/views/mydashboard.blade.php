@@ -195,13 +195,13 @@
                 <div class="blob blob-3"></div>
             </div>
             <div class="logo-section">
-                <a href="{{ route('login') }}" class="header-logo-link">
+                <a href="{{ route('landingpage') }}" class="header-logo-link">
                     <img src="{{ asset('assets/img/logonustech.png') }}" alt="NUSTECH Logo" class="header-logo-img">
                 </a>
                 <div class="logo-text">
                     <h1>
                         <i class="ph-fill ph-broadcast"></i>
-                        <a href="{{ route('login') }}" style="text-decoration: none; color: inherit;"><span class="bold-title">NUSTECH</span></a>
+                        <a href="{{ route('landingpage') }}" style="text-decoration: none; color: inherit;"><span class="bold-title">NUSTECH</span></a>
                         <span class="regular-title">Monitoring Dashboard</span>
                     </h1>
                     <p>Real-Time Network & Site Operation Center</p>

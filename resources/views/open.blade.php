@@ -192,7 +192,7 @@
 <body>
     <header class="main-header">
         <div class="header-logo-container">
-            <a href="javascript:void(0)" class="header-brand-link" onclick="openNavModal()"
+            <a href="{{ route('landingpage') }}" class="header-brand-link"
                 style="text-decoration: none !important; color: white !important;">
                 <div class="header-brand" style="display: flex; align-items: center; gap: 8px; font-weight: bold;">
                     Project <span style="opacity: 0.5;">|</span> Operational
