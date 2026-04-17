@@ -363,7 +363,7 @@
                         </ul>
                     </div>
                 @endif
-                <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" id="profileForm">
                     @csrf
                     @method('PUT')
                     <input type="file" name="photo" id="photoInput" style="display: none;" accept="image/jpeg,image/png,image/jpg" onchange="previewImage(this)">
@@ -530,12 +530,23 @@
                     toast: true,
                     position: 'top-end',
                     showConfirmButton: false,
-                    timer: 2000,
+                    timer: 1500,
                     timerProgressBar: true
                 });
                 Toast.fire({
                     icon: 'success',
                     title: 'Foto kamera berhasil diambil'
+                }).then(() => {
+                    // Automatically submit form
+                    Swal.fire({
+                        title: 'Menyimpan Perubahan...',
+                        text: 'Mohon tunggu sebentar',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    document.getElementById('profileForm').submit();
                 });
             }, 'image/jpeg', 0.9);
         }
@@ -578,6 +589,16 @@
                 var reader = new FileReader();
                 reader.onload = function(e) {
                     document.getElementById('photoPreview').src = e.target.result;
+                    // Auto submit after file preview
+                    Swal.fire({
+                        title: 'Menyimpan Perubahan...',
+                        text: 'Mohon tunggu sebentar',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    document.getElementById('profileForm').submit();
                 }
                 reader.readAsDataURL(input.files[0]);
             }

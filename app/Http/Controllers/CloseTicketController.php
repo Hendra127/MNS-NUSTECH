@@ -119,4 +119,46 @@ class CloseTicketController extends Controller
 
         return redirect()->back()->with('success', 'Data close ticket berhasil diimport');
     }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'kategori'       => 'required',
+            'tanggal_rekap' => 'required|date',
+            'tanggal_close' => 'required|date',
+            'kendala'        => 'required',
+            'detail_problem' => 'required',
+            'plan_actions'   => 'required',
+            'ce'             => 'required',
+        ]);
+
+        $ticket = Ticket::findOrFail($id);
+        
+        $tanggalOpen = Carbon::parse($request->tanggal_rekap);
+        $tanggalClose = Carbon::parse($request->tanggal_close);
+        $durasi = $tanggalOpen->diffInDays($tanggalClose);
+
+        $ticket->update([
+            'kategori'       => $request->kategori,
+            'tanggal_rekap'  => $request->tanggal_rekap,
+            'tanggal_close'  => $request->tanggal_close,
+            'durasi'         => $durasi,
+            'kendala'        => $request->kendala,
+            'detail_problem' => $request->detail_problem,
+            'plan_actions'   => $request->plan_actions,
+            'ce'             => $request->ce,
+            'bulan_open'     => $tanggalOpen->format('F'),
+            'bulan_close'    => $tanggalClose->format('F'),
+        ]);
+
+        return redirect()->back()->with('success', 'Tiket ' . $ticket->site_code . ' berhasil diupdate!');
+    }
+
+    public function destroy($id)
+    {
+        $ticket = Ticket::findOrFail($id);
+        $ticket->delete();
+
+        return redirect()->back()->with('success', 'Tiket berhasil dihapus!');
+    }
 }

@@ -186,44 +186,13 @@
             color: #ccc !important;
             opacity: 0.5;
         }
-
-        /* Select2 Dark Mode Fix */
-        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection {
-            background-color: #2a2a2a !important;
-            border-color: #444 !important;
-            color: #fff !important;
-        }
-
-        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection__rendered {
-            color: #f8fafc !important;
-        }
-
-        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-dropdown {
-            background-color: #1e1e1e !important;
-            border-color: #444 !important;
-        }
-
-        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-results__option {
-            color: #e0e0e0 !important;
-        }
-
-        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-results__option--highlighted {
-            background-color: #0d6efd !important;
-            color: #fff !important;
-        }
-
-        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-search__field {
-            background-color: #2a2a2a !important;
-            border-color: #444 !important;
-            color: #fff !important;
-        }
     </style>
 </head>
 
 <body>
     <header class="main-header">
         <div class="header-logo-container">
-            <a href="javascript:void(0)" class="header-brand-link" onclick="openNavModal()"
+            <a href="{{ route('landingpage') }}" class="header-brand-link"
                 style="text-decoration: none !important; color: white !important;">
                 <div class="header-brand" style="display: flex; align-items: center; gap: 8px; font-weight: bold;">
                     Project <span style="opacity: 0.5;">|</span> Operational
@@ -271,20 +240,21 @@
                     </a>
                     <form action="{{ route('logout') }}" method="POST" id="logout-form">
                         @csrf
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            style="margin-right: 8px;">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                            <polyline points="16 17 21 12 16 7"></polyline>
-                            <line x1="21" y1="12" x2="9" y2="12"></line>
-                        </svg>
-                        Logout
+                        <button type="submit" 
+                            style="width: 100%; text-align: left; padding: 10px 15px; border: none; background: transparent; color: red; font-size: 14px; display: flex; align-items: center; transition: background 0.2s;"
+                            onmouseover="this.style.backgroundColor='#fff0f0'"
+                            onmouseout="this.style.backgroundColor='transparent'">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                style="margin-right: 8px;">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                <polyline points="16 17 21 12 16 7"></polyline>
+                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                            </svg>
+                            Logout
                         </button>
                     </form>
                 </div>
-                <form action="{{ route('logout') }}" method="POST" id="logout-form">
-                    @csrf
-                </form>
             </div>
         </div>
     </header>
@@ -560,19 +530,18 @@
                                             </select>
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label fw-bold text-primary">Tanggal Open</label>
+                                            <label class="form-label fw-bold text-primary">Tanggal Open/Rekap</label>
                                             <input type="date" name="tanggal_rekap" class="form-control"
                                                 value="{{ $t->tanggal_rekap }}" required>
                                         </div>
-                                        <div class="col-md-8">
-                                            <label class="form-label fw-bold text-primary">Kendala</label>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold">Kendala</label>
                                             @php $kendalaOpts = ['PERANGKAT TIDAK ADA INTERNET', 'INTERNET TIDAK BISA DIGUNAKAN', 'PASSWORD SALAH', 'PERANGKAT INTERNET RUSAK']; @endphp
                                             <select name="kendala" class="form-select" required>
                                                 <option value="">-- Pilih Kendala --</option>
                                                 @foreach($kendalaOpts as $opt)
                                                     <option value="{{ $opt }}" {{ $t->kendala == $opt ? 'selected' : '' }}>
-                                                        {{ $opt }}
-                                                    </option>
+                                                        {{ $opt }}</option>
                                                 @endforeach
                                                 @if($t->kendala && !in_array($t->kendala, $kendalaOpts))
                                                     <option value="{{ $t->kendala }}" selected>{{ $t->kendala }} (Lainnya)
@@ -580,15 +549,58 @@
                                                 @endif
                                             </select>
                                         </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold text-primary">Detail Problem</label>
-                                            <textarea name="detail_problem" class="form-control" rows="3"
-                                                required>{{ $t->detail_problem }}</textarea>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold text-primary">Action Plan</label>
-                                            <textarea name="plan_actions" class="form-control" rows="3"
-                                                required>{{ $t->plan_actions }}</textarea>
+                                        <div class="row mt-3">
+                                            <div class="col-md-7">
+                                                <label class="form-label fw-bold text-dark mb-2">Hardware & Deskripsi Masalah</label>
+                                                <div id="hw-list-container-{{ $t->id }}">
+                                                    @php 
+                                                        $details = json_decode($t->detail_problem ?? '{}', true);
+                                                        if (json_last_error() !== JSON_ERROR_NONE || !is_array($details)) {
+                                                            $hwArray = explode(',', $t->hardware_problem ?? '');
+                                                            $details = [];
+                                                            foreach($hwArray as $hx) if(!empty($hx)) $details[$hx] = $t->detail_problem;
+                                                        }
+                                                    @endphp
+
+                                                    @if(empty($details))
+                                                        <div class="hw-row-unified mb-2" id="hw-row-{{ $t->id }}-initial">
+                                                            <div class="row g-2 align-items-stretch">
+                                                                <div class="col-md-10">
+                                                                    <select class="form-select" onchange="renderHardwareRow('{{ $t->id }}', this.value, '', 'hw-row-{{ $t->id }}-initial')"
+                                                                        style="font-size: 0.9rem; border-color: #dee2e6 !important; height: 38px;">
+                                                                        <option value="">-- Pilih Perangkat --</option>
+                                                                        @foreach(['MODEM', 'ROUTER', 'AP1', 'AP2', 'TRANSCEIVER', 'STAVOLT', 'LAIN LAIN'] as $opt)
+                                                                            <option value="{{ $opt }}">{{ $opt }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-2 d-flex gap-1 justify-content-start align-items-center">
+                                                                    <button type="button" class="btn btn-outline-danger btn-sm rounded-circle p-0" 
+                                                                        style="width: 24px; height: 24px;" 
+                                                                        onclick="removeHwRow('hw-row-{{ $t->id }}-initial', '{{ $t->id }}')">
+                                                                        <i class="bi bi-x"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @else
+                                                        @foreach($details as $hw => $desc)
+                                                            @if(!empty($hw))
+                                                                <script>
+                                                                    document.addEventListener('DOMContentLoaded', function() {
+                                                                        renderHardwareRow('{{ $t->id }}', '{{ $hw }}', `{!! addslashes($desc) !!}`);
+                                                                    });
+                                                                </script>
+                                                            @endif
+                                                        @endforeach
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <label class="form-label fw-bold text-dark mb-2">Action Plan</label>
+                                                <textarea name="plan_actions" class="form-control" rows="5" required 
+                                                    style="border-color: #dee2e6 !important; box-shadow: none;">{{ $t->plan_actions }}</textarea>
+                                            </div>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label fw-bold text-primary">CE (Customer Engineer)</label>
@@ -601,29 +613,22 @@
                                                 <option value="Hasrul Fandi Serang" {{ $t->ce == 'Hasrul Fandi Serang' ? 'selected' : '' }}>Hasrul Fandi Serang</option>
                                             </select>
                                         </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold text-primary">Evidence (Foto/Video) - <small
-                                                    class="text-muted">Bisa pilih banyak</small></label>
+                                        <div class="col-md-8">
+                                            <label class="form-label fw-bold text-primary">Evidence (Foto/Video)</label>
                                             <input type="file" name="evidence[]" class="form-control"
                                                 accept="image/*,video/*" multiple>
-
-                                            {{-- Tampilkan bukti yang sudah diupload --}}
+                                            
                                             <div class="mt-2 d-flex flex-wrap gap-2">
                                                 @if($t->evidences->count() > 0)
                                                     @foreach($t->evidences as $ev)
                                                         <div class="position-relative">
-                                                            <a href="javascript:void(0)"
-                                                                onclick="viewEvidence('{{ asset('storage/' . $ev->path) }}')"
-                                                                class="badge bg-info text-white text-decoration-none">
+                                                            <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage/' . $ev->path) }}')" class="badge bg-info text-white text-decoration-none">
                                                                 <i class="bi bi-paperclip"></i> Bukti #{{ $loop->iteration }}
                                                             </a>
                                                         </div>
                                                     @endforeach
                                                 @elseif($t->evidence && str_contains($t->evidence, '.'))
-                                                    {{-- Legacy support --}}
-                                                    <a href="javascript:void(0)"
-                                                        onclick="viewEvidence('{{ asset('storage/' . $t->evidence) }}')"
-                                                        class="badge bg-secondary text-white text-decoration-none">
+                                                    <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage/' . $t->evidence) }}')" class="badge bg-secondary text-white text-decoration-none">
                                                         <i class="bi bi-paperclip"></i> Bukti Lama
                                                     </a>
                                                 @else
@@ -705,7 +710,7 @@
                                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                         aria-label="Close"></button>
                                 </div>
-                                <div class="modal-body p-4">
+                                <div class="modal-body p-4 bg-white">
                                     <div class="row g-4">
                                         <div class="col-md-6">
                                             <div class="bg-light p-3 rounded-4 shadow-sm h-100">
@@ -717,8 +722,7 @@
                                                             class="fw-bold">{{ $t->site_code }}</span></div>
                                                     <div class="d-flex justify-content-between border-bottom pb-2 gap-2">
                                                         <span class="text-muted small flex-shrink-0">Nama Site</span><span
-                                                            class="fw-bold text-end">{{ $t->nama_site }}</span>
-                                                    </div>
+                                                            class="fw-bold text-end">{{ $t->nama_site }}</span></div>
                                                     <div class="d-flex justify-content-between border-bottom pb-2"><span
                                                             class="text-muted small">Provinsi</span><span
                                                             class="fw-semibold">{{ $t->provinsi }}</span></div>
@@ -770,29 +774,33 @@
                                                         class="bi bi-exclamation-triangle-fill"></i> Detail Teknis</h6>
                                                 <div class="row g-3">
                                                     <div class="col-md-6">
-                                                        <div class="p-3 bg-white rounded-3 h-100 border">
+                                                        <div class="p-3 bg-white rounded-3 h-100 border text-center">
                                                             <div class="text-muted small fw-bold mb-1">KENDALA UTAMA</div>
                                                             <p class="mb-0 fw-semibold text-dark">{{ $t->kendala }}</p>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <div class="p-3 bg-white rounded-3 h-100 border">
-                                                            <div class="text-muted small fw-bold mb-1">EVIDENCE (BUKTI)
+                                                        <div class="p-3 bg-white rounded-3 h-100 border text-center">
+                                                            <div class="text-muted small fw-bold mb-1">PERANGKAT BERMASALAH</div>
+                                                            <div class="d-flex flex-wrap justify-content-center gap-1 mt-1">
+                                                                @foreach(explode(',', $t->hardware_problem ?? '') as $hw)
+                                                                    <span class="badge bg-primary">{{ strtoupper($hw) }}</span>
+                                                                @endforeach
                                                             </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="p-3 bg-white rounded-3 h-100 border">
+                                                            <div class="text-muted small fw-bold mb-1">EVIDENCE (BUKTI)</div>
                                                             <div class="d-flex flex-column gap-1">
                                                                 @if($t->evidences->count() > 0)
                                                                     @foreach($t->evidences as $ev)
-                                                                        <a href="javascript:void(0)"
-                                                                            onclick="viewEvidence('{{ asset('storage/' . $ev->path) }}')"
-                                                                            class="text-primary text-decoration-none small">
-                                                                            <i class="bi bi-eye"></i> Lihat Bukti
-                                                                            #{{ $loop->iteration }}
+                                                                        <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage/' . $ev->path) }}')" class="text-primary text-decoration-none small">
+                                                                            <i class="bi bi-eye"></i> Lihat Bukti #{{ $loop->iteration }}
                                                                         </a>
                                                                     @endforeach
                                                                 @elseif($t->evidence && str_contains($t->evidence, '.'))
-                                                                    <a href="javascript:void(0)"
-                                                                        onclick="viewEvidence('{{ asset('storage/' . $t->evidence) }}')"
-                                                                        class="text-primary text-decoration-none small">
+                                                                     <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage/' . $t->evidence) }}')" class="text-primary text-decoration-none small">
                                                                         <i class="bi bi-eye"></i> Lihat Bukti Utama
                                                                     </a>
                                                                 @else
@@ -802,19 +810,29 @@
                                                         </div>
                                                     </div>
                                                     <div class="col-12">
-                                                        <div class="p-3 bg-white rounded-3 mb-3 border">
-                                                            <div class="text-muted small fw-bold mb-1">DETAIL PROBLEM</div>
-                                                            <p class="mb-0 text-dark small" style="line-height: 1.6;">
-                                                                {{ $t->detail_problem }}
-                                                            </p>
+                                                        <div class="p-2 bg-light rounded-3 mb-3 border-start border-4 border-primary">
+                                                            <div class="text-muted small fw-bold px-2 mb-2">DETAIL PER PERANGKAT</div>
+                                                            <div class="px-2">
+                                                                @php 
+                                                                    $details = json_decode($t->detail_problem ?? '{}', true);
+                                                                    if (json_last_error() !== JSON_ERROR_NONE || !is_array($details)) {
+                                                                        $details = ['MASALAH' => $t->detail_problem];
+                                                                    }
+                                                                @endphp
+                                                                @foreach($details as $hw => $desc)
+                                                                    <div class="d-flex gap-2 mb-1 border-bottom pb-1 border-light">
+                                                                        <span class="fw-bold text-dark small" style="min-width: 100px;">{{ strtoupper($hw) }}:</span>
+                                                                        <span class="text-muted small">{{ $desc }}</span>
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
                                                         </div>
                                                         <div class="p-3 rounded-3"
                                                             style="background-color: #f0f7ff; border-left: 4px solid #3a7bd5;">
                                                             <div class="text-primary small fw-bold mb-1">PLAN ACTION /
                                                                 TINDAKAN</div>
                                                             <p class="mb-0 text-dark small" style="line-height: 1.6;">
-                                                                {{ $t->plan_actions }}
-                                                            </p>
+                                                                {{ $t->plan_actions }}</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -822,7 +840,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="modal-footer border-0 p-4 d-flex justify-content-between">
+                                <div class="modal-footer border-0 p-4 bg-white d-flex justify-content-between">
                                     @if($t->site && $t->site->ip_router && in_array(auth()->user()->role ?? '', ['admin', 'superadmin']))
                                         <button type="button" class="btn btn-outline-primary px-4 rounded-pill shadow-sm"
                                             onclick="remoteMikrotik('{{ $t->site->ip_router }}', '{{ $t->kategori }}', '{{ $t->nama_site }}', '{{ $t->site_code }}')">
@@ -855,7 +873,8 @@
     <div class="modal fade" id="modalTambahTicket" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-centered">
             <form method="POST" action="{{ route('open.ticket.store') }}"
-                class="modal-content border-0 shadow-lg rounded-4 overflow-hidden" enctype="multipart/form-data">
+                class="modal-content border-0 shadow-lg rounded-4 overflow-hidden" enctype="multipart/form-data"
+                style="background-color: white !important; color: #333 !important;">
                 @csrf
                 <div class="modal-header text-white d-flex justify-content-center position-relative"
                     style="background-color: #071152;">
@@ -863,7 +882,7 @@
                     <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
                         data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body p-4">
+                <div class="modal-body p-4" style="background-color: white !important;">
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label class="form-label fw-bold">Pilih Site ID</label>
@@ -905,7 +924,7 @@
                                 required>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Tanggal Open</label>
+                            <label class="form-label">Tanggal Rekap</label>
                             <input type="date" name="tanggal_rekap" class="form-control" value="{{ date('Y-m-d') }}">
                         </div>
                         <div class="col-md-4">
@@ -923,18 +942,44 @@
                                 <option value="PERANGKAT INTERNET RUSAK">PERANGKAT INTERNET RUSAK</option>
                             </select>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Detail Problem</label>
-                            <textarea name="detail_problem" class="form-control" rows="3" required
-                                placeholder="Jelaskan detail masalah..."></textarea>
+                        <div class="row mt-3">
+                            <div class="col-md-7">
+                                <label class="form-label fw-bold text-dark mb-2">Hardware & Deskripsi Masalah</label>
+                                <div id="hw-list-container-main">
+                                    {{-- Baris Pertama Default --}}
+                                    <div class="hw-row-unified mb-2" id="hw-row-main-initial">
+                                        <div class="row g-2 align-items-stretch">
+                                            <div class="col-md-10">
+                                                <select class="form-select" onchange="renderHardwareRow('main', this.value, '', 'hw-row-main-initial')"
+                                                    style="font-size: 0.9rem; border-color: #dee2e6 !important; height: 38px;">
+                                                    <option value="">-- Pilih Perangkat --</option>
+                                                    @foreach(['MODEM', 'ROUTER', 'AP1', 'AP2', 'TRANSCEIVER', 'STAVOLT', 'LAIN LAIN'] as $opt)
+                                                        <option value="{{ $opt }}">{{ $opt }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-md-2 d-flex gap-1 justify-content-start align-items-center">
+                                                <button type="button" class="btn btn-outline-danger btn-sm rounded-circle p-0 d-none" 
+                                                    style="width: 24px; height: 24px;" 
+                                                    onclick="removeHwRow('hw-row-main-initial', 'main')">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label fw-bold text-dark mb-2">Action Plan</label>
+                                <textarea name="plan_actions" class="form-control" rows="5" required
+                                    placeholder="Jelaskan detail action plan..."
+                                    style="border-color: #dee2e6 !important; box-shadow: none;"></textarea>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Action Plan</label>
-                            <textarea name="plan_actions" class="form-control" rows="3" required
-                                placeholder="Jelaskan detail action plan..."></textarea>
-                        </div>
+
                         <input type="hidden" name="status" value="open">
                         <div class="col-md-4">
+                            <label class="form-label fw-bold">Pilih CE</label>
                             <select name="ce" class="form-select" required>
                                 <option value="">-- Pilih CE --</option>
                                 <option value="Eka Mahatva Yudha">Eka Mahatva Yudha</option>
@@ -944,11 +989,10 @@
                                 <option value="Hasrul Fandi Serang">Hasrul Fandi Serang</option>
                             </select>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-8">
                             <label class="form-label fw-bold">Evidence (Foto/Video)</label>
                             <input type="file" name="evidence[]" class="form-control" accept="image/*,video/*" multiple>
-                            <small class="text-muted">Pilih satu atau beberapa file. Format: jpg, png, mp4. Maks
-                                20MB/file.</small>
+                            <small class="text-muted">Pilih satu atau beberapa file. Format: jpg, png, mp4. Maks 20MB/file.</small>
                         </div>
                     </div>
                 </div>
@@ -1294,6 +1338,84 @@
                 $('#provinsi').val(prov || '');
                 $('#kabupaten').val(kab || '');
                 $('#kategori').val(kategoriSingkat);
+            });
+
+            // 3. Hardware Row Management (Unified Dynamic Rows)
+            window.renderHardwareRow = function(modalId, hwValue = '', hwDesc = '', explicitId = null) {
+                let container = $(`#hw-list-container-${modalId}`);
+                let isUpdate = explicitId !== null;
+                let rowId = explicitId || ('hw-row-' + modalId + '-' + Math.random().toString(36).substring(7));
+                
+                let isSelected = hwValue !== '';
+                
+                let html = `
+                    <div class="hw-row-unified mb-2 animate__animated animate__fadeIn" id="${rowId}" data-hw="${hwValue}">
+                        <div class="row g-2 align-items-stretch">
+                            <div class="${isSelected ? 'col-md-3' : 'col-md-10'}">
+                                ${isSelected ? 
+                                    `<div class="border rounded-3 bg-light fw-bold text-dark d-flex align-items-center justify-content-center shadow-none" 
+                                        style="font-size: 0.9rem; border-color: #dee2e6 !important; height: 38px;">
+                                        ${hwValue.toUpperCase()}
+                                        <input type="hidden" name="hardware_problem[]" value="${hwValue}">
+                                    </div>` :
+                                    `<select class="form-select" onchange="renderHardwareRow('${modalId}', this.value, '', '${rowId}')" 
+                                        style="font-size: 0.9rem; border-color: #dee2e6 !important; height: 38px;">
+                                        <option value="">-- Pilih Perangkat --</option>
+                                        <option value="MODEM">MODEM</option>
+                                        <option value="ROUTER">ROUTER</option>
+                                        <option value="AP1">AP1</option>
+                                        <option value="AP2">AP2</option>
+                                        <option value="TRANSCEIVER">TRANSCEIVER</option>
+                                        <option value="STAVOLT">STAVOLT</option>
+                                        <option value="LAIN LAIN">LAIN LAIN</option>
+                                    </select>`
+                                }
+                            </div>
+                            <div class="col-md-7 ${isSelected ? '' : 'd-none'}">
+                                <textarea name="hw_details[]" class="form-control" 
+                                    rows="1" placeholder="Detail kendala..." 
+                                    style="font-size: 0.9rem; resize: none; border-color: #dee2e6 !important; box-shadow: none; height: 38px; line-height: 1.5; padding-top: 5px;">${hwDesc}</textarea>
+                            </div>
+                            <div class="col-md-2 d-flex gap-1 justify-content-start align-items-center">
+                                <button type="button" class="btn btn-primary btn-sm rounded-circle p-0 ${isSelected ? '' : 'd-none'}" 
+                                    style="width: 24px; height: 24px;" onclick="renderHardwareRow('${modalId}')" title="Tambah Perangkat Lain">
+                                    <i class="bi bi-plus" style="font-size: 0.9rem;"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-danger btn-sm rounded-circle p-0 ${isSelected ? '' : 'd-none'}" 
+                                    style="width: 24px; height: 24px;" onclick="removeHwRow('${rowId}', '${modalId}')" title="Hapus Baris">
+                                    <i class="bi bi-x" style="font-size: 0.9rem;"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                if (isSelected && isUpdate) {
+                    $(`#${rowId}`).replaceWith(html);
+                } else {
+                    container.append(html);
+                }
+            };
+
+            window.removeHwRow = function(rowId, modalId) {
+                let element = document.getElementById(rowId);
+                if (element) {
+                    element.remove();
+                    // Pastikan minimal satu baris dropdown tetap ada jika semua dihapus
+                    let container = document.getElementById(`hw-list-container-${modalId}`);
+                    if (container && container.children.length === 0) {
+                        renderHardwareRow(modalId);
+                    }
+                }
+            };
+
+            // Initialize Master Select2 (Simple Theme)
+            $(document).on('shown.bs.modal', '.modal', function () {
+                $(this).find('.select2-master-simple').select2({
+                    theme: 'bootstrap-5',
+                    width: '100%',
+                    dropdownParent: $(this)
+                });
             });
         });
     </script>
