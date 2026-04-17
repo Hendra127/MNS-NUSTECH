@@ -581,7 +581,63 @@
         </div>
     </div>
     @endforeach
+    
+    <!-- Modal Viewer Evidence -->
+    <div class="modal fade" id="modalViewerEvidence" tabindex="-1" aria-hidden="true" style="z-index: 99999;">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content bg-transparent border-0 shadow-none">
+                <div class="modal-body p-0 text-center position-relative">
+                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3"
+                        data-bs-dismiss="modal" aria-label="Close" style="z-index: 100001;"></button>
+                    <div id="evidenceContainer" class="d-flex justify-content-center align-items-center">
+                        <!-- Content will be injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function viewEvidence(url) {
+            const container = document.getElementById('evidenceContainer');
+            if (!container) return;
+
+            const ext = url.split('.').pop().toLowerCase();
+            const videoExts = ['mp4', 'mov', 'avi', 'webm'];
+
+            container.innerHTML = '';
+
+            if (videoExts.includes(ext)) {
+                container.innerHTML = `<video src="${url}" controls autoplay class="img-fluid rounded shadow-lg" style="max-height: 85vh; width: auto;"></video>`;
+            } else {
+                container.innerHTML = `<img src="${url}" class="img-fluid rounded shadow-lg" style="max-height: 85vh; width: auto; object-fit: contain;">`;
+            }
+
+            var myModal = new bootstrap.Modal(document.getElementById('modalViewerEvidence'));
+            myModal.show();
+        }
+
+        // SCRIPT KONFIRMASI DELETE DENGAN SWEETALERT2
+        $(document).on('click', '.btn-delete', function (e) {
+            const siteName = $(this).data('name');
+            const $form = $(this).closest('form');
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Tiket untuk " + siteName + " akan dihapus permanen!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                customClass: { popup: 'rounded-4' }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $form.submit();
+                }
+            });
+        });
+    </script>
     <script>
         $(document).ready(function () {
             /**

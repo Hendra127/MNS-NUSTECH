@@ -263,18 +263,6 @@
                     </div>
                 </div>
 
-                <div class="card stat-card white-card clickable-card" data-type="cm_all" style="cursor: pointer; grid-column: span 2;">
-                    <div class="card-inner">
-                        <div class="label-side"><span class="label-text">DOC<br>CM</span></div>
-                        <div class="vertical-divider"></div>
-                        <div class="value-side">
-                            <div class="value-group">
-                                <span class="value" id="stat-cm-done">{{ $cmDone }}</span>
-                                <span class="sub-value" id="stat-cm-total">/ {{ $cmTotal }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Sidebar Menu -->
@@ -1054,7 +1042,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (tableTitle) tableTitle.innerText = data.type_label;
                         
                         // FIX: Merubah Header secara dinamis
-                        if (type === 'pm_bmn' || type === 'pm_sl' || type === 'cm_all') {
+                        if (type === 'pm_bmn' || type === 'pm_sl') {
                             if (tableHeaderLast) tableHeaderLast.innerText = 'Date';
                         } else {
                             if (tableHeaderLast) tableHeaderLast.innerText = 'Duration';
@@ -1191,10 +1179,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     applyPulse('stat-all-open', s.totalOpen);
                     applyPulse('stat-pm-bmn-done', s.pmBmnDone);
                     applyPulse('stat-pm-sl-done', s.pmSlDone);
-                    applyPulse('stat-cm-done', s.cmDone);
                     safeUpdateInnerText('stat-pm-bmn-total', `/ ${s.pmBmnTotal}`);
                     safeUpdateInnerText('stat-pm-sl-total', `/ ${s.pmSlTotal}`);
-                    safeUpdateInnerText('stat-cm-total', `/ ${s.cmTotal}`);
                 } catch (e) { console.warn("Error update stats:", e); }
 
                 // 2. Update Jadwal Piket
@@ -1248,7 +1234,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (tableTitle) tableTitle.innerText = data.type_label;
                     
                     // Update Header Tabel Kolom Terakhir
-                    if (data.type === 'pm_bmn' || data.type === 'pm_sl' || data.type === 'cm_all') {
+                    if (data.type === 'pm_bmn' || data.type === 'pm_sl') {
                         if (tableHeaderLast) tableHeaderLast.innerText = 'Date';
                     } else {
                         if (tableHeaderLast) tableHeaderLast.innerText = 'Duration';

@@ -4,8 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OpenTicketController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\DatapasController;
-use App\Http\Controllers\LaporanpmController;
-use App\Http\Controllers\PmlibertaController;
+// use App\Http\Controllers\LaporanpmController;
+use App\Http\Controllers\PMLibertaController;
 use App\Http\Controllers\CloseTicketController;
 use App\Http\Controllers\DetailticketController;
 use App\Http\Controllers\SummaryTicketController;
@@ -188,7 +188,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/summarypm/chart-data', [SummaryPMController::class , 'getChartData'])->name('summarypm.chartdata');
         Route::get('/summarypm/sites', [SummaryPMController::class , 'getSites'])->name('summarypm.sites');
 
-        // Rute yang memerlukan login (Middleware Auth)        Route::middleware(['auth'])->group(function () {
+        // Rute yang memerlukan login (Halaman Landing, Profile, dll)
     
         // Halaman landingpage
         Route::get('/landingpage', [LandingpageController::class , 'index'])->name('landingpage');
@@ -324,6 +324,5 @@ Route::middleware(['auth'])->group(function () {
 
             // Audit Log
             Route::get('/logs/{siteId}',               [MikrotikController::class, 'getCommandLogs'])->name('logs');
-        });
     });
-
+});

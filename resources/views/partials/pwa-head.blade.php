@@ -366,22 +366,65 @@
         }
     }
 
-    // Panggil fungsi segera setelah DOM siap, tanpa menunggu event beforeinstallprompt
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
+    // --- Session Keep-Alive Pulse ---
+    // Pings the server every 5 minutes to prevent session timeout and keep the CSRF token fresh
+    function initSessionPulse() {
+        console.log('Session pulse initialized');
+        setInterval(async () => {
+            try {
+                const response = await fetch('{{ route("csrf.refresh") }}');
+                const data = await response.json();
+                
+                // Update all CSRF tokens on the page
+                if (data.token) {
+                    const tokens = document.querySelectorAll('input[name="_token"]');
+                    tokens.forEach(t => t.value = data.token);
+                    
+                    const meta = document.querySelector('meta[name="csrf-token"]');
+                    if (meta) meta.content = data.token;
+                    
+                    console.log('Session pulse: Token refreshed');
+                }
+            } catch (e) {
+                console.warn('Session pulse failed. Connection might be lost.');
+            }
+        }, 300000); // 5 Minutes
+    }
+
+    // Sesi Pulse & Notifikasi hanya untuk user yang login
+    @auth
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                showInstallButton();
+                initDarkMode();
+                initNotificationBell();
+                initNavLogo();
+                initSessionPulse();
+                updateChartsTheme(localStorage.getItem('theme') || 'light');
+            });
+        } else {
             showInstallButton();
             initDarkMode();
             initNotificationBell();
             initNavLogo();
+            initSessionPulse();
             updateChartsTheme(localStorage.getItem('theme') || 'light');
-        });
-    } else {
-        showInstallButton();
-        initDarkMode();
-        initNotificationBell();
-        initNavLogo();
-        updateChartsTheme(localStorage.getItem('theme') || 'light');
-    }
+        }
+    @else
+        // Untuk user guest (misal di halaman login)
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                showInstallButton();
+                initDarkMode();
+                initNavLogo();
+                // Notifikasi & Pulse dilewati
+            });
+        } else {
+            showInstallButton();
+            initDarkMode();
+            initNavLogo();
+        }
+    @endauth
 </script>
 
 <style>
