@@ -81,6 +81,24 @@ Route::get('/csrf-refresh', function () {
      auth()->user()->unreadNotifications->markAsRead();
      return response()->json(['success' => true]);
  })->name('notifications.markRead');
+ 
+ Route::get('/get-drive-title', function (Illuminate\Http\Request $request) {
+     $url = $request->query('url');
+     if (!$url) return response()->json(['error' => 'URL is required'], 400);
+     try {
+         $client = new \GuzzleHttp\Client(['timeout' => 5, 'verify' => false]);
+         $response = $client->get($url);
+         $html = (string) $response->getBody();
+         preg_match('/<title>(.*?)<\/title>/', $html, $matches);
+         if (isset($matches[1])) {
+             $title = str_replace(' - Google Drive', '', $matches[1]);
+             return response()->json(['title' => html_entity_decode(trim($title))]);
+         }
+         return response()->json(['error' => 'Title not found'], 404);
+     } catch (\Exception $e) {
+         return response()->json(['error' => $e->getMessage()], 500);
+     }
+ })->name('get.drive.title')->middleware('auth');
 
 
 // --- PROTECTED ROUTES (Harus login dulu) ---

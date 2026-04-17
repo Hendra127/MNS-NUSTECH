@@ -189,6 +189,174 @@
             background-color: #f0f4f8 !important;
             color: #000 !important;
         }
+
+        /* Google Drive Smart Chip Style */
+        .drive-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            background: #fff;
+            border: 1px solid #dadce0;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #3c4043;
+            text-decoration: none !important;
+            transition: all 0.2s ease;
+            max-width: 180px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            box-shadow: 0 1px 2px rgba(60,64,67,0.1);
+        }
+        .drive-chip:hover {
+            background: #f8f9fa;
+            color: #1a73e8;
+            border-color: #d2e3fc;
+            box-shadow: 0 2px 5px rgba(60,64,67,0.15);
+            transform: translateY(-1px);
+        }
+        .drive-chip i {
+            color: #1e8e3e;
+            margin-right: 8px;
+            font-size: 14px;
+        }
+        [data-bs-theme="dark"] .drive-chip {
+            background: #2d2e30;
+            border-color: #5f6368;
+            color: #e8eaed;
+        }
+        [data-bs-theme="dark"] .drive-chip:hover {
+            background: #3c4043;
+            color: #8ab4f8;
+            border-color: #8ab4f8;
+        }
+
+        /* Google Drive Preview Card Styles */
+        .drive-preview-card {
+            position: fixed;
+            width: 360px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05);
+            z-index: 2000;
+            padding: 0;
+            overflow: hidden;
+            pointer-events: auto; /* Allow clicking buttons */
+            opacity: 0;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            transform: translateY(10px) scale(0.95);
+        }
+        .drive-preview-card.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        .preview-header {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            gap: 12px;
+            border-bottom: 1px solid #f1f3f4;
+        }
+        .preview-header i.bi-file-pdf { color: #ea4335; font-size: 20px; flex-shrink: 0; }
+        .preview-title {
+            flex-grow: 1;
+            font-weight: 500;
+            font-size: 14px;
+            color: #1a73e8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-right: 8px;
+        }
+        .preview-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .preview-actions i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: #5f6368;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .preview-actions i:hover {
+            background-color: #f1f3f4;
+            color: #202124;
+        }
+        .preview-body { padding: 12px 20px; }
+        .preview-thumbnail {
+            width: 100%;
+            height: 180px;
+            background: #f8f9fa;
+            border: 1px solid #dadce0;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .preview-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .preview-footer { padding: 12px 20px 20px; }
+        .preview-info-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+            font-size: 12px;
+            color: #5f6368;
+        }
+        .preview-info-row i { font-size: 16px; }
+        .preview-cta {
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-ringkas {
+            background: #e8f0fe;
+            color: #1967d2;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-circle-action {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e8f0fe;
+            color: #1a73e8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+        }
+        [data-bs-theme="dark"] .drive-preview-card {
+            background: #1e1e21;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            border: 1px solid #444;
+        }
+        [data-bs-theme="dark"] .preview-header { border-bottom-color: #333; }
+        [data-bs-theme="dark"] .preview-title { color: #8ab4f8; }
+        [data-bs-theme="dark"] .preview-thumbnail { background: #2d2e31; border-color: #3c4043; }
+        [data-bs-theme="dark"] .preview-info-row { color: #9aa0a6; }
+        [data-bs-theme="dark"] .btn-ringkas { background: #3c4043; color: #8ab4f8; }
+        [data-bs-theme="dark"] .btn-circle-action { background: #303134; color: #8ab4f8; }
     </style>
 </head>
 
@@ -312,6 +480,24 @@
                         </select>
                     </div>
                     <div class="col-12 col-md-auto">
+                        <select name="provinsi" id="filter-provinsi" class="form-select form-select-sm w-100">
+                            <option value="">Provinsi...</option>
+                            @foreach($provinsiList as $p)
+                                <option value="{{ $p }}" {{ request('provinsi') == $p ? 'selected' : '' }}>{{ $p }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <select name="kab" id="filter-kab" class="form-select form-select-sm w-100">
+                            <option value="">Kabupaten...</option>
+                            @if(request('provinsi') && isset($provinsiKabMap[request('provinsi')]))
+                                @foreach($provinsiKabMap[request('provinsi')] as $k)
+                                    <option value="{{ $k }}" {{ request('kab') == $k ? 'selected' : '' }}>{{ $k }}</option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-auto">
                         <input type="date" name="tgl_mulai" class="form-control form-control-sm w-100"
                             value="{{ request('tgl_mulai') }}" title="Dari Tanggal">
                     </div>
@@ -353,6 +539,7 @@
                         <th>DATE</th>
                         <th>STATUS</th>
                         <th>KATEGORI</th>
+                        <th>FILE PM</th>
                         @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                             <th class="sticky-col-right">AKSI</th>
                         @endif
@@ -387,23 +574,45 @@
                             </span>
                         </td>
                         <td class="text-center">{{ $item->kategori }}</td>
+                        <td class="text-center">
+                            @if($item->file_pm)
+                                @php
+                                    $fileName = "PM " . $item->site_id . " " . $item->nama_lokasi . " " . ($item->date ? \Carbon\Carbon::parse($item->date)->format('Y') : '') . " .pdf";
+                                @endphp
+                                <a href="{{ $item->file_pm }}" target="_blank" class="drive-chip" title="{{ $fileName }}"
+                                   onmouseover="showDrivePreview(this, '{{ $item->file_pm }}', '{{ $fileName }}')"
+                                   onmouseout="hideDrivePreview()">
+                                    <i class="bi bi-file-earmark-pdf-fill"></i>
+                                    <span>{{ $fileName }}</span>
+                                </a>
+                            @else
+                                <span class="text-muted small">No File</span>
+                            @endif
+                        </td>
                         @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                             <td class="text-center sticky-col-right">
                                 <div class="btn-group btn-group-sm">
-                                    <button type="button" class="btn bi bi-pencil btn-edit" data-id="{{ $item->id }}"
-                                        data-site_id="{{ $item->site_id }}" data-nama_lokasi="{{ $item->nama_lokasi }}"
-                                        data-provinsi="{{ $item->provinsi }}" data-kabupaten="{{ $item->kabupaten }}"
-                                        data-date="{{ $item->date ? \Carbon\Carbon::parse($item->date)->format('Y-m-d') : '' }}"
-                                        data-month="{{ $item->month }}" data-status="{{ $item->status }}"
-                                        data-week="{{ $item->week }}" data-kategori="{{ $item->kategori }}">
-                                    </button>
-                                    <form action="{{ route('pmliberta.destroy', $item->id) }}" method="POST"
-                                        class="form-delete">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="button" class="btn bi bi-trash btn-delete-trigger"
-                                            data-nama="{{ $item->nama_lokasi }}"> </button>
-                                    </form>
+                                    @if(!(auth()->user()->role === 'admin' && strtoupper($item->status ?: 'PENDING') === 'DONE'))
+                                        <button type="button" class="btn bi bi-pencil btn-edit" data-id="{{ $item->id }}"
+                                            data-site_id="{{ $item->site_id }}" data-nama_lokasi="{{ $item->nama_lokasi }}"
+                                            data-provinsi="{{ $item->provinsi }}" data-kabupaten="{{ $item->kabupaten }}"
+                                            data-date="{{ $item->date ? \Carbon\Carbon::parse($item->date)->format('Y-m-d') : '' }}"
+                                            data-month="{{ $item->month }}" data-status="{{ $item->status }}"
+                                            data-week="{{ $item->week }}" data-kategori="{{ $item->kategori }}"
+                                            data-file_pm="{{ $item->file_pm }}">
+                                        </button>
+                                        <form action="{{ route('pmliberta.destroy', $item->id) }}" method="POST"
+                                            class="form-delete">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" class="btn bi bi-trash btn-delete-trigger"
+                                                data-nama="{{ $item->nama_lokasi }}"> </button>
+                                        </form>
+                                    @else
+                                        <span class="badge bg-light text-muted border py-1 px-2" style="font-size: 10px; cursor: not-allowed;" title="Data DONE telah dikunci">
+                                            <i class="bi bi-lock-fill"></i> LOCKED
+                                        </span>
+                                    @endif
                                 </div>
                             </td>
                         @endif
@@ -480,11 +689,20 @@
                             <div class="col-md-6">
                                 <label class="form-label">Status</label>
                                 <select name="status" id="edit_status" class="form-select">
-                                     <option value="DONE" {{ auth()->user()->role === 'admin' ? 'disabled' : '' }}>DONE</option>
-                                     <option value="PENDING">PENDING</option>
-                                     <option value="ON PROGRESS">ON PROGRESS</option>
-                                     <option value="HOLD">HOLD</option>
-                                 </select>
+                                    @if(auth()->user()->role !== 'admin')
+                                        <option value="DONE">DONE</option>
+                                        <option value="PENDING">PENDING</option>
+                                        <option value="ON PROGRESS">ON PROGRESS</option>
+                                    @endif
+                                    <option value="HOLD">HOLD</option>
+                                </select>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Link Google Drive (File PM)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-link-45deg"></i></span>
+                                    <input type="url" name="file_pm" id="edit_file_pm" class="form-control border-start-0" placeholder="https://drive.google.com/...">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -568,15 +786,26 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Status</label>
                                 <select name="status" class="form-select rounded-3">
-                                     <option value="DONE" {{ auth()->user()->role === 'admin' ? 'disabled' : '' }}>DONE</option>
-                                     <option value="PENDING" selected>PENDING</option>
-                                     <option value="ON PROGRESS">ON PROGRESS</option>
-                                     <option value="HOLD">HOLD</option>
-                                 </select>
+                                    @if(auth()->user()->role !== 'admin')
+                                        <option value="DONE">DONE</option>
+                                        <option value="PENDING" selected>PENDING</option>
+                                        <option value="ON PROGRESS">ON PROGRESS</option>
+                                        <option value="HOLD">HOLD</option>
+                                    @else
+                                        <option value="HOLD" selected>HOLD</option>
+                                    @endif
+                                </select>
                             </div>
                             <div class="col-12">
                                 <label class="form-label fw-bold">PIC CE</label>
                                 <input type="text" name="pic_ce" class="form-control rounded-3">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Link Google Drive (File PM)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-link-45deg"></i></span>
+                                    <input type="url" name="file_pm" class="form-control border-start-0" placeholder="https://drive.google.com/...">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -591,8 +820,204 @@
         </div>
     </div>
 
+    <!-- Preview Card Element -->
+    <div id="drivePreview" class="drive-preview-card">
+        <div class="preview-header">
+            <i class="bi bi-file-pdf-fill bi-file-pdf"></i>
+            <span id="previewTitle" class="preview-title">Loading...</span>
+            <div class="preview-actions">
+                <i class="bi bi-copy" id="previewActionCopy" title="Copy Link" style="cursor: pointer;"></i>
+                <i class="bi bi-pencil" id="previewActionEdit" title="Edit Data" style="cursor: pointer;"></i>
+                <i class="bi bi-eye-slash" id="previewActionHide" title="Sembunyikan" style="cursor: pointer;"></i>
+            </div>
+        </div>
+        <div class="preview-body">
+            <div class="preview-thumbnail">
+                <img id="previewImg" src="" alt="Thumbnail">
+            </div>
+        </div>
+        <div class="preview-footer">
+            <div class="preview-info-row">
+                <i class="bi bi-person-circle"></i>
+                <span>NUSTECH adalah pemilik</span>
+            </div>
+            <div class="preview-info-row">
+                <i class="bi bi-clock-history"></i>
+                <span id="previewHistory">Anda belum pernah melihat file ini</span>
+            </div>
+            <div class="preview-cta">
+                <button class="btn-ringkas" id="previewActionSummary"><i class="bi bi-stars"></i> Ringkas file ini</button>
+                <div class="btn-circle-action" id="previewActionOpen" style="cursor: pointer;"><i class="bi bi-arrow-right-short" style="font-size: 24px;"></i></div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
+        let hideTimeout;
+        let currentUrl = '';
+        let currentElement = null;
+
+        function getDriveId(url) {
+            if (!url) return null;
+            let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            if (match) return match[1];
+            try {
+                let params = new URLSearchParams(new URL(url).search);
+                return params.get('id');
+            } catch(e) { return null; }
+        }
+
+        async function fetchDriveFileName(fileId, chipElement) {
+            if (!fileId) return;
+            
+            try {
+                // Gunakan route internal Laravel agar terhindar dari pemblokiran Cloudflare
+                const url = `https://drive.google.com/file/d/${fileId}/view`;
+                const response = await fetch(`/get-drive-title?url=${encodeURIComponent(url)}`);
+                const data = await response.json();
+                
+                if (data && data.title) {
+                    let driveTitle = data.title;
+                    
+                    if (driveTitle && driveTitle !== 'Google Drive: Terjadi Masalah' && driveTitle !== 'Google Drive') {
+                        // Update Judul di Card
+                        const previewTitle = document.getElementById('previewTitle');
+                        if (previewTitle) previewTitle.innerText = driveTitle;
+                        
+                        // Update teks di Chip Asal
+                        if (chipElement) {
+                            const span = chipElement.querySelector('span');
+                            if (span) span.innerText = driveTitle;
+                            // Tandai chip ini sudah berhasil mengambil nama asli
+                            chipElement.setAttribute('data-fetched', 'true');
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error("Gagal mengambil nama file drive via server:", e);
+            }
+        }
+
+        function showDrivePreview(element, url, currentTitle) {
+            clearTimeout(hideTimeout);
+            const preview = document.getElementById('drivePreview');
+            const fileId = getDriveId(url);
+            
+            if (fileId) {
+                currentUrl = url;
+                currentElement = element;
+                
+                // Gunakan teks yang sudah ada di chip sebagai judul awal
+                const chipText = element.querySelector('span').innerText;
+                document.getElementById('previewTitle').innerText = chipText;
+                document.getElementById('previewImg').src = `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`;
+                
+                // Hanya fetch jika belum pernah berhasil di-fetch sebelumnya
+                if (element.getAttribute('data-fetched') !== 'true') {
+                    fetchDriveFileName(fileId, element);
+                }
+                
+                // Reset display dan class first to get accurate measurements
+                preview.style.display = 'block';
+                const rect = element.getBoundingClientRect();
+                const cardWidth = preview.offsetWidth || 360;
+                const cardHeight = preview.offsetHeight || 420;
+                
+                let left = rect.left;
+                let top = rect.top + 30;
+
+                // Boundary checking - Right edge
+                if (left + cardWidth > window.innerWidth) {
+                    left = window.innerWidth - cardWidth - 20;
+                }
+                // Boundary checking - Left edge
+                if (left < 10) left = 10;
+
+                // Boundary checking - Bottom edge
+                if (top + cardHeight > window.innerHeight) {
+                    top = rect.top - cardHeight - 10;
+                }
+                
+                preview.style.left = left + 'px';
+                preview.style.top = top + 'px';
+                
+                setTimeout(() => preview.classList.add('show'), 10);
+            }
+        }
+        function hideDrivePreview() {
+            hideTimeout = setTimeout(() => {
+                const preview = document.getElementById('drivePreview');
+                preview.classList.remove('show');
+                setTimeout(() => {
+                    if (!preview.classList.contains('show')) {
+                        preview.style.display = 'none';
+                    }
+                }, 200);
+            }, 300); // 300ms buffer to allow moving mouse to the card
+        }
+
+        // Event listeners for the preview card itself
+        document.getElementById('drivePreview').addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+        document.getElementById('drivePreview').addEventListener('mouseleave', hideDrivePreview);
+
+        // Action: Copy Link
+        document.getElementById('previewActionCopy').addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (currentUrl) {
+                navigator.clipboard.writeText(currentUrl).then(() => {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Link berhasil disalin!',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                });
+            }
+        });
+
+        // Action: Open Edit Modal
+        document.getElementById('previewActionEdit').addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (currentElement) {
+                // Find the edit button in the SAME row
+                const row = currentElement.closest('tr');
+                const editBtn = row.querySelector('.btn-edit');
+                if (editBtn) {
+                    hideDrivePreview();
+                    editBtn.click();
+                }
+            }
+        });
+
+        // Action: Hide Preview
+        document.getElementById('previewActionHide').addEventListener('click', function(e) {
+            e.stopPropagation();
+            const preview = document.getElementById('drivePreview');
+            preview.classList.remove('show');
+            setTimeout(() => preview.style.display = 'none', 200);
+        });
+
+        // Action: Open in New Tab
+        document.getElementById('previewActionOpen').addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (currentUrl) window.open(currentUrl, '_blank');
+        });
+
+        // Action: Summary (Ringkas)
+        document.getElementById('previewActionSummary').addEventListener('click', function(e) {
+            e.stopPropagation();
+            Swal.fire({
+                title: 'Summarizing...',
+                text: 'Fitur AI sedang memproses dokumen PM ini.',
+                icon: 'info',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        });
+
         $(document).ready(function () {
             // Inisialisasi Select2 untuk Tambah Data
             $('#siteSelectAdd').select2({
@@ -629,6 +1054,7 @@
                 let status = $(this).data('status');
                 let week = $(this).data('week');
                 let kategori = $(this).data('kategori');
+                let file_pm = $(this).data('file_pm');
                 // 2. Penanganan khusus untuk Tanggal
                 // Input type="date" HANYA menerima format YYYY-MM-DD
                 let rawDate = $(this).data('date');
@@ -646,6 +1072,7 @@
                 $('#edit_status').val(status);
                 $('#edit_week').val(week);
                 $('#edit_kategori').val(kategori);
+                $('#edit_file_pm').val(file_pm);
                 // 4. Set action URL form secara dinamis ke route update
                 // Pastikan route di web.php adalah /PMLiberta/{id}
                 $('#formEdit').attr('action', '/PMLiberta/' + id);
@@ -729,7 +1156,33 @@
             }
         });
     </script>
-    <!-- SCRIPT UNTUK SUBMIT FORM PENCARIAN OTOMATIS SETELAH USER BERHENTI MENGETIK SELAMA 500MS -->
+    <script>
+        // Mapping data dari controller untuk cascading filter
+        const provinsiKabMap = @json($provinsiKabMap);
+
+        function updateKabupatenDropdown(provinsi, targetId, selectedKab = '') {
+            const kabDropdown = $(`#${targetId}`);
+            kabDropdown.empty();
+            kabDropdown.append('<option value="">Kabupaten...</option>');
+
+            if (provinsi && provinsiKabMap[provinsi]) {
+                provinsiKabMap[provinsi].forEach(kab => {
+                    const isSelected = kab === selectedKab ? 'selected' : '';
+                    kabDropdown.append(`<option value="${kab}" ${isSelected}>${kab}</option>`);
+                });
+            }
+        }
+
+        // Event listener untuk filter bar
+        $('#filter-provinsi').on('change', function () {
+            updateKabupatenDropdown($(this).val(), 'filter-kab');
+        });
+        
+        // Agar Provinsi ter-update jika kategori berubah, form akan submit otomatis
+        $('select[name="kategori"]').on('change', function() {
+            $('#searchForm').submit();
+        });
+    </script>
 </body>
 
 </html>

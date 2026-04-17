@@ -16,6 +16,38 @@ class PMLibertaController extends Controller
     public function index(Request $request)
     {
         $sites = \App\Models\Site::orderBy('site_id', 'asc')->get();
+        
+        // Ambil data unik Provinsi dan Kabupaten untuk cascading filter
+        $category = $request->kategori;
+        $provinsiListQuery = \App\Models\Site::query();
+        if ($category) {
+            // Mapping Kategori PM ke Tipe Site di database
+            // Jika Kategori PM 'BMN' -> cari Tipe Site 'BARANG MILIK NEGARA'
+            // Jika Kategori PM 'SL' -> cari Tipe Site 'SEWA LAYANAN'
+            $tipeSearch = ($category === 'BMN') ? 'BARANG MILIK NEGARA' : 'SEWA LAYANAN';
+            $provinsiListQuery->where('tipe', 'LIKE', '%' . $tipeSearch . '%');
+        }
+
+        $provinsiList = $provinsiListQuery->whereNotNull('provinsi')
+            ->where('provinsi', '!=', '')
+            ->distinct()
+            ->orderBy('provinsi', 'asc')
+            ->pluck('provinsi');
+
+        $provinsiKabMap = [];
+        foreach ($provinsiList as $p) {
+            $kabQuery = \App\Models\Site::where('provinsi', $p)
+                ->whereNotNull('kab')
+                ->where('kab', '!=', '');
+            
+            if ($category) {
+                $tipeSearch = ($category === 'BMN') ? 'BARANG MILIK NEGARA' : 'SEWA LAYANAN';
+                $kabQuery->where('tipe', 'LIKE', '%' . $tipeSearch . '%');
+            }
+            
+            $provinsiKabMap[$p] = $kabQuery->distinct()->orderBy('kab', 'asc')->pluck('kab');
+        }
+
         $query = PMLiberta::query();
 
         // 1. Filter Search Box (Nama Lokasi, Site ID, atau PIC CE)
@@ -32,6 +64,14 @@ class PMLibertaController extends Controller
         // 2. Filter Kategori
         $query->when($request->kategori, function ($q) use ($request) {
             return $q->where('kategori', $request->kategori);
+        });
+
+        // [MOD] Filter Provinsi & Kabupaten
+        $query->when($request->provinsi, function ($q) use ($request) {
+            return $q->where('provinsi', $request->provinsi);
+        });
+        $query->when($request->kab, function ($q) use ($request) {
+            return $q->where('kabupaten', $request->kab);
         });
 
         // 3. Filter Status
@@ -76,7 +116,9 @@ class PMLibertaController extends Controller
             'totalSLDone' => $totalSLDone,
             'totalHold' => $totalHold,
             'totalPending' => $totalPending,
-            'sites' => $sites
+            'sites' => $sites,
+            'provinsiList' => $provinsiList,
+            'provinsiKabMap' => $provinsiKabMap
         ]);
     }
 
@@ -115,6 +157,7 @@ class PMLibertaController extends Controller
             'week' => $request->week,
             'kategori' => $request->kategori,
             'pic_ce' => $request->pic_ce,
+            'file_pm' => $request->file_pm,
         ]);
 
         // [MOD] Notification if status is HOLD
@@ -150,8 +193,13 @@ class PMLibertaController extends Controller
         $data = PMLiberta::findOrFail($id);
 
         // [MOD] Restriction for role 'admin'
-        if (auth()->user()->role === 'admin' && strtoupper($request->status) === 'DONE') {
-            return back()->with('error', 'Role Admin tidak diperbolehkan mengatur status ke DONE.');
+        if (auth()->user()->role === 'admin') {
+            if (strtoupper($request->status) === 'DONE') {
+                return back()->with('error', 'Role Admin tidak diperbolehkan mengatur status ke DONE.');
+            }
+            if (strtoupper($data->status) === 'DONE') {
+                return back()->with('error', 'Data yang sudah DONE tidak dapat diubah oleh Admin.');
+            }
         }
 
         $oldStatus = $data->status;
@@ -166,7 +214,7 @@ class PMLibertaController extends Controller
             'status' => $request->status,
             'week' => $request->week,
             'kategori' => $request->kategori,
-            // Tambahkan kolom lain sesuai kebutuhan
+            'file_pm' => $request->file_pm,
         ]);
 
         // [MOD] Notification if status is changed to HOLD by admin
@@ -181,8 +229,13 @@ class PMLibertaController extends Controller
     public function destroy($id)
     {
         $data = PMLiberta::findOrFail($id);
-        $data->delete();
 
+        // [MOD] Restriction for role 'admin': Cannot delete records that are already DONE
+        if (auth()->check() && auth()->user()->role === 'admin' && strtoupper($data->status) === 'DONE') {
+            return back()->with('error', 'Data yang sudah DONE tidak dapat dihapus oleh Admin.');
+        }
+
+        $data->delete();
         return back()->with('success', 'Data berhasil dihapus!');
     }
 }

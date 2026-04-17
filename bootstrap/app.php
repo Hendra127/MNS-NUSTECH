@@ -18,6 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
     })
+    ->withSchedule(function ($schedule) {
+        $schedule->command('notifications:prune')->daily();
+    })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();
