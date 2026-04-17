@@ -186,6 +186,37 @@
             color: #ccc !important;
             opacity: 0.5;
         }
+
+        /* Select2 Dark Mode Fix */
+        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection {
+            background-color: #2a2a2a !important;
+            border-color: #444 !important;
+            color: #fff !important;
+        }
+
+        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection__rendered {
+            color: #f8fafc !important;
+        }
+
+        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-dropdown {
+            background-color: #1e1e1e !important;
+            border-color: #444 !important;
+        }
+
+        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-results__option {
+            color: #e0e0e0 !important;
+        }
+
+        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-results__option--highlighted {
+            background-color: #0d6efd !important;
+            color: #fff !important;
+        }
+
+        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-search__field {
+            background-color: #2a2a2a !important;
+            border-color: #444 !important;
+            color: #fff !important;
+        }
     </style>
 </head>
 
@@ -529,7 +560,7 @@
                                             </select>
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label fw-bold text-primary">Tanggal Open/Rekap</label>
+                                            <label class="form-label fw-bold text-primary">Tanggal Open</label>
                                             <input type="date" name="tanggal_rekap" class="form-control"
                                                 value="{{ $t->tanggal_rekap }}" required>
                                         </div>
@@ -540,7 +571,8 @@
                                                 <option value="">-- Pilih Kendala --</option>
                                                 @foreach($kendalaOpts as $opt)
                                                     <option value="{{ $opt }}" {{ $t->kendala == $opt ? 'selected' : '' }}>
-                                                        {{ $opt }}</option>
+                                                        {{ $opt }}
+                                                    </option>
                                                 @endforeach
                                                 @if($t->kendala && !in_array($t->kendala, $kendalaOpts))
                                                     <option value="{{ $t->kendala }}" selected>{{ $t->kendala }} (Lainnya)
@@ -570,23 +602,28 @@
                                             </select>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label fw-bold text-primary">Evidence (Foto/Video) - <small class="text-muted">Bisa pilih banyak</small></label>
+                                            <label class="form-label fw-bold text-primary">Evidence (Foto/Video) - <small
+                                                    class="text-muted">Bisa pilih banyak</small></label>
                                             <input type="file" name="evidence[]" class="form-control"
                                                 accept="image/*,video/*" multiple>
-                                            
+
                                             {{-- Tampilkan bukti yang sudah diupload --}}
                                             <div class="mt-2 d-flex flex-wrap gap-2">
                                                 @if($t->evidences->count() > 0)
                                                     @foreach($t->evidences as $ev)
                                                         <div class="position-relative">
-                                                            <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage/' . $ev->path) }}')" class="badge bg-info text-white text-decoration-none">
+                                                            <a href="javascript:void(0)"
+                                                                onclick="viewEvidence('{{ asset('storage/' . $ev->path) }}')"
+                                                                class="badge bg-info text-white text-decoration-none">
                                                                 <i class="bi bi-paperclip"></i> Bukti #{{ $loop->iteration }}
                                                             </a>
                                                         </div>
                                                     @endforeach
                                                 @elseif($t->evidence && str_contains($t->evidence, '.'))
                                                     {{-- Legacy support --}}
-                                                    <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage/' . $t->evidence) }}')" class="badge bg-secondary text-white text-decoration-none">
+                                                    <a href="javascript:void(0)"
+                                                        onclick="viewEvidence('{{ asset('storage/' . $t->evidence) }}')"
+                                                        class="badge bg-secondary text-white text-decoration-none">
                                                         <i class="bi bi-paperclip"></i> Bukti Lama
                                                     </a>
                                                 @else
@@ -668,7 +705,7 @@
                                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                         aria-label="Close"></button>
                                 </div>
-                                <div class="modal-body p-4 bg-white">
+                                <div class="modal-body p-4">
                                     <div class="row g-4">
                                         <div class="col-md-6">
                                             <div class="bg-light p-3 rounded-4 shadow-sm h-100">
@@ -680,7 +717,8 @@
                                                             class="fw-bold">{{ $t->site_code }}</span></div>
                                                     <div class="d-flex justify-content-between border-bottom pb-2 gap-2">
                                                         <span class="text-muted small flex-shrink-0">Nama Site</span><span
-                                                            class="fw-bold text-end">{{ $t->nama_site }}</span></div>
+                                                            class="fw-bold text-end">{{ $t->nama_site }}</span>
+                                                    </div>
                                                     <div class="d-flex justify-content-between border-bottom pb-2"><span
                                                             class="text-muted small">Provinsi</span><span
                                                             class="fw-semibold">{{ $t->provinsi }}</span></div>
@@ -739,16 +777,22 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="p-3 bg-white rounded-3 h-100 border">
-                                                            <div class="text-muted small fw-bold mb-1">EVIDENCE (BUKTI)</div>
+                                                            <div class="text-muted small fw-bold mb-1">EVIDENCE (BUKTI)
+                                                            </div>
                                                             <div class="d-flex flex-column gap-1">
                                                                 @if($t->evidences->count() > 0)
                                                                     @foreach($t->evidences as $ev)
-                                                                        <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage/' . $ev->path) }}')" class="text-primary text-decoration-none small">
-                                                                            <i class="bi bi-eye"></i> Lihat Bukti #{{ $loop->iteration }}
+                                                                        <a href="javascript:void(0)"
+                                                                            onclick="viewEvidence('{{ asset('storage/' . $ev->path) }}')"
+                                                                            class="text-primary text-decoration-none small">
+                                                                            <i class="bi bi-eye"></i> Lihat Bukti
+                                                                            #{{ $loop->iteration }}
                                                                         </a>
                                                                     @endforeach
                                                                 @elseif($t->evidence && str_contains($t->evidence, '.'))
-                                                                     <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage/' . $t->evidence) }}')" class="text-primary text-decoration-none small">
+                                                                    <a href="javascript:void(0)"
+                                                                        onclick="viewEvidence('{{ asset('storage/' . $t->evidence) }}')"
+                                                                        class="text-primary text-decoration-none small">
                                                                         <i class="bi bi-eye"></i> Lihat Bukti Utama
                                                                     </a>
                                                                 @else
@@ -761,14 +805,16 @@
                                                         <div class="p-3 bg-white rounded-3 mb-3 border">
                                                             <div class="text-muted small fw-bold mb-1">DETAIL PROBLEM</div>
                                                             <p class="mb-0 text-dark small" style="line-height: 1.6;">
-                                                                {{ $t->detail_problem }}</p>
+                                                                {{ $t->detail_problem }}
+                                                            </p>
                                                         </div>
                                                         <div class="p-3 rounded-3"
                                                             style="background-color: #f0f7ff; border-left: 4px solid #3a7bd5;">
                                                             <div class="text-primary small fw-bold mb-1">PLAN ACTION /
                                                                 TINDAKAN</div>
                                                             <p class="mb-0 text-dark small" style="line-height: 1.6;">
-                                                                {{ $t->plan_actions }}</p>
+                                                                {{ $t->plan_actions }}
+                                                            </p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -776,7 +822,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="modal-footer border-0 p-4 bg-white d-flex justify-content-between">
+                                <div class="modal-footer border-0 p-4 d-flex justify-content-between">
                                     @if($t->site && $t->site->ip_router && in_array(auth()->user()->role ?? '', ['admin', 'superadmin']))
                                         <button type="button" class="btn btn-outline-primary px-4 rounded-pill shadow-sm"
                                             onclick="remoteMikrotik('{{ $t->site->ip_router }}', '{{ $t->kategori }}', '{{ $t->nama_site }}', '{{ $t->site_code }}')">
@@ -809,8 +855,7 @@
     <div class="modal fade" id="modalTambahTicket" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-centered">
             <form method="POST" action="{{ route('open.ticket.store') }}"
-                class="modal-content border-0 shadow-lg rounded-4 overflow-hidden" enctype="multipart/form-data"
-                style="background-color: white !important; color: #333 !important;">
+                class="modal-content border-0 shadow-lg rounded-4 overflow-hidden" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-header text-white d-flex justify-content-center position-relative"
                     style="background-color: #071152;">
@@ -818,7 +863,7 @@
                     <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
                         data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body p-4" style="background-color: white !important;">
+                <div class="modal-body p-4">
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label class="form-label fw-bold">Pilih Site ID</label>
@@ -860,7 +905,7 @@
                                 required>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Tanggal Rekap</label>
+                            <label class="form-label">Tanggal Open</label>
                             <input type="date" name="tanggal_rekap" class="form-control" value="{{ date('Y-m-d') }}">
                         </div>
                         <div class="col-md-4">
@@ -902,7 +947,8 @@
                         <div class="col-md-4">
                             <label class="form-label fw-bold">Evidence (Foto/Video)</label>
                             <input type="file" name="evidence[]" class="form-control" accept="image/*,video/*" multiple>
-                            <small class="text-muted">Pilih satu atau beberapa file. Format: jpg, png, mp4. Maks 20MB/file.</small>
+                            <small class="text-muted">Pilih satu atau beberapa file. Format: jpg, png, mp4. Maks
+                                20MB/file.</small>
                         </div>
                     </div>
                 </div>

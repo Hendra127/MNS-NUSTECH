@@ -200,6 +200,148 @@
             logoContainer.insertBefore(logoLink, logoContainer.firstChild);
         }
     }
+ 
+     // --- Notification Bell Injection ---
+     function initNotificationBell() {
+         const headerContainer = document.querySelector('.d-flex.align-items-center.gap-3');
+         if (headerContainer && !document.getElementById('notification-bell-wrapper')) {
+             const wrapper = document.createElement('div');
+             wrapper.id = 'notification-bell-wrapper';
+             wrapper.className = 'position-relative d-flex align-items-center';
+             wrapper.style.marginRight = '10px';
+             wrapper.style.position = 'relative'; // Manual override to be sure
+ 
+             const bellBtn = document.createElement('button');
+             bellBtn.className = 'btn btn-link text-white opacity-75 hover-opacity-100 p-0';
+             bellBtn.style.textDecoration = 'none';
+             bellBtn.innerHTML = '<i class="bi bi-bell-fill" style="font-size: 1.3rem;"></i>';
+             
+             const badge = document.createElement('span');
+             badge.id = 'notification-badge';
+             badge.className = 'position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none';
+             badge.style.fontSize = '0.6rem';
+             badge.style.padding = '2px 5px';
+             bellBtn.appendChild(badge);
+ 
+             const dropdown = document.createElement('div');
+             dropdown.id = 'notification-dropdown';
+             dropdown.className = 'dropdown-menu shadow-lg border-0'; // Removed dropdown-menu-end to use manual right
+             dropdown.style.width = '350px';
+             dropdown.style.maxHeight = '450px';
+             dropdown.style.overflowY = 'auto';
+             dropdown.style.borderRadius = '16px';
+             dropdown.style.marginTop = '20px'; 
+             dropdown.style.position = 'absolute';
+             dropdown.style.top = '100%'; // Force specifically below the bell icon
+             dropdown.style.right = '-10px'; 
+             dropdown.style.left = 'auto';
+             dropdown.style.zIndex = '1050';
+             dropdown.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)';
+             dropdown.innerHTML = `
+                 <div class="px-3 py-3 border-bottom d-flex justify-content-between align-items-center notification-header">
+                     <span class="fw-bold notification-title">Pusat Notifikasi</span>
+                     <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1" style="font-size: 0.7rem;">Sistem</span>
+                 </div>
+                 <div id="notification-items" class="py-0"></div>
+             `;
+ 
+             wrapper.appendChild(bellBtn);
+             wrapper.appendChild(dropdown);
+             
+             // Toggle dropdown
+             bellBtn.onclick = (e) => {
+                 e.stopPropagation();
+                 dropdown.classList.toggle('show');
+                 if (dropdown.classList.contains('show')) {
+                     markNotificationsAsRead();
+                 }
+             };
+ 
+             document.addEventListener('click', () => dropdown.classList.remove('show'));
+             dropdown.onclick = (e) => e.stopPropagation();
+ 
+             // Inject next to dark mode toggle
+             const darkModeToggle = document.getElementById('dark-mode-toggle');
+             if (darkModeToggle) {
+                 headerContainer.insertBefore(wrapper, darkModeToggle);
+             } else {
+                 headerContainer.prepend(wrapper);
+             }
+ 
+             fetchNotifications();
+             setInterval(fetchNotifications, 30000); // 30 seconds
+         }
+     }
+ 
+     async function fetchNotifications() {
+         try {
+             const res = await fetch('{{ route("notifications.fetch") }}');
+             const data = await res.json();
+             const badge = document.getElementById('notification-badge');
+             const items = document.getElementById('notification-items');
+             
+             if (data.count > 0) {
+                 badge.innerText = data.count;
+                 badge.classList.remove('d-none');
+             } else {
+                 badge.classList.add('d-none');
+             }
+ 
+             if (data.notifications && data.notifications.length > 0) {
+                 items.innerHTML = data.notifications.map(n => {
+                     const isUnread = !n.read_at;
+                     const userName = n.data.user_name || 'System';
+                     const timeStr = new Date(n.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                     const dateStr = new Date(n.created_at).toLocaleDateString();
+                     
+                     return `
+                     <div class="px-3 py-3 border-bottom hover-bg-light transition-all ${isUnread ? 'bg-primary-subtle' : ''}" style="cursor: default; position: relative;">
+                         ${isUnread ? '<div style="position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #0d6efd;"></div>' : ''}
+                         <div class="d-flex gap-3">
+                            <div class="flex-shrink-0">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center bg-primary text-white" style="width: 35px; height: 35px; font-size: 0.8rem; font-weight: bold;">
+                                    ${userName.substring(0, 2).toUpperCase()}
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="fw-bold" style="font-size: 0.85rem; color: var(--bs-body-color);">${userName}</span>
+                                    <span class="text-muted" style="font-size: 0.7rem;">${timeStr}</span>
+                                </div>
+                                <div style="font-size: 0.8rem; line-height: 1.4; color: var(--bs-secondary-color);">
+                                    ${n.data.message.replace(userName + ' telah ', '')}
+                                </div>
+                                <div class="mt-2 d-flex align-items-center">
+                                    <span class="badge ${isUnread ? 'bg-primary' : 'bg-secondary'} text-uppercase" style="font-size: 0.6rem; letter-spacing: 0.5px;">
+                                        PM LIBERTA
+                                    </span>
+                                    <span class="ms-2 text-muted" style="font-size: 0.7rem;">${dateStr}</span>
+                                </div>
+                            </div>
+                         </div>
+                     </div>
+                 `}).join('');
+             } else {
+                 items.innerHTML = `
+                    <div class="px-3 py-5 text-center">
+                        <i class="bi bi-bell-slash text-muted mb-2" style="font-size: 2rem; display: block;"></i>
+                        <div class="text-muted small">Belum ada notifikasi saat ini</div>
+                    </div>
+                 `;
+             }
+         } catch (e) {}
+     }
+ 
+     async function markNotificationsAsRead() {
+         try {
+             await fetch('{{ route("notifications.markRead") }}', {
+                 method: 'POST',
+                 headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+             });
+             const badge = document.getElementById('notification-badge');
+             if(badge) badge.classList.add('d-none');
+         } catch (e) {}
+     }
 
     function updateChartsTheme(theme) {
         if (typeof Chart !== 'undefined') {
@@ -229,12 +371,14 @@
         document.addEventListener('DOMContentLoaded', () => {
             showInstallButton();
             initDarkMode();
+            initNotificationBell();
             initNavLogo();
             updateChartsTheme(localStorage.getItem('theme') || 'light');
         });
     } else {
         showInstallButton();
         initDarkMode();
+        initNotificationBell();
         initNavLogo();
         updateChartsTheme(localStorage.getItem('theme') || 'light');
     }
@@ -778,6 +922,50 @@
         background-color: #1a1a1a !important;
         border-color: #333 !important;
     }
+
+    /* --- Notification Dropdown Premium Styling --- */
+    .notification-header {
+        background: #f8f9fa;
+        border-radius: 16px 16px 0 0;
+    }
+    .notification-title {
+        color: #212529;
+    }
+    [data-bs-theme="dark"] .notification-header {
+        background: #252525 !important;
+    }
+    [data-bs-theme="dark"] .notification-title {
+        color: #f8f9fa !important;
+    }
+    .hover-bg-light:hover {
+        background-color: rgba(0, 0, 0, 0.03);
+    }
+    [data-bs-theme="dark"] .hover-bg-light:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+    [data-bs-theme="dark"] #notification-dropdown {
+        background-color: #1e1e1e !important;
+        color: #e0e0e0 !important;
+    }
+    [data-bs-theme="dark"] #notification-dropdown .border-bottom {
+        border-color: #333 !important;
+    }
+    [data-bs-theme="dark"] #notification-dropdown .text-dark {
+        color: #e0e0e0 !important;
+    }
+    [data-bs-theme="dark"] #notification-dropdown .bg-light,
+    [data-bs-theme="dark"] #notification-dropdown .bg-info-subtle {
+        background-color: rgba(13, 110, 253, 0.1) !important;
+    }
+    [data-bs-theme="dark"] #notification-dropdown style {
+        background-color: #1a1a1a !important;
+    }
+    
+    /* --- Scrollbar for dropdown --- */
+    #notification-dropdown::-webkit-scrollbar { width: 6px; }
+    #notification-dropdown::-webkit-scrollbar-track { background: transparent; }
+    #notification-dropdown::-webkit-scrollbar-thumb { background: #adb5bd; border-radius: 10px; }
+    [data-bs-theme="dark"] #notification-dropdown::-webkit-scrollbar-thumb { background: #444; }
 
     /* --- Tabs Section background & border --- */
     [data-bs-theme="dark"] .tabs-section {

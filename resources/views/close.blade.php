@@ -416,8 +416,7 @@
         <div class="modal fade" id="modalEditTicket{{ $t->id }}" tabindex="-1">
             <div class="modal-dialog modal-xl modal-dialog-centered">
                 <form method="POST" action="{{ route('close.ticket.update', $t->id) }}"
-                    class="modal-content border-0 shadow-lg rounded-4 overflow-hidden"
-                    style="background-color: white !important; color: #333 !important;">
+                    class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
                     @csrf
                     @method('PUT')
                     <div class="modal-header text-white d-flex justify-content-center position-relative"
@@ -428,7 +427,7 @@
                         <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
                             data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="modal-body p-4" style="background-color: white !important;">
+                    <div class="modal-body p-4">
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label class="form-label fw-bold">Site ID / Code</label>
@@ -512,7 +511,7 @@
                     </div>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-4 bg-white">
+                <div class="modal-body p-4">
                     <div class="row g-4">
                         <div class="col-md-6">
                             <div class="bg-light p-3 rounded-4 shadow-sm h-100">
@@ -575,7 +574,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-0 p-4 bg-white">
+                <div class="modal-footer border-0 p-4">
                     <button type="button" class="btn btn-primary px-4 rounded-pill shadow-sm" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>

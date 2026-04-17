@@ -66,6 +66,21 @@ Route::post('/logout', [AuthController::class , 'logout'])->name('logout');
 Route::get('/csrf-refresh', function () {
     return response()->json(['token' => csrf_token()]);
 })->name('csrf.refresh');
+ 
+ // --- NOTIFICATION ROUTES ---
+ Route::get('/notifications/fetch', function() {
+     if(!auth()->check()) return response()->json([]);
+     return response()->json([
+         'notifications' => auth()->user()->notifications()->latest()->take(10)->get(),
+         'count' => auth()->user()->unreadNotifications->count()
+     ]);
+ })->name('notifications.fetch');
+ 
+ Route::post('/notifications/mark-read', function() {
+     if(!auth()->check()) return response()->json(['success' => false]);
+     auth()->user()->unreadNotifications->markAsRead();
+     return response()->json(['success' => true]);
+ })->name('notifications.markRead');
 
 
 // --- PROTECTED ROUTES (Harus login dulu) ---

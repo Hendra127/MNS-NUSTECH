@@ -480,11 +480,11 @@
                             <div class="col-md-6">
                                 <label class="form-label">Status</label>
                                 <select name="status" id="edit_status" class="form-select">
-                                    <option value="DONE">DONE</option>
-                                    <option value="PENDING">PENDING</option>
-                                    <option value="ON PROGRESS">ON PROGRESS</option>
-                                    <option value="HOLD">HOLD</option>
-                                </select>
+                                     <option value="DONE" {{ auth()->user()->role === 'admin' ? 'disabled' : '' }}>DONE</option>
+                                     <option value="PENDING">PENDING</option>
+                                     <option value="ON PROGRESS">ON PROGRESS</option>
+                                     <option value="HOLD">HOLD</option>
+                                 </select>
                             </div>
                         </div>
                     </div>
@@ -568,11 +568,11 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Status</label>
                                 <select name="status" class="form-select rounded-3">
-                                    <option value="DONE">DONE</option>
-                                    <option value="PENDING" selected>PENDING</option>
-                                    <option value="ON PROGRESS">ON PROGRESS</option>
-                                    <option value="HOLD">HOLD</option>
-                                </select>
+                                     <option value="DONE" {{ auth()->user()->role === 'admin' ? 'disabled' : '' }}>DONE</option>
+                                     <option value="PENDING" selected>PENDING</option>
+                                     <option value="ON PROGRESS">ON PROGRESS</option>
+                                     <option value="HOLD">HOLD</option>
+                                 </select>
                             </div>
                             <div class="col-12">
                                 <label class="form-label fw-bold">PIC CE</label>

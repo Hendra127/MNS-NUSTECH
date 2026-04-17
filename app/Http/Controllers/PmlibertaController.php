@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\PMLiberta;
+use App\Models\User;
+use App\Notifications\StatusHoldNotification;
 use App\Exports\PMLibertaExport;
 use App\Imports\PMLibertaImport;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Notification;
 
 class PMLibertaController extends Controller
 {
@@ -96,6 +99,11 @@ class PMLibertaController extends Controller
             return back()->with('error', "Data untuk Site {$request->site_id} pada tanggal {$request->date} ({$request->kategori}) sudah ada dengan status: {$existing->status}");
         }
 
+        // [MOD] Restriction for role 'admin'
+        if (auth()->user()->role === 'admin' && strtoupper($request->status) === 'DONE') {
+            return back()->with('error', 'Role Admin tidak diperbolehkan mengatur status ke DONE.');
+        }
+
         PMLiberta::create([
             'site_id' => $request->site_id,
             'nama_lokasi' => $request->nama_lokasi,
@@ -108,6 +116,12 @@ class PMLibertaController extends Controller
             'kategori' => $request->kategori,
             'pic_ce' => $request->pic_ce,
         ]);
+
+        // [MOD] Notification if status is HOLD
+        if (strtoupper($request->status) === 'HOLD' && auth()->user()->role === 'admin') {
+            $recipients = User::where('role', 'superadmin')->get();
+            Notification::send($recipients, new StatusHoldNotification((object)$request->all(), auth()->user()));
+        }
 
         return back()->with('success', 'Data berhasil ditambahkan!');
     }
@@ -135,6 +149,13 @@ class PMLibertaController extends Controller
     {
         $data = PMLiberta::findOrFail($id);
 
+        // [MOD] Restriction for role 'admin'
+        if (auth()->user()->role === 'admin' && strtoupper($request->status) === 'DONE') {
+            return back()->with('error', 'Role Admin tidak diperbolehkan mengatur status ke DONE.');
+        }
+
+        $oldStatus = $data->status;
+
         $data->update([
             'site_id' => $request->site_id,
             'nama_lokasi' => $request->nama_lokasi,
@@ -147,6 +168,12 @@ class PMLibertaController extends Controller
             'kategori' => $request->kategori,
             // Tambahkan kolom lain sesuai kebutuhan
         ]);
+
+        // [MOD] Notification if status is changed to HOLD by admin
+        if (strtoupper($request->status) === 'HOLD' && auth()->user()->role === 'admin') {
+            $recipients = User::where('role', 'superadmin')->get();
+            Notification::send($recipients, new StatusHoldNotification($data, auth()->user()));
+        }
 
         return back()->with('success', 'Data berhasil diperbarui!');
     }
