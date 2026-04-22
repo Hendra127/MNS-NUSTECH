@@ -20,7 +20,7 @@ class CloseTicketController extends Controller
         $tgl_selesai = $request->tgl_selesai;
 
         // Inisialisasi Query dengan status 'closed'
-        $query = Ticket::with('site')->where('status', 'closed');
+        $query = Ticket::with(['site', 'evidences'])->where('status', 'closed');
 
         // 1. Filter Pencarian (Site Code, Nama Site, atau CE)
         if ($search) {

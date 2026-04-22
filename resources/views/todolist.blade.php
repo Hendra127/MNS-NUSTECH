@@ -184,8 +184,10 @@
             flex: 1;
             max-width: 600px;
             min-width: 300px;
-            position: relative; /* For floating button */
+            position: relative;
+            /* For floating button */
         }
+
         .todo-add-group {
             position: relative;
             background: #ffffff;
@@ -193,16 +195,19 @@
             border: 1.5px solid #e2e8f0;
             transition: all 0.3s;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
         }
+
         .todo-add-group:focus-within {
             border-color: #8b5cf6;
             box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
         }
+
         .todo-add-input-alt {
             width: 100%;
             border: none;
-            padding: 12px 60px 12px 15px; /* Extra right padding for button */
+            padding: 12px 60px 12px 15px;
+            /* Extra right padding for button */
             font-size: 13.5px;
             resize: none;
             background: transparent;
@@ -211,6 +216,7 @@
             min-height: 50px;
             display: block;
         }
+
         .todo-floating-btn {
             position: absolute;
             right: 10px;
@@ -228,15 +234,16 @@
             transition: all 0.2s;
             box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
         }
+
         .todo-floating-btn:hover {
             background: #1d4ed8;
             transform: scale(1.05);
         }
+
         .todo-floating-btn:active {
             transform: scale(0.95);
         }
-
-        </style>
+    </style>
 </head>
 
 <body>
@@ -301,10 +308,13 @@
         </div>
     </header>
     <div class="tabs-section">
-        <a href="{{ url('/todolist') }}" class="tab {{ request()->is('todolist*') ? 'active' : '' }}" style="text-decoration: none;">To Do List</a>
+        <a href="{{ url('/todolist') }}" class="tab {{ request()->is('todolist*') ? 'active' : '' }}"
+            style="text-decoration: none;">To Do List</a>
         @if(auth()->check() && auth()->user()->role === 'superadmin')
-            <a href="{{ route('jadwalpiket') }}" class="tab {{ request()->is('jadwalpiket*') ? 'active' : '' }}" style="text-decoration: none;">Jadwal Piket</a>
-            <a href="{{ route('remotelog') }}" class="tab {{ request()->is('remote-log*') ? 'active' : '' }}" style="text-decoration: none;">Log Remote</a>
+            <a href="{{ route('jadwalpiket') }}" class="tab {{ request()->is('jadwalpiket*') ? 'active' : '' }}"
+                style="text-decoration: none;">Jadwal Piket</a>
+            <a href="{{ route('remotelog') }}" class="tab {{ request()->is('remote-log*') ? 'active' : '' }}"
+                style="text-decoration: none;">Log Remote</a>
         @endif
     </div>
     <div class="container-fluid mt-4 px-4">
@@ -395,7 +405,8 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h6 class="m-0" style="font-weight: 700; text-decoration: line-through;">
-                                        {{ $done->title }}</h6>
+                                        {{ $done->title }}
+                                    </h6>
                                     <small class="text-muted" style="font-size: 10px;">Selesai pada:
                                         {{ $done->updated_at->format('d M H:i') }}</small>
                                 </div>

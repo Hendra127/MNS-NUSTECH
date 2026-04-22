@@ -56,13 +56,13 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-3">
-            @if(auth()->check() && auth()->user()->role === 'superadmin')
+            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                 <a href="{{ route('setting.index') }}" class="text-white opacity-75 hover-opacity-100" title="Settings">
                     <i class="bi bi-gear-fill" style="font-size: 1.3rem;"></i>
                 </a>
             @endif
             <div class="user-profile-wrapper" style="position: relative;">
-                    @if(auth()->check() && auth()->user()->role === 'superadmin')
+                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                     <a href="{{ route('setting.index') }}" class="user-profile-icon" title="Setting User"
                         style="cursor: pointer; text-decoration: none; color: inherit;">
                         @if(auth()->user()->photo)
@@ -110,8 +110,10 @@
             style="text-decoration: none;">All Sites</a>
         <a href="{{ route('datapas') }}" class="tab {{ request()->is('datapass*') ? 'active' : '' }}"
             style="text-decoration: none;">Management Password</a>
-        <a href="{{ route('laporancm') }}" class="tab {{ request()->is('laporancm*') ? 'active' : '' }}"
-            style="text-decoration: none;">Correctiv Maintenance</a>
+        @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+            <a href="{{ route('laporancm') }}" class="tab {{ request()->is('laporancm*') ? 'active' : '' }}"
+                style="text-decoration: none;">Correctiv Maintenance</a>
+        @endif
         <a href="{{ route('pmliberta') }}" class="tab {{ request()->is('PMLiberta*') ? 'active' : '' }}"
             style="text-decoration: none;">Preventive Maintenance</a>
         <a href="{{ route('summarypm') }}" class="tab {{ request()->is('summarypm*') ? 'active' : '' }}"
@@ -163,6 +165,8 @@
                         <th>PASS AP2</th>
                         @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                             <th class="sticky-col-right">Aksi</th>
+                        @elseif(auth()->check() && auth()->user()->role === 'user')
+                            <th class="sticky-col-right">Info</th>
                         @endif
                     </tr>
                 </thead>
@@ -188,6 +192,12 @@
                                         @csrf
                                         @method('DELETE')
                                     </form>
+                                </td>
+                            @elseif(auth()->check() && auth()->user()->role === 'user')
+                                <td class="text-center sticky-col-right">
+                                    <button class="btn btn-sm bi bi-info-circle" onclick="viewInfo({{ json_encode($row) }})"
+                                        title="Info">
+                                    </button>
                                 </td>
                             @endif
                         </tr>
@@ -391,6 +401,26 @@
         function closeM(id) {
             document.getElementById(id).style.display = 'none';
         }
+        // 3. Logic View Info (read-only untuk role admin/user)
+        function viewInfo(data) {
+            Swal.fire({
+                title: '<i class="bi bi-info-circle-fill text-primary"></i> Info Lokasi',
+                html: `
+                    <div style="text-align: left; font-size: 14px; line-height: 2;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr><td style="color:#888; width:120px;">Nama Lokasi</td><td><b>${data.nama_lokasi}</b></td></tr>
+                            <tr><td style="color:#888;">Kabupaten</td><td>${data.kabupaten}</td></tr>
+                            <tr><td style="color:#888;">ADOP</td><td>${data.adop}</td></tr>
+                            <tr><td style="color:#888;">PASS AP1</td><td><code>${data.pass_ap1}</code></td></tr>
+                            <tr><td style="color:#888;">PASS AP2</td><td><code>${data.pass_ap2}</code></td></tr>
+                        </table>
+                    </div>`,
+                confirmButtonText: 'Tutup',
+                confirmButtonColor: '#0d6efd',
+                customClass: { popup: 'rounded-4' }
+            });
+        }
+
         // 3. Logic Edit Data
         function editData(data) {
             // Set Action URL ke Route Update

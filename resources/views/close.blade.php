@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}?v=1.1">
     <script src="{{ asset('js/nav-modal.js') }}"></script>
     <script src="{{ asset('js/profile-dropdown.js') }}"></script>
-    @include('components.nav-modal-structure')
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Close Ticket | Project Operational</title>
@@ -165,10 +164,21 @@
             color: #ccc !important;
             opacity: 0.5;
         }
+
+        /* Remote icon dark mode — sama dengan edit & hapus */
+        .btn-remote-action {
+            color: #000;
+        }
+
+        [data-bs-theme="dark"] .btn-remote-action {
+            color: #7ec8e3 !important;
+            /* cyan-teal sesuai ikon edit di dark mode */
+        }
     </style>
 </head>
 
 <body>
+    @include('components.nav-modal-structure')
     <header class="main-header">
         <div class="header-logo-container">
             <a href="javascript:void(0)" class="header-brand-link" onclick="openNavModal()"
@@ -179,13 +189,13 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-3">
-            @if(auth()->check() && auth()->user()->role === 'superadmin')
+            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                 <a href="{{ route('setting.index') }}" class="text-white opacity-75 hover-opacity-100" title="Settings">
                     <i class="bi bi-gear-fill" style="font-size: 1.3rem;"></i>
                 </a>
             @endif
             <div class="user-profile-wrapper" style="position: relative;">
-                @if(auth()->check() && auth()->user()->role === 'superadmin')
+                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                     <a href="{{ route('setting.index') }}" class="user-profile-icon" title="Setting User"
                         style="cursor: pointer; text-decoration: none; color: inherit;">
                         @if(auth()->user()->photo)
@@ -354,6 +364,8 @@
                             <th class="text-center">CE</th>
                             @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                                 <th class="text-center sticky-col-right">AKSI</th>
+                            @elseif(auth()->check() && auth()->user()->role === 'user')
+                                <th class="text-center sticky-col-right">INFO</th>
                             @endif
                         </tr>
                     </thead>
@@ -384,6 +396,18 @@
                                                 data-name="{{ $t->nama_site }}">
                                             </button>
                                         </form>
+                                        <button type="button" class="btn btn-sm bi bi-info-circle" data-bs-toggle="modal"
+                                            data-bs-target="#modalInfo{{ $t->id }}">
+                                        </button>
+                                        @if($t->site && $t->site->ip_router && in_array(auth()->user()->role ?? '', ['admin', 'superadmin']))
+                                            <button type="button" class="btn btn-sm btn-remote-action" title="Remote Mikrotik"
+                                                onclick="remoteMikrotik('{{ $t->site->ip_router }}', '{{ $t->kategori }}', '{{ $t->nama_site }}', '{{ $t->site_code }}', '{{ $t->site->gateway_area }}', '{{ $t->site->hub }}')">
+                                                <i class="bi bi-broadcast"></i>
+                                            </button>
+                                        @endif
+                                    </td>
+                                @elseif(auth()->check() && auth()->user()->role === 'user')
+                                    <td class="text-center sticky-col-right">
                                         <button type="button" class="btn btn-sm bi bi-info-circle" data-bs-toggle="modal"
                                             data-bs-target="#modalInfo{{ $t->id }}">
                                         </button>
@@ -482,6 +506,24 @@
                                 <textarea name="plan_actions" class="form-control" rows="3"
                                     required>{{ $t->plan_actions }}</textarea>
                             </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold text-primary">Evidence (Bukti Saat Ini)</label>
+                                <div class="d-flex flex-wrap gap-2 mb-2">
+                                    @if($t->evidences->count() > 0)
+                                        @foreach($t->evidences as $ev)
+                                            <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage_public/' . $ev->path) }}')" class="badge bg-info text-white text-decoration-none">
+                                                <i class="bi bi-paperclip"></i> Bukti #{{ $loop->iteration }}
+                                            </a>
+                                        @endforeach
+                                    @elseif($t->evidence && str_contains($t->evidence, '.'))
+                                        <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage_public/' . $t->evidence) }}')" class="badge bg-secondary text-white text-decoration-none">
+                                            <i class="bi bi-paperclip"></i> Bukti Utama
+                                        </a>
+                                    @else
+                                        <span class="text-muted small">TIDAK ADA</span>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -495,91 +537,109 @@
 
     {{-- MODAL DETAIL / INFO --}}
     @foreach($tickets as $t)
-    <div class="modal fade" id="modalInfo{{ $t->id }}" tabindex="-1" aria-labelledby="labelInfo{{ $t->id }}" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="modal-header border-0 p-4 d-flex align-items-center justify-content-between"
-                    style="background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="bg-white bg-opacity-25 p-2 rounded-circle">
-                            <i class="bi bi-info-circle-fill text-white fs-4"></i>
+        <div class="modal fade" id="modalInfo{{ $t->id }}" tabindex="-1" aria-labelledby="labelInfo{{ $t->id }}" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="modal-header border-0 p-3 d-flex align-items-center justify-content-between"
+                        style="background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-white bg-opacity-25 p-2 rounded-circle">
+                                <i class="bi bi-info-circle-fill text-white fs-4"></i>
+                            </div>
+                            <div>
+                                <h5 class="modal-title text-white fw-bold mb-0" id="labelInfo{{ $t->id }}">Detail Tiket Site</h5>
+                                <small class="text-white text-opacity-75">Informasi lengkap perbaikan perangkat</small>
+                            </div>
                         </div>
-                        <div>
-                            <h5 class="modal-title text-white fw-bold mb-0" id="labelInfo{{ $t->id }}">Detail Tiket Site</h5>
-                            <small class="text-white text-opacity-75">Informasi lengkap perbaikan perangkat</small>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-3">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="bg-light p-2 rounded-3 shadow-sm h-100">
+                                    <h6 class="fw-bold text-primary mb-3 d-flex align-items-center gap-2"><i class="bi bi-geo-alt-fill"></i> Lokasi &amp; Identitas</h6>
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex justify-content-between border-bottom pb-2"><span class="text-muted small">Site ID</span><span class="fw-bold">{{ $t->site_code }}</span></div>
+                                        <div class="d-flex justify-content-between border-bottom pb-2 gap-2"><span class="text-muted small flex-shrink-0">Nama Site</span><span class="fw-bold text-end">{{ $t->nama_site }}</span></div>
+                                        <div class="d-flex justify-content-between border-bottom pb-2"><span class="text-muted small">Provinsi</span><span class="fw-semibold">{{ $t->provinsi }}</span></div>
+                                        <div class="d-flex justify-content-between border-bottom pb-2"><span class="text-muted small">Kabupaten</span><span class="fw-semibold">{{ $t->kabupaten }}</span></div>
+                                        <div class="d-flex justify-content-between pb-2"><span class="text-muted small">Kategori</span><span class="badge bg-info text-white fw-bold">{{ $t->kategori }}</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="bg-light p-2 rounded-3 shadow-sm h-100">
+                                    <h6 class="fw-bold text-success mb-3 d-flex align-items-center gap-2"><i class="bi bi-clock-history"></i> Progres &amp; Waktu</h6>
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex justify-content-between border-bottom pb-2"><span class="text-muted small">Tgl Open</span><span class="fw-bold">{{ \Carbon\Carbon::parse($t->tanggal_rekap)->format('d M Y') }}</span></div>
+                                        <div class="d-flex justify-content-between border-bottom pb-2"><span class="text-muted small">Tgl Close</span><span class="fw-bold">{{ $t->tanggal_close ? \Carbon\Carbon::parse($t->tanggal_close)->format('d M Y') : '-' }}</span></div>
+                                        <div class="d-flex justify-content-between border-bottom pb-2"><span class="text-muted small">Status</span><span class="badge bg-success text-white fw-bold px-3 rounded-pill">{{ strtoupper($t->status) }}</span></div>
+                                        <div class="d-flex justify-content-between border-bottom pb-2"><span class="text-muted small">Durasi</span><span class="text-danger fw-bold fs-5">{{ number_format($t->durasi, 0) }} Hari</span></div>
+                                        <div class="d-flex justify-content-between pb-2"><span class="text-muted small">CE</span><span class="fw-semibold">{{ $t->ce ?? '-' }}</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="bg-light p-2 rounded-3 shadow-sm">
+                                    <h6 class="fw-bold text-danger mb-3 d-flex align-items-center gap-2"><i class="bi bi-exclamation-triangle-fill"></i> Detail Teknis</h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="p-2 bg-white rounded-3 h-100 border">
+                                                <div class="text-muted small fw-bold mb-1">KENDALA UTAMA</div>
+                                                <p class="mb-0 fw-semibold text-dark">{{ $t->kendala }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="p-2 bg-white rounded-3 h-100 border">
+                                                <div class="text-muted small fw-bold mb-1">EVIDENCE</div>
+                                                <p class="mb-0 fw-semibold text-dark">
+                                                    <div class="d-flex flex-column gap-1">
+                                                        @if($t->evidences->count() > 0)
+                                                            @foreach($t->evidences as $ev)
+                                                                <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage_public/' . $ev->path) }}')" class="text-primary text-decoration-none small">
+                                                                    <i class="bi bi-eye"></i> Lihat Bukti #{{ $loop->iteration }}
+                                                                </a>
+                                                            @endforeach
+                                                        @elseif($t->evidence && str_contains($t->evidence, '.') && !str_contains(strtolower($t->evidence), 'tidak ada'))
+                                                            <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage_public/' . $t->evidence) }}')" class="text-primary text-decoration-none small">
+                                                                <i class="bi bi-eye"></i> Lihat Bukti Utama
+                                                            </a>
+                                                        @else
+                                                            <span class="text-muted small">TIDAK ADA</span>
+                                                        @endif
+                                                    </div>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="p-2 bg-white rounded-3 mb-3 border">
+                                                <div class="text-muted small fw-bold mb-1">DETAIL PROBLEM</div>
+                                                <p class="mb-0 text-dark small" style="line-height: 1.6;">{{ $t->detail_problem }}</p>
+                                            </div>
+                                            <div class="p-2 rounded-3" style="background-color: #f0f7ff; border-left: 4px solid #3a7bd5;">
+                                                <div class="text-primary small fw-bold mb-1">PLAN ACTION / TINDAKAN</div>
+                                                <p class="mb-0 text-dark small" style="line-height: 1.6;">{{ $t->plan_actions }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="bg-light p-3 rounded-4 shadow-sm h-100">
-                                <h6 class="fw-bold text-primary mb-3 d-flex align-items-center gap-2"><i class="bi bi-geo-alt-fill"></i> Lokasi &amp; Identitas</h6>
-                                <div class="d-flex flex-column gap-2">
-                                    <div class="d-flex justify-content-between border-bottom pb-2"><span class="text-muted small">Site ID</span><span class="fw-bold">{{ $t->site_code }}</span></div>
-                                    <div class="d-flex justify-content-between border-bottom pb-2 gap-2"><span class="text-muted small flex-shrink-0">Nama Site</span><span class="fw-bold text-end">{{ $t->nama_site }}</span></div>
-                                    <div class="d-flex justify-content-between border-bottom pb-2"><span class="text-muted small">Provinsi</span><span class="fw-semibold">{{ $t->provinsi }}</span></div>
-                                    <div class="d-flex justify-content-between border-bottom pb-2"><span class="text-muted small">Kabupaten</span><span class="fw-semibold">{{ $t->kabupaten }}</span></div>
-                                    <div class="d-flex justify-content-between pb-2"><span class="text-muted small">Kategori</span><span class="badge bg-info text-white fw-bold">{{ $t->kategori }}</span></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="bg-light p-3 rounded-4 shadow-sm h-100">
-                                <h6 class="fw-bold text-success mb-3 d-flex align-items-center gap-2"><i class="bi bi-clock-history"></i> Progres &amp; Waktu</h6>
-                                <div class="d-flex flex-column gap-2">
-                                    <div class="d-flex justify-content-between border-bottom pb-2"><span class="text-muted small">Tgl Open</span><span class="fw-bold">{{ \Carbon\Carbon::parse($t->tanggal_rekap)->format('d M Y') }}</span></div>
-                                    <div class="d-flex justify-content-between border-bottom pb-2"><span class="text-muted small">Tgl Close</span><span class="fw-bold">{{ $t->tanggal_close ? \Carbon\Carbon::parse($t->tanggal_close)->format('d M Y') : '-' }}</span></div>
-                                    <div class="d-flex justify-content-between border-bottom pb-2"><span class="text-muted small">Status</span><span class="badge bg-success text-white fw-bold px-3 rounded-pill">{{ strtoupper($t->status) }}</span></div>
-                                    <div class="d-flex justify-content-between border-bottom pb-2"><span class="text-muted small">Durasi</span><span class="text-danger fw-bold fs-5">{{ number_format($t->durasi, 0) }} Hari</span></div>
-                                    <div class="d-flex justify-content-between pb-2"><span class="text-muted small">CE</span><span class="fw-semibold">{{ $t->ce ?? '-' }}</span></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="bg-light p-3 rounded-4 shadow-sm">
-                                <h6 class="fw-bold text-danger mb-3 d-flex align-items-center gap-2"><i class="bi bi-exclamation-triangle-fill"></i> Detail Teknis</h6>
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <div class="p-3 bg-white rounded-3 h-100 border">
-                                            <div class="text-muted small fw-bold mb-1">KENDALA UTAMA</div>
-                                            <p class="mb-0 fw-semibold text-dark">{{ $t->kendala }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="p-3 bg-white rounded-3 h-100 border">
-                                            <div class="text-muted small fw-bold mb-1">EVIDENCE</div>
-                                            <p class="mb-0 fw-semibold text-dark">
-                                                @if($t->evidence && str_contains($t->evidence, '.') && !str_contains(strtolower($t->evidence), 'tidak ada'))
-                                                    <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage/' . $t->evidence) }}')" class="text-primary text-decoration-none"><i class="bi bi-eye"></i> ADA (Klik untuk lihat)</a>
-                                                @else
-                                                    TIDAK ADA
-                                                @endif
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="p-3 bg-white rounded-3 mb-3 border">
-                                            <div class="text-muted small fw-bold mb-1">DETAIL PROBLEM</div>
-                                            <p class="mb-0 text-dark small" style="line-height: 1.6;">{{ $t->detail_problem }}</p>
-                                        </div>
-                                        <div class="p-3 rounded-3" style="background-color: #f0f7ff; border-left: 4px solid #3a7bd5;">
-                                            <div class="text-primary small fw-bold mb-1">PLAN ACTION / TINDAKAN</div>
-                                            <p class="mb-0 text-dark small" style="line-height: 1.6;">{{ $t->plan_actions }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="modal-footer border-0 p-3 bg-white d-flex justify-content-between">
+                        @if($t->site && $t->site->ip_router && in_array(auth()->user()->role ?? '', ['admin', 'superadmin']))
+                            <button type="button" class="btn btn-outline-primary px-4 rounded-pill shadow-sm"
+                                onclick="remoteMikrotik('{{ $t->site->ip_router }}', '{{ $t->kategori }}', '{{ $t->nama_site }}', '{{ $t->site_code }}', '{{ $t->site->gateway_area }}', '{{ $t->site->hub }}')">
+                                <i class="bi bi-broadcast me-2"></i>Remote Mikrotik
+                            </button>
+                        @else
+                            <span></span>
+                        @endif
+                        <button type="button" class="btn btn-primary px-4 rounded-pill shadow-sm" data-bs-dismiss="modal">Tutup</button>
                     </div>
-                </div>
-                <div class="modal-footer border-0 p-4">
-                    <button type="button" class="btn btn-primary px-4 rounded-pill shadow-sm" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
-    </div>
     @endforeach
     
     <!-- Modal Viewer Evidence -->
@@ -731,6 +791,163 @@
                 loadTable(window.location.href);
             };
         });
+    </script>
+    <script>
+        // Daftar tunnel WireGuard dari config/wireguard.php
+        const wgTunnels = @json($wgTunnels ?? []);
+
+        function remoteMikrotik(ip, kategori, namaSite, siteCode, gateway, hub) {
+            // Tentukan kredensial berdasarkan kategori/tipe
+            let username = 'admin';
+            let password = 'SLAPRO2024'; // Default SL
+            let tipeLabel = 'SEWA LAYANAN';
+
+            if (kategori && (kategori.toUpperCase().includes('BMN') || kategori.toUpperCase().includes('BARANG MILIK NEGARA'))) {
+                password = 'KAPLBR2024';
+                tipeLabel = 'BMN';
+            } else {
+                tipeLabel = 'SL';
+            }
+
+            // Cek tunnel terakhir dari localStorage
+            const lastTunnel = localStorage.getItem('last_wg_tunnel');
+
+            // Build select options dari daftar tunnel
+            let tunnelOptions = '<option value="">-- Pilih Tunnel --</option>';
+            wgTunnels.forEach(t => {
+                const selected = (t === lastTunnel) ? 'selected' : '';
+                tunnelOptions += `<option value="${t}" ${selected}>${t}</option>`;
+            });
+
+            // Tampilkan SweetAlert dengan info koneksi + input tunnel name
+            Swal.fire({
+                title: '<i class="bi bi-broadcast"></i> Remote Mikrotik',
+                html: `
+                <div style="text-align: left; font-size: 14px; line-height: 2;">
+                    <div style="background: linear-gradient(135deg, #e8f4fd, #f0f7ff); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid #0d6efd;">
+                        <div style="font-weight: 700; font-size: 16px; color: #071152; margin-bottom: 5px;">
+                            ${namaSite}
+                        </div>
+                        <div style="font-size: 12px; color: #666;">Site ID: ${siteCode} | Tipe: ${tipeLabel}</div>
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                            <td style="padding: 8px 0; color: #666; width: 120px;"><i class="bi bi-globe2 me-2"></i>IP Router</td>
+                            <td style="padding: 8px 0; font-weight: 700; font-family: monospace; font-size: 15px; color: #0d6efd;">${ip}</td>
+                            <td style="padding: 8px 0; width: 30px;"><button class="btn btn-sm btn-outline-primary" onclick="copyText('${ip}')" title="Copy IP"><i class="bi bi-clipboard"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; color: #666;"><i class="bi bi-hdd-network me-2"></i>HUB</td>
+                            <td style="padding: 8px 0; font-weight: 600;">${hub || '-'}</td>
+                            <td style="padding: 8px 0;"><button class="btn btn-sm btn-outline-primary" onclick="copyText('${hub || ''}')" title="Copy HUB"><i class="bi bi-clipboard"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; color: #666;"><i class="bi bi-door-open me-2"></i>Gateway</td>
+                            <td style="padding: 8px 0; font-weight: 600;">${gateway || '-'}</td>
+                            <td style="padding: 8px 0;"><button class="btn btn-sm btn-outline-primary" onclick="copyText('${gateway || ''}')" title="Copy Gateway"><i class="bi bi-clipboard"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; color: #666;"><i class="bi bi-person-fill me-2"></i>Username</td>
+                            <td style="padding: 8px 0; font-weight: 600;">${username}</td>
+                            <td style="padding: 8px 0;"><button class="btn btn-sm btn-outline-primary" onclick="copyText('${username}')" title="Copy"><i class="bi bi-clipboard"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; color: #666;"><i class="bi bi-key-fill me-2"></i>Password</td>
+                            <td style="padding: 8px 0; font-weight: 600; font-family: monospace;">${password}</td>
+                            <td style="padding: 8px 0;"><button class="btn btn-sm btn-outline-primary" onclick="copyText('${password}')" title="Copy"><i class="bi bi-clipboard"></i></button></td>
+                        </tr>
+                    </table>
+                    <hr style="margin: 12px 0;">
+                    <div style="margin-top: 5px;">
+                        <label style="font-size: 13px; font-weight: 600; color: #333; display: block; margin-bottom: 5px;">
+                            <i class="bi bi-shield-lock-fill me-1" style="color: #0d6efd;"></i> Pilih Tunnel WireGuard
+                        </label>
+                        <select id="swal-tunnel-name" class="form-select" 
+                               style="font-size: 14px; border: 2px solid #dee2e6; border-radius: 8px; padding: 8px 12px; cursor: pointer;">
+                            ${tunnelOptions}
+                        </select>
+                        <small style="color: #888; font-size: 11px;">Pilih tunnel VPN yang sesuai untuk site ini</small>
+                    </div>
+                </div>
+            `,
+                showCancelButton: true,
+                showDenyButton: true,
+                confirmButtonText: '<i class="bi bi-rocket-takeoff-fill me-1"></i> Remote Otomatis',
+                denyButtonText: '<i class="bi bi-box-arrow-up-right me-1"></i> Buka WebFig',
+                cancelButtonText: 'Tutup',
+                confirmButtonColor: '#198754',
+                denyButtonColor: '#0d6efd',
+                cancelButtonColor: '#6c757d',
+                width: 540,
+                customClass: {
+                    popup: 'rounded-4'
+                },
+                preConfirm: () => {
+                    const tunnelName = document.getElementById('swal-tunnel-name').value.trim();
+                    if (!tunnelName) {
+                        Swal.showValidationMessage('<i class="bi bi-exclamation-triangle me-1"></i> Pilih tunnel WireGuard terlebih dahulu!');
+                        return false;
+                    }
+                    return tunnelName;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.setItem('last_wg_tunnel', result.value);
+                    launchRemote(ip, username, password, result.value, namaSite, siteCode);
+                } else if (result.isDenied) {
+                    window.open('http://' + ip, '_blank');
+                }
+            });
+        }
+
+        function launchRemote(ip, user, pass, tunnelName, siteName, siteCode) {
+            const remoteUrl = `nusa-remote://${tunnelName}___${ip}___${user}___${pass}`;
+            window.location.assign(remoteUrl);
+
+            fetch('/remote-log/store', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    site_name: siteName,
+                    site_code: siteCode || '',
+                    ip_router: ip,
+                    tunnel_name: tunnelName,
+                    source_page: 'close_ticket',
+                    status: 'success'
+                })
+            }).catch(e => console.log('Log remote:', e));
+
+            Swal.fire({
+                icon: 'info',
+                title: 'Remote Berjalan',
+                html: `
+                <div style="font-size: 14px;">
+                    Sedang mengaktifkan VPN <b>${tunnelName}</b> dan membuka WinBox ke <b>${siteName}</b>...
+                </div>
+            `,
+                timer: 5000,
+                showConfirmButton: false,
+                timerProgressBar: true,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                Toast.fire({ icon: 'success', title: 'Berhasil dicopy!' });
+            });
+        }
     </script>
 </body>
 

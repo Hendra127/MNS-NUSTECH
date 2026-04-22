@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     @include('partials.pwa-head')
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
@@ -23,10 +24,12 @@
             --glass-bg: rgba(255, 255, 255, 0.9);
             --premium-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
         }
+
         body {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
         }
+
         .profile-wrapper {
             max-width: 900px;
             margin: 60px auto;
@@ -35,10 +38,19 @@
             gap: 30px;
             animation: fadeIn 0.8s ease-out;
         }
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
+
         /* Left Side: Visual Profile Card */
         .visual-card {
             background: var(--primary-navy);
@@ -53,6 +65,7 @@
             position: relative;
             overflow: hidden;
         }
+
         .visual-card::before {
             content: '';
             position: absolute;
@@ -63,6 +76,7 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 50%;
         }
+
         .visual-card::after {
             content: '';
             position: absolute;
@@ -73,11 +87,13 @@
             background: rgba(255, 255, 255, 0.05);
             border-radius: 50%;
         }
+
         .avatar-container {
             position: relative;
             margin-bottom: 25px;
             z-index: 2;
         }
+
         .profile-photo-preview {
             width: 150px;
             height: 150px;
@@ -87,10 +103,12 @@
             transition: all 0.3s ease;
             cursor: pointer;
         }
+
         .profile-photo-preview:hover {
             border-color: #fff;
             transform: scale(1.03);
         }
+
         .camera-badge {
             position: absolute;
             bottom: 5px;
@@ -103,17 +121,19 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             font-size: 1.2rem;
             cursor: pointer;
             transition: all 0.2s ease;
             z-index: 10;
         }
+
         .camera-badge:hover {
             background: var(--primary-navy);
             color: white;
             transform: scale(1.1);
         }
+
         /* Photo Viewer Overlay */
         .photo-viewer-overlay {
             position: fixed;
@@ -130,10 +150,12 @@
             opacity: 0;
             transition: opacity 0.3s ease;
         }
+
         .photo-viewer-overlay.active {
             display: flex;
             opacity: 1;
         }
+
         .viewer-content {
             position: relative;
             max-width: 90%;
@@ -141,16 +163,19 @@
             transform: scale(0.85);
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+
         .photo-viewer-overlay.active .viewer-content {
             transform: scale(1);
         }
+
         .viewer-image {
             max-width: 100%;
             max-height: 85vh;
             border-radius: 15px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            border: 5px solid rgba(255,255,255,0.1);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            border: 5px solid rgba(255, 255, 255, 0.1);
         }
+
         .close-viewer {
             position: absolute;
             top: -50px;
@@ -160,22 +185,27 @@
             cursor: pointer;
             transition: color 0.2s;
         }
+
         .close-viewer:hover {
             color: #ff4d4d;
         }
+
         .user-info-text {
             z-index: 2;
         }
+
         .user-info-text h4 {
             margin: 0;
             font-weight: 700;
             letter-spacing: 0.5px;
         }
+
         .user-info-text p {
             opacity: 0.8;
             font-size: 0.95rem;
             margin-top: 5px;
         }
+
         /* Right Side: Form Card */
         .settings-card {
             background: var(--glass-bg);
@@ -185,6 +215,7 @@
             box-shadow: var(--premium-shadow);
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
+
         .settings-card h3 {
             color: var(--primary-navy);
             font-weight: 800;
@@ -193,12 +224,15 @@
             align-items: center;
             gap: 12px;
         }
+
         .settings-card h3 i {
             font-size: 1.8rem;
         }
+
         .form-group-modern {
             margin-bottom: 24px;
         }
+
         .form-group-modern label {
             display: block;
             margin-bottom: 8px;
@@ -206,9 +240,11 @@
             color: #55606e;
             font-size: 0.9rem;
         }
+
         .input-wrapper {
             position: relative;
         }
+
         .input-wrapper i {
             position: absolute;
             left: 15px;
@@ -217,6 +253,7 @@
             color: #8a9aaa;
             transition: all 0.3s;
         }
+
         .form-control-modern {
             width: 100%;
             padding: 12px 15px 12px 45px;
@@ -226,15 +263,18 @@
             font-size: 0.95rem;
             transition: all 0.3s ease;
         }
+
         .form-control-modern:focus {
             border-color: var(--primary-navy);
             box-shadow: 0 0 0 4px rgba(15, 59, 86, 0.08);
             outline: none;
             background: #fff;
         }
-        .form-control-modern:focus + i {
+
+        .form-control-modern:focus+i {
             color: var(--primary-navy);
         }
+
         .btn-premium {
             background: var(--primary-navy);
             color: white;
@@ -248,14 +288,17 @@
             width: 100%;
             margin-top: 10px;
         }
+
         .btn-premium:hover {
             transform: translateY(-3px);
             box-shadow: 0 12px 25px rgba(15, 59, 86, 0.3);
             background: #154b6c;
         }
+
         .btn-premium:active {
             transform: translateY(1px);
         }
+
         .back-link {
             display: inline-flex;
             align-items: center;
@@ -266,24 +309,29 @@
             margin-bottom: 30px;
             transition: color 0.3s;
         }
+
         .back-link:hover {
             color: var(--primary-navy);
         }
+
         @media (max-width: 991px) {
             .profile-wrapper {
                 grid-template-columns: 1fr;
                 margin: 40px 20px;
             }
+
             .visual-card {
                 padding: 30px;
             }
         }
     </style>
 </head>
+
 <body>
     <header class="main-header">
         <div class="header-logo-container">
-            <a href="javascript:void(0)" class="header-brand-link" onclick="openNavModal()" style="text-decoration: none !important; color: white !important;">
+            <a href="javascript:void(0)" class="header-brand-link" onclick="openNavModal()"
+                style="text-decoration: none !important; color: white !important;">
                 <div class="header-brand" style="display: flex; align-items: center; gap: 8px; font-weight: bold;">
                     Project <span style="opacity: 0.5;">|</span> Operational
                 </div>
@@ -296,23 +344,31 @@
                 </a>
             @endif
             <div class="user-profile-wrapper" style="position: relative;">
-                <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer; text-decoration: none; color: inherit;">
+                <div class="user-profile-icon" id="profileDropdownTrigger"
+                    style="cursor: pointer; text-decoration: none; color: inherit;">
                     @if(auth()->check() && auth()->user()->photo)
-                        <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                        <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
+                            style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                     @else
                         <i class="bi bi-person-circle" style="font-size: 1.5rem; color: white;"></i>
                     @endif
                 </div>
-                <div id="profileDropdownMenu" class="hidden" style="position: absolute; right: 0; top: 100%; mt: 10px; width: 150px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; display: none; flex-direction: column; overflow: hidden;">
-                    <div style="padding: 10px 15px; border-bottom: 1px solid #eee; font-size: 14px; font-weight: bold; color: #333;">
+                <div id="profileDropdownMenu" class="hidden"
+                    style="position: absolute; right: 0; top: 100%; mt: 10px; width: 150px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; display: none; flex-direction: column; overflow: hidden;">
+                    <div
+                        style="padding: 10px 15px; border-bottom: 1px solid #eee; font-size: 14px; font-weight: bold; color: #333;">
                         {{ auth()->user()->name ?? 'User' }}
                     </div>
-                    <a href="{{ route('profile.edit') }}" style="padding: 10px 15px; text-decoration: none; color: #333; font-size: 14px; display: flex; align-items: center; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#f5f5f5'" onmouseout="this.style.backgroundColor='transparent'">
+                    <a href="{{ route('profile.edit') }}"
+                        style="padding: 10px 15px; text-decoration: none; color: #333; font-size: 14px; display: flex; align-items: center; transition: background 0.2s;"
+                        onmouseover="this.style.backgroundColor='#f5f5f5'"
+                        onmouseout="this.style.backgroundColor='transparent'">
                         <i class="bi bi-person me-2"></i> Profile
                     </a>
                     <form action="{{ route('logout') }}" method="POST" id="logout-form">
                         @csrf
-                        <button type="submit" style="width: 100%; text-align: left; padding: 10px 15px; background: none; border: none; font-size: 14px; color: #dc3545; cursor: pointer;">
+                        <button type="submit"
+                            style="width: 100%; text-align: left; padding: 10px 15px; background: none; border: none; font-size: 14px; color: #dc3545; cursor: pointer;">
                             <i class="bi bi-box-arrow-right"></i> Logout
                         </button>
                     </form>
@@ -326,13 +382,12 @@
             <div class="visual-card">
                 <div class="avatar-container">
                     @if(auth()->user()->photo)
-                        <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" 
-                             alt="Profile Photo" 
-                             class="profile-photo-preview" 
-                             id="photoPreview" 
-                             onclick="openPhotoViewer(this.src)">
+                        <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile Photo"
+                            class="profile-photo-preview" id="photoPreview" onclick="openPhotoViewer(this.src)">
                     @else
-                        <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=random&size=200" alt="Default Avatar" class="profile-photo-preview" id="photoPreview" onclick="openPhotoViewer(this.src)">
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=random&size=200"
+                            alt="Default Avatar" class="profile-photo-preview" id="photoPreview"
+                            onclick="openPhotoViewer(this.src)">
                     @endif
                     <div class="camera-badge" onclick="showPhotoSourceOptions()">
                         <i class="bi bi-camera"></i>
@@ -363,21 +418,26 @@
                         </ul>
                     </div>
                 @endif
-                <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" id="profileForm">
+                <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
-                    <input type="file" name="photo" id="photoInput" style="display: none;" accept="image/jpeg,image/png,image/jpg" onchange="previewImage(this)">
+                    <input type="file" name="photo" id="photoInput" style="display: none;"
+                        accept="image/jpeg,image/png,image/jpg" onchange="previewImage(this)">
                     <div class="form-group-modern">
                         <label>Nama Lengkap</label>
                         <div class="input-wrapper">
-                            <input type="text" name="name" class="form-control-modern" value="{{ old('name', auth()->user()->name) }}" required placeholder="Masukkan nama lengkap">
+                            <input type="text" name="name" class="form-control-modern"
+                                value="{{ old('name', auth()->user()->name) }}" required
+                                placeholder="Masukkan nama lengkap">
                             <i class="bi bi-person"></i>
                         </div>
                     </div>
                     <div class="form-group-modern">
                         <label>Alamat Email</label>
                         <div class="input-wrapper">
-                            <input type="email" name="email" class="form-control-modern" value="{{ old('email', auth()->user()->email) }}" required placeholder="Masukkan email aktif">
+                            <input type="email" name="email" class="form-control-modern"
+                                value="{{ old('email', auth()->user()->email) }}" required
+                                placeholder="Masukkan email aktif">
                             <i class="bi bi-envelope"></i>
                         </div>
                     </div>
@@ -392,7 +452,8 @@
                     <div class="form-group-modern mb-5">
                         <label>Konfirmasi Password Baru</label>
                         <div class="input-wrapper">
-                            <input type="password" name="password_confirmation" class="form-control-modern" placeholder="••••••••">
+                            <input type="password" name="password_confirmation" class="form-control-modern"
+                                placeholder="••••••••">
                             <i class="bi bi-lock-fill"></i>
                         </div>
                     </div>
@@ -416,17 +477,26 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
                 <div class="modal-header border-0 bg-dark text-white p-4">
-                    <h5 class="modal-title fw-bold mb-0 text-center w-100"><i class="bi bi-camera-fill me-2"></i> Ambil Foto Profil</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" onclick="stopCamera()"></button>
+                    <h5 class="modal-title fw-bold mb-0 text-center w-100"><i class="bi bi-camera-fill me-2"></i> Ambil
+                        Foto Profil</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        onclick="stopCamera()"></button>
                 </div>
                 <div class="modal-body p-0 bg-black position-relative" style="aspect-ratio: 1/1; min-height: 320px;">
-                    <video id="cameraStream" autoplay playsinline class="w-100 h-100" style="object-fit: cover;"></video>
+                    <video id="cameraStream" autoplay playsinline class="w-100 h-100"
+                        style="object-fit: cover;"></video>
                     <canvas id="cameraCanvas" style="display: none;"></canvas>
-                    <div id="captureCountdown" class="position-absolute top-50 left-50 translate-middle text-white display-1 fw-bold" style="display: none;"></div>
+                    <div id="captureCountdown"
+                        class="position-absolute top-50 left-50 translate-middle text-white display-1 fw-bold"
+                        style="display: none;"></div>
                 </div>
                 <div class="modal-footer border-0 p-4 bg-white d-flex justify-content-center gap-3">
-                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal" onclick="stopCamera()">Batal</button>
-                    <button type="button" class="btn btn-primary rounded-circle p-0 d-flex align-items-center justify-content-center shadow-lg" id="captureBtn" onclick="takePhoto()" style="width: 70px; height: 70px; font-size: 1.8rem; background: #0f3b56; border: none;">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal"
+                        onclick="stopCamera()">Batal</button>
+                    <button type="button"
+                        class="btn btn-primary rounded-circle p-0 d-flex align-items-center justify-content-center shadow-lg"
+                        id="captureBtn" onclick="takePhoto()"
+                        style="width: 70px; height: 70px; font-size: 1.8rem; background: #0f3b56; border: none;">
                         <i class="bi bi-camera"></i>
                     </button>
                 </div>
@@ -467,9 +537,9 @@
 
         async function startCamera() {
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "user", aspectRatio: 1/1 }, 
-                    audio: false 
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "user", aspectRatio: 1 / 1 },
+                    audio: false
                 });
                 const video = document.getElementById('cameraStream');
                 video.srcObject = stream;
@@ -497,56 +567,45 @@
             const video = document.getElementById('cameraStream');
             const canvas = document.getElementById('cameraCanvas');
             const context = canvas.getContext('2d');
-            
+
             // Set canvas size to match video
             const size = Math.min(video.videoWidth, video.videoHeight);
             canvas.width = size;
             canvas.height = size;
-            
+
             // Center crop to square
             const startX = (video.videoWidth - size) / 2;
             const startY = (video.videoHeight - size) / 2;
-            
+
             context.drawImage(video, startX, startY, size, size, 0, 0, size, size);
-            
+
             // Convert to data URL for preview
             const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
             document.getElementById('photoPreview').src = dataUrl;
-            
+
             // Convert to BLOB and set to Input File
             canvas.toBlob((blob) => {
                 const file = new File([blob], "profile_photo.jpg", { type: "image/jpeg" });
-                
+
                 // Use DataTransfer to set file to input
                 const dataTransfer = new DataTransfer();
                 dataTransfer.items.add(file);
                 document.getElementById('photoInput').files = dataTransfer.files;
-                
+
                 cameraModal.hide();
                 stopCamera();
-                
+
                 // Show success toast
                 const Toast = Swal.mixin({
                     toast: true,
                     position: 'top-end',
                     showConfirmButton: false,
-                    timer: 1500,
+                    timer: 2000,
                     timerProgressBar: true
                 });
                 Toast.fire({
                     icon: 'success',
                     title: 'Foto kamera berhasil diambil'
-                }).then(() => {
-                    // Automatically submit form
-                    Swal.fire({
-                        title: 'Menyimpan Perubahan...',
-                        text: 'Mohon tunggu sebentar',
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
-                    document.getElementById('profileForm').submit();
                 });
             }, 'image/jpeg', 0.9);
         }
@@ -587,27 +646,17 @@
                     return;
                 }
                 var reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     document.getElementById('photoPreview').src = e.target.result;
-                    // Auto submit after file preview
-                    Swal.fire({
-                        title: 'Menyimpan Perubahan...',
-                        text: 'Mohon tunggu sebentar',
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
-                    document.getElementById('profileForm').submit();
                 }
                 reader.readAsDataURL(input.files[0]);
             }
         }
         @if(session('success'))
-            Swal.fire({ 
-                icon: 'success', 
-                title: 'Profil Diperbarui!', 
-                text: "{{ session('success') }}", 
+            Swal.fire({
+                icon: 'success',
+                title: 'Profil Diperbarui!',
+                text: "{{ session('success') }}",
                 background: '#fff',
                 color: '#0f3b56',
                 iconColor: '#0f3b56',
@@ -620,5 +669,5 @@
         @endif
     </script>
 </body>
-</html>
 
+</html>

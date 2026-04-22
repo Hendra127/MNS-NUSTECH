@@ -3,6 +3,9 @@
     const trigger = document.getElementById('profileDropdownTrigger');
     const menu = document.getElementById('profileDropdownMenu');
 
+    // Hentikan jika elemen tidak ada (misal: role superadmin)
+    if (!trigger || !menu) return;
+
     // Toggle dropdown saat ikon diklik
     trigger.addEventListener('click', function(e) {
         e.stopPropagation(); // Mencegah event bubbling

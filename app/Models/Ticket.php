@@ -11,7 +11,7 @@ class Ticket extends Model
     protected $fillable = [
         'site_id',
         'site_code',
-        'kategori','status','durasi','kendala','detail_problem','nama_site',
+        'kategori','status','durasi','kendala','hardware_problem','detail_problem','nama_site',
                 'provinsi',
                 'kabupaten',
                 'tanggal_rekap',

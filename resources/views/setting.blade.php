@@ -115,7 +115,7 @@
         }
 
         [data-bs-theme="dark"] .stat-card:hover {
-            background: rgba(30,35,45, 0.9);
+            background: rgba(30, 35, 45, 0.9);
             border-color: var(--accent-blue);
         }
 
@@ -706,7 +706,6 @@
             color: #cbd5e1;
             background: rgba(0, 0, 0, 0.2);
         }
-
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
 </head>
@@ -728,9 +727,11 @@
                 </a>
             @endif
             <div class="user-profile-wrapper" style="position: relative;">
-                <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer; text-decoration: none; color: inherit;">
+                <div class="user-profile-icon" id="profileDropdownTrigger"
+                    style="cursor: pointer; text-decoration: none; color: inherit;">
                     @if(auth()->user()->photo)
-                        <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                        <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
+                            style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                     @else
                         <i class="bi bi-person-circle" style="font-size: 1.5rem; color: white;"></i>
                     @endif
@@ -811,7 +812,8 @@
 
                     <select name="role" class="select-luxury" onchange="this.form.submit()">
                         <option value="">Role</option>
-                        <option value="superadmin" {{ request('role') == 'superadmin' ? 'selected' : '' }}>Superadmin</option>
+                        <option value="superadmin" {{ request('role') == 'superadmin' ? 'selected' : '' }}>Superadmin
+                        </option>
                         <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
                         <option value="user" {{ request('role') == 'user' ? 'selected' : '' }}>User</option>
                     </select>
@@ -825,8 +827,9 @@
                     </a>
                 </form>
 
-                <button class="btn-filter-luxury ms-2" data-bs-toggle="modal" data-bs-target="#addUserModal" 
-                        title="Tambah User Baru" style="width: 44px; height: 44px; padding: 0 !important; justify-content: center;">
+                <button class="btn-filter-luxury ms-2" data-bs-toggle="modal" data-bs-target="#addUserModal"
+                    title="Tambah User Baru"
+                    style="width: 44px; height: 44px; padding: 0 !important; justify-content: center;">
                     <i class="bi bi-plus-lg" style="font-size: 1.2rem;"></i>
                 </button>
             </div>

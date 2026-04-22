@@ -960,18 +960,28 @@ loadMessages();
 
                     // Update Evidence Row
                     const evidenceEl = document.getElementById('m-evidence');
-                    // Check if evidence exists and looks like a file path (contains a period)
-                    const hasEvidence = data.evidence && 
-                                      data.evidence.trim() !== '' && 
-                                      data.evidence !== 'null' && 
-                                      data.evidence.includes('.');
+                    evidenceEl.innerHTML = '';
+                    
+                    const baseUrl = "{{ asset('storage_public') }}";
+                    let evidenceHtml = '';
 
-                    if (hasEvidence) {
-                        const baseUrl = "{{ asset('storage_public') }}";
-                        evidenceEl.innerHTML = `<a href="javascript:void(0)" onclick="viewEvidence('${baseUrl}/${data.evidence}')" class="text-primary fw-bold" style="text-decoration: none;"><i class="ph ph-eye"></i> ADA (Klik untuk lihat)</a>`;
+                    // 1. Cek Multiple evidence (Relasi)
+                    if (data.evidences && data.evidences.length > 0) {
+                        data.evidences.forEach((ev, idx) => {
+                            evidenceHtml += `
+                                <a href="javascript:void(0)" onclick="viewEvidence('${baseUrl}/${ev.path}')" class="text-primary fw-bold me-2" style="text-decoration: none; font-size: 0.85rem;">
+                                    <i class="ph ph-eye"></i> Bukti #${idx + 1}
+                                </a>`;
+                        });
+                    } 
+                    // 2. Fallback ke evidence utama (kolom lama)
+                    else if (data.evidence && data.evidence.includes('.')) {
+                        evidenceHtml = `<a href="javascript:void(0)" onclick="viewEvidence('${baseUrl}/${data.evidence}')" class="text-primary fw-bold" style="text-decoration: none; font-size: 0.85rem;"><i class="ph ph-eye"></i> ADA (Klik untuk lihat)</a>`;
                     } else {
-                        evidenceEl.innerText = 'TIDAK ADA';
+                        evidenceHtml = '<span class="text-muted">TIDAK ADA</span>';
                     }
+
+                    evidenceEl.innerHTML = evidenceHtml;
 
                     // Render Map
                     setTimeout(() => {
@@ -1389,8 +1399,55 @@ document.addEventListener('DOMContentLoaded', function() {
             border-color: #3498db !important;
             transform: translateY(-2px);
         }
+        .viewer-modal-content {
+            background: rgba(0,0,0,0.85);
+            max-width: 95vw;
+            max-height: 95vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            border: none;
+            box-shadow: none;
+        }
+        .viewer-modal-content img, .viewer-modal-content video {
+            max-width: 90vw;
+            max-height: 85vh;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
     `;
     document.head.appendChild(styleSheet);
+
+    function viewEvidence(url) {
+        const modal = document.getElementById('viewerEvidenceModal');
+        const container = document.getElementById('viewerEvidenceContainer');
+        const ext = url.split('.').pop().toLowerCase();
+        const videoExts = ['mp4', 'mov', 'avi', 'webm'];
+
+        container.innerHTML = '';
+        if (videoExts.includes(ext)) {
+            container.innerHTML = `<video src="${url}" controls autoplay></video>`;
+        } else {
+            container.innerHTML = `<img src="${url}" alt="Evidence">`;
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    function closeViewerModal() {
+        document.getElementById('viewerEvidenceModal').style.display = 'none';
+        document.getElementById('viewerEvidenceContainer').innerHTML = '';
+    }
 </script>
+
+<!-- Modal Viewer Evidence Custom -->
+<div id="viewerEvidenceModal" class="custom-modal" onclick="closeViewerModal()" style="display:none; z-index: 10001;">
+    <span class="close-modal" onclick="closeViewerModal()" style="color: #fff; top: 20px; right: 30px; font-size: 40px;">&times;</span>
+    <div class="modal-content viewer-modal-content" onclick="event.stopPropagation()">
+        <div id="viewerEvidenceContainer"></div>
+    </div>
+</div>
+
 </body>
 </html>

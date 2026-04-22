@@ -181,7 +181,7 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-3">
-            @if(auth()->check() && auth()->user()->role === 'superadmin')
+            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                 <a href="{{ route('setting.index') }}" class="text-white opacity-75 hover-opacity-100" title="Settings">
                     <i class="bi bi-gear-fill" style="font-size: 1.3rem;"></i>
                 </a>
@@ -235,8 +235,10 @@
             style="text-decoration: none;">All Sites</a>
         <a href="{{ route('datapas') }}" class="tab {{ request()->is('datapass*') ? 'active' : '' }}"
             style="text-decoration: none;">Management Password</a>
-        <a href="{{ route('laporancm') }}" class="tab {{ request()->is('laporancm*') ? 'active' : '' }}"
-            style="text-decoration: none;">Correctiv Maintenance</a>
+        @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+            <a href="{{ route('laporancm') }}" class="tab {{ request()->is('laporancm*') ? 'active' : '' }}"
+                style="text-decoration: none;">Correctiv Maintenance</a>
+        @endif
         <a href="{{ route('pmliberta') }}" class="tab {{ request()->is('PMLiberta*') ? 'active' : '' }}"
             style="text-decoration: none;">Preventive Maintenance</a>
         <a href="{{ route('summarypm') }}" class="tab {{ request()->is('summarypm*') ? 'active' : '' }}"
@@ -357,6 +359,8 @@
                         <th>EXPECTED SQF</th>
                         @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                             <th class="col-sticky-right col-aksi">AKSI</th>
+                        @elseif(auth()->check() && auth()->user()->role === 'user')
+                            <th class="col-sticky-right col-aksi">INFO</th>
                         @endif
                     </tr>
                 </thead>
@@ -416,6 +420,12 @@
                                                 </button>
                                             </form>
                                     </div>
+                                </td>
+                            @elseif(auth()->check() && auth()->user()->role === 'user')
+                                <td class="col-sticky-right col-aksi text-center">
+                                    <button type="button" class="btn btn-sm bi bi-info-circle"
+                                        onclick="viewSiteInfo({{ $site->toJson() }})" title="Info Site">
+                                    </button>
                                 </td>
                             @endif
                         </tr>
@@ -646,6 +656,36 @@
             }
 
             $('#modalSite').modal('show');
+        }
+
+        // Fungsi Info (read-only) untuk role user
+        function viewSiteInfo(data) {
+            Swal.fire({
+                title: '<i class="bi bi-info-circle-fill" style="color:#0d6efd;"></i> Info Site',
+                html: `
+                    <div style="text-align:left; font-size:13px; line-height:1.9;">
+                        <table style="width:100%; border-collapse:collapse;">
+                            <tr><td style="color:#888; width:130px;">Site ID</td><td><b>${data.site_id}</b></td></tr>
+                            <tr><td style="color:#888;">Site Name</td><td>${data.sitename || '-'}</td></tr>
+                            <tr><td style="color:#888;">Tipe</td><td>${data.tipe || '-'}</td></tr>
+                            <tr><td style="color:#888;">Batch</td><td>${data.batch || '-'}</td></tr>
+                            <tr><td style="color:#888;">Provinsi</td><td>${data.provinsi || '-'}</td></tr>
+                            <tr><td style="color:#888;">Kabupaten</td><td>${data.kab || '-'}</td></tr>
+                            <tr><td style="color:#888;">Kecamatan</td><td>${data.kecamatan || '-'}</td></tr>
+                            <tr><td style="color:#888;">Nama PIC</td><td>${data.nama_pic || '-'}</td></tr>
+                            <tr><td style="color:#888;">Nomor PIC</td><td>${data.nomor_pic || '-'}</td></tr>
+                            <tr><td style="color:#888;">Gateway Area</td><td>${data.gateway_area || '-'}</td></tr>
+                            <tr><td style="color:#888;">Hub</td><td>${data.hub || '-'}</td></tr>
+                            <tr><td style="color:#888;">IP Router</td><td><code>${data.ip_router || '-'}</code></td></tr>
+                            <tr><td style="color:#888;">IP AP1</td><td><code>${data.ip_ap1 || '-'}</code></td></tr>
+                            <tr><td style="color:#888;">IP AP2</td><td><code>${data.ip_ap2 || '-'}</code></td></tr>
+                        </table>
+                    </div>`,
+                confirmButtonText: 'Tutup',
+                confirmButtonColor: '#0d6efd',
+                customClass: { popup: 'rounded-4' },
+                width: 520
+            });
         }
     </script>
     {{-- Script untuk konfirmasi hapus dengan SweetAlert --}}

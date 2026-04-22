@@ -110,6 +110,7 @@ class OpenTicketController extends Controller
             'durasi'         => 'nullable|numeric',
             'durasi_akhir'   => 'nullable|numeric',
             'kendala'        => 'nullable|string',
+            'hardware_problem' => 'nullable|array',
             'detail_problem' => 'required|string',
             'status'         => 'required|string',
             'plan_actions'    => 'nullable|string',
@@ -128,6 +129,11 @@ class OpenTicketController extends Controller
             return redirect()->back()
                 ->withInput()
                 ->with('error', "Gagal! Tiket untuk Site {$request->nama_site} sudah ada dan masih berstatus OPEN.");
+        }
+
+        // Process hardware_problem array to string
+        if (isset($data['hardware_problem']) && is_array($data['hardware_problem'])) {
+            $data['hardware_problem'] = implode(',', $data['hardware_problem']);
         }
 
         // Handle File Upload (Support Multiple)
@@ -176,6 +182,7 @@ class OpenTicketController extends Controller
             'kategori'       => 'required',
             'tanggal_rekap'  => 'required|date',
             'kendala'        => 'required',
+            'hardware_problem' => 'nullable|array',
             'detail_problem' => 'required',
             'plan_actions'    => 'required',
             'ce'             => 'required',
@@ -189,6 +196,13 @@ class OpenTicketController extends Controller
         $ticket->kategori       = $request->kategori;
         $ticket->tanggal_rekap  = $request->tanggal_rekap;
         $ticket->kendala        = $request->kendala;
+        
+        if ($request->has('hardware_problem')) {
+            $ticket->hardware_problem = is_array($request->hardware_problem) ? implode(',', $request->hardware_problem) : $request->hardware_problem;
+        } else {
+            $ticket->hardware_problem = null;
+        }
+
         $ticket->detail_problem = $request->detail_problem;
         $ticket->plan_actions    = $request->plan_actions;
         $ticket->ce             = $request->ce;

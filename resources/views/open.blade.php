@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}?v=1.1">
     <script src="{{ asset('js/nav-modal.js') }}"></script>
     <script src="{{ asset('js/profile-dropdown.js') }}"></script>
-    @include('components.nav-modal-structure')
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Open Ticket | Project Operational</title>
@@ -186,13 +185,88 @@
             color: #ccc !important;
             opacity: 0.5;
         }
+
+        /* --- Hardware Chip & Unified Textarea --- */
+        .hw-chip-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px;
+            border: 1px solid #dee2e6;
+            border-bottom: none;
+            background: #fdfdfd;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            min-height: 50px;
+            align-items: center;
+        }
+
+        .hw-chip {
+            display: inline-flex;
+            align-items: center;
+            background-color: #0d6efd;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            gap: 10px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2);
+            text-transform: uppercase;
+        }
+
+        .hw-chip i.bi-cpu {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .hw-chip .btn-close-chip {
+            cursor: pointer;
+            font-size: 16px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .hw-chip .btn-close-chip:hover {
+            opacity: 1;
+        }
+
+        .textarea-unified {
+            border-top-left-radius: 0 !important;
+            border-top-right-radius: 0 !important;
+            border-color: #dee2e6 !important;
+            box-shadow: none !important;
+            resize: none;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Modal Uniform Styling */
+        .modal-content {
+            color: #000 !important;
+        }
+        .modal-content label {
+            color: #000 !important;
+            font-weight: 700 !important; /* Bold */
+        }
+        .modal-content .form-control, 
+        .modal-content .form-select,
+        .modal-content .text-muted,
+        .modal-content .empty-chips-msg {
+            color: #000 !important;
+        }
+        .modal-header .modal-title {
+            font-weight: 800 !important;
+        }
     </style>
 </head>
 
 <body>
+    @include('components.nav-modal-structure')
     <header class="main-header">
         <div class="header-logo-container">
-            <a href="{{ route('landingpage') }}" class="header-brand-link"
+            <a href="javascript:void(0)" onclick="openNavModal()" class="header-brand-link"
                 style="text-decoration: none !important; color: white !important;">
                 <div class="header-brand" style="display: flex; align-items: center; gap: 8px; font-weight: bold;">
                     Project <span style="opacity: 0.5;">|</span> Operational
@@ -200,13 +274,13 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-3">
-            @if(auth()->check() && auth()->user()->role === 'superadmin')
+            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                 <a href="{{ route('setting.index') }}" class="text-white opacity-75 hover-opacity-100" title="Settings">
                     <i class="bi bi-gear-fill" style="font-size: 1.3rem;"></i>
                 </a>
             @endif
             <div class="user-profile-wrapper" style="position: relative;">
-                @if(auth()->check() && auth()->user()->role === 'superadmin')
+                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                     <a href="{{ route('setting.index') }}" class="user-profile-icon" title="Setting User"
                         style="cursor: pointer; text-decoration: none; color: inherit;">
                         @if(auth()->user()->photo)
@@ -396,6 +470,8 @@
                             <th>CE</th>
                             @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                                 <th class="sticky-col-right">AKSI</th>
+                            @elseif(auth()->check() && auth()->user()->role === 'user')
+                                <th class="sticky-col-right">INFO</th>
                             @endif
                         </tr>
                     </thead>
@@ -456,10 +532,16 @@
                                         </button>
                                         @if($t->site && $t->site->ip_router && in_array(auth()->user()->role ?? '', ['admin', 'superadmin']))
                                             <button type="button" class="btn btn-sm btn-remote-action" title="Remote Mikrotik"
-                                                onclick="remoteMikrotik('{{ $t->site->ip_router }}', '{{ $t->kategori }}', '{{ $t->nama_site }}', '{{ $t->site_code }}')">
+                                                onclick="remoteMikrotik('{{ $t->site->ip_router }}', '{{ $t->kategori }}', '{{ $t->nama_site }}', '{{ $t->site_code }}', '{{ $t->site->gateway_area }}', '{{ $t->site->hub }}')">
                                                 <i class="bi bi-broadcast"></i>
                                             </button>
                                         @endif
+                                    </td>
+                                @elseif(auth()->check() && auth()->user()->role === 'user')
+                                    <td class="text-center sticky-col-right">
+                                        <button type="button" class="btn btn-sm bi bi-info-circle" data-bs-toggle="modal"
+                                            data-bs-target="#modalInfo{{ $t->id }}">
+                                        </button>
                                     </td>
                                 @endif
                             </tr>
@@ -489,7 +571,7 @@
                                     <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
                                         data-bs-dismiss="modal"></button>
                                 </div>
-                                <div class="modal-body p-4">
+                                <div class="modal-body p-3">
                                     <div class="row g-3">
                                         <div class="col-md-4">
                                             <label class="form-label fw-bold">Site ID / Code</label>
@@ -535,7 +617,7 @@
                                                 value="{{ $t->tanggal_rekap }}" required>
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label fw-bold">Kendala</label>
+                                            <label class="form-label fw-bold">Problem</label>
                                             @php $kendalaOpts = ['PERANGKAT TIDAK ADA INTERNET', 'INTERNET TIDAK BISA DIGUNAKAN', 'PASSWORD SALAH', 'PERANGKAT INTERNET RUSAK']; @endphp
                                             <select name="kendala" class="form-select" required>
                                                 <option value="">-- Pilih Kendala --</option>
@@ -550,56 +632,44 @@
                                             </select>
                                         </div>
                                         <div class="row mt-3">
-                                            <div class="col-md-7">
-                                                <label class="form-label fw-bold text-dark mb-2">Hardware & Deskripsi Masalah</label>
-                                                <div id="hw-list-container-{{ $t->id }}">
-                                                    @php 
-                                                        $details = json_decode($t->detail_problem ?? '{}', true);
-                                                        if (json_last_error() !== JSON_ERROR_NONE || !is_array($details)) {
-                                                            $hwArray = explode(',', $t->hardware_problem ?? '');
-                                                            $details = [];
-                                                            foreach($hwArray as $hx) if(!empty($hx)) $details[$hx] = $t->detail_problem;
-                                                        }
-                                                    @endphp
-
-                                                    @if(empty($details))
-                                                        <div class="hw-row-unified mb-2" id="hw-row-{{ $t->id }}-initial">
-                                                            <div class="row g-2 align-items-stretch">
-                                                                <div class="col-md-10">
-                                                                    <select class="form-select" onchange="renderHardwareRow('{{ $t->id }}', this.value, '', 'hw-row-{{ $t->id }}-initial')"
-                                                                        style="font-size: 0.9rem; border-color: #dee2e6 !important; height: 38px;">
-                                                                        <option value="">-- Pilih Perangkat --</option>
-                                                                        @foreach(['MODEM', 'ROUTER', 'AP1', 'AP2', 'TRANSCEIVER', 'STAVOLT', 'LAIN LAIN'] as $opt)
-                                                                            <option value="{{ $opt }}">{{ $opt }}</option>
-                                                                        @endforeach
-                                                                    </select>
-                                                                </div>
-                                                                <div class="col-md-2 d-flex gap-1 justify-content-start align-items-center">
-                                                                    <button type="button" class="btn btn-outline-danger btn-sm rounded-circle p-0" 
-                                                                        style="width: 24px; height: 24px;" 
-                                                                        onclick="removeHwRow('hw-row-{{ $t->id }}-initial', '{{ $t->id }}')">
-                                                                        <i class="bi bi-x"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    @else
-                                                        @foreach($details as $hw => $desc)
-                                                            @if(!empty($hw))
-                                                                <script>
-                                                                    document.addEventListener('DOMContentLoaded', function() {
-                                                                        renderHardwareRow('{{ $t->id }}', '{{ $hw }}', `{!! addslashes($desc) !!}`);
-                                                                    });
-                                                                </script>
-                                                            @endif
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold text-dark mb-2">Detail Problem</label>
+                                                
+                                                {{-- Selector Perangkat --}}
+                                                <div class="mb-0">
+                                                    <select class="form-select form-select-sm" onchange="addHardwareChip('{{ $t->id }}', this.value); this.value='';"
+                                                        style="border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-color: #dee2e6 !important; background-color: #fff;">
+                                                        <option value="">-- Pilih Perangkat Yang Bermasalah --</option>
+                                                        @foreach(['MODEM', 'ROUTER', 'AP1', 'AP2', 'TRANSCEIVER', 'STAVOLT', 'RAK', 'ANTENA', 'LAIN LAIN'] as $opt)
+                                                            <option value="{{ $opt }}">{{ $opt }}</option>
                                                         @endforeach
-                                                    @endif
+                                                    </select>
                                                 </div>
+
+                                                {{-- Container Chips --}}
+                                                <div id="hw-chips-{{ $t->id }}" class="hw-chip-container">
+                                                    @php 
+                                                        $hwArr = array_filter(explode(',', $t->hardware_problem ?? ''));
+                                                    @endphp
+                                                    @foreach($hwArr as $item)
+                                                        <div class="hw-chip" data-value="{{ $item }}">
+                                                            <i class="bi bi-cpu"></i> {{ $item }}
+                                                            <span class="btn-close-chip" onclick="removeHardwareChip('{{ $t->id }}', '{{ $item }}')">×</span>
+                                                            <input type="hidden" name="hardware_problem[]" value="{{ $item }}">
+                                                        </div>
+                                                    @endforeach
+                                                    <div class="empty-chips-msg text-muted small {{ count($hwArr) > 0 ? 'd-none' : '' }}">Belum ada perangkat terpilih</div>
+                                                </div>
+
+                                                {{-- Unified Textarea --}}
+                                                <textarea name="detail_problem" class="form-control textarea-unified" rows="5" required 
+                                                    placeholder="Tulis detail deskripsi masalah di sini...">{{ $t->detail_problem }}</textarea>
                                             </div>
-                                            <div class="col-md-5">
+                                            <div class="col-md-6">
                                                 <label class="form-label fw-bold text-dark mb-2">Action Plan</label>
-                                                <textarea name="plan_actions" class="form-control" rows="5" required 
-                                                    style="border-color: #dee2e6 !important; box-shadow: none;">{{ $t->plan_actions }}</textarea>
+                                                <textarea name="plan_actions" class="form-control" rows="8" required 
+                                                    placeholder="Jelaskan detail action plan..."
+                                                    style="border-color: #dee2e6 !important; box-shadow: none; border-radius: 8px;">{{ $t->plan_actions }}</textarea>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
@@ -622,13 +692,13 @@
                                                 @if($t->evidences->count() > 0)
                                                     @foreach($t->evidences as $ev)
                                                         <div class="position-relative">
-                                                            <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage/' . $ev->path) }}')" class="badge bg-info text-white text-decoration-none">
+                                                            <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage_public/' . $ev->path) }}')" class="badge bg-info text-white text-decoration-none">
                                                                 <i class="bi bi-paperclip"></i> Bukti #{{ $loop->iteration }}
                                                             </a>
                                                         </div>
                                                     @endforeach
                                                 @elseif($t->evidence && str_contains($t->evidence, '.'))
-                                                    <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage/' . $t->evidence) }}')" class="badge bg-secondary text-white text-decoration-none">
+                                                    <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage_public/' . $t->evidence) }}')" class="badge bg-secondary text-white text-decoration-none">
                                                         <i class="bi bi-paperclip"></i> Bukti Lama
                                                     </a>
                                                 @else
@@ -664,7 +734,7 @@
                                         class="btn-close btn-close-white position-absolute top-50 end-0 translate-middle-y me-3"
                                         data-bs-dismiss="modal"></button>
                                 </div>
-                                <div class="modal-body p-4">
+                                <div class="modal-body p-3">
                                     <div class="mb-3">
                                         <label class="form-label fw-bold">Tanggal Close</label>
                                         <input type="date" name="tanggal_close" class="form-control"
@@ -694,7 +764,7 @@
                         aria-hidden="true">
                         <div class="modal-dialog modal-xl modal-dialog-centered">
                             <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                                <div class="modal-header border-0 p-4 d-flex align-items-center justify-content-between"
+                                <div class="modal-header border-0 p-3 d-flex align-items-center justify-content-between"
                                     style="background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);">
                                     <div class="d-flex align-items-center gap-3">
                                         <div class="bg-white bg-opacity-25 p-2 rounded-circle">
@@ -710,10 +780,10 @@
                                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                         aria-label="Close"></button>
                                 </div>
-                                <div class="modal-body p-4 bg-white">
+                                <div class="modal-body p-3 bg-white">
                                     <div class="row g-4">
                                         <div class="col-md-6">
-                                            <div class="bg-light p-3 rounded-4 shadow-sm h-100">
+                                            <div class="bg-light p-2 rounded-3 shadow-sm h-100">
                                                 <h6 class="fw-bold text-primary mb-3 d-flex align-items-center gap-2"><i
                                                         class="bi bi-geo-alt-fill"></i> Lokasi &amp; Identitas</h6>
                                                 <div class="d-flex flex-column gap-2">
@@ -737,7 +807,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <div class="bg-light p-3 rounded-4 shadow-sm h-100">
+                                            <div class="bg-light p-2 rounded-3 shadow-sm h-100">
                                                 <h6 class="fw-bold text-success mb-3 d-flex align-items-center gap-2"><i
                                                         class="bi bi-clock-history"></i> Progres &amp; Waktu</h6>
                                                 <div class="d-flex flex-column gap-2">
@@ -769,18 +839,18 @@
                                             </div>
                                         </div>
                                         <div class="col-12">
-                                            <div class="bg-light p-3 rounded-4 shadow-sm">
+                                            <div class="bg-light p-2 rounded-3 shadow-sm">
                                                 <h6 class="fw-bold text-danger mb-3 d-flex align-items-center gap-2"><i
                                                         class="bi bi-exclamation-triangle-fill"></i> Detail Teknis</h6>
                                                 <div class="row g-3">
                                                     <div class="col-md-6">
-                                                        <div class="p-3 bg-white rounded-3 h-100 border text-center">
+                                                        <div class="p-2 bg-white rounded-3 h-100 border text-center">
                                                             <div class="text-muted small fw-bold mb-1">KENDALA UTAMA</div>
                                                             <p class="mb-0 fw-semibold text-dark">{{ $t->kendala }}</p>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <div class="p-3 bg-white rounded-3 h-100 border text-center">
+                                                        <div class="p-2 bg-white rounded-3 h-100 border text-center">
                                                             <div class="text-muted small fw-bold mb-1">PERANGKAT BERMASALAH</div>
                                                             <div class="d-flex flex-wrap justify-content-center gap-1 mt-1">
                                                                 @foreach(explode(',', $t->hardware_problem ?? '') as $hw)
@@ -790,17 +860,17 @@
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <div class="p-3 bg-white rounded-3 h-100 border">
+                                                        <div class="p-2 bg-white rounded-3 h-100 border">
                                                             <div class="text-muted small fw-bold mb-1">EVIDENCE (BUKTI)</div>
                                                             <div class="d-flex flex-column gap-1">
                                                                 @if($t->evidences->count() > 0)
                                                                     @foreach($t->evidences as $ev)
-                                                                        <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage/' . $ev->path) }}')" class="text-primary text-decoration-none small">
+                                                                        <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage_public/' . $ev->path) }}')" class="text-primary text-decoration-none small">
                                                                             <i class="bi bi-eye"></i> Lihat Bukti #{{ $loop->iteration }}
                                                                         </a>
                                                                     @endforeach
                                                                 @elseif($t->evidence && str_contains($t->evidence, '.'))
-                                                                     <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage/' . $t->evidence) }}')" class="text-primary text-decoration-none small">
+                                                                     <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage_public/' . $t->evidence) }}')" class="text-primary text-decoration-none small">
                                                                         <i class="bi bi-eye"></i> Lihat Bukti Utama
                                                                     </a>
                                                                 @else
@@ -827,7 +897,7 @@
                                                                 @endforeach
                                                             </div>
                                                         </div>
-                                                        <div class="p-3 rounded-3"
+                                                        <div class="p-2 rounded-3"
                                                             style="background-color: #f0f7ff; border-left: 4px solid #3a7bd5;">
                                                             <div class="text-primary small fw-bold mb-1">PLAN ACTION /
                                                                 TINDAKAN</div>
@@ -840,10 +910,10 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="modal-footer border-0 p-4 bg-white d-flex justify-content-between">
+                                <div class="modal-footer border-0 p-3 bg-white d-flex justify-content-between">
                                     @if($t->site && $t->site->ip_router && in_array(auth()->user()->role ?? '', ['admin', 'superadmin']))
                                         <button type="button" class="btn btn-outline-primary px-4 rounded-pill shadow-sm"
-                                            onclick="remoteMikrotik('{{ $t->site->ip_router }}', '{{ $t->kategori }}', '{{ $t->nama_site }}', '{{ $t->site_code }}')">
+                                            onclick="remoteMikrotik('{{ $t->site->ip_router }}', '{{ $t->kategori }}', '{{ $t->nama_site }}', '{{ $t->site_code }}', '{{ $t->site->gateway_area }}', '{{ $t->site->hub }}')">
                                             <i class="bi bi-broadcast me-2"></i>Remote Mikrotik
                                         </button>
                                     @else
@@ -933,7 +1003,7 @@
                                 readonly>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">Kendala</label>
+                            <label class="form-label fw-bold">Problem</label>
                             <select name="kendala" class="form-select" required>
                                 <option value="">-- Pilih Kendala --</option>
                                 <option value="PERANGKAT TIDAK ADA INTERNET">PERANGKAT TIDAK ADA INTERNET</option>
@@ -943,37 +1013,34 @@
                             </select>
                         </div>
                         <div class="row mt-3">
-                            <div class="col-md-7">
-                                <label class="form-label fw-bold text-dark mb-2">Hardware & Deskripsi Masalah</label>
-                                <div id="hw-list-container-main">
-                                    {{-- Baris Pertama Default --}}
-                                    <div class="hw-row-unified mb-2" id="hw-row-main-initial">
-                                        <div class="row g-2 align-items-stretch">
-                                            <div class="col-md-10">
-                                                <select class="form-select" onchange="renderHardwareRow('main', this.value, '', 'hw-row-main-initial')"
-                                                    style="font-size: 0.9rem; border-color: #dee2e6 !important; height: 38px;">
-                                                    <option value="">-- Pilih Perangkat --</option>
-                                                    @foreach(['MODEM', 'ROUTER', 'AP1', 'AP2', 'TRANSCEIVER', 'STAVOLT', 'LAIN LAIN'] as $opt)
-                                                        <option value="{{ $opt }}">{{ $opt }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="col-md-2 d-flex gap-1 justify-content-start align-items-center">
-                                                <button type="button" class="btn btn-outline-danger btn-sm rounded-circle p-0 d-none" 
-                                                    style="width: 24px; height: 24px;" 
-                                                    onclick="removeHwRow('hw-row-main-initial', 'main')">
-                                                    <i class="bi bi-x"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-dark mb-2">Detail Problem</label>
+                                
+                                {{-- Selector Perangkat --}}
+                                <div class="mb-0">
+                                    <select class="form-select form-select-sm" onchange="addHardwareChip('tambah', this.value); this.value='';"
+                                        style="border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-color: #dee2e6 !important; background-color: #fff;">
+                                        <option value="">-- Pilih Perangkat Yang Bermasalah --</option>
+                                        @foreach(['MODEM', 'ROUTER', 'AP1', 'AP2', 'TRANSCEIVER', 'STAVOLT', 'RAK', 'ANTENA', 'LAIN LAIN'] as $opt)
+                                            <option value="{{ $opt }}">{{ $opt }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
+
+                                {{-- Container Chips --}}
+                                <div id="hw-chips-tambah" class="hw-chip-container">
+                                    <div class="empty-chips-msg text-muted small">Belum ada perangkat terpilih</div>
+                                </div>
+
+                                {{-- Unified Textarea --}}
+                                <textarea name="detail_problem" class="form-control textarea-unified" rows="5" required 
+                                    placeholder="Tulis detail deskripsi masalah di sini..."></textarea>
                             </div>
-                            <div class="col-md-5">
+                            <div class="col-md-6">
                                 <label class="form-label fw-bold text-dark mb-2">Action Plan</label>
-                                <textarea name="plan_actions" class="form-control" rows="5" required
+                                <textarea name="plan_actions" class="form-control" rows="8" required
                                     placeholder="Jelaskan detail action plan..."
-                                    style="border-color: #dee2e6 !important; box-shadow: none;"></textarea>
+                                    style="border-color: #dee2e6 !important; box-shadow: none; border-radius: 8px;"></textarea>
                             </div>
                         </div>
 
@@ -1009,7 +1076,7 @@
         // Daftar tunnel WireGuard dari config/wireguard.php
         const wgTunnels = @json($wgTunnels ?? []);
 
-        function remoteMikrotik(ip, kategori, namaSite, siteCode) {
+        function remoteMikrotik(ip, kategori, namaSite, siteCode, gateway, hub) {
             // Tentukan kredensial berdasarkan kategori/tipe
             let username = 'admin';
             let password = 'SLAPRO2024'; // Default SL
@@ -1048,6 +1115,16 @@
                             <td style="padding: 8px 0; color: #666; width: 120px;"><i class="bi bi-globe2 me-2"></i>IP Router</td>
                             <td style="padding: 8px 0; font-weight: 700; font-family: monospace; font-size: 15px; color: #0d6efd;">${ip}</td>
                             <td style="padding: 8px 0; width: 30px;"><button class="btn btn-sm btn-outline-primary" onclick="copyText('${ip}')" title="Copy IP"><i class="bi bi-clipboard"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; color: #666;"><i class="bi bi-hdd-network me-2"></i>HUB</td>
+                            <td style="padding: 8px 0; font-weight: 600;">${hub || '-'}</td>
+                            <td style="padding: 8px 0;"><button class="btn btn-sm btn-outline-primary" onclick="copyText('${hub || ''}')" title="Copy HUB"><i class="bi bi-clipboard"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; color: #666;"><i class="bi bi-door-open me-2"></i>Gateway</td>
+                            <td style="padding: 8px 0; font-weight: 600;">${gateway || '-'}</td>
+                            <td style="padding: 8px 0;"><button class="btn btn-sm btn-outline-primary" onclick="copyText('${gateway || ''}')" title="Copy Gateway"><i class="bi bi-clipboard"></i></button></td>
                         </tr>
                         <tr>
                             <td style="padding: 8px 0; color: #666;"><i class="bi bi-person-fill me-2"></i>Username</td>
@@ -1340,74 +1417,38 @@
                 $('#kategori').val(kategoriSingkat);
             });
 
-            // 3. Hardware Row Management (Unified Dynamic Rows)
-            window.renderHardwareRow = function(modalId, hwValue = '', hwDesc = '', explicitId = null) {
-                let container = $(`#hw-list-container-${modalId}`);
-                let isUpdate = explicitId !== null;
-                let rowId = explicitId || ('hw-row-' + modalId + '-' + Math.random().toString(36).substring(7));
+            // --- NEW: Hardware Chips Logic ---
+            window.addHardwareChip = function(modalId, device) {
+                if (!device) return;
+                const container = $(`#hw-chips-${modalId}`);
                 
-                let isSelected = hwValue !== '';
-                
-                let html = `
-                    <div class="hw-row-unified mb-2 animate__animated animate__fadeIn" id="${rowId}" data-hw="${hwValue}">
-                        <div class="row g-2 align-items-stretch">
-                            <div class="${isSelected ? 'col-md-3' : 'col-md-10'}">
-                                ${isSelected ? 
-                                    `<div class="border rounded-3 bg-light fw-bold text-dark d-flex align-items-center justify-content-center shadow-none" 
-                                        style="font-size: 0.9rem; border-color: #dee2e6 !important; height: 38px;">
-                                        ${hwValue.toUpperCase()}
-                                        <input type="hidden" name="hardware_problem[]" value="${hwValue}">
-                                    </div>` :
-                                    `<select class="form-select" onchange="renderHardwareRow('${modalId}', this.value, '', '${rowId}')" 
-                                        style="font-size: 0.9rem; border-color: #dee2e6 !important; height: 38px;">
-                                        <option value="">-- Pilih Perangkat --</option>
-                                        <option value="MODEM">MODEM</option>
-                                        <option value="ROUTER">ROUTER</option>
-                                        <option value="AP1">AP1</option>
-                                        <option value="AP2">AP2</option>
-                                        <option value="TRANSCEIVER">TRANSCEIVER</option>
-                                        <option value="STAVOLT">STAVOLT</option>
-                                        <option value="LAIN LAIN">LAIN LAIN</option>
-                                    </select>`
-                                }
-                            </div>
-                            <div class="col-md-7 ${isSelected ? '' : 'd-none'}">
-                                <textarea name="hw_details[]" class="form-control" 
-                                    rows="1" placeholder="Detail kendala..." 
-                                    style="font-size: 0.9rem; resize: none; border-color: #dee2e6 !important; box-shadow: none; height: 38px; line-height: 1.5; padding-top: 5px;">${hwDesc}</textarea>
-                            </div>
-                            <div class="col-md-2 d-flex gap-1 justify-content-start align-items-center">
-                                <button type="button" class="btn btn-primary btn-sm rounded-circle p-0 ${isSelected ? '' : 'd-none'}" 
-                                    style="width: 24px; height: 24px;" onclick="renderHardwareRow('${modalId}')" title="Tambah Perangkat Lain">
-                                    <i class="bi bi-plus" style="font-size: 0.9rem;"></i>
-                                </button>
-                                <button type="button" class="btn btn-outline-danger btn-sm rounded-circle p-0 ${isSelected ? '' : 'd-none'}" 
-                                    style="width: 24px; height: 24px;" onclick="removeHwRow('${rowId}', '${modalId}')" title="Hapus Baris">
-                                    <i class="bi bi-x" style="font-size: 0.9rem;"></i>
-                                </button>
-                            </div>
-                        </div>
+                // Prevent duplication
+                if (container.find(`.hw-chip[data-value="${device}"]`).length > 0) return;
+
+                const chipHtml = `
+                    <div class="hw-chip animate__animated animate__zoomIn animate__faster" data-value="${device}">
+                        <i class="bi bi-cpu"></i> ${device}
+                        <span class="btn-close-chip" onclick="removeHardwareChip('${modalId}', '${device}')">×</span>
+                        <input type="hidden" name="hardware_problem[]" value="${device}">
                     </div>
                 `;
 
-                if (isSelected && isUpdate) {
-                    $(`#${rowId}`).replaceWith(html);
-                } else {
-                    container.append(html);
+                container.find('.empty-chips-msg').addClass('d-none');
+                container.append(chipHtml);
+            };
+
+            window.removeHardwareChip = function(modalId, device) {
+                const container = $(`#hw-chips-${modalId}`);
+                container.find(`.hw-chip[data-value="${device}"]`).remove();
+                
+                if (container.find('.hw-chip').length === 0) {
+                    container.find('.empty-chips-msg').removeClass('d-none');
                 }
             };
 
-            window.removeHwRow = function(rowId, modalId) {
-                let element = document.getElementById(rowId);
-                if (element) {
-                    element.remove();
-                    // Pastikan minimal satu baris dropdown tetap ada jika semua dihapus
-                    let container = document.getElementById(`hw-list-container-${modalId}`);
-                    if (container && container.children.length === 0) {
-                        renderHardwareRow(modalId);
-                    }
-                }
-            };
+            // Remove legacy Hardware Row Management functions if no longer needed
+            // (Keeping placeholders if needed for other parts, but logic is replaced above)
+
 
             // Initialize Master Select2 (Simple Theme)
             $(document).on('shown.bs.modal', '.modal', function () {
