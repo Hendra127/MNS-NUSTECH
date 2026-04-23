@@ -128,6 +128,14 @@
             cursor: pointer;
         }
 
+        .pinned-card {
+            border: 2px solid #f59e0b !important;
+            background: #fffbeb !important;
+        }
+        .pin-active {
+            color: #f59e0b !important;
+        }
+
         /* ===== PREMIUM SECTION HEADER ===== */
         .section-header {
             display: flex;
@@ -337,7 +345,7 @@
                             $completed = collect($todo->checklists ?? [])->where('completed', true)->count();
                             $percent = $total > 0 ? round(($completed / $total) * 100) : 0;
                         @endphp
-                        <div class="note-item" id="todo-card-{{ $todo->id }}" data-id="{{ $todo->id }}">
+                        <div class="note-item {{ $todo->is_pinned ? 'pinned-card' : '' }}" id="todo-card-{{ $todo->id }}" data-id="{{ $todo->id }}">
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <div style="flex: 1;">
                                     <h5 style="font-weight: 700; margin: 0; color: #1e293b; display: inline-block;" contenteditable="true"
@@ -363,6 +371,8 @@
                                         <i class="bi bi-share text-primary fs-5 cursor-pointer"
                                             onclick="shareTodo({{ $todo->id }}, {{ $sharedIds }})" title="Bagikan"></i>
                                     @endif
+                                    <i class="bi {{ $todo->is_pinned ? 'bi-pin-fill pin-active' : 'bi-pin' }} fs-5 cursor-pointer pin-btn"
+                                        onclick="togglePin({{ $todo->id }}, this)" title="Sematkan"></i>
                                     <i class="bi bi-check-circle-fill text-success fs-5 cursor-pointer"
                                         onclick="toggleStatus({{ $todo->id }})"></i>
                                     <i class="bi bi-trash text-danger cursor-pointer fs-5"
@@ -416,7 +426,7 @@
                     </h4>
                     <div id="done-list">
                         @forelse($dones as $done)
-                            <div class="note-item done-card mb-3" id="todo-card-{{ $done->id }}" data-id="{{ $done->id }}" style="min-height: auto; padding: 15px;">
+                            <div class="note-item done-card {{ $done->is_pinned ? 'pinned-card' : '' }} mb-3" id="todo-card-{{ $done->id }}" data-id="{{ $done->id }}" style="min-height: auto; padding: 15px;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div style="flex: 1; min-width: 0; padding-right: 15px;">
                                         <h6 class="m-0" style="font-weight: 700; text-decoration: line-through;">
@@ -556,6 +566,7 @@
                                 </div>
                                 <div class="d-flex gap-2 ms-2">
                                     ${shareBtn}
+                                    <i class="bi bi-pin fs-5 cursor-pointer pin-btn" onclick="togglePin(${id}, this)" title="Sematkan"></i>
                                     <i class="bi bi-check-circle-fill text-success fs-5 cursor-pointer" onclick="toggleStatus(${id})"></i>
                                     <i class="bi bi-trash text-danger cursor-pointer fs-5" onclick="deleteTodo(${id})"></i>
                                 </div>
@@ -590,6 +601,29 @@
                 error: function(xhr) {
                     Swal.fire({ icon: 'error', title: 'Error', text: xhr.responseJSON?.message || 'Gagal menambah project' });
                 }
+            });
+        }
+
+        // ===== TOGGLE PIN =====
+        function togglePin(id, iconEl) {
+            $.post(`/todolist/pin/${id}`, function(res) {
+                if (res.success) {
+                    const $card = $(`#todo-card-${id}`);
+                    const $icon = $(iconEl);
+                    if (res.is_pinned) {
+                        $card.addClass('pinned-card');
+                        $icon.removeClass('bi-pin').addClass('bi-pin-fill pin-active');
+                        Toast.fire({ icon: 'success', title: 'Tugas disematkan!' });
+                    } else {
+                        $card.removeClass('pinned-card');
+                        $icon.removeClass('bi-pin-fill pin-active').addClass('bi-pin');
+                        Toast.fire({ icon: 'success', title: 'Sematkan dilepas.' });
+                    }
+                    // Refresh halaman setelah jeda singkat agar urutan update (pinned di atas)
+                    setTimeout(() => location.reload(), 1000);
+                }
+            }).fail(function() {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Gagal menyematkan tugas' });
             });
         }
 

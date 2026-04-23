@@ -12,12 +12,14 @@ class Todo extends Model
         'content', 
         'checklists', 
         'is_done', 
+        'is_pinned',
         'color'
     ];
 
     // Casting checklists agar otomatis menjadi array saat dipanggil
     protected $casts = [
         'checklists' => 'array',
+        'is_pinned' => 'boolean',
     ];
 
     // Relasi ke User (pembuat)

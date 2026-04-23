@@ -18,14 +18,14 @@ class TodolistController extends Controller
                   ->orWhereHas('sharedUsers', function($q) use ($userId) {
                       $q->where('users.id', $userId);
                   });
-        })->where('is_done', false)->latest()->get();
+        })->where('is_done', false)->orderBy('is_pinned', 'desc')->latest()->get();
 
         $dones = Todo::where(function($query) use ($userId) {
             $query->where('user_id', $userId)
                   ->orWhereHas('sharedUsers', function($q) use ($userId) {
                       $q->where('users.id', $userId);
                   });
-        })->where('is_done', true)->latest()->get();
+        })->where('is_done', true)->orderBy('is_pinned', 'desc')->latest()->get();
 
         $users = \App\Models\User::where('id', '!=', auth()->id())->get();
 
@@ -63,6 +63,14 @@ class TodolistController extends Controller
 
 
         return response()->json(['success' => true]);
+    }
+
+    public function togglePin($id)
+    {
+        $todo = $this->findTodoWithAccess($id);
+        $todo->update(['is_pinned' => !$todo->is_pinned]);
+        
+        return response()->json(['success' => true, 'is_pinned' => $todo->is_pinned]);
     }
     // Mengupdate isi konten/detail catatan
     public function update(Request $request, $id)
@@ -206,21 +214,37 @@ class TodolistController extends Controller
     private function findTodoWithAccess($id)
     {
         $userId = auth()->id();
-        return Todo::where(function($query) use ($userId) {
-            $query->where('user_id', $userId)
-                  ->orWhereHas('sharedUsers', function($q) use ($userId) {
-                      $q->where('users.id', $userId);
-                  });
-        })->findOrFail($id);
+        $todo = Todo::findOrFail($id);
+        
+        // Jika pemilik, berikan akses
+        if ($todo->user_id == $userId) {
+            return $todo;
+        }
+        
+        // Jika dibagikan ke user ini, berikan akses
+        $isShared = \DB::table('todo_user')
+            ->where('todo_id', $id)
+            ->where('user_id', $userId)
+            ->exists();
+
+        if ($isShared) {
+            return $todo;
+        }
+
+        abort(403, 'Unauthorized access to this To Do List.');
     }
 
     private function notifyOwnerIfShared($todo, $actionDescription)
     {
-        if (auth()->id() !== $todo->user_id) {
-            $owner = \App\Models\User::find($todo->user_id);
-            if ($owner) {
-                $owner->notify(new \App\Notifications\TaskUpdatedNotification($todo, $actionDescription, auth()->user()->name));
+        try {
+            if (auth()->id() !== $todo->user_id) {
+                $owner = \App\Models\User::find($todo->user_id);
+                if ($owner) {
+                    $owner->notify(new \App\Notifications\TaskUpdatedNotification($todo, $actionDescription, auth()->user()->name));
+                }
             }
+        } catch (\Exception $e) {
+            \Log::error('Notification Error: ' . $e->getMessage());
         }
     }
 }
