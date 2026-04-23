@@ -280,10 +280,17 @@
                 headerContainer.prepend(wrapper);
             }
 
+            // Request Notification Permission
+            if ("Notification" in window && Notification.permission !== "denied") {
+                Notification.requestPermission();
+            }
+
             fetchNotifications();
             setInterval(fetchNotifications, 30000); // 30 seconds
         }
     }
+
+    let notifiedIds = new Set();
 
     async function fetchNotifications() {
         try {
@@ -300,6 +307,31 @@
             }
 
             if (data.notifications && data.notifications.length > 0) {
+                // Check for new notifications to trigger push
+                if ("Notification" in window && Notification.permission === "granted") {
+                    data.notifications.forEach(n => {
+                        const isUnread = !n.read_at;
+                        if (isUnread && !notifiedIds.has(n.id)) {
+                            notifiedIds.add(n.id);
+                            
+                            new Notification(n.data.module || 'Pemberitahuan Baru', {
+                                body: n.data.message,
+                                icon: '/assets/img/logonustech.png'
+                            });
+                            
+                            if(typeof Swal !== 'undefined') {
+                                const Toast = Swal.mixin({
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 3000
+                                });
+                                Toast.fire({ icon: 'info', title: n.data.message });
+                            }
+                        }
+                    });
+                }
+
                 items.innerHTML = data.notifications.map(n => {
                     const isUnread = !n.read_at;
                     const userName = n.data.user_name || 'System';
@@ -325,7 +357,7 @@
                                 </div>
                                 <div class="mt-2 d-flex align-items-center">
                                     <span class="badge ${isUnread ? 'bg-primary' : 'bg-secondary'} text-uppercase" style="font-size: 0.6rem; letter-spacing: 0.5px;">
-                                        PM LIBERTA
+                                        ${n.data.module || 'PM LIBERTA'}
                                     </span>
                                     <span class="ms-2 text-muted" style="font-size: 0.7rem;">${dateStr}</span>
                                 </div>

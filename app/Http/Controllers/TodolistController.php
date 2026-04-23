@@ -13,17 +13,23 @@ class TodolistController extends Controller
         // Ambil data milik user yang sedang login saja
         $userId = auth()->id();
 
-        $todos = Todo::where('user_id', $userId)
-                     ->where('is_done', false)
-                     ->latest()
-                     ->get();
+        $todos = Todo::where(function($query) use ($userId) {
+            $query->where('user_id', $userId)
+                  ->orWhereHas('sharedUsers', function($q) use ($userId) {
+                      $q->where('users.id', $userId);
+                  });
+        })->where('is_done', false)->latest()->get();
 
-        $dones = Todo::where('user_id', $userId)
-                     ->where('is_done', true)
-                     ->latest()
-                     ->get();
+        $dones = Todo::where(function($query) use ($userId) {
+            $query->where('user_id', $userId)
+                  ->orWhereHas('sharedUsers', function($q) use ($userId) {
+                      $q->where('users.id', $userId);
+                  });
+        })->where('is_done', true)->latest()->get();
 
-        return view('todolist', compact('todos', 'dones'));
+        $users = \App\Models\User::where('id', '!=', auth()->id())->get();
+
+        return view('todolist', compact('todos', 'dones', 'users'));
     }
     public function store(Request $request)
     {
@@ -54,9 +60,11 @@ class TodolistController extends Controller
 
     public function toggle($id)
     {
-        $todo = Todo::where('user_id', auth()->id())->findOrFail($id);
+        $todo = clone $this->findTodoWithAccess($id);
         $newStatus = !$todo->is_done;
         $todo->update(['is_done' => $newStatus]);
+        
+        $this->notifyOwnerIfShared($todo, $newStatus ? 'menyelesaikan' : 'mengembalikan ke status Ongoing');
 
         ActivityLog::record([
             'action' => 'update',
@@ -74,10 +82,12 @@ class TodolistController extends Controller
     // Mengupdate isi konten/detail catatan
     public function update(Request $request, $id)
     {
-        $todo = Todo::where('user_id', auth()->id())->findOrFail($id);
+        $todo = $this->findTodoWithAccess($id);
         $todo->update([
             'content' => $request->content
         ]);
+        
+        $this->notifyOwnerIfShared($todo, 'mengubah detail');
 
         return response()->json(['success' => true]);
     }
@@ -85,9 +95,11 @@ class TodolistController extends Controller
     // Menghapus catatan secara permanen
     public function destroy($id)
     {
-        $todo = Todo::where('user_id', auth()->id())->findOrFail($id);
+        $todo = $this->findTodoWithAccess($id);
         $title = $todo->title;
         $todo->delete();
+
+        $this->notifyOwnerIfShared($todo, 'menghapus');
 
         ActivityLog::record([
             'action' => 'delete',
@@ -101,7 +113,7 @@ class TodolistController extends Controller
     }
     // Menambah sub-item ke dalam checklist
     public function addSubTask(Request $request, $id) {
-        $todo = Todo::where('user_id', auth()->id())->findOrFail($id);
+        $todo = $this->findTodoWithAccess($id);
         $checklists = $todo->checklists ?? [];
         
         $checklists[] = [
@@ -111,6 +123,8 @@ class TodolistController extends Controller
         ];
 
         $todo->update(['checklists' => $checklists]);
+        
+        $this->notifyOwnerIfShared($todo, 'menambah subtask baru');
 
         ActivityLog::record([
             'action' => 'create',
@@ -125,7 +139,7 @@ class TodolistController extends Controller
 
     // Menandai sub-item selesai/belum
     public function toggleSubTask(Request $request, $id) {
-        $todo = Todo::where('user_id', auth()->id())->findOrFail($id);
+        $todo = $this->findTodoWithAccess($id);
         $checklists = $todo->checklists;
 
         foreach ($checklists as &$item) {
@@ -135,13 +149,16 @@ class TodolistController extends Controller
         }
 
         $todo->update(['checklists' => $checklists]);
+        $this->notifyOwnerIfShared($todo, 'mengubah status subtask');
         return response()->json(['success' => true]);
     }
     // Update Judul Project
     public function updateTitle(Request $request, $id) {
-        $todo = Todo::where('user_id', auth()->id())->findOrFail($id);
+        $todo = $this->findTodoWithAccess($id);
         $oldTitle = $todo->title;
         $todo->update(['title' => $request->title]);
+
+        $this->notifyOwnerIfShared($todo, 'mengubah judul');
 
         ActivityLog::record([
             'action' => 'update',
@@ -159,7 +176,7 @@ class TodolistController extends Controller
 
     // Update Teks Sub-task/Checklist
     public function updateSubTask(Request $request, $id) {
-        $todo = Todo::where('user_id', auth()->id())->findOrFail($id);
+        $todo = $this->findTodoWithAccess($id);
         $checklists = $todo->checklists;
 
         foreach ($checklists as &$item) {
@@ -169,12 +186,13 @@ class TodolistController extends Controller
         }
 
         $todo->update(['checklists' => $checklists]);
+        $this->notifyOwnerIfShared($todo, 'mengubah teks subtask');
         return response()->json(['success' => true]);
     }
 
     // Menghapus sub-item
     public function deleteSubTask(Request $request, $id) {
-        $todo = Todo::where('user_id', auth()->id())->findOrFail($id);
+        $todo = $this->findTodoWithAccess($id);
         
         if (!$todo->checklists) {
             return response()->json(['success' => true]);
@@ -186,6 +204,8 @@ class TodolistController extends Controller
 
         $todo->update(['checklists' => $checklists]);
         
+        $this->notifyOwnerIfShared($todo, 'menghapus subtask');
+        
         ActivityLog::record([
             'action' => 'delete',
             'module' => 'To Do List',
@@ -195,5 +215,54 @@ class TodolistController extends Controller
         ]);
 
         return response()->json(['success' => true]);
+    }
+
+    // Share To Do
+    public function share(Request $request, $id)
+    {
+        $todo = Todo::findOrFail($id);
+        if (auth()->user()->role !== 'superadmin') {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        $userIds = $request->user_ids ?? [];
+        $todo->sharedUsers()->sync($userIds);
+
+        $customMessage = $request->message;
+        $usersToNotify = \App\Models\User::whereIn('id', $userIds)->get();
+        foreach ($usersToNotify as $user) {
+            $user->notify(new \App\Notifications\TaskSharedNotification($todo, $customMessage));
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    public function checkNotifications()
+    {
+        $user = auth()->user();
+        $notifications = $user->unreadNotifications;
+        $user->unreadNotifications->markAsRead();
+        return response()->json(['notifications' => $notifications]);
+    }
+
+    private function findTodoWithAccess($id)
+    {
+        $userId = auth()->id();
+        return Todo::where(function($query) use ($userId) {
+            $query->where('user_id', $userId)
+                  ->orWhereHas('sharedUsers', function($q) use ($userId) {
+                      $q->where('users.id', $userId);
+                  });
+        })->findOrFail($id);
+    }
+
+    private function notifyOwnerIfShared($todo, $actionDescription)
+    {
+        if (auth()->id() !== $todo->user_id) {
+            $owner = \App\Models\User::find($todo->user_id);
+            if ($owner) {
+                $owner->notify(new \App\Notifications\TaskUpdatedNotification($todo, $actionDescription, auth()->user()->name));
+            }
+        }
     }
 }

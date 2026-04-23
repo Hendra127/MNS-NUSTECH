@@ -20,9 +20,15 @@ class Todo extends Model
         'checklists' => 'array',
     ];
 
-    // Relasi ke User
+    // Relasi ke User (pembuat)
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // Relasi ke User yang di-share
+    public function sharedUsers()
+    {
+        return $this->belongsToMany(User::class, 'todo_user', 'todo_id', 'user_id');
     }
 }

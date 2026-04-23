@@ -351,14 +351,32 @@
                         @endphp
                         <div class="note-item" id="todo-card-{{ $todo->id }}" data-id="{{ $todo->id }}">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 style="font-weight: 700; margin: 0; color: #1e293b;" contenteditable="true"
-                                    onblur="updateProjectTitle({{ $todo->id }}, this.innerText)">
-                                    {{ $todo->title }}
-                                </h5>
-                                <div class="d-flex gap-2">
+                                <div style="flex: 1;">
+                                    <h5 style="font-weight: 700; margin: 0; color: #1e293b; display: inline-block;" contenteditable="true"
+                                        onblur="updateProjectTitle({{ $todo->id }}, this.innerText)">
+                                        {{ $todo->title }}
+                                    </h5>
+                                    @if(auth()->id() !== $todo->user_id)
+                                        <div class="text-muted mt-1" style="font-size: 11px; font-weight: 500;">
+                                            <i class="bi bi-reply-fill text-primary"></i> Dibagikan oleh {{ $todo->user->name ?? 'Admin' }}
+                                        </div>
+                                    @elseif($todo->sharedUsers && $todo->sharedUsers->count() > 0)
+                                        <div class="text-muted mt-1" style="font-size: 11px; font-weight: 500;">
+                                            <i class="bi bi-people-fill text-success"></i> Dibagikan ke {{ $todo->sharedUsers->count() }} user
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="d-flex gap-2 ms-2">
+                                    @if(auth()->check() && auth()->user()->role === 'superadmin')
+                                        @php
+                                            $sharedIds = $todo->sharedUsers->pluck('id')->toJson();
+                                        @endphp
+                                        <i class="bi bi-share text-primary fs-5 cursor-pointer"
+                                            onclick="shareTodo({{ $todo->id }}, {{ $sharedIds }})" title="Bagikan"></i>
+                                    @endif
                                     <i class="bi bi-check-circle-fill text-success fs-5 cursor-pointer"
                                         onclick="toggleStatus({{ $todo->id }})"></i>
-                                    <i class="bi bi-trash text-danger cursor-pointer"
+                                    <i class="bi bi-trash text-danger cursor-pointer fs-5"
                                         onclick="deleteTodo({{ $todo->id }})"></i>
                                 </div>
                             </div>
@@ -411,6 +429,15 @@
                                     <h6 class="m-0" style="font-weight: 700; text-decoration: line-through;">
                                         {{ $done->title }}
                                     </h6>
+                                    @if(auth()->id() !== $done->user_id)
+                                        <div class="text-muted mt-1" style="font-size: 10px;">
+                                            <i class="bi bi-reply-fill text-primary"></i> Dibagikan oleh {{ $done->user->name ?? 'Admin' }}
+                                        </div>
+                                    @elseif($done->sharedUsers && $done->sharedUsers->count() > 0)
+                                        <div class="text-muted mt-1" style="font-size: 10px;">
+                                            <i class="bi bi-people-fill text-success"></i> Dibagikan ke {{ $done->sharedUsers->count() }} user
+                                        </div>
+                                    @endif
                                     <small class="text-muted" style="font-size: 10px;">Selesai pada:
                                         {{ $done->updated_at->format('d M H:i') }}</small>
                                 </div>
@@ -429,7 +456,48 @@
             </div>
         </div>
     </div>
+
+    <!-- Share Modal -->
+    <div class="modal fade" id="shareModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Bagikan Project</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="shareForm">
+                        <input type="hidden" id="shareTodoId">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Pesan Tambahan (Opsional):</label>
+                            <textarea class="form-control" id="shareMessage" rows="2" placeholder="Cth: Tolong selesaikan hari ini ya..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Pilih User:</label>
+                            <div id="userCheckboxes">
+                                @if(isset($users))
+                                    @foreach($users as $user)
+                                        <div class="form-check">
+                                            <input class="form-check-input user-share-cb" type="checkbox" value="{{ $user->id }}" id="user_{{ $user->id }}">
+                                            <label class="form-check-label" for="user_{{ $user->id }}">
+                                                {{ $user->name }}
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                @endif
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" onclick="submitShare()">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     {{-- Script untuk dropdown profile dan CRUD To Do List --}}
@@ -593,7 +661,48 @@
                     }
                 });
             }
+
         });
+
+        // --- Share Logic ---
+        function shareTodo(id, sharedIds) {
+            $('#shareTodoId').val(id);
+            $('#shareMessage').val('');
+            // Reset all checkboxes
+            $('.user-share-cb').prop('checked', false);
+            // Check the ones already shared
+            if (sharedIds && sharedIds.length > 0) {
+                sharedIds.forEach(userId => {
+                    $('#user_' + userId).prop('checked', true);
+                });
+            }
+            var shareModal = new bootstrap.Modal(document.getElementById('shareModal'));
+            shareModal.show();
+        }
+
+        function submitShare() {
+            let id = $('#shareTodoId').val();
+            let message = $('#shareMessage').val();
+            let userIds = [];
+            $('.user-share-cb:checked').each(function() {
+                userIds.push($(this).val());
+            });
+
+            $.post(`/todolist/share/${id}`, { user_ids: userIds, message: message }, function(res) {
+                if (res.success) {
+                    $('#shareModal').modal('hide');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Tugas telah dibagikan',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => location.reload());
+                } else {
+                    Swal.fire('Error', res.message || 'Terjadi kesalahan', 'error');
+                }
+            });
+        }
     </script>
 </body>
 

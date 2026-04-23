@@ -195,6 +195,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/todolist/update-title/{id}', [TodolistController::class, 'updateTitle']);
     Route::post('/todolist/subtask/update/{id}', [TodolistController::class, 'updateSubTask']);
     Route::delete('/todolist/subtask/delete/{id}', [TodolistController::class, 'deleteSubTask']);
+    Route::post('/todolist/share/{id}', [TodolistController::class, 'share']);
+    Route::get('/notifications/check', [TodolistController::class, 'checkNotifications']);
 
     // --- LAPORAN CM ROUTES (Admin & Superadmin) ---
     Route::middleware(['role:admin,superadmin'])->group(function () {
