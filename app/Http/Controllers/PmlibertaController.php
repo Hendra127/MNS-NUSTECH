@@ -16,7 +16,7 @@ class PMLibertaController extends Controller
     public function index(Request $request)
     {
         $sites = \App\Models\Site::orderBy('site_id', 'asc')->get();
-        
+
         // Ambil data unik Provinsi dan Kabupaten untuk cascading filter
         $category = $request->kategori;
         $provinsiListQuery = \App\Models\Site::query();
@@ -39,12 +39,12 @@ class PMLibertaController extends Controller
             $kabQuery = \App\Models\Site::where('provinsi', $p)
                 ->whereNotNull('kab')
                 ->where('kab', '!=', '');
-            
+
             if ($category) {
                 $tipeSearch = ($category === 'BMN') ? 'BARANG MILIK NEGARA' : 'SEWA LAYANAN';
                 $kabQuery->where('tipe', 'LIKE', '%' . $tipeSearch . '%');
             }
-            
+
             $provinsiKabMap[$p] = $kabQuery->distinct()->orderBy('kab', 'asc')->pluck('kab');
         }
 
@@ -89,11 +89,9 @@ class PMLibertaController extends Controller
         // 4. Filter Rentang Tanggal
         if ($request->tgl_mulai && $request->tgl_selesai) {
             $query->whereBetween('date', [$request->tgl_mulai, $request->tgl_selesai]);
-        }
-        elseif ($request->tgl_mulai) {
+        } elseif ($request->tgl_mulai) {
             $query->where('date', '>=', $request->tgl_mulai);
-        }
-        elseif ($request->tgl_selesai) {
+        } elseif ($request->tgl_selesai) {
             $query->where('date', '<=', $request->tgl_selesai);
         }
 
@@ -103,8 +101,8 @@ class PMLibertaController extends Controller
         $totalHold = (clone $query)->where('status', 'HOLD')->count();
         $totalPending = (clone $query)->where(function ($q) {
             $q->where('status', 'PENDING')
-              ->orWhereNull('status')
-              ->orWhere('status', '');
+                ->orWhereNull('status')
+                ->orWhere('status', '');
         })->count();
 
         // Ambil data dan pertahankan filter saat pindah halaman
@@ -163,7 +161,7 @@ class PMLibertaController extends Controller
         // [MOD] Notification if status is HOLD
         if (strtoupper($request->status) === 'HOLD' && auth()->user()->role === 'admin') {
             $recipients = User::where('role', 'superadmin')->get();
-            Notification::send($recipients, new StatusHoldNotification((object)$request->all(), auth()->user()));
+            Notification::send($recipients, new StatusHoldNotification((object) $request->all(), auth()->user()));
         }
 
         return back()->with('success', 'Data berhasil ditambahkan!');
@@ -183,8 +181,7 @@ class PMLibertaController extends Controller
         try {
             Excel::import(new PMLibertaImport, $request->file('file'));
             return back()->with('success', 'Data berhasil diimport!');
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return back()->with('error', 'Gagal mengimport data: ' . $e->getMessage());
         }
     }

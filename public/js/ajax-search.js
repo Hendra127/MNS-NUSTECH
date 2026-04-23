@@ -131,6 +131,11 @@ function initAjaxSearch($) {
                 $('.table-responsive-custom, .table-responsive').css({ opacity: 1, pointerEvents: 'auto' });
                 var $p = getPaginationContainer();
                 if ($p) $p.css({ opacity: 1, pointerEvents: 'auto' });
+                
+                // Re-init drag scroll setelah tabel diperbarui
+                if (typeof initDragToScroll === 'function') {
+                    initDragToScroll();
+                }
             }
         });
     }
@@ -232,24 +237,16 @@ if (document.readyState === 'loading') {
 
 // Re-init setelah setiap AJAX yang mengganti tabel (MutationObserver)
 (function() {
-    var targets = [
-        '.table-responsive-custom',
-        '.table-responsive',
-        '.card',
-        '.container-fluid'
-    ];
-
-    var observerTarget = null;
-    targets.forEach(function(sel) {
-        if (!observerTarget) observerTarget = document.querySelector(sel);
-    });
-    if (!observerTarget) observerTarget = document.body;
+    // Selalu observe body untuk menangani penggantian kontainer utama
+    var observerTarget = document.body;
 
     var observer = new MutationObserver(function(mutations) {
         var shouldReinit = mutations.some(function(m) {
             return m.type === 'childList' && m.addedNodes.length > 0;
         });
-        if (shouldReinit) initDragToScroll();
+        if (shouldReinit) {
+            if (typeof initDragToScroll === 'function') initDragToScroll();
+        }
     });
 
     observer.observe(observerTarget, { childList: true, subtree: true });

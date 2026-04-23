@@ -243,17 +243,17 @@
         }
 
         /* Modal Uniform Styling */
-        .modal-content {
+        html:not([data-bs-theme="dark"]) .modal-content {
             color: #000 !important;
         }
-        .modal-content label {
+        html:not([data-bs-theme="dark"]) .modal-content label {
             color: #000 !important;
             font-weight: 700 !important; /* Bold */
         }
-        .modal-content .form-control, 
-        .modal-content .form-select,
-        .modal-content .text-muted,
-        .modal-content .empty-chips-msg {
+        html:not([data-bs-theme="dark"]) .modal-content .form-control, 
+        html:not([data-bs-theme="dark"]) .modal-content .form-select,
+        html:not([data-bs-theme="dark"]) .modal-content .text-muted,
+        html:not([data-bs-theme="dark"]) .modal-content .empty-chips-msg {
             color: #000 !important;
         }
         .modal-header .modal-title {
@@ -274,13 +274,13 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-3">
-            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+            @if(auth()->check() && auth()->user()->role === 'superadmin')
                 <a href="{{ route('setting.index') }}" class="text-white opacity-75 hover-opacity-100" title="Settings">
                     <i class="bi bi-gear-fill" style="font-size: 1.3rem;"></i>
                 </a>
             @endif
             <div class="user-profile-wrapper" style="position: relative;">
-                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                @if(auth()->check() && auth()->user()->role === 'superadmin')
                     <a href="{{ route('setting.index') }}" class="user-profile-icon" title="Setting User"
                         style="cursor: pointer; text-decoration: none; color: inherit;">
                         @if(auth()->user()->photo)
@@ -433,7 +433,7 @@
                         <tr>
                             <th class="sticky-col col-no">NO</th>
                             <th class="sticky-col col-site-id">SITE ID</th>
-                            <th class="sticky-col col-nama_site">NAMA SITE</th>
+                            <th class="sticky-col col-nama_site" style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="NAMA SITE">NAMA SITE</th>
                             <th class="text-center {{ request('sort') == 'durasi' ? 'sorting-active' : '' }}"
                                 style="min-width: 120px; cursor: pointer;">
                                 <a href="{{ request()->fullUrlWithQuery(['sort' => 'durasi', 'order' => (request('sort') == 'durasi' && request('order') == 'asc') ? 'desc' : 'asc']) }}"
@@ -480,7 +480,7 @@
                             <tr>
                                 <td class="text-center sticky-col col-no">{{ $tickets->firstItem() + $i }}</td>
                                 <td class="text-center sticky-col col-site-id">{{ $t->site_code }}</td>
-                                <td class="sticky-col col-nama_site">{{ $t->nama_site }}</td>
+                                <td class="sticky-col col-nama_site text-truncate" style="max-width: 150px;" title="{{ $t->nama_site }}">{{ $t->nama_site }}</td>
                                 <td class="text-center">
                                     @php
                                         $tanggalRekap = \Carbon\Carbon::parse($t->tanggal_rekap)->startOfDay();
@@ -638,7 +638,7 @@
                                                 {{-- Selector Perangkat --}}
                                                 <div class="mb-0">
                                                     <select class="form-select form-select-sm" onchange="addHardwareChip('{{ $t->id }}', this.value); this.value='';"
-                                                        style="border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-color: #dee2e6 !important; background-color: #fff;">
+                                                        style="border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-color: #dee2e6 !important;">
                                                         <option value="">-- Pilih Perangkat Yang Bermasalah --</option>
                                                         @foreach(['MODEM', 'ROUTER', 'AP1', 'AP2', 'TRANSCEIVER', 'STAVOLT', 'RAK', 'ANTENA', 'LAIN LAIN'] as $opt)
                                                             <option value="{{ $opt }}">{{ $opt }}</option>
@@ -943,8 +943,7 @@
     <div class="modal fade" id="modalTambahTicket" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-centered">
             <form method="POST" action="{{ route('open.ticket.store') }}"
-                class="modal-content border-0 shadow-lg rounded-4 overflow-hidden" enctype="multipart/form-data"
-                style="background-color: white !important; color: #333 !important;">
+                class="modal-content border-0 shadow-lg rounded-4 overflow-hidden" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-header text-white d-flex justify-content-center position-relative"
                     style="background-color: #071152;">
@@ -952,7 +951,7 @@
                     <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
                         data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body p-4" style="background-color: white !important;">
+                <div class="modal-body p-4">
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label class="form-label fw-bold">Pilih Site ID</label>
@@ -1019,7 +1018,7 @@
                                 {{-- Selector Perangkat --}}
                                 <div class="mb-0">
                                     <select class="form-select form-select-sm" onchange="addHardwareChip('tambah', this.value); this.value='';"
-                                        style="border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-color: #dee2e6 !important; background-color: #fff;">
+                                        style="border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-color: #dee2e6 !important;">
                                         <option value="">-- Pilih Perangkat Yang Bermasalah --</option>
                                         @foreach(['MODEM', 'ROUTER', 'AP1', 'AP2', 'TRANSCEIVER', 'STAVOLT', 'RAK', 'ANTENA', 'LAIN LAIN'] as $opt)
                                             <option value="{{ $opt }}">{{ $opt }}</option>

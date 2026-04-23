@@ -1,5 +1,6 @@
 {{-- PWA Meta Tags & Service Worker Registration --}}
 <link rel="manifest" href="/manifest.json">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <meta name="theme-color" content="#071152">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,7 +22,16 @@
     });
 
     function showInstallButton() {
-        // Cari container navbar dari sisi kanan (semua blade pakai struktur yang sama)
+        // Jangan munculkan jika aplikasi sudah terinstall (standalone mode)
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            return;
+        }
+
+        // Jangan munculkan jika user pernah mengklik/menolak sebelumnya (opsional, tapi sesuai permintaan user)
+        if (localStorage.getItem('pwa_install_clicked')) {
+            return;
+        }
+
         const headerContainer = document.querySelector('.d-flex.align-items-center.gap-3');
 
         if (headerContainer && !document.getElementById('pwa-install-btn')) {
@@ -52,10 +62,10 @@
                     deferredPrompt.prompt();
                     // Minta pilihan dari user
                     const { outcome } = await deferredPrompt.userChoice;
-                    if (outcome === 'accepted') {
-                        btn.style.display = 'none';
-                    }
-                    deferredPrompt = null; // Reset setelah sekali klik
+                    // Apapun pilihannya (accept/cancel), hilangkan tombol sesuai permintaan user
+                    btn.style.display = 'none';
+                    localStorage.setItem('pwa_install_clicked', 'true');
+                    deferredPrompt = null;
                 } else {
                     // Jika PWA support tidak terdeteksi (HTTP) atau sudah terinstall
                     Swal.fire({
@@ -74,6 +84,8 @@
                         confirmButtonColor: '#0d6efd',
                         customClass: { popup: 'rounded-4' }
                     });
+                    localStorage.setItem('pwa_install_clicked', 'true');
+                    btn.style.display = 'none';
                 }
             };
 
@@ -391,23 +403,58 @@
         }, 300000); // 5 Minutes
     }
 
+    // Auto Logout Script (1 Jam AFK)
+    function initAutoLogout() {
+        let timeout;
+        const maxIdleTime = 3600000; // 1 Jam
+
+        function resetTimer() {
+            clearTimeout(timeout);
+            timeout = setTimeout(logoutUser, maxIdleTime);
+        }
+
+        function logoutUser() {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = "{{ route('logout') }}";
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = document.querySelector('meta[name="csrf-token"]')?.content || "{{ csrf_token() }}";
+            form.appendChild(csrfToken);
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(evt => {
+            document.addEventListener(evt, resetTimer, true);
+        });
+        resetTimer();
+    }
+
     // Sesi Pulse & Notifikasi hanya untuk user yang login
     @auth
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
                 showInstallButton();
                 initDarkMode();
+                @if(in_array(auth()->user()->role, ['admin', 'superadmin']))
                 initNotificationBell();
+                @endif
                 initNavLogo();
                 initSessionPulse();
+                initAutoLogout();
                 updateChartsTheme(localStorage.getItem('theme') || 'light');
             });
         } else {
             showInstallButton();
             initDarkMode();
+            @if(in_array(auth()->user()->role, ['admin', 'superadmin']))
             initNotificationBell();
+            @endif
             initNavLogo();
             initSessionPulse();
+            initAutoLogout();
             updateChartsTheme(localStorage.getItem('theme') || 'light');
         }
     @else
@@ -417,17 +464,29 @@
                 showInstallButton();
                 initDarkMode();
                 initNavLogo();
-                // Notifikasi & Pulse dilewati
+                initSessionPulse();
+                // Notifikasi dilewati
             });
         } else {
             showInstallButton();
             initDarkMode();
             initNavLogo();
+            initSessionPulse();
         }
     @endauth
 </script>
 
 <style>
+    /* Fix for header icons spacing to avoid misclicks - adjusted to 1.2rem */
+    .main-header .d-flex.align-items-center.gap-3,
+    .main-header .d-flex.align-items-center.gap-4 {
+        gap: 1.2rem !important;
+    }
+    
+    .user-profile-wrapper {
+        margin-left: 0;
+    }
+
     /* Smooth Global Theme Transition */
     html.theme-transition,
     html.theme-transition *,
@@ -1517,5 +1576,52 @@
     [data-bs-theme="dark"] .table-responsive-custom::-webkit-scrollbar-thumb {
         background: #444 !important;
         border-color: #1a1a1a !important;
+    }
+
+    /* --- Select2 Dark Mode Fix --- */
+    [data-bs-theme="dark"] .select2-container--default .select2-selection--single,
+    [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection--single {
+        background-color: #2a2a2a !important;
+        border-color: #444 !important;
+    }
+    [data-bs-theme="dark"] .select2-container--default .select2-selection--single .select2-selection__rendered,
+    [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        color: #e0e0e0 !important;
+    }
+    [data-bs-theme="dark"] .select2-dropdown {
+        background-color: #1e1e1e !important;
+        border-color: #333 !important;
+        color: #e0e0e0 !important;
+    }
+    [data-bs-theme="dark"] .select2-search input {
+        background-color: #2a2a2a !important;
+        border-color: #444 !important;
+        color: #e0e0e0 !important;
+    }
+    [data-bs-theme="dark"] .select2-results__option {
+        background-color: #1e1e1e !important;
+        color: #e0e0e0 !important;
+    }
+    [data-bs-theme="dark"] .select2-results__option--highlighted[aria-selected],
+    [data-bs-theme="dark"] .select2-results__option:hover {
+        background-color: #0d6efd !important;
+        color: #fff !important;
+    }
+    [data-bs-theme="dark"] .select2-container--default .select2-selection--single .select2-selection__arrow b {
+        border-color: #888 transparent transparent transparent !important;
+    }
+
+    /* --- Hardware Chip & Textarea Dark Mode Fixes --- */
+    [data-bs-theme="dark"] .hw-chip-container {
+        background: #1e1e1e !important;
+        border-color: #444 !important;
+    }
+    [data-bs-theme="dark"] .textarea-unified {
+        border-color: #444 !important;
+        background-color: #2a2a2a !important;
+        color: #e0e0e0 !important;
+    }
+    [data-bs-theme="dark"] select.form-select[style*="border-color"] {
+        border-color: #444 !important;
     }
 </style>

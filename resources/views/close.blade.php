@@ -189,13 +189,13 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-3">
-            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+            @if(auth()->check() && auth()->user()->role === 'superadmin')
                 <a href="{{ route('setting.index') }}" class="text-white opacity-75 hover-opacity-100" title="Settings">
                     <i class="bi bi-gear-fill" style="font-size: 1.3rem;"></i>
                 </a>
             @endif
             <div class="user-profile-wrapper" style="position: relative;">
-                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                @if(auth()->check() && auth()->user()->role === 'superadmin')
                     <a href="{{ route('setting.index') }}" class="user-profile-icon" title="Setting User"
                         style="cursor: pointer; text-decoration: none; color: inherit;">
                         @if(auth()->user()->photo)
@@ -319,7 +319,7 @@
                         <tr>
                             <th class="sticky-col col-no">NO</th>
                             <th class="sticky-col col-site-id">SITE ID</th>
-                            <th class="sticky-col col-nama_site">NAMA SITE</th>
+                            <th class="sticky-col col-nama_site" style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="NAMA SITE">NAMA SITE</th>
                             <th class="text-center">KATEGORI</th>
                             <th class="text-center {{ request('sort') == 'tanggal_rekap' ? 'sorting-active' : '' }}"
                                 style="min-width: 150px; cursor: pointer;">
@@ -374,7 +374,7 @@
                             <tr>
                                 <td class="sticky-col col-no text-center">{{ $tickets->firstItem() + $i }}</td>
                                 <td class="sticky-col col-site-id text-center">{{ $t->site_code }}</td>
-                                <td class="sticky-col col-nama_site">{{ $t->nama_site }}</td>
+                                <td class="sticky-col col-nama_site text-truncate" style="max-width: 150px;" title="{{ $t->nama_site }}">{{ $t->nama_site }}</td>
                                 <td class="text-center">{{ $t->kategori }}</td>
                                 <td class="text-center">{{ \Carbon\Carbon::parse($t->tanggal_rekap)->format('d M Y') }}</td>
                                 <td class="text-center">

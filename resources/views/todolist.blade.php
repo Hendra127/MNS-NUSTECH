@@ -87,7 +87,7 @@
         }
 
         /* Opsional: Jika judul project (h5) juga sering panjang, tambahkan ini */
-        .note-item h5 {
+        .note-item h5, .note-item h6 {
             word-break: break-word;
             white-space: normal;
             overflow-wrap: anywhere;
@@ -349,7 +349,7 @@
                             $completed = collect($todo->checklists ?? [])->where('completed', true)->count();
                             $percent = $total > 0 ? round(($completed / $total) * 100) : 0;
                         @endphp
-                        <div class="note-item" id="todo-card-{{ $todo->id }}">
+                        <div class="note-item" id="todo-card-{{ $todo->id }}" data-id="{{ $todo->id }}">
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <h5 style="font-weight: 700; margin: 0; color: #1e293b;" contenteditable="true"
                                     onblur="updateProjectTitle({{ $todo->id }}, this.innerText)">
@@ -375,15 +375,19 @@
                             <div class="checklist-area mb-3"
                                 style="max-height: 250px; overflow-y: auto; overflow-x: hidden; flex-grow: 1;">
                                 @foreach($todo->checklists ?? [] as $item)
-                                    <div class="checklist-item">
-                                        <input type="checkbox" {{ $item['completed'] ? 'checked' : '' }}
-                                            onchange="toggleSubTask('{{ $todo->id }}', '{{ $item['id'] }}')"
-                                            class="form-check-input cursor-pointer" style="min-width: 18px;">
-                                        <span class="{{ $item['completed'] ? 'strikethrough' : '' }}" style="font-size: 13px;"
-                                            contenteditable="true"
-                                            onblur="updateSubTaskText('{{ $todo->id }}', '{{ $item['id'] }}', this.innerText)">
-                                            {{ $item['text'] }}
-                                        </span>
+                                    <div class="checklist-item" style="justify-content: space-between;">
+                                        <div style="display: flex; align-items: flex-start; gap: 10px; flex: 1;">
+                                            <input type="checkbox" {{ $item['completed'] ? 'checked' : '' }}
+                                                onchange="toggleSubTask('{{ $todo->id }}', '{{ $item['id'] }}')"
+                                                class="form-check-input cursor-pointer" style="min-width: 18px;">
+                                            <span class="{{ $item['completed'] ? 'strikethrough' : '' }}" style="font-size: 13px; flex: 1;"
+                                                contenteditable="true"
+                                                onblur="updateSubTaskText('{{ $todo->id }}', '{{ $item['id'] }}', this.innerText)">
+                                                {{ $item['text'] }}
+                                            </span>
+                                        </div>
+                                        <i class="bi bi-trash text-danger cursor-pointer ms-2" style="font-size: 14px; margin-top: 2px;" title="Hapus sub-task"
+                                            onclick="deleteSubTask('{{ $todo->id }}', '{{ $item['id'] }}')"></i>
                                     </div>
                                 @endforeach
                             </div>
@@ -401,9 +405,9 @@
                     <h4 class="mb-4" style="font-weight: 700;"><i class="bi bi-check-all text-success"></i> Completed
                     </h4>
                     @forelse($dones as $done)
-                        <div class="note-item done-card mb-3" style="min-height: auto; padding: 15px;">
+                        <div class="note-item done-card mb-3" data-id="{{ $done->id }}" style="min-height: auto; padding: 15px;">
                             <div class="d-flex justify-content-between align-items-center">
-                                <div>
+                                <div style="flex: 1; min-width: 0; padding-right: 15px;">
                                     <h6 class="m-0" style="font-weight: 700; text-decoration: line-through;">
                                         {{ $done->title }}
                                     </h6>
@@ -427,6 +431,7 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     {{-- Script untuk dropdown profile dan CRUD To Do List --}}
     <script>
         $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } });
@@ -527,6 +532,68 @@
                 location.reload();
             });
         }
+        function deleteSubTask(todoId, subtaskId) {
+            Swal.fire({
+                title: 'Hapus Sub-task?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/todolist/subtask/delete/${todoId}`,
+                        type: 'DELETE',
+                        data: { subtask_id: subtaskId },
+                        success: () => {
+                            Toast.fire({ icon: 'success', title: 'Sub-task dihapus' })
+                                .then(() => location.reload());
+                        }
+                    });
+                }
+            });
+        }
+
+        // --- SortableJS Drag & Drop Logic ---
+        document.addEventListener('DOMContentLoaded', function () {
+            var ongoingGrid = document.querySelector('.notes-grid');
+            var doneColumn = document.querySelector('.done-column');
+
+            if (ongoingGrid) {
+                Sortable.create(ongoingGrid, {
+                    group: 'todos',
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    handle: '.note-item', // Biar semua area bisa ditarik
+                    onEnd: function (evt) {
+                        if (evt.to === doneColumn && evt.from !== doneColumn) {
+                            var todoId = evt.item.getAttribute('data-id');
+                            if (todoId) {
+                                toggleStatus(todoId);
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (doneColumn) {
+                Sortable.create(doneColumn, {
+                    group: 'todos',
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    handle: '.note-item', // Biar semua area bisa ditarik
+                    onEnd: function (evt) {
+                        if (evt.to === ongoingGrid && evt.from !== ongoingGrid) {
+                            var todoId = evt.item.getAttribute('data-id');
+                            if (todoId) {
+                                toggleStatus(todoId);
+                            }
+                        }
+                    }
+                });
+            }
+        });
     </script>
 </body>
 

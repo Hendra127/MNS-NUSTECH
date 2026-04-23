@@ -181,7 +181,7 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-3">
-            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+            @if(auth()->check() && auth()->user()->role === 'superadmin')
                 <a href="{{ route('setting.index') }}" class="text-white opacity-75 hover-opacity-100" title="Settings">
                     <i class="bi bi-gear-fill" style="font-size: 1.3rem;"></i>
                 </a>
@@ -327,7 +327,9 @@
                     <tr>
                         <th class="sticky-col col-no">NO</th>
                         <th class="sticky-col col-site-id">SITE ID</th>
-                        <th class="sticky-col col-sitename">SITENAME</th>
+                        <th class="sticky-col col-sitename"
+                            style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                            title="SITENAME">SITENAME</th>
                         <th>TIPE</th>
                         <th>BATCH</th>
                         <th>LATITUDE</th>
@@ -369,7 +371,8 @@
                         <tr>
                             <td class="text-center sticky-col col-no">{{ $loop->iteration }}</td>
                             <td class="sticky-col col-site-id">{{ $site->site_id }}</td>
-                            <td class="sticky-col col-sitename">{{ $site->sitename }}</td>
+                            <td class="sticky-col col-sitename text-truncate" style="max-width: 150px;"
+                                title="{{ $site->sitename }}">{{ $site->sitename }}</td>
                             <td>{{ $site->tipe }}</td>
                             <td>{{ $site->batch }}</td>
                             <td>{{ $site->latitude }}</td>
@@ -460,7 +463,7 @@
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
-                    </div >
+                        </div >
             @endif
     </script>
     <!-- MODAL ADD DATA -->

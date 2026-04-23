@@ -444,13 +444,13 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-3">
-            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+            @if(auth()->check() && auth()->user()->role === 'superadmin')
                 <a href="{{ route('setting.index') }}" class="text-white opacity-75 hover-opacity-100" title="Settings">
                     <i class="bi bi-gear-fill" style="font-size: 1.3rem;"></i>
                 </a>
             @endif
             <div class="user-profile-wrapper" style="position: relative;">
-                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                @if(auth()->check() && auth()->user()->role === 'superadmin')
                     <a href="{{ route('setting.index') }}" class="user-profile-icon" title="Setting User"
                         style="cursor: pointer; text-decoration: none; color: inherit;">
                         @if(auth()->user()->photo)
@@ -608,7 +608,7 @@
                     <tr>
                         <th class="text-center sticky-col col-no">NO</th>
                         <th class="sticky-col col-site-id">SITE ID</th>
-                        <th class="sticky-col col-nama_lokasi">NAMA LOKASI</th>
+                        <th class="sticky-col col-nama_lokasi" style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="NAMA LOKASI">NAMA LOKASI</th>
                         <th>PROVINSI</th>
                         <th>KABUPATEN / KOTA</th>
                         <th>PIC CE</th>
@@ -629,7 +629,7 @@
                     <tr>
                         <td class="text-center sticky-col col-no">{{ $loop->iteration }}</td>
                         <td class="text-center sticky-col col-site-id">{{ $item->site_id }}</td>
-                        <td class="sticky-col col-nama_lokasi">{{ $item->nama_lokasi }}</td>
+                        <td class="sticky-col col-nama_lokasi text-truncate" style="max-width: 150px;" title="{{ $item->nama_lokasi }}">{{ $item->nama_lokasi }}</td>
                         <td>{{ $item->provinsi }}</td>
                         <td>{{ $item->kabupaten }}</td>
                         <td>{{ $item->pic_ce }}</td>

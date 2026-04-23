@@ -71,7 +71,7 @@
                 </div>
                 <ul>
                     <li><a href="{{ route('todolist') }}"><i class="bi bi-check2-square me-2"></i> My Todo List</a></li>
-                    @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                    @if(auth()->check() && auth()->user()->role === 'superadmin')
                         <li><a href="{{ route('jadwalpiket') }}"><i class="bi bi-calendar-event me-2"></i> Jadwal Piket</a></li>
                         <li><a href="{{ route('remotelog') }}"><i class="bi bi-shield-lock me-2"></i> Log Remote</a></li>
                     @endif
@@ -81,40 +81,3 @@
         </div>
     </div>
 </div>
-
-<!-- Auto Logout Script -->
-<script>
-    (function() {
-        let timeout;
-        const maxIdleTime = 3600000; // 1 jam (3.600.000 ms)
-
-        function resetTimer() {
-            clearTimeout(timeout);
-            timeout = setTimeout(logoutUser, maxIdleTime);
-        }
-
-        function logoutUser() {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = "{{ route('logout') }}";
-            
-            const csrfToken = document.createElement('input');
-            csrfToken.type = 'hidden';
-            csrfToken.name = '_token';
-            const metaCsrf = document.querySelector('meta[name="csrf-token"]');
-            csrfToken.value = metaCsrf ? metaCsrf.getAttribute('content') : "{{ csrf_token() }}";
-            
-            form.appendChild(csrfToken);
-            document.body.appendChild(form);
-            form.submit();
-        }
-
-        window.onload = resetTimer;
-        window.onmousemove = resetTimer;
-        window.onmousedown = resetTimer; 
-        window.ontouchstart = resetTimer;
-        window.onclick = resetTimer;     
-        window.onkeydown = resetTimer;   
-        window.addEventListener('scroll', resetTimer, true);
-    })();
-</script>

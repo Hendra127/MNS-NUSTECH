@@ -56,13 +56,13 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-3">
-            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+            @if(auth()->check() && auth()->user()->role === 'superadmin')
                 <a href="{{ route('setting.index') }}" class="text-white opacity-75 hover-opacity-100" title="Settings">
                     <i class="bi bi-gear-fill" style="font-size: 1.3rem;"></i>
                 </a>
             @endif
             <div class="user-profile-wrapper" style="position: relative;">
-                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                @if(auth()->check() && auth()->user()->role === 'superadmin')
                     <a href="{{ route('setting.index') }}" class="user-profile-icon" title="Setting User"
                         style="cursor: pointer; text-decoration: none; color: inherit;">
                         @if(auth()->user()->photo)
@@ -121,13 +121,14 @@
     </div>
     <!-- CONTENT -->
     <div class="content-container">
-        <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3" style="margin-bottom: 20px;">
+        <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3"
+            style="margin-bottom: 20px;">
             <div class="actions flex-shrink-0">
                 @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                     <button type="button" class="btn-action bi bi-plus" title="Add" data-toggle="modal"
                         data-target="#modalSite" onclick="addSite()"></button>
-                    <form action="{{ route('datapas.import') }}" method="POST" enctype="multipart/form-data"
-                        id="importForm" class="m-0">
+                    <form action="{{ route('datapas.import') }}" method="POST" enctype="multipart/form-data" id="importForm"
+                        class="m-0">
                         @csrf
                         <input type="file" name="file" id="fileInput" style="display: none;" accept=".xlsx, .xls, .csv"
                             onchange="handleFileUpload()">
@@ -142,11 +143,13 @@
                 </a>
             </div>
             <div class="w-100 mt-2 mt-lg-0 d-flex justify-content-lg-end">
-                <form method="GET" action="{{ route('datapas') }}" class="search-form row g-2 align-items-center m-0" id="search-form">
+                <form method="GET" action="{{ route('datapas') }}" class="search-form row g-2 align-items-center m-0"
+                    id="search-form">
                     <div class="col-12 col-md-auto">
                         <div class="search-box d-flex align-items-center w-100">
                             <input type="text" name="search" id="search-input" placeholder="Search"
-                                value="{{ request('search') }}" autocomplete="off" style="flex-grow: 1; border: none; outline: none; padding-left: 15px;">
+                                value="{{ request('search') }}" autocomplete="off"
+                                style="flex-grow: 1; border: none; outline: none; padding-left: 15px;">
                             <button type="submit" class="search-btn">🔍</button>
                         </div>
                     </div>
@@ -211,7 +214,7 @@
         </div>
         <div class="pagination-wrapper">
             <span class="pagination-info">
-                Showing {{ $datapass->firstItem() ?? 0 }} to {{ $datapass->lastItem() ?? 0 }} 
+                Showing {{ $datapass->firstItem() ?? 0 }} to {{ $datapass->lastItem() ?? 0 }}
                 of&nbsp;<strong>{{ $datapass->total() }}</strong>&nbsp;results
             </span>
             <nav>

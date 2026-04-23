@@ -61,6 +61,10 @@ Route::domain('nustech.co.id')->group(function () {
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+// Fallback for timeout-logout to prevent 404
+Route::get('/timeout-logout', function () {
+    return redirect('/login');
+});
 
 // CSRF Token Refresh — dipanggil JS di semua halaman agar session tidak expire
 Route::get('/csrf-refresh', function () {
@@ -162,8 +166,8 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/datapass/{id}', [DatapasController::class, 'update'])->name('datapas.update');
     Route::delete('/datapass/{id}', [DatapasController::class, 'destroy'])->name('datapas.destroy');
 
-    // --- PERANGKAT & TRACKER (Superadmin Only) ---
-    Route::middleware(['role:superadmin'])->group(function () {
+    // --- PERANGKAT & TRACKER (Admin & Superadmin) ---
+    Route::middleware(['role:admin,superadmin'])->group(function () {
         Route::get('/pergantianperangkat', [PergantianController::class, 'index'])->name('pergantianperangkat');
         Route::post('/pergantianperangkat/store', [PergantianController::class, 'store'])->name('pergantianperangkat.store');
         Route::post('/pergantianperangkat/import', [PergantianController::class, 'import'])->name('pergantianperangkat.import');
@@ -190,9 +194,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/todolist/subtask/toggle/{id}', [TodolistController::class, 'toggleSubTask'])->name('subtask.toggle');
     Route::post('/todolist/update-title/{id}', [TodolistController::class, 'updateTitle']);
     Route::post('/todolist/subtask/update/{id}', [TodolistController::class, 'updateSubTask']);
+    Route::delete('/todolist/subtask/delete/{id}', [TodolistController::class, 'deleteSubTask']);
 
-    // --- LAPORAN CM ROUTES (Superadmin Only) ---
-    Route::middleware(['role:superadmin'])->group(function () {
+    // --- LAPORAN CM ROUTES (Admin & Superadmin) ---
+    Route::middleware(['role:admin,superadmin'])->group(function () {
         Route::get('/laporancm', [LaporanCMController::class, 'index'])->name('laporancm');
         Route::post('/laporancm/store', [LaporanCMController::class, 'store'])->name('laporancm.store');
         Route::put('/laporancm/{id}', [LaporanCMController::class, 'update'])->name('laporancm.update');

@@ -171,4 +171,29 @@ class TodolistController extends Controller
         $todo->update(['checklists' => $checklists]);
         return response()->json(['success' => true]);
     }
+
+    // Menghapus sub-item
+    public function deleteSubTask(Request $request, $id) {
+        $todo = Todo::where('user_id', auth()->id())->findOrFail($id);
+        
+        if (!$todo->checklists) {
+            return response()->json(['success' => true]);
+        }
+
+        $checklists = collect($todo->checklists)->filter(function ($item) use ($request) {
+            return $item['id'] != $request->subtask_id;
+        })->values()->all();
+
+        $todo->update(['checklists' => $checklists]);
+        
+        ActivityLog::record([
+            'action' => 'delete',
+            'module' => 'To Do List',
+            'description' => 'Menghapus sub-task dari project ' . $todo->title,
+            'record_id' => $todo->id,
+            'record_label' => $todo->title,
+        ]);
+
+        return response()->json(['success' => true]);
+    }
 }

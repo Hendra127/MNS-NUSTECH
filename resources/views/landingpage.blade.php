@@ -345,8 +345,9 @@
               <i class="fa-solid fa-clipboard-list"></i> PM Summary
             </a>
           </div>
-        </li>
+          @endif
 
+          @if(Auth::user()->role === 'superadmin')
         <li class="relative group">
           <a href="#" class="nav-link px-4 py-2 flex items-center">
             Jadwal Piket
@@ -363,7 +364,7 @@
 
         @auth
           @php $role = Auth::user()->role; @endphp
-          @if (in_array($role, ['admin', 'superadmin']))
+          @if ($role === 'superadmin')
             <li class="relative group">
               <a href="#" class="nav-link px-4 py-2 flex items-center">
                 SLA
@@ -453,15 +454,17 @@
           <li><a href="{{ route('summaryperangkat') }}" class="block px-3 py-2 border-b border-gray-50">PM Summary</a>
           </li>
 
+          @if(Auth::user()->role === 'superadmin')
           <!-- Operasional -->
           <li class="font-bold px-3 pt-4 text-blue-600 text-sm">LAINNYA</li>
           <li><a href="{{ route('jadwalpiket') }}" class="block px-3 py-2 border-b border-gray-50">Jadwal Piket</a></li>
+          @endif
           @endif
         @endauth
         <li><a href="{{ route('todolist') }}" class="block px-3 py-2 border-b border-gray-50">To Do List</a></li>
 
         @auth
-          @if (in_array(Auth::user()->role, ['admin', 'superadmin']))
+          @if (Auth::user()->role === 'superadmin')
             <li class="font-bold px-3 pt-4 text-slate-500 text-sm">SLA / REPORT</li>
             <li><a href="{{ url('rekap-bmn') }}" class="block px-3 py-2 border-b border-gray-50">Rekap BMN</a></li>
             <li><a href="{{ url('rekap-sl') }}" class="block px-3 py-2 border-b border-gray-50">Rekap SL</a></li>
@@ -505,31 +508,6 @@
       mobileMenu.classList.toggle('hidden');
     });
 
-    // Auto Logout Script based on Inactivity
-    (function () {
-      let timeout;
-      const maxIdleTime = 3600000; // 1 jam (3.600.000 ms)
-
-      function resetTimer() {
-        clearTimeout(timeout);
-        timeout = setTimeout(logoutUser, maxIdleTime);
-      }
-
-      function logoutUser() {
-        const logoutBtn = document.querySelector('form[action="{{ route('logout') }}"]');
-        if (logoutBtn) {
-          logoutBtn.submit();
-        }
-      }
-
-      window.onload = resetTimer;
-      window.onmousemove = resetTimer;
-      window.onmousedown = resetTimer;
-      window.ontouchstart = resetTimer;
-      window.onclick = resetTimer;
-      window.onkeydown = resetTimer;
-      window.addEventListener('scroll', resetTimer, true);
-    })();
   </script>
 </body>
 
