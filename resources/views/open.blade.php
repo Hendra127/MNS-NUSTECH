@@ -280,18 +280,7 @@
                 </a>
             @endif
             <div class="user-profile-wrapper" style="position: relative;">
-                @if(auth()->check() && auth()->user()->role === 'superadmin')
-                    <a href="{{ route('setting.index') }}" class="user-profile-icon" title="Setting User"
-                        style="cursor: pointer; text-decoration: none; color: inherit;">
-                        @if(auth()->user()->photo)
-                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
-                                style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
-                        @else
-                            <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
-                        @endif
-                    </a>
-                @else
-                    <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
+                <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
                         @if(auth()->check() && auth()->user()->photo)
                             <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
                                 style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
@@ -299,7 +288,6 @@
                             <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
                         @endif
                     </div>
-                @endif
                 <div id="profileDropdownMenu" class="hidden"
                     style="position: absolute; right: 0; top: 100%; mt: 10px; width: 150px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; display: none; flex-direction: column; overflow: hidden;">
                     <div

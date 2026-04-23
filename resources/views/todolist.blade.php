@@ -264,18 +264,7 @@
                 </a>
             @endif
             <div class="user-profile-wrapper" style="position: relative;">
-                @if(auth()->check() && auth()->user()->role === 'superadmin')
-                    <a href="{{ route('setting.index') }}" class="user-profile-icon" title="Setting User"
-                        style="cursor: pointer; text-decoration: none; color: inherit;">
-                        @if(auth()->user()->photo)
-                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
-                                style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
-                        @else
-                            <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
-                        @endif
-                    </a>
-                @else
-                    <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
+                <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
                         @if(auth()->check() && auth()->user()->photo)
                             <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
                                 style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
@@ -283,7 +272,6 @@
                             <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
                         @endif
                     </div>
-                @endif
                 <div id="profileDropdownMenu" class="hidden"
                     style="position: absolute; right: 0; top: 100%; mt: 10px; width: 150px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; display: none; flex-direction: column; overflow: hidden;">
                     <div
@@ -353,7 +341,8 @@
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <div style="flex: 1;">
                                     <h5 style="font-weight: 700; margin: 0; color: #1e293b; display: inline-block;" contenteditable="true"
-                                        onblur="updateProjectTitle({{ $todo->id }}, this.innerText)">
+                                        onkeydown="if(event.key==='Enter'){event.preventDefault();saveTitle({{ $todo->id }},this);}"
+                                        onblur="saveTitle({{ $todo->id }},this)">
                                         {{ $todo->title }}
                                     </h5>
                                     @if(auth()->id() !== $todo->user_id)
@@ -361,7 +350,7 @@
                                             <i class="bi bi-reply-fill text-primary"></i> Dibagikan oleh {{ $todo->user->name ?? 'Admin' }}
                                         </div>
                                     @elseif($todo->sharedUsers && $todo->sharedUsers->count() > 0)
-                                        <div class="text-muted mt-1" style="font-size: 11px; font-weight: 500;">
+                                        <div class="text-muted mt-1 share-info-badge" style="font-size: 11px; font-weight: 500;">
                                             <i class="bi bi-people-fill text-success"></i> Dibagikan ke {{ $todo->sharedUsers->count() }} user
                                         </div>
                                     @endif
@@ -383,38 +372,41 @@
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between mb-1" style="font-size: 11px; font-weight: 600;">
                                     <span>Progress</span>
-                                    <span>{{ $percent }}%</span>
+                                    <span class="pct-label">{{ $percent }}%</span>
                                 </div>
                                 <div class="progress">
-                                    <div class="progress-bar" style="width: {{ $percent }}%; background-color: #8b5cf6;">
+                                    <div class="progress-bar pct-bar" style="width: {{ $percent }}%; background-color: #8b5cf6;">
                                     </div>
                                 </div>
                             </div>
                             <div class="checklist-area mb-3"
                                 style="max-height: 250px; overflow-y: auto; overflow-x: hidden; flex-grow: 1;">
                                 @foreach($todo->checklists ?? [] as $item)
-                                    <div class="checklist-item" style="justify-content: space-between;">
+                                    <div class="checklist-item" style="justify-content: space-between;" id="sub-{{ $item['id'] }}">
                                         <div style="display: flex; align-items: flex-start; gap: 10px; flex: 1;">
                                             <input type="checkbox" {{ $item['completed'] ? 'checked' : '' }}
-                                                onchange="toggleSubTask('{{ $todo->id }}', '{{ $item['id'] }}')"
+                                                onchange="toggleSub('{{ $todo->id }}', '{{ $item['id'] }}', this)"
                                                 class="form-check-input cursor-pointer" style="min-width: 18px;">
                                             <span class="{{ $item['completed'] ? 'strikethrough' : '' }}" style="font-size: 13px; flex: 1;"
                                                 contenteditable="true"
-                                                onblur="updateSubTaskText('{{ $todo->id }}', '{{ $item['id'] }}', this.innerText)">
+                                                onkeydown="if(event.key==='Enter'){event.preventDefault();saveSub('{{ $todo->id }}','{{ $item['id'] }}',this);}"
+                                                onblur="saveSub('{{ $todo->id }}', '{{ $item['id'] }}', this)">
                                                 {{ $item['text'] }}
                                             </span>
                                         </div>
                                         <i class="bi bi-trash text-danger cursor-pointer ms-2" style="font-size: 14px; margin-top: 2px;" title="Hapus sub-task"
-                                            onclick="deleteSubTask('{{ $todo->id }}', '{{ $item['id'] }}')"></i>
+                                            onclick="deleteSub('{{ $todo->id }}', '{{ $item['id'] }}')"></i>
                                     </div>
                                 @endforeach
                             </div>
                             <input type="text" class="form-control form-control-sm subtask-input"
                                 placeholder="+ Tambah sub-task..."
-                                onkeypress="if(event.key === 'Enter') addSubTask('{{ $todo->id }}', this)">
+                                onkeydown="if(event.key === 'Enter'){ event.preventDefault(); addSubTask('{{ $todo->id }}', this); }">
                         </div>
                     @empty
-                        <p class="text-muted">Tidak ada project berjalan.</p>
+                        <div id="no-todo-msg" class="col-12 text-center py-5">
+                            <p class="text-muted">Tidak ada project berjalan.</p>
+                        </div>
                     @endforelse
                 </div>
             </div>
@@ -422,36 +414,40 @@
                 <div class="done-column">
                     <h4 class="mb-4" style="font-weight: 700;"><i class="bi bi-check-all text-success"></i> Completed
                     </h4>
-                    @forelse($dones as $done)
-                        <div class="note-item done-card mb-3" data-id="{{ $done->id }}" style="min-height: auto; padding: 15px;">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div style="flex: 1; min-width: 0; padding-right: 15px;">
-                                    <h6 class="m-0" style="font-weight: 700; text-decoration: line-through;">
-                                        {{ $done->title }}
-                                    </h6>
-                                    @if(auth()->id() !== $done->user_id)
-                                        <div class="text-muted mt-1" style="font-size: 10px;">
-                                            <i class="bi bi-reply-fill text-primary"></i> Dibagikan oleh {{ $done->user->name ?? 'Admin' }}
-                                        </div>
-                                    @elseif($done->sharedUsers && $done->sharedUsers->count() > 0)
-                                        <div class="text-muted mt-1" style="font-size: 10px;">
-                                            <i class="bi bi-people-fill text-success"></i> Dibagikan ke {{ $done->sharedUsers->count() }} user
-                                        </div>
-                                    @endif
-                                    <small class="text-muted" style="font-size: 10px;">Selesai pada:
-                                        {{ $done->updated_at->format('d M H:i') }}</small>
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <i class="bi bi-arrow-counterclockwise text-primary fs-5 cursor-pointer"
-                                        onclick="toggleStatus({{ $done->id }})" title="Kembalikan ke Aktif"></i>
-                                    <i class="bi bi-trash text-danger cursor-pointer"
-                                        onclick="deleteTodo({{ $done->id }})"></i>
+                    <div id="done-list">
+                        @forelse($dones as $done)
+                            <div class="note-item done-card mb-3" id="todo-card-{{ $done->id }}" data-id="{{ $done->id }}" style="min-height: auto; padding: 15px;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div style="flex: 1; min-width: 0; padding-right: 15px;">
+                                        <h6 class="m-0" style="font-weight: 700; text-decoration: line-through;">
+                                            {{ $done->title }}
+                                        </h6>
+                                        @if(auth()->id() !== $done->user_id)
+                                            <div class="text-muted mt-1" style="font-size: 10px;">
+                                                <i class="bi bi-reply-fill text-primary"></i> Dibagikan oleh {{ $done->user->name ?? 'Admin' }}
+                                            </div>
+                                        @elseif($done->sharedUsers && $done->sharedUsers->count() > 0)
+                                            <div class="text-muted mt-1" style="font-size: 10px;">
+                                                <i class="bi bi-people-fill text-success"></i> Dibagikan ke {{ $done->sharedUsers->count() }} user
+                                            </div>
+                                        @endif
+                                        <small class="text-muted" style="font-size: 10px;">Selesai pada:
+                                            {{ $done->updated_at->format('d M H:i') }}</small>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <i class="bi bi-arrow-counterclockwise text-primary fs-5 cursor-pointer"
+                                            onclick="toggleStatus({{ $done->id }})" title="Kembalikan ke Aktif"></i>
+                                        <i class="bi bi-trash text-danger cursor-pointer"
+                                            onclick="deleteTodo({{ $done->id }})"></i>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    @empty
-                        <p class="text-center text-muted py-5">Belum ada project selesai.</p>
-                    @endforelse
+                        @empty
+                            <div id="no-done-msg" class="text-center py-5">
+                                <p class="text-muted">Belum ada project selesai.</p>
+                            </div>
+                        @endforelse
+                    </div>
                 </div>
             </div>
         </div>
@@ -503,206 +499,398 @@
     {{-- Script untuk dropdown profile dan CRUD To Do List --}}
     <script>
         $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } });
-        // Konfigurasi Toast (Notifikasi kecil di pojok untuk auto-save)
+
+        // ===== TOAST =====
         const Toast = Swal.mixin({
             toast: true,
-            position: 'top-end',
+            position: 'top',
             showConfirmButton: false,
             timer: 2000,
             timerProgressBar: true
         });
-        // --- UI Logic ---
-        $('#profileDropdownTrigger').on('click', function (e) {
+
+        // ===== PROFILE DROPDOWN =====
+        $('#profileDropdownTrigger').on('click', function(e) {
             e.stopPropagation();
             $('#profileDropdownMenu').fadeToggle(200);
         });
         $(document).on('click', () => $('#profileDropdownMenu').fadeOut(200));
+
+        // ===== ENTER di textarea utama =====
         function handleTextareaEnter(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 saveTodo();
             }
         }
-        // --- CRUD Utama ---
+
+        // ===== TAMBAH PROJECT =====
         function saveTodo() {
-            let title = $('#todoInput').val();
-            if (!title.trim()) {
-                Swal.fire({ icon: 'error', title: 'Oops...', text: 'Nama project tidak boleh kosong!' });
+            const title = $('#todoInput').val().trim();
+            if (!title) {
+                Swal.fire({ icon: 'error', title: 'Oops!', text: 'Nama project tidak boleh kosong!' });
                 return;
             }
-            $.post("{{ route('todolist.store') }}", { title: title }, function () {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: 'Project baru telah ditambahkan',
-                    showConfirmButton: false,
-                    timer: 1500
-                }).then(() => location.reload());
+            $.ajax({
+                url: "{{ route('todolist.store') }}",
+                type: 'POST',
+                data: { title: title },
+                success: function(res) {
+                    if (!res || !res.data) return;
+                    const id = res.data.id;
+                    const isSuperadmin = {{ auth()->check() && auth()->user()->role === 'superadmin' ? 'true' : 'false' }};
+                    const shareBtn = isSuperadmin
+                        ? `<i class="bi bi-share text-primary fs-5 cursor-pointer" onclick="shareTodo(${id}, [])" title="Bagikan"></i>`
+                        : '';
+                    const card = `
+                        <div class="note-item" id="todo-card-${id}" data-id="${id}"
+                             style="opacity:0; transform:scale(0.95); transition:all 0.3s;">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div style="flex:1;">
+                                    <h5 style="font-weight:700;margin:0;color:#1e293b;display:inline-block;"
+                                        contenteditable="true"
+                                        onkeydown="if(event.key==='Enter'){event.preventDefault();saveTitle(${id},this);}"
+                                        onblur="saveTitle(${id},this)">
+                                        ${esc(title)}
+                                    </h5>
+                                </div>
+                                <div class="d-flex gap-2 ms-2">
+                                    ${shareBtn}
+                                    <i class="bi bi-check-circle-fill text-success fs-5 cursor-pointer" onclick="toggleStatus(${id})"></i>
+                                    <i class="bi bi-trash text-danger cursor-pointer fs-5" onclick="deleteTodo(${id})"></i>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1" style="font-size:11px;font-weight:600;">
+                                    <span>Progress</span><span class="pct-label">0%</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar pct-bar" style="width:0%;background-color:#8b5cf6;"></div>
+                                </div>
+                            </div>
+                            <div class="checklist-area mb-3"
+                                 style="max-height:250px;overflow-y:auto;overflow-x:hidden;flex-grow:1;"></div>
+                            <input type="text" class="form-control form-control-sm subtask-input"
+                                   placeholder="+ Tambah sub-task..."
+                                   onkeydown="if(event.key === 'Enter'){ event.preventDefault(); addSubTask(${id},this); }">
+                        </div>`;
+                    const $card = $(card);
+                    
+                    // Remove empty message if exists
+                    $('#no-todo-msg').remove();
+                    
+                    $('.notes-grid').prepend($card);
+                    setTimeout(() => $card.css({ opacity: 1, transform: 'scale(1)' }), 20);
+                    $('#todoInput').val('');
+                    // Update badge
+                    const $badge = $('.count-badge');
+                    $badge.text((parseInt($badge.text()) || 0) + 1);
+                    Toast.fire({ icon: 'success', title: 'Project berhasil ditambahkan!' });
+                },
+                error: function(xhr) {
+                    Swal.fire({ icon: 'error', title: 'Error', text: xhr.responseJSON?.message || 'Gagal menambah project' });
+                }
             });
         }
+
+        // ===== TOGGLE DONE / ONGOING =====
         function toggleStatus(id) {
-            $.post("/todolist/toggle/" + id, () => {
-                Toast.fire({ icon: 'success', title: 'Status berhasil diperbarui' })
-                    .then(() => location.reload());
+            $.post('/todolist/toggle/' + id, function() {
+                const $card = $('#todo-card-' + id);
+                const title = $card.find('h5').text().trim() || $card.find('h6').text().trim();
+                const isDone = $card.hasClass('done-card');
+
+                if (!isDone) {
+                    // → pindah ke Done
+                    $card.fadeOut(250, function() {
+                        $(this).remove();
+                        
+                        // Check empty state for Ongoing
+                        if ($('.notes-grid .note-item').length === 0) {
+                            $('.notes-grid').append(`<div id="no-todo-msg" class="col-12 text-center py-5"><p class="text-muted">Tidak ada project berjalan.</p></div>`);
+                        }
+
+                        const doneCard = `
+                            <div class="note-item done-card mb-3" id="todo-card-${id}" data-id="${id}"
+                                 style="min-height:auto;padding:15px;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div style="flex:1;min-width:0;padding-right:15px;">
+                                        <h6 class="m-0" style="font-weight:700;text-decoration:line-through;">${esc(title)}</h6>
+                                        <small class="text-muted" style="font-size:10px;">Selesai: baru saja</small>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <i class="bi bi-arrow-counterclockwise text-primary fs-5 cursor-pointer"
+                                           onclick="toggleStatus(${id})" title="Kembalikan"></i>
+                                        <i class="bi bi-trash text-danger cursor-pointer"
+                                           onclick="deleteTodo(${id})"></i>
+                                    </div>
+                                </div>
+                            </div>`;
+                        const $done = $(doneCard).hide();
+                        
+                        // Remove empty message for Done
+                        $('#no-done-msg').remove();
+                        
+                        $('#done-list').prepend($done);
+                        $done.fadeIn(250);
+                        adjustBadge(-1);
+                    });
+                } else {
+                    // → kembalikan ke Ongoing
+                    $card.fadeOut(250, function() {
+                        $(this).remove();
+                        
+                        // Check empty state for Done
+                        if ($('#done-list .done-card').length === 0) {
+                            $('#done-list').append(`<div id="no-done-msg" class="text-center py-5"><p class="text-muted">Belum ada project selesai.</p></div>`);
+                        }
+
+                        const onCard = `
+                            <div class="note-item" id="todo-card-${id}" data-id="${id}"
+                                 style="opacity:0;transition:all 0.3s;">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div style="flex:1;">
+                                        <h5 style="font-weight:700;margin:0;color:#1e293b;"
+                                            contenteditable="true"
+                                            onkeydown="if(event.key==='Enter'){event.preventDefault();saveTitle(${id},this);}"
+                                            onblur="saveTitle(${id},this)">${esc(title)}</h5>
+                                    </div>
+                                    <div class="d-flex gap-2 ms-2">
+                                        <i class="bi bi-check-circle-fill text-success fs-5 cursor-pointer" onclick="toggleStatus(${id})"></i>
+                                        <i class="bi bi-trash text-danger cursor-pointer fs-5" onclick="deleteTodo(${id})"></i>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1" style="font-size:11px;font-weight:600;">
+                                        <span>Progress</span><span class="pct-label">0%</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar pct-bar" style="width:0%;background-color:#8b5cf6;"></div>
+                                    </div>
+                                </div>
+                                <div class="checklist-area mb-3"
+                                     style="max-height:250px;overflow-y:auto;flex-grow:1;"></div>
+                                <input type="text" class="form-control form-control-sm subtask-input"
+                                       placeholder="+ Tambah sub-task..."
+                                       onkeydown="if(event.key === 'Enter'){ event.preventDefault(); addSubTask(${id},this); }">
+                            </div>`;
+                        const $on = $(onCard);
+                        
+                        // Remove empty message for Ongoing
+                        $('#no-todo-msg').remove();
+                        
+                        $('.notes-grid').prepend($on);
+                        setTimeout(() => $on.css('opacity', 1), 20);
+                        adjustBadge(1);
+                    });
+                }
+                Toast.fire({ icon: 'success', title: 'Status diperbarui!' });
+            }).fail(function(xhr) {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Gagal memperbarui status' });
             });
         }
+
+        // ===== HAPUS PROJECT =====
         function deleteTodo(id) {
             Swal.fire({
-                title: 'Hapus Project?',
-                text: "Data yang dihapus tidak bisa dikembalikan!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "/todolist/delete/" + id,
-                        type: 'DELETE',
-                        success: () => {
-                            Swal.fire('Terhapus!', 'Project telah dihapus.', 'success')
-                                .then(() => location.reload());
+                title: 'Hapus Project?', text: 'Data tidak bisa dikembalikan!',
+                icon: 'warning', showCancelButton: true,
+                confirmButtonColor: '#d33', cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!', cancelButtonText: 'Batal'
+            }).then(r => {
+                if (!r.isConfirmed) return;
+                $.ajax({ url: '/todolist/delete/' + id, type: 'DELETE', success: function() {
+                    const $card = $('#todo-card-' + id);
+                    const isDone = $card.hasClass('done-card');
+                    $card.fadeOut(250, function() {
+                        $(this).remove();
+                        if (!isDone) {
+                            adjustBadge(-1);
+                            if ($('.notes-grid .note-item').length === 0) {
+                                $('.notes-grid').append(`<div id="no-todo-msg" class="col-12 text-center py-5"><p class="text-muted">Tidak ada project berjalan.</p></div>`);
+                            }
+                        } else {
+                            if ($('#done-list .done-card').length === 0) {
+                                $('#done-list').append(`<div id="no-done-msg" class="text-center py-5"><p class="text-muted">Belum ada project selesai.</p></div>`);
+                            }
                         }
                     });
-                }
+                    Toast.fire({ icon: 'success', title: 'Project dihapus!' });
+                }, error: function() {
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Gagal menghapus project' });
+                }});
             });
         }
-        // --- Edit In-Place (Auto-Save) ---
-        function updateProjectTitle(id, newTitle) {
-            if (!newTitle.trim()) return;
-            $.post("/todolist/update-title/" + id, { title: newTitle }, function () {
-                Toast.fire({ icon: 'success', title: 'Judul disimpan' });
+
+        // ===== EDIT JUDUL (Enter / blur) =====
+        let _tTimer = {};
+        function saveTitle(id, el) {
+            const t = el.innerText.trim();
+            if (!t) return;
+            clearTimeout(_tTimer[id]);
+            _tTimer[id] = setTimeout(() => {
+                $.post('/todolist/update-title/' + id, { title: t }, function() {
+                    Toast.fire({ icon: 'success', title: 'Judul disimpan!' });
+                });
+            }, 200);
+        }
+
+        // ===== TAMBAH SUB-TASK =====
+        function addSubTask(todoId, inputEl) {
+            const text = $(inputEl).val().trim();
+            if (!text) return;
+            $.post(`/todolist/subtask/add/${todoId}`, { text: text }, function(res) {
+                if (!res || !res.success) return;
+                const item = res.checklists[res.checklists.length - 1];
+                const row = `
+                    <div class="checklist-item" style="justify-content:space-between;" id="sub-${item.id}">
+                        <div style="display:flex;align-items:flex-start;gap:10px;flex:1;">
+                            <input type="checkbox" class="form-check-input cursor-pointer" style="min-width:18px;"
+                                   onchange="toggleSub('${todoId}','${item.id}',this)">
+                            <span style="font-size:13px;flex:1;" contenteditable="true"
+                                  onkeydown="if(event.key==='Enter'){event.preventDefault();saveSub('${todoId}','${item.id}',this);}"
+                                  onblur="saveSub('${todoId}','${item.id}',this)">${esc(text)}</span>
+                        </div>
+                        <i class="bi bi-trash text-danger cursor-pointer ms-2" style="font-size:14px;margin-top:2px;"
+                           onclick="deleteSub('${todoId}','${item.id}')"></i>
+                    </div>`;
+                $(`#todo-card-${todoId} .checklist-area`).append(row);
+                $(inputEl).val('');
+                recalcPct(todoId, res.checklists);
+                Toast.fire({ icon: 'success', title: 'Sub-task ditambahkan!' });
+            }).fail(function() {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Gagal menambah sub-task' });
             });
         }
-        function updateSubTaskText(todoId, subtaskId, newText) {
-            if (!newText.trim()) return;
-            $.post(`/todolist/subtask/update/${todoId}`, {
-                subtask_id: subtaskId,
-                text: newText
-            }, function () {
-                Toast.fire({ icon: 'success', title: 'Perubahan disimpan' });
+
+        // ===== TOGGLE CHECKBOX SUB-TASK =====
+        function toggleSub(todoId, subId, cbEl) {
+            $.post(`/todolist/subtask/toggle/${todoId}`, { subtask_id: subId }, function() {
+                const $span = $(`#sub-${subId} span`);
+                $span.toggleClass('strikethrough');
+                // hitung ulang dari DOM
+                const $area = $(`#todo-card-${todoId} .checklist-area`);
+                const total = $area.find('.checklist-item').length;
+                const done = $area.find('input[type=checkbox]:checked').length;
+                const pct = total > 0 ? Math.round(done / total * 100) : 0;
+                $(`#todo-card-${todoId} .pct-bar`).css('width', pct + '%');
+                $(`#todo-card-${todoId} .pct-label`).text(pct + '%');
+                Toast.fire({ icon: 'success', title: 'Status sub-task diperbarui!' });
             });
         }
-        // --- Sub-task Logic ---
-        function addSubTask(todoId, inputElement) {
-            let text = $(inputElement).val();
-            if (!text.trim()) return;
-            $.post(`/todolist/subtask/add/${todoId}`, { text: text }, () => {
-                Toast.fire({ icon: 'success', title: 'Sub-task ditambahkan' })
-                    .then(() => location.reload());
-            });
+
+        // ===== EDIT TEKS SUB-TASK =====
+        let _sTimer = {};
+        function saveSub(todoId, subId, el) {
+            const t = el.innerText.trim();
+            if (!t) return;
+            const k = todoId + '_' + subId;
+            clearTimeout(_sTimer[k]);
+            _sTimer[k] = setTimeout(() => {
+                $.post(`/todolist/subtask/update/${todoId}`, { subtask_id: subId, text: t }, function() {
+                    Toast.fire({ icon: 'success', title: 'Sub-task diperbarui!' });
+                });
+            }, 200);
         }
-        function toggleSubTask(todoId, subtaskId) {
-            $.post(`/todolist/subtask/toggle/${todoId}`, { subtask_id: subtaskId }, () => {
-                // Reload tanpa alert untuk UX yang lebih cepat pada checkbox
-                location.reload();
-            });
-        }
-        function deleteSubTask(todoId, subtaskId) {
+
+        // ===== HAPUS SUB-TASK =====
+        function deleteSub(todoId, subId) {
             Swal.fire({
-                title: 'Hapus Sub-task?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
+                title: 'Hapus Sub-task?', icon: 'warning', showCancelButton: true,
+                confirmButtonColor: '#d33', cancelButtonColor: '#3085d6',
                 confirmButtonText: 'Ya, Hapus!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: `/todolist/subtask/delete/${todoId}`,
-                        type: 'DELETE',
-                        data: { subtask_id: subtaskId },
-                        success: () => {
-                            Toast.fire({ icon: 'success', title: 'Sub-task dihapus' })
-                                .then(() => location.reload());
-                        }
-                    });
-                }
+            }).then(r => {
+                if (!r.isConfirmed) return;
+                $.ajax({ url: `/todolist/subtask/delete/${todoId}`, type: 'DELETE',
+                    data: { subtask_id: subId },
+                    success: function() {
+                        $(`#sub-${subId}`).fadeOut(200, function() {
+                            $(this).remove();
+                            // hitung ulang dari DOM
+                            const $area = $(`#todo-card-${todoId} .checklist-area`);
+                            const total = $area.find('.checklist-item').length;
+                            const done = $area.find('input[type=checkbox]:checked').length;
+                            const pct = total > 0 ? Math.round(done / total * 100) : 0;
+                            $(`#todo-card-${todoId} .pct-bar`).css('width', pct + '%');
+                            $(`#todo-card-${todoId} .pct-label`).text(pct + '%');
+                        });
+                        Toast.fire({ icon: 'success', title: 'Sub-task dihapus!' });
+                    },
+                    error: function() {
+                        Swal.fire({ icon: 'error', title: 'Error', text: 'Gagal menghapus sub-task' });
+                    }
+                });
             });
         }
 
-        // --- SortableJS Drag & Drop Logic ---
-        document.addEventListener('DOMContentLoaded', function () {
-            var ongoingGrid = document.querySelector('.notes-grid');
-            var doneColumn = document.querySelector('.done-column');
+        // ===== HELPER: recalc progress dari array checklists =====
+        function recalcPct(todoId, checklists) {
+            const total = checklists.length;
+            const done  = checklists.filter(i => i.completed).length;
+            const pct   = total > 0 ? Math.round(done / total * 100) : 0;
+            $(`#todo-card-${todoId} .pct-bar`).css('width', pct + '%');
+            $(`#todo-card-${todoId} .pct-label`).text(pct + '%');
+        }
 
-            if (ongoingGrid) {
-                Sortable.create(ongoingGrid, {
-                    group: 'todos',
-                    animation: 150,
-                    ghostClass: 'sortable-ghost',
-                    handle: '.note-item', // Biar semua area bisa ditarik
-                    onEnd: function (evt) {
-                        if (evt.to === doneColumn && evt.from !== doneColumn) {
-                            var todoId = evt.item.getAttribute('data-id');
-                            if (todoId) {
-                                toggleStatus(todoId);
-                            }
-                        }
-                    }
-                });
-            }
+        // ===== HELPER: badge jumlah ongoing =====
+        function adjustBadge(delta) {
+            const $b = $('.count-badge');
+            $b.text(Math.max(0, (parseInt($b.text()) || 0) + delta));
+        }
 
-            if (doneColumn) {
-                Sortable.create(doneColumn, {
-                    group: 'todos',
-                    animation: 150,
-                    ghostClass: 'sortable-ghost',
-                    handle: '.note-item', // Biar semua area bisa ditarik
-                    onEnd: function (evt) {
-                        if (evt.to === ongoingGrid && evt.from !== ongoingGrid) {
-                            var todoId = evt.item.getAttribute('data-id');
-                            if (todoId) {
-                                toggleStatus(todoId);
-                            }
-                        }
-                    }
-                });
-            }
+        // ===== HELPER: escape HTML =====
+        function esc(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
 
+        // ===== SORTABLE =====
+        document.addEventListener('DOMContentLoaded', function() {
+            const grid = document.querySelector('.notes-grid');
+            const done = document.querySelector('.done-column');
+            if (grid) Sortable.create(grid, {
+                group:'todos', animation:150, ghostClass:'sortable-ghost', handle:'.note-item',
+                onEnd: evt => { if (evt.to === done && evt.from !== done) toggleStatus(evt.item.dataset.id); }
+            });
+            if (done) Sortable.create(done, {
+                group:'todos', animation:150, ghostClass:'sortable-ghost', handle:'.note-item',
+                onEnd: evt => { if (evt.to === grid && evt.from !== grid) toggleStatus(evt.item.dataset.id); }
+            });
         });
 
-        // --- Share Logic ---
+        // ===== SHARE =====
         function shareTodo(id, sharedIds) {
             $('#shareTodoId').val(id);
             $('#shareMessage').val('');
-            // Reset all checkboxes
             $('.user-share-cb').prop('checked', false);
-            // Check the ones already shared
-            if (sharedIds && sharedIds.length > 0) {
-                sharedIds.forEach(userId => {
-                    $('#user_' + userId).prop('checked', true);
-                });
-            }
-            var shareModal = new bootstrap.Modal(document.getElementById('shareModal'));
-            shareModal.show();
+            (sharedIds || []).forEach(uid => $('#user_' + uid).prop('checked', true));
+            new bootstrap.Modal(document.getElementById('shareModal')).show();
         }
 
         function submitShare() {
-            let id = $('#shareTodoId').val();
-            let message = $('#shareMessage').val();
-            let userIds = [];
-            $('.user-share-cb:checked').each(function() {
-                userIds.push($(this).val());
-            });
+            const id = $('#shareTodoId').val();
+            const message = $('#shareMessage').val();
+            const userIds = [];
+            $('.user-share-cb:checked').each(function() { userIds.push($(this).val()); });
 
             $.post(`/todolist/share/${id}`, { user_ids: userIds, message: message }, function(res) {
-                if (res.success) {
-                    $('#shareModal').modal('hide');
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil!',
-                        text: 'Tugas telah dibagikan',
-                        showConfirmButton: false,
-                        timer: 1500
-                    }).then(() => location.reload());
+                if (!res.success) { Swal.fire('Error', res.message || 'Terjadi kesalahan', 'error'); return; }
+                bootstrap.Modal.getInstance(document.getElementById('shareModal')).hide();
+                // update badge share di card
+                const $card = $(`#todo-card-${id}`);
+                $card.find('.share-info-badge').remove();
+                if (userIds.length > 0) {
+                    $card.find('h5').after(`<div class="text-muted mt-1 share-info-badge" style="font-size:11px;font-weight:500;">
+                        <i class="bi bi-people-fill text-success"></i> Dibagikan ke ${userIds.length} user</div>`);
+                    $card.find('.bi-share').attr('onclick', `shareTodo(${id},${JSON.stringify(userIds.map(Number))})`);
                 } else {
-                    Swal.fire('Error', res.message || 'Terjadi kesalahan', 'error');
+                    $card.find('.bi-share').attr('onclick', `shareTodo(${id},[])`);
                 }
+                Toast.fire({ icon: 'success', title: 'Tugas berhasil dibagikan!' });
             });
         }
+
+
+
     </script>
 </body>
 

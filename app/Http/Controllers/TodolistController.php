@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Todo;
-use App\Models\ActivityLog;
+
 use Illuminate\Http\Request;
 
 class TodolistController extends Controller
@@ -44,13 +44,7 @@ class TodolistController extends Controller
             'type' => 'note'
         ]);
 
-        ActivityLog::record([
-            'action' => 'create',
-            'module' => 'To Do List',
-            'description' => 'Membuat project baru: ' . $request->title,
-            'record_id' => $todo->id,
-            'record_label' => $request->title,
-        ]);
+
 
         return response()->json([
             'success' => true,
@@ -66,16 +60,7 @@ class TodolistController extends Controller
         
         $this->notifyOwnerIfShared($todo, $newStatus ? 'menyelesaikan' : 'mengembalikan ke status Ongoing');
 
-        ActivityLog::record([
-            'action' => 'update',
-            'module' => 'To Do List',
-            'description' => $newStatus ? 'Menyelesaikan project: ' . $todo->title : 'Mengembalikan project ke Ongoing: ' . $todo->title,
-            'record_id' => $todo->id,
-            'record_label' => $todo->title,
-            'field_changed' => 'is_done',
-            'old_value' => !$newStatus ? 'Completed' : 'Ongoing',
-            'new_value' => $newStatus ? 'Completed' : 'Ongoing',
-        ]);
+
 
         return response()->json(['success' => true]);
     }
@@ -101,13 +86,7 @@ class TodolistController extends Controller
 
         $this->notifyOwnerIfShared($todo, 'menghapus');
 
-        ActivityLog::record([
-            'action' => 'delete',
-            'module' => 'To Do List',
-            'description' => 'Menghapus project: ' . $title,
-            'record_id' => $id,
-            'record_label' => $title,
-        ]);
+
 
         return response()->json(['success' => true]);
     }
@@ -126,15 +105,9 @@ class TodolistController extends Controller
         
         $this->notifyOwnerIfShared($todo, 'menambah subtask baru');
 
-        ActivityLog::record([
-            'action' => 'create',
-            'module' => 'To Do List',
-            'description' => 'Menambah sub-task "' . $request->text . '" pada project ' . $todo->title,
-            'record_id' => $todo->id,
-            'record_label' => $todo->title,
-        ]);
 
-        return back();
+
+        return response()->json(['success' => true, 'checklists' => $checklists]);
     }
 
     // Menandai sub-item selesai/belum
@@ -160,16 +133,7 @@ class TodolistController extends Controller
 
         $this->notifyOwnerIfShared($todo, 'mengubah judul');
 
-        ActivityLog::record([
-            'action' => 'update',
-            'module' => 'To Do List',
-            'description' => 'Mengubah judul project',
-            'record_id' => $todo->id,
-            'record_label' => $request->title,
-            'field_changed' => 'title',
-            'old_value' => $oldTitle,
-            'new_value' => $request->title,
-        ]);
+
 
         return response()->json(['success' => true]);
     }
@@ -206,13 +170,7 @@ class TodolistController extends Controller
         
         $this->notifyOwnerIfShared($todo, 'menghapus subtask');
         
-        ActivityLog::record([
-            'action' => 'delete',
-            'module' => 'To Do List',
-            'description' => 'Menghapus sub-task dari project ' . $todo->title,
-            'record_id' => $todo->id,
-            'record_label' => $todo->title,
-        ]);
+
 
         return response()->json(['success' => true]);
     }
