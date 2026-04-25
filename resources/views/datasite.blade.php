@@ -187,18 +187,7 @@
                 </a>
             @endif
             <div class="user-profile-wrapper" style="position: relative;">
-                @if(auth()->check() && auth()->user()->role === 'superadmin')
-                    <a href="{{ route('setting.index') }}" class="user-profile-icon" title="Setting User"
-                        style="cursor: pointer; text-decoration: none; color: inherit;">
-                        @if(auth()->user()->photo)
-                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
-                                style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
-                        @else
-                            <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
-                        @endif
-                    </a>
-                @else
-                    <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
+                <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
                         @if(auth()->check() && auth()->user()->photo)
                             <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
                                 style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
@@ -206,7 +195,6 @@
                             <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
                         @endif
                     </div>
-                @endif
                 <div id="profileDropdownMenu" class="hidden"
                     style="position: absolute; right: 0; top: 100%; mt: 10px; width: 150px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; display: none; flex-direction: column; overflow: hidden;">
                     <div
@@ -235,8 +223,10 @@
             style="text-decoration: none;">All Sites</a>
         <a href="{{ route('datapas') }}" class="tab {{ request()->is('datapass*') ? 'active' : '' }}"
             style="text-decoration: none;">Management Password</a>
-        <a href="{{ route('laporancm') }}" class="tab {{ request()->is('laporancm*') ? 'active' : '' }}"
-            style="text-decoration: none;">Correctiv Maintenance</a>
+        @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+            <a href="{{ route('laporancm') }}" class="tab {{ request()->is('laporancm*') ? 'active' : '' }}"
+                style="text-decoration: none;">Correctiv Maintenance</a>
+        @endif
         <a href="{{ route('pmliberta') }}" class="tab {{ request()->is('PMLiberta*') ? 'active' : '' }}"
             style="text-decoration: none;">Preventive Maintenance</a>
         <a href="{{ route('summarypm') }}" class="tab {{ request()->is('summarypm*') ? 'active' : '' }}"
@@ -325,7 +315,9 @@
                     <tr>
                         <th class="sticky-col col-no">NO</th>
                         <th class="sticky-col col-site-id">SITE ID</th>
-                        <th class="sticky-col col-sitename">SITENAME</th>
+                        <th class="sticky-col col-sitename"
+                            style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                            title="SITENAME">SITENAME</th>
                         <th>TIPE</th>
                         <th>BATCH</th>
                         <th>LATITUDE</th>
@@ -357,6 +349,8 @@
                         <th>EXPECTED SQF</th>
                         @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                             <th class="col-sticky-right col-aksi">AKSI</th>
+                        @elseif(auth()->check() && auth()->user()->role === 'user')
+                            <th class="col-sticky-right col-aksi">INFO</th>
                         @endif
                     </tr>
                 </thead>
@@ -365,7 +359,8 @@
                         <tr>
                             <td class="text-center sticky-col col-no">{{ $loop->iteration }}</td>
                             <td class="sticky-col col-site-id">{{ $site->site_id }}</td>
-                            <td class="sticky-col col-sitename">{{ $site->sitename }}</td>
+                            <td class="sticky-col col-sitename text-truncate" style="max-width: 150px;"
+                                title="{{ $site->sitename }}">{{ $site->sitename }}</td>
                             <td>{{ $site->tipe }}</td>
                             <td>{{ $site->batch }}</td>
                             <td>{{ $site->latitude }}</td>
@@ -417,6 +412,12 @@
                                             </form>
                                     </div>
                                 </td>
+                            @elseif(auth()->check() && auth()->user()->role === 'user')
+                                <td class="col-sticky-right col-aksi text-center">
+                                    <button type="button" class="btn btn-sm bi bi-info-circle"
+                                        onclick="viewSiteInfo({{ $site->toJson() }})" title="Info Site">
+                                    </button>
+                                </td>
                             @endif
                         </tr>
                     @empty
@@ -450,7 +451,7 @@
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
-                    </div >
+                        </div >
             @endif
     </script>
     <!-- MODAL ADD DATA -->
@@ -646,6 +647,36 @@
             }
 
             $('#modalSite').modal('show');
+        }
+
+        // Fungsi Info (read-only) untuk role user
+        function viewSiteInfo(data) {
+            Swal.fire({
+                title: '<i class="bi bi-info-circle-fill" style="color:#0d6efd;"></i> Info Site',
+                html: `
+                    <div style="text-align:left; font-size:13px; line-height:1.9;">
+                        <table style="width:100%; border-collapse:collapse;">
+                            <tr><td style="color:#888; width:130px;">Site ID</td><td><b>${data.site_id}</b></td></tr>
+                            <tr><td style="color:#888;">Site Name</td><td>${data.sitename || '-'}</td></tr>
+                            <tr><td style="color:#888;">Tipe</td><td>${data.tipe || '-'}</td></tr>
+                            <tr><td style="color:#888;">Batch</td><td>${data.batch || '-'}</td></tr>
+                            <tr><td style="color:#888;">Provinsi</td><td>${data.provinsi || '-'}</td></tr>
+                            <tr><td style="color:#888;">Kabupaten</td><td>${data.kab || '-'}</td></tr>
+                            <tr><td style="color:#888;">Kecamatan</td><td>${data.kecamatan || '-'}</td></tr>
+                            <tr><td style="color:#888;">Nama PIC</td><td>${data.nama_pic || '-'}</td></tr>
+                            <tr><td style="color:#888;">Nomor PIC</td><td>${data.nomor_pic || '-'}</td></tr>
+                            <tr><td style="color:#888;">Gateway Area</td><td>${data.gateway_area || '-'}</td></tr>
+                            <tr><td style="color:#888;">Hub</td><td>${data.hub || '-'}</td></tr>
+                            <tr><td style="color:#888;">IP Router</td><td><code>${data.ip_router || '-'}</code></td></tr>
+                            <tr><td style="color:#888;">IP AP1</td><td><code>${data.ip_ap1 || '-'}</code></td></tr>
+                            <tr><td style="color:#888;">IP AP2</td><td><code>${data.ip_ap2 || '-'}</code></td></tr>
+                        </table>
+                    </div>`,
+                confirmButtonText: 'Tutup',
+                confirmButtonColor: '#0d6efd',
+                customClass: { popup: 'rounded-4' },
+                width: 520
+            });
         }
     </script>
     {{-- Script untuk konfirmasi hapus dengan SweetAlert --}}

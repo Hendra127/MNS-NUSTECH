@@ -62,18 +62,7 @@
                 </a>
             @endif
             <div class="user-profile-wrapper" style="position: relative;">
-                    @if(auth()->check() && auth()->user()->role === 'superadmin')
-                    <a href="{{ route('setting.index') }}" class="user-profile-icon" title="Setting User"
-                        style="cursor: pointer; text-decoration: none; color: inherit;">
-                        @if(auth()->user()->photo)
-                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
-                                style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
-                        @else
-                            <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
-                        @endif
-                    </a>
-                @else
-                    <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
+                <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
                         @if(auth()->check() && auth()->user()->photo)
                             <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
                                 style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
@@ -81,7 +70,6 @@
                             <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
                         @endif
                     </div>
-                @endif
                 <div id="profileDropdownMenu" class="hidden"
                     style="position: absolute; right: 0; top: 100%; mt: 10px; width: 150px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; display: none; flex-direction: column; overflow: hidden;">
                     <div
@@ -110,8 +98,10 @@
             style="text-decoration: none;">All Sites</a>
         <a href="{{ route('datapas') }}" class="tab {{ request()->is('datapass*') ? 'active' : '' }}"
             style="text-decoration: none;">Management Password</a>
-        <a href="{{ route('laporancm') }}" class="tab {{ request()->is('laporancm*') ? 'active' : '' }}"
-            style="text-decoration: none;">Correctiv Maintenance</a>
+        @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+            <a href="{{ route('laporancm') }}" class="tab {{ request()->is('laporancm*') ? 'active' : '' }}"
+                style="text-decoration: none;">Correctiv Maintenance</a>
+        @endif
         <a href="{{ route('pmliberta') }}" class="tab {{ request()->is('PMLiberta*') ? 'active' : '' }}"
             style="text-decoration: none;">Preventive Maintenance</a>
         <a href="{{ route('summarypm') }}" class="tab {{ request()->is('summarypm*') ? 'active' : '' }}"
@@ -119,13 +109,14 @@
     </div>
     <!-- CONTENT -->
     <div class="content-container">
-        <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3" style="margin-bottom: 20px;">
+        <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3"
+            style="margin-bottom: 20px;">
             <div class="actions flex-shrink-0">
                 @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                     <button type="button" class="btn-action bi bi-plus" title="Add" data-toggle="modal"
                         data-target="#modalSite" onclick="addSite()"></button>
-                    <form action="{{ route('datapas.import') }}" method="POST" enctype="multipart/form-data"
-                        id="importForm" class="m-0">
+                    <form action="{{ route('datapas.import') }}" method="POST" enctype="multipart/form-data" id="importForm"
+                        class="m-0">
                         @csrf
                         <input type="file" name="file" id="fileInput" style="display: none;" accept=".xlsx, .xls, .csv"
                             onchange="handleFileUpload()">
@@ -140,11 +131,13 @@
                 </a>
             </div>
             <div class="w-100 mt-2 mt-lg-0 d-flex justify-content-lg-end">
-                <form method="GET" action="{{ route('datapas') }}" class="search-form row g-2 align-items-center m-0" id="search-form">
+                <form method="GET" action="{{ route('datapas') }}" class="search-form row g-2 align-items-center m-0"
+                    id="search-form">
                     <div class="col-12 col-md-auto">
                         <div class="search-box d-flex align-items-center w-100">
                             <input type="text" name="search" id="search-input" placeholder="Search"
-                                value="{{ request('search') }}" autocomplete="off" style="flex-grow: 1; border: none; outline: none; padding-left: 15px;">
+                                value="{{ request('search') }}" autocomplete="off"
+                                style="flex-grow: 1; border: none; outline: none; padding-left: 15px;">
                             <button type="submit" class="search-btn">🔍</button>
                         </div>
                     </div>
@@ -163,6 +156,8 @@
                         <th>PASS AP2</th>
                         @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                             <th class="sticky-col-right">Aksi</th>
+                        @elseif(auth()->check() && auth()->user()->role === 'user')
+                            <th class="sticky-col-right">Info</th>
                         @endif
                     </tr>
                 </thead>
@@ -173,8 +168,24 @@
                             <td class="sticky-col col-site-id">{{ $row->nama_lokasi }}</td>
                             <td>{{ $row->kabupaten }}</td>
                             <td class="text-center">{{ $row->adop }}</td>
-                            <td>{{ $row->pass_ap1 }}</td>
-                            <td>{{ $row->pass_ap2 }}</td>
+                            <td>
+                                @if($row->ip_ap1)
+                                    <a href="{{ str_starts_with($row->ip_ap1, 'http') ? $row->ip_ap1 : 'http://' . $row->ip_ap1 }}" target="_blank" title="Go to AP1 Server" style="text-decoration: none; color: inherit;">
+                                        {{ $row->pass_ap1 }}
+                                    </a>
+                                @else
+                                    {{ $row->pass_ap1 }}
+                                @endif
+                            </td>
+                            <td>
+                                @if($row->ip_ap2)
+                                    <a href="{{ str_starts_with($row->ip_ap2, 'http') ? $row->ip_ap2 : 'http://' . $row->ip_ap2 }}" target="_blank" title="Go to AP2 Server" style="text-decoration: none; color: inherit;">
+                                        {{ $row->pass_ap2 }}
+                                    </a>
+                                @else
+                                    {{ $row->pass_ap2 }}
+                                @endif
+                            </td>
                             @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                                 <td class="text-center sticky-col-right">
                                     <button class="btn btn-sm bi bi-pencil" onclick="editData({{ json_encode($row) }})"
@@ -189,6 +200,12 @@
                                         @method('DELETE')
                                     </form>
                                 </td>
+                            @elseif(auth()->check() && auth()->user()->role === 'user')
+                                <td class="text-center sticky-col-right">
+                                    <button class="btn btn-sm bi bi-info-circle" onclick="viewInfo({{ json_encode($row) }})"
+                                        title="Info">
+                                    </button>
+                                </td>
                             @endif
                         </tr>
                     @empty
@@ -201,7 +218,7 @@
         </div>
         <div class="pagination-wrapper">
             <span class="pagination-info">
-                Showing {{ $datapass->firstItem() ?? 0 }} to {{ $datapass->lastItem() ?? 0 }} 
+                Showing {{ $datapass->firstItem() ?? 0 }} to {{ $datapass->lastItem() ?? 0 }}
                 of&nbsp;<strong>{{ $datapass->total() }}</strong>&nbsp;results
             </span>
             <nav>
@@ -268,6 +285,21 @@
                                     <span class="input-group-text"><i class="bi bi-shield-lock-fill"></i></span>
                                     <input type="text" name="pass_ap2" class="form-control" placeholder="Password AP2"
                                         required>
+                                </div>
+                            </div>
+                            {{-- Baris 5: Link AP1 & Link AP2 --}}
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Link Server AP1 (IP)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+                                    <input type="text" name="ip_ap1" class="form-control" placeholder="Contoh: 10.x.x.x">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Link Server AP2 (IP)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+                                    <input type="text" name="ip_ap2" class="form-control" placeholder="Contoh: 10.x.x.x">
                                 </div>
                             </div>
                         </div>
@@ -355,11 +387,27 @@
                                 </div>
                             </div>
                             {{-- Baris 4: Full Width (Atau setengah jika ingin ditambah field lain) --}}
-                            <div class="col-md-6 offset-md-6"> {{-- Diletakkan di kanan bawah --}}
+                            <div class="col-md-6">
                                 <label class="form-label fw-bold">PASS AP2</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
                                     <input type="text" name="pass_ap2" id="edit_pass_ap2" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Link Server AP1 (IP)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+                                    <input type="text" name="ip_ap1" id="edit_ip_ap1" class="form-control"
+                                        placeholder="Contoh: 10.x.x.x">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Link Server AP2 (IP)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+                                    <input type="text" name="ip_ap2" id="edit_ip_ap2" class="form-control"
+                                        placeholder="Contoh: 10.x.x.x">
                                 </div>
                             </div>
                         </div>
@@ -391,6 +439,26 @@
         function closeM(id) {
             document.getElementById(id).style.display = 'none';
         }
+        // 3. Logic View Info (read-only untuk role admin/user)
+        function viewInfo(data) {
+            Swal.fire({
+                title: '<i class="bi bi-info-circle-fill text-primary"></i> Info Lokasi',
+                html: `
+                    <div style="text-align: left; font-size: 14px; line-height: 2;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr><td style="color:#888; width:120px;">Nama Lokasi</td><td><b>${data.nama_lokasi}</b></td></tr>
+                            <tr><td style="color:#888;">Kabupaten</td><td>${data.kabupaten}</td></tr>
+                            <tr><td style="color:#888;">ADOP</td><td>${data.adop}</td></tr>
+                            <tr><td style="color:#888;">PASS AP1</td><td>${data.ip_ap1 ? `<a href="${data.ip_ap1.startsWith('http') ? data.ip_ap1 : 'http://' + data.ip_ap1}" target="_blank" style="text-decoration:none; color:inherit;"><code>${data.pass_ap1}</code></a>` : `<code>${data.pass_ap1}</code>`}</td></tr>
+                            <tr><td style="color:#888;">PASS AP2</td><td>${data.ip_ap2 ? `<a href="${data.ip_ap2.startsWith('http') ? data.ip_ap2 : 'http://' + data.ip_ap2}" target="_blank" style="text-decoration:none; color:inherit;"><code>${data.pass_ap2}</code></a>` : `<code>${data.pass_ap2}</code>`}</td></tr>
+                        </table>
+                    </div>`,
+                confirmButtonText: 'Tutup',
+                confirmButtonColor: '#0d6efd',
+                customClass: { popup: 'rounded-4' }
+            });
+        }
+
         // 3. Logic Edit Data
         function editData(data) {
             // Set Action URL ke Route Update
@@ -402,6 +470,8 @@
             document.getElementById('edit_adop').value = data.adop;
             document.getElementById('edit_pass_ap1').value = data.pass_ap1;
             document.getElementById('edit_pass_ap2').value = data.pass_ap2;
+            document.getElementById('edit_ip_ap1').value = data.ip_ap1 || '';
+            document.getElementById('edit_ip_ap2').value = data.ip_ap2 || '';
             editModal.style.display = 'block';
         }
         // 4. Handle Upload Excel (Smooth Loading)

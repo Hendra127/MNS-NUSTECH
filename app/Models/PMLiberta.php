@@ -20,7 +20,8 @@ class PMLiberta extends Model
         'status', 
         'week', 
         'kategori',
-        'durasi'
+        'durasi',
+        'file_pm'
     ];
 
     // Relasi ke Model Site

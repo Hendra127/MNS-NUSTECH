@@ -26,33 +26,44 @@
             border-bottom: 2px solid #e0e0e0 !important;
             box-shadow: 0 1px 0 #e0e0e0;
         }
-        
+
         .sticky-col {
             position: sticky !important;
             background-color: #fff !important;
             z-index: 5 !important;
             background-clip: padding-box;
         }
-        
+
         thead th.sticky-col {
             z-index: 20 !important;
             background-color: #f5f6fa !important;
         }
 
-        .col-no { left: 0; min-width: 50px; }
-        .col-site-id { left: 50px; min-width: 135px; }
-        .col-nama_lokasi { left: 185px; min-width: 250px; }
-        
+        .col-no {
+            left: 0;
+            min-width: 50px;
+        }
+
+        .col-site-id {
+            left: 50px;
+            min-width: 135px;
+        }
+
+        .col-nama_lokasi {
+            left: 185px;
+            min-width: 250px;
+        }
+
         /* Striped background for sticky columns */
         tbody tr:nth-child(even) .sticky-col {
             background-color: #fafbfc !important;
         }
-        
+
         /* Hover effect */
         tbody tr:hover td {
             background-color: #f0f5fb !important;
         }
-        
+
         /* Table Structure Refinement */
         .table-responsive-custom {
             max-height: 700px;
@@ -189,6 +200,236 @@
             background-color: #f0f4f8 !important;
             color: #000 !important;
         }
+
+        /* Google Drive Smart Chip Style */
+        .drive-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            background: #fff;
+            border: 1px solid #dadce0;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #3c4043;
+            text-decoration: none !important;
+            transition: all 0.2s ease;
+            max-width: 180px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            box-shadow: 0 1px 2px rgba(60, 64, 67, 0.1);
+        }
+
+        .drive-chip:hover {
+            background: #f8f9fa;
+            color: #1a73e8;
+            border-color: #d2e3fc;
+            box-shadow: 0 2px 5px rgba(60, 64, 67, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .drive-chip i {
+            color: #1e8e3e;
+            margin-right: 8px;
+            font-size: 14px;
+        }
+
+        [data-bs-theme="dark"] .drive-chip {
+            background: #2d2e30;
+            border-color: #5f6368;
+            color: #e8eaed;
+        }
+
+        [data-bs-theme="dark"] .drive-chip:hover {
+            background: #3c4043;
+            color: #8ab4f8;
+            border-color: #8ab4f8;
+        }
+
+        /* Google Drive Preview Card Styles - Premium & Tidy */
+        .drive-preview-card {
+            position: fixed;
+            width: 300px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 18px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
+            z-index: 2000;
+            padding: 0;
+            overflow: hidden;
+            pointer-events: auto;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(10px) scale(0.98);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .drive-preview-card.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .preview-header {
+            display: flex;
+            align-items: center;
+            padding: 10px 14px;
+            gap: 10px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .preview-header i.bi-file-pdf {
+            color: #ea4335;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .preview-title {
+            flex-grow: 1;
+            font-weight: 600;
+            font-size: 13px;
+            color: #1a73e8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .preview-actions {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            flex-shrink: 0;
+        }
+
+        .preview-actions i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            color: #5f6368;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .preview-actions i:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: #202124;
+        }
+
+        .preview-body {
+            padding: 10px 14px;
+        }
+
+        .preview-thumbnail {
+            width: 100%;
+            height: 140px;
+            background: #f1f3f4;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .preview-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-footer {
+            padding: 0 14px 14px;
+        }
+
+        .preview-info-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+            font-size: 11px;
+            color: #5f6368;
+        }
+
+        .preview-info-row i {
+            font-size: 14px;
+        }
+
+        .preview-cta {
+            margin-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-ringkas {
+            background: #0d6efd;
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-grow: 1;
+            justify-content: center;
+        }
+
+        .btn-circle-action {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: #f1f3f4;
+            color: #5f6368;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-circle-action:hover {
+            background: #e8eaed;
+            color: #202124;
+        }
+
+        [data-bs-theme="dark"] .drive-preview-card {
+            background: #1e1e21;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid #444;
+        }
+
+        [data-bs-theme="dark"] .preview-header {
+            border-bottom-color: #333;
+        }
+
+        [data-bs-theme="dark"] .preview-title {
+            color: #8ab4f8;
+        }
+
+        [data-bs-theme="dark"] .preview-thumbnail {
+            background: #2d2e31;
+            border-color: #3c4043;
+        }
+
+        [data-bs-theme="dark"] .preview-info-row {
+            color: #9aa0a6;
+        }
+
+        [data-bs-theme="dark"] .btn-ringkas {
+            background: #3c4043;
+            color: #8ab4f8;
+        }
+
+        [data-bs-theme="dark"] .btn-circle-action {
+            background: #303134;
+            color: #8ab4f8;
+        }
     </style>
 </head>
 
@@ -209,18 +450,7 @@
                 </a>
             @endif
             <div class="user-profile-wrapper" style="position: relative;">
-                @if(auth()->check() && auth()->user()->role === 'superadmin')
-                    <a href="{{ route('setting.index') }}" class="user-profile-icon" title="Setting User"
-                        style="cursor: pointer; text-decoration: none; color: inherit;">
-                        @if(auth()->user()->photo)
-                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
-                                style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
-                        @else
-                            <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
-                        @endif
-                    </a>
-                @else
-                    <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
+                <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
                         @if(auth()->check() && auth()->user()->photo)
                             <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
                                 style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
@@ -228,7 +458,6 @@
                             <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
                         @endif
                     </div>
-                @endif
                 <div id="profileDropdownMenu" class="hidden"
                     style="position: absolute; right: 0; top: 100%; mt: 10px; width: 150px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; display: none; flex-direction: column; overflow: hidden;">
                     <div
@@ -257,8 +486,10 @@
             style="text-decoration: none;">All Sites</a>
         <a href="{{ route('datapas') }}" class="tab {{ request()->is('datapass*') ? 'active' : '' }}"
             style="text-decoration: none;">Management Password</a>
-        <a href="{{ route('laporancm') }}" class="tab {{ request()->is('laporancm*') ? 'active' : '' }}"
-            style="text-decoration: none;">Correctiv Maintenance</a>
+        @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+            <a href="{{ route('laporancm') }}" class="tab {{ request()->is('laporancm*') ? 'active' : '' }}"
+                style="text-decoration: none;">Correctiv Maintenance</a>
+        @endif
         <a href="{{ route('pmliberta') }}" class="tab {{ request()->is('PMLiberta*') ? 'active' : '' }}"
             style="text-decoration: none;">Preventive Maintenance</a>
         <a href="{{ route('summarypm') }}" class="tab {{ request()->is('summarypm*') ? 'active' : '' }}"
@@ -272,7 +503,8 @@
     </div>
     <!-- CONTENT -->
     <div class="content-container">
-        <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3" style="margin-bottom: 20px;">
+        <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3"
+            style="margin-bottom: 20px;">
             <div class="actions flex-shrink-0">
                 @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                     <button type="button" class="btn-action bi bi-plus" title="Tambah Data" data-bs-toggle="modal"
@@ -287,23 +519,23 @@
                         </button>
                     </form>
                 @endif
-                <a href="{{ route('pmliberta.export', request()->all()) }}" 
-                   class="btn-action bi bi-download"
-                   title="Download"
-                   style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
+                <a href="{{ route('pmliberta.export', request()->all()) }}" class="btn-action bi bi-download"
+                    title="Download"
+                    style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
                 </a>
             </div>
             <div class="w-100 mt-2 mt-lg-0">
-                <form method="GET" action="{{ route('pmliberta') }}" class="search-form row g-2 align-items-center w-100 m-0 justify-content-lg-end" id="searchForm">
-                    <div class="col-12 col-md-auto">
-                        <select name="kategori" class="form-select form-select-sm w-100">
+                <form method="GET" action="{{ route('pmliberta') }}"
+                    class="search-form row g-2 align-items-center w-100 m-0 justify-content-lg-end" id="searchForm">
+                    <div class="col-auto">
+                        <select name="kategori" class="form-select form-select-sm" style="max-width: 130px;">
                             <option value="">Semua Kategori</option>
                             <option value="BMN" {{ request('kategori') == 'BMN' ? 'selected' : '' }}>BMN</option>
                             <option value="SL" {{ request('kategori') == 'SL' ? 'selected' : '' }}>SL</option>
                         </select>
                     </div>
-                    <div class="col-12 col-md-auto">
-                        <select name="status" class="form-select form-select-sm w-100">
+                    <div class="col-auto">
+                        <select name="status" class="form-select form-select-sm" style="max-width: 120px;">
                             <option value="">Semua Status</option>
                             <option value="DONE" {{ request('status') == 'DONE' ? 'selected' : '' }}>DONE</option>
                             <option value="PENDING" {{ request('status') == 'PENDING' ? 'selected' : '' }}>PENDING</option>
@@ -311,28 +543,47 @@
                             <option value="HOLD" {{ request('status') == 'HOLD' ? 'selected' : '' }}>HOLD</option>
                         </select>
                     </div>
-                    <div class="col-12 col-md-auto">
-                        <input type="date" name="tgl_mulai" class="form-control form-control-sm w-100"
+                    <div class="col-auto">
+                        <select name="provinsi" id="filter-provinsi" class="form-select form-select-sm" style="max-width: 115px;">
+                            <option value="">Provinsi...</option>
+                            @foreach($provinsiList as $p)
+                                <option value="{{ $p }}" {{ request('provinsi') == $p ? 'selected' : '' }}>{{ $p }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <select name="kab" id="filter-kab" class="form-select form-select-sm" style="max-width: 120px;">
+                            <option value="">Kabupaten...</option>
+                            @if(request('provinsi') && isset($provinsiKabMap[request('provinsi')]))
+                                @foreach($provinsiKabMap[request('provinsi')] as $k)
+                                    <option value="{{ $k }}" {{ request('kab') == $k ? 'selected' : '' }}>{{ $k }}</option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <input type="date" name="tgl_mulai" class="form-control form-control-sm" style="max-width: 140px;"
                             value="{{ request('tgl_mulai') }}" title="Dari Tanggal">
                     </div>
-                    <div class="col-12 col-md-auto">
-                        <input type="date" name="tgl_selesai" class="form-control form-control-sm w-100"
+                    <div class="col-auto">
+                        <input type="date" name="tgl_selesai" class="form-control form-control-sm" style="max-width: 140px;"
                             value="{{ request('tgl_selesai') }}" title="Sampai Tanggal">
                     </div>
                     <div class="col-auto">
-                        <button type="submit" class="btn-filter-pill w-100 justify-content-center">
+                        <button type="submit" class="btn-filter-pill">
                             <i class="bi bi-funnel"></i> Filter
                         </button>
                     </div>
                     <div class="col-auto">
-                        <a href="{{ route('pmliberta') }}" class="btn btn-light btn-sm rounded-pill border d-flex align-items-center justify-content-center h-100"
+                        <a href="{{ route('pmliberta') }}"
+                            class="btn btn-light btn-sm rounded-pill border d-flex align-items-center justify-content-center h-100"
                             title="Reset Filter"><i class="bi bi-arrow-repeat"></i></a>
                     </div>
-                    <div class="col-12 col-md-auto">
-                        <div class="search-box d-flex align-items-center w-100">
+                    <div class="col-auto">
+                        <div class="search-box d-flex align-items-center">
                             <input type="text" id="search-input" name="search" placeholder="Search..."
                                 value="{{ request('search') }}"
-                                style="flex-grow: 1; border: none; outline: none; padding-left: 15px;">
+                                style="flex-grow: 1; border: none; outline: none; padding-left: 15px; min-width: 120px;">
                             <button type="submit" class="search-btn">🔍</button>
                         </div>
                     </div>
@@ -345,7 +596,7 @@
                     <tr>
                         <th class="text-center sticky-col col-no">NO</th>
                         <th class="sticky-col col-site-id">SITE ID</th>
-                        <th class="sticky-col col-nama_lokasi">NAMA LOKASI</th>
+                        <th class="sticky-col col-nama_lokasi" style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="NAMA LOKASI">NAMA LOKASI</th>
                         <th>PROVINSI</th>
                         <th>KABUPATEN / KOTA</th>
                         <th>PIC CE</th>
@@ -353,8 +604,11 @@
                         <th>DATE</th>
                         <th>STATUS</th>
                         <th>KATEGORI</th>
+                        <th>FILE PM</th>
                         @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                             <th class="sticky-col-right">AKSI</th>
+                        @elseif(auth()->check() && auth()->user()->role === 'user')
+                            <th class="sticky-col-right">INFO</th>
                         @endif
                     </tr>
                 </thead>
@@ -363,7 +617,7 @@
                     <tr>
                         <td class="text-center sticky-col col-no">{{ $loop->iteration }}</td>
                         <td class="text-center sticky-col col-site-id">{{ $item->site_id }}</td>
-                        <td class="sticky-col col-nama_lokasi">{{ $item->nama_lokasi }}</td>
+                        <td class="sticky-col col-nama_lokasi text-truncate" style="max-width: 150px;" title="{{ $item->nama_lokasi }}">{{ $item->nama_lokasi }}</td>
                         <td>{{ $item->provinsi }}</td>
                         <td>{{ $item->kabupaten }}</td>
                         <td>{{ $item->pic_ce }}</td>
@@ -387,24 +641,59 @@
                             </span>
                         </td>
                         <td class="text-center">{{ $item->kategori }}</td>
+                        <td class="text-center">
+                            @if($item->file_pm)
+                                @php
+                                    $fileName = "PM " . $item->site_id . " " . $item->nama_lokasi . " " . ($item->date ? \Carbon\Carbon::parse($item->date)->format('Y') : '') . " .pdf";
+                                @endphp
+                                <a href="{{ $item->file_pm }}" target="_blank" class="drive-chip" title="{{ $fileName }}"
+                                    onmouseover="showDrivePreview(this, '{{ $item->file_pm }}', '{{ $fileName }}')"
+                                    onmouseout="hideDrivePreview()">
+                                    <i class="bi bi-file-earmark-pdf-fill"></i>
+                                    <span>{{ $fileName }}</span>
+                                </a>
+                            @else
+                                <span class="text-muted small">No File</span>
+                            @endif
+                        </td>
                         @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                             <td class="text-center sticky-col-right">
                                 <div class="btn-group btn-group-sm">
-                                    <button type="button" class="btn bi bi-pencil btn-edit" data-id="{{ $item->id }}"
-                                        data-site_id="{{ $item->site_id }}" data-nama_lokasi="{{ $item->nama_lokasi }}"
-                                        data-provinsi="{{ $item->provinsi }}" data-kabupaten="{{ $item->kabupaten }}"
-                                        data-date="{{ $item->date ? \Carbon\Carbon::parse($item->date)->format('Y-m-d') : '' }}"
-                                        data-month="{{ $item->month }}" data-status="{{ $item->status }}"
-                                        data-week="{{ $item->week }}" data-kategori="{{ $item->kategori }}">
-                                    </button>
-                                    <form action="{{ route('pmliberta.destroy', $item->id) }}" method="POST"
-                                        class="form-delete">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="button" class="btn bi bi-trash btn-delete-trigger"
-                                            data-nama="{{ $item->nama_lokasi }}"> </button>
-                                    </form>
+                                    @if(!(auth()->user()->role === 'admin' && strtoupper($item->status ?: 'PENDING') === 'DONE'))
+                                        <button type="button" class="btn bi bi-pencil btn-edit" data-id="{{ $item->id }}"
+                                            data-site_id="{{ $item->site_id }}" data-nama_lokasi="{{ $item->nama_lokasi }}"
+                                            data-provinsi="{{ $item->provinsi }}" data-kabupaten="{{ $item->kabupaten }}"
+                                            data-date="{{ $item->date ? \Carbon\Carbon::parse($item->date)->format('Y-m-d') : '' }}"
+                                            data-month="{{ $item->month }}" data-status="{{ $item->status }}"
+                                            data-week="{{ $item->week }}" data-kategori="{{ $item->kategori }}"
+                                            data-file_pm="{{ $item->file_pm }}">
+                                        </button>
+                                        <form action="{{ route('pmliberta.destroy', $item->id) }}" method="POST"
+                                            class="form-delete">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" class="btn bi bi-trash btn-delete-trigger"
+                                                data-nama="{{ $item->nama_lokasi }}"> </button>
+                                        </form>
+                                    @else
+                                        <span class="badge bg-light text-muted border py-1 px-2"
+                                            style="font-size: 10px; cursor: not-allowed;" title="Data DONE telah dikunci">
+                                            <i class="bi bi-lock-fill"></i> LOCKED
+                                        </span>
+                                    @endif
                                 </div>
+                            </td>
+                        @elseif(auth()->check() && auth()->user()->role === 'user')
+                            <td class="text-center sticky-col-right">
+                                <button type="button" class="btn btn-sm bi bi-info-circle btn-info-pm"
+                                    data-id="{{ $item->id }}"
+                                    data-site_id="{{ $item->site_id }}" data-nama_lokasi="{{ $item->nama_lokasi }}"
+                                    data-provinsi="{{ $item->provinsi }}" data-kabupaten="{{ $item->kabupaten }}"
+                                    data-date="{{ $item->date ? \Carbon\Carbon::parse($item->date)->format('d M Y') : '-' }}"
+                                    data-month="{{ $item->month }}" data-status="{{ $item->status }}"
+                                    data-week="{{ $item->week }}" data-kategori="{{ $item->kategori }}"
+                                    data-file_pm="{{ $item->file_pm }}" title="Info">
+                                </button>
                             </td>
                         @endif
                     </tr>
@@ -480,11 +769,22 @@
                             <div class="col-md-6">
                                 <label class="form-label">Status</label>
                                 <select name="status" id="edit_status" class="form-select">
-                                     <option value="DONE" {{ auth()->user()->role === 'admin' ? 'disabled' : '' }}>DONE</option>
-                                     <option value="PENDING">PENDING</option>
-                                     <option value="ON PROGRESS">ON PROGRESS</option>
-                                     <option value="HOLD">HOLD</option>
-                                 </select>
+                                    @if(auth()->user()->role !== 'admin')
+                                        <option value="DONE">DONE</option>
+                                        <option value="PENDING">PENDING</option>
+                                        <option value="ON PROGRESS">ON PROGRESS</option>
+                                    @endif
+                                    <option value="HOLD">HOLD</option>
+                                </select>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Link Google Drive (File PM)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i
+                                            class="bi bi-link-45deg"></i></span>
+                                    <input type="url" name="file_pm" id="edit_file_pm"
+                                        class="form-control border-start-0" placeholder="https://drive.google.com/...">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -568,15 +868,28 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Status</label>
                                 <select name="status" class="form-select rounded-3">
-                                     <option value="DONE" {{ auth()->user()->role === 'admin' ? 'disabled' : '' }}>DONE</option>
-                                     <option value="PENDING" selected>PENDING</option>
-                                     <option value="ON PROGRESS">ON PROGRESS</option>
-                                     <option value="HOLD">HOLD</option>
-                                 </select>
+                                    @if(auth()->user()->role !== 'admin')
+                                        <option value="DONE">DONE</option>
+                                        <option value="PENDING" selected>PENDING</option>
+                                        <option value="ON PROGRESS">ON PROGRESS</option>
+                                        <option value="HOLD">HOLD</option>
+                                    @else
+                                        <option value="HOLD" selected>HOLD</option>
+                                    @endif
+                                </select>
                             </div>
                             <div class="col-12">
                                 <label class="form-label fw-bold">PIC CE</label>
                                 <input type="text" name="pic_ce" class="form-control rounded-3">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Link Google Drive (File PM)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i
+                                            class="bi bi-link-45deg"></i></span>
+                                    <input type="url" name="file_pm" class="form-control border-start-0"
+                                        placeholder="https://drive.google.com/...">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -591,8 +904,199 @@
         </div>
     </div>
 
+    <!-- Preview Card Element -->
+    <div id="drivePreview" class="drive-preview-card">
+        <div class="preview-header">
+            <i class="bi bi-file-pdf-fill bi-file-pdf"></i>
+            <span id="previewTitle" class="preview-title">Loading...</span>
+            <div class="preview-actions">
+                <i class="bi bi-copy" id="previewActionCopy" title="Copy Link" style="cursor: pointer;"></i>
+                <i class="bi bi-eye-slash" id="previewActionHide" title="Sembunyikan" style="cursor: pointer;"></i>
+            </div>
+        </div>
+        <div class="preview-body">
+            <div class="preview-thumbnail">
+                <img id="previewImg" src="" alt="Thumbnail">
+            </div>
+        </div>
+        <div class="preview-footer">
+            <div class="preview-info-row">
+                <i class="bi bi-person-circle"></i>
+                <span>NUSTECH adalah pemilik</span>
+            </div>
+            <div class="preview-info-row">
+                <i class="bi bi-clock-history"></i>
+                <span id="previewHistory">Anda belum pernah melihat file ini</span>
+            </div>
+            <div class="preview-cta">
+                <button class="btn-ringkas" id="previewActionSummary"><i class="bi bi-stars"></i> Ringkas file
+                    ini</button>
+                <div class="btn-circle-action" id="previewActionOpen" style="cursor: pointer;"><i
+                        class="bi bi-arrow-right-short" style="font-size: 24px;"></i></div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
+        let hideTimeout;
+        let currentUrl = '';
+        let currentElement = null;
+
+        function getDriveId(url) {
+            if (!url) return null;
+            let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            if (match) return match[1];
+            try {
+                let params = new URLSearchParams(new URL(url).search);
+                return params.get('id');
+            } catch (e) { return null; }
+        }
+
+        async function fetchDriveFileName(fileId, chipElement) {
+            if (!fileId) return;
+
+            try {
+                // Gunakan route internal Laravel agar terhindar dari pemblokiran Cloudflare
+                const url = `https://drive.google.com/file/d/${fileId}/view`;
+                const response = await fetch(`/get-drive-title?url=${encodeURIComponent(url)}`);
+                const data = await response.json();
+
+                if (data && data.title) {
+                    let driveTitle = data.title;
+
+                    if (driveTitle && driveTitle !== 'Google Drive: Terjadi Masalah' && driveTitle !== 'Google Drive') {
+                        // Update Judul di Card
+                        const previewTitle = document.getElementById('previewTitle');
+                        if (previewTitle) previewTitle.innerText = driveTitle;
+
+                        // Update teks di Chip Asal
+                        if (chipElement) {
+                            const span = chipElement.querySelector('span');
+                            if (span) span.innerText = driveTitle;
+                            // Tandai chip ini sudah berhasil mengambil nama asli
+                            chipElement.setAttribute('data-fetched', 'true');
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error("Gagal mengambil nama file drive via server:", e);
+            }
+        }
+
+        function showDrivePreview(element, url, currentTitle) {
+            clearTimeout(hideTimeout);
+            const preview = document.getElementById('drivePreview');
+            const fileId = getDriveId(url);
+
+            if (fileId) {
+                currentUrl = url;
+                currentElement = element;
+
+                // Gunakan teks yang sudah ada di chip sebagai judul awal
+                const chipText = element.querySelector('span').innerText;
+                document.getElementById('previewTitle').innerText = chipText;
+                document.getElementById('previewImg').src = `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`;
+
+                // Hanya fetch jika belum pernah berhasil di-fetch sebelumnya
+                if (element.getAttribute('data-fetched') !== 'true') {
+                    fetchDriveFileName(fileId, element);
+                }
+
+                // Handle image error
+                const previewImg = document.getElementById('previewImg');
+                previewImg.onerror = function() {
+                    this.parentElement.innerHTML = '<i class="bi bi-file-earmark-pdf" style="font-size: 60px; color: #dee2e6;"></i>';
+                };
+
+                // Reset display dan class first to get accurate measurements
+                preview.style.display = 'block';
+                const rect = element.getBoundingClientRect();
+                const cardWidth = preview.offsetWidth || 360;
+                const cardHeight = preview.offsetHeight || 420;
+
+                let left = rect.left;
+                let top = rect.top + 30;
+
+                // Boundary checking - Right edge
+                if (left + cardWidth > window.innerWidth) {
+                    left = window.innerWidth - cardWidth - 20;
+                }
+                // Boundary checking - Left edge
+                if (left < 10) left = 10;
+
+                // Boundary checking - Bottom edge
+                if (top + cardHeight > window.innerHeight) {
+                    top = rect.top - cardHeight - 10;
+                }
+
+                preview.style.left = left + 'px';
+                preview.style.top = top + 'px';
+
+                setTimeout(() => preview.classList.add('show'), 10);
+            }
+        }
+        function hideDrivePreview() {
+            hideTimeout = setTimeout(() => {
+                const preview = document.getElementById('drivePreview');
+                preview.classList.remove('show');
+                setTimeout(() => {
+                    if (!preview.classList.contains('show')) {
+                        preview.style.display = 'none';
+                    }
+                }, 200);
+            }, 300); // 300ms buffer to allow moving mouse to the card
+        }
+
+        // Event listeners for the preview card itself
+        document.getElementById('drivePreview').addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+        document.getElementById('drivePreview').addEventListener('mouseleave', hideDrivePreview);
+
+        // Action: Copy Link
+        document.getElementById('previewActionCopy').addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (currentUrl) {
+                navigator.clipboard.writeText(currentUrl).then(() => {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Link berhasil disalin!',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                });
+            }
+        });
+
+
+
+        // Action: Hide Preview
+        document.getElementById('previewActionHide').addEventListener('click', function (e) {
+            e.stopPropagation();
+            const preview = document.getElementById('drivePreview');
+            preview.classList.remove('show');
+            setTimeout(() => preview.style.display = 'none', 200);
+        });
+
+        // Action: Open in New Tab
+        document.getElementById('previewActionOpen').addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (currentUrl) window.open(currentUrl, '_blank');
+        });
+
+        // Action: Summary (Ringkas)
+        document.getElementById('previewActionSummary').addEventListener('click', function (e) {
+            e.stopPropagation();
+            Swal.fire({
+                title: 'Summarizing...',
+                text: 'Fitur AI sedang memproses dokumen PM ini.',
+                icon: 'info',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        });
+
         $(document).ready(function () {
             // Inisialisasi Select2 untuk Tambah Data
             $('#siteSelectAdd').select2({
@@ -629,6 +1133,7 @@
                 let status = $(this).data('status');
                 let week = $(this).data('week');
                 let kategori = $(this).data('kategori');
+                let file_pm = $(this).data('file_pm');
                 // 2. Penanganan khusus untuk Tanggal
                 // Input type="date" HANYA menerima format YYYY-MM-DD
                 let rawDate = $(this).data('date');
@@ -646,6 +1151,7 @@
                 $('#edit_status').val(status);
                 $('#edit_week').val(week);
                 $('#edit_kategori').val(kategori);
+                $('#edit_file_pm').val(file_pm);
                 // 4. Set action URL form secara dinamis ke route update
                 // Pastikan route di web.php adalah /PMLiberta/{id}
                 $('#formEdit').attr('action', '/PMLiberta/' + id);
@@ -653,6 +1159,50 @@
                 // Menggunakan cara Bootstrap 5 yang lebih stabil
                 var editModal = new bootstrap.Modal(document.getElementById('modalEdit'));
                 editModal.show();
+            });
+
+            // Handler INFO (read-only) untuk role user
+            $(document).on('click', '.btn-info-pm', function () {
+                let site_id     = $(this).data('site_id');
+                let nama_lokasi = $(this).data('nama_lokasi');
+                let provinsi    = $(this).data('provinsi');
+                let kabupaten   = $(this).data('kabupaten');
+                let tanggal     = $(this).data('date') || '-';
+                let month       = $(this).data('month') || '-';
+                let week        = $(this).data('week') || '-';
+                let status      = $(this).data('status') || 'PENDING';
+                let kategori    = $(this).data('kategori') || '-';
+                let file_pm     = $(this).data('file_pm') || '';
+
+                let statusColor = { DONE:'#198754', PENDING:'#ffc107', 'ON PROGRESS':'#0dcaf0', HOLD:'#dc3545' };
+                let badgeColor  = statusColor[status.toUpperCase()] || '#6c757d';
+
+                let fileHtml = file_pm
+                    ? `<a href="${file_pm}" target="_blank" style="color:#0d6efd;"><i class="bi bi-file-earmark-pdf-fill me-1"></i>Lihat File PM</a>`
+                    : '<span style="color:#aaa;">Tidak ada file</span>';
+
+                Swal.fire({
+                    title: '<i class="bi bi-info-circle-fill" style="color:#0d6efd;"></i> Detail PM',
+                    html: `
+                        <div style="text-align:left; font-size:14px; line-height:2;">
+                            <table style="width:100%; border-collapse:collapse;">
+                                <tr><td style="color:#888; width:120px;">Site ID</td><td><b>${site_id}</b></td></tr>
+                                <tr><td style="color:#888;">Nama Lokasi</td><td>${nama_lokasi}</td></tr>
+                                <tr><td style="color:#888;">Provinsi</td><td>${provinsi}</td></tr>
+                                <tr><td style="color:#888;">Kabupaten</td><td>${kabupaten}</td></tr>
+                                <tr><td style="color:#888;">Tanggal</td><td>${tanggal}</td></tr>
+                                <tr><td style="color:#888;">Month</td><td>${month}</td></tr>
+                                <tr><td style="color:#888;">Week</td><td>${week}</td></tr>
+                                <tr><td style="color:#888;">Kategori</td><td>${kategori}</td></tr>
+                                <tr><td style="color:#888;">Status</td><td><span style="background:${badgeColor}; color:white; padding:2px 10px; border-radius:20px; font-size:12px; font-weight:700;">${status || 'PENDING'}</span></td></tr>
+                                <tr><td style="color:#888;">File PM</td><td>${fileHtml}</td></tr>
+                            </table>
+                        </div>`,
+                    confirmButtonText: 'Tutup',
+                    confirmButtonColor: '#0d6efd',
+                    customClass: { popup: 'rounded-4' },
+                    width: 500
+                });
             });
         });
     </script>
@@ -729,7 +1279,33 @@
             }
         });
     </script>
-    <!-- SCRIPT UNTUK SUBMIT FORM PENCARIAN OTOMATIS SETELAH USER BERHENTI MENGETIK SELAMA 500MS -->
+    <script>
+        // Mapping data dari controller untuk cascading filter
+        const provinsiKabMap = @json($provinsiKabMap);
+
+        function updateKabupatenDropdown(provinsi, targetId, selectedKab = '') {
+            const kabDropdown = $(`#${targetId}`);
+            kabDropdown.empty();
+            kabDropdown.append('<option value="">Kabupaten...</option>');
+
+            if (provinsi && provinsiKabMap[provinsi]) {
+                provinsiKabMap[provinsi].forEach(kab => {
+                    const isSelected = kab === selectedKab ? 'selected' : '';
+                    kabDropdown.append(`<option value="${kab}" ${isSelected}>${kab}</option>`);
+                });
+            }
+        }
+
+        // Event listener untuk filter bar
+        $('#filter-provinsi').on('change', function () {
+            updateKabupatenDropdown($(this).val(), 'filter-kab');
+        });
+
+        // Agar Provinsi ter-update jika kategori berubah, form akan submit otomatis
+        $('select[name="kategori"]').on('change', function () {
+            $('#searchForm').submit();
+        });
+    </script>
 </body>
 
 </html>

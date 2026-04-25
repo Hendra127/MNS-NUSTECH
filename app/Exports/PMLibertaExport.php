@@ -39,6 +39,7 @@ class PMLibertaExport implements FromCollection, WithHeadings, WithMapping
             'STATUS',
             'WEEK',
             'KATEGORI',
+            'FILE PM',
         ];
     }
 
@@ -56,6 +57,7 @@ class PMLibertaExport implements FromCollection, WithHeadings, WithMapping
             $row->status,
             $row->week,
             $row->kategori,
+            $row->file_pm,
         ];
     }
 }

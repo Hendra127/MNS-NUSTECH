@@ -31,6 +31,8 @@ class DatapassImport implements ToModel, WithHeadingRow
             'adop'        => $row['adop'],
             'pass_ap1'    => $row['pass_ap1'],
             'pass_ap2'    => $row['pass_ap2'],
+            'ip_ap1'      => $row['ip_ap1'] ?? null,
+            'ip_ap2'      => $row['ip_ap2'] ?? null,
         ]);
     }
 }

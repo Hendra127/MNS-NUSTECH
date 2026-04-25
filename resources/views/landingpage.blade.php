@@ -239,11 +239,19 @@
         <span class="font-bold underline underline-offset-[10px] decoration-white/50">Nustech Indonesia.</span>
       </p>
 
-      <div class="flex flex-wrap mt-2">
+      <div class="flex flex-wrap mt-2 gap-3">
         <a href="{{ route('mydashboard') }}"
           class="btn-simple px-8 py-3.5 flex items-center space-x-3 group text-white no-underline">
           <span class="font-bold text-[15px]">Explore Dashboard</span>
           <i class="fa-solid fa-circle-arrow-right text-[1.1rem] group-hover:translate-x-1 transition-transform"></i>
+        </a>
+        <a href="http://nustech.co.id"
+          class="px-8 py-3.5 flex items-center space-x-3 group text-white no-underline"
+          style="border-radius: 9999px; border: 1px solid rgba(255,255,255,0.4); background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); transition: all 0.3s ease;"
+          onmouseover="this.style.background='rgba(255,255,255,0.18)'; this.style.borderColor='rgba(255,255,255,0.7)';"
+          onmouseout="this.style.background='rgba(255,255,255,0.08)'; this.style.borderColor='rgba(255,255,255,0.4)';">
+          <i class="fa-solid fa-house text-[1.1rem]"></i>
+          <span class="font-bold text-[15px]">Halaman Utama</span>
         </a>
       </div>
     </div>
@@ -278,9 +286,11 @@
             <a href="{{ route('datapas') }}" class="dropdown-item">
               <i class="fa-solid fa-lock"></i> Manajemen Password
             </a>
+            @if(Auth::check() && Auth::user()->role !== 'user')
             <a href="{{ route('laporancm') }}" class="dropdown-item">
               <i class="fa-solid fa-tools"></i> Corrective Maintenance
             </a>
+            @endif
             <a href="{{ route('pmliberta') }}" class="dropdown-item">
               <i class="fa-solid fa-shield-heart"></i> Preventive Maintenance
             </a>
@@ -314,7 +324,9 @@
           </div>
         </li>
 
-        <li class="relative group">
+        @auth
+          @if(Auth::user()->role !== 'user')
+          <li class="relative group">
           <a href="#" class="nav-link px-4 py-2 flex items-center">
             Log Perangkat
           </a>
@@ -333,8 +345,9 @@
               <i class="fa-solid fa-clipboard-list"></i> PM Summary
             </a>
           </div>
-        </li>
+          @endif
 
+          @if(Auth::user()->role === 'superadmin')
         <li class="relative group">
           <a href="#" class="nav-link px-4 py-2 flex items-center">
             Jadwal Piket
@@ -346,10 +359,12 @@
             </a>
           </div>
         </li>
+          @endif
+        @endauth
 
         @auth
           @php $role = Auth::user()->role; @endphp
-          @if (in_array($role, ['admin', 'superadmin']))
+          @if ($role === 'superadmin')
             <li class="relative group">
               <a href="#" class="nav-link px-4 py-2 flex items-center">
                 SLA
@@ -411,8 +426,10 @@
         <li class="font-bold px-3 pt-3 text-blue-600 text-sm">DATA SITE</li>
         <li><a href="{{ route('datasite') }}" class="block px-3 py-2 border-b border-gray-50">Data Site</a></li>
         <li><a href="{{ route('datapas') }}" class="block px-3 py-2 border-b border-gray-50">Manajemen Password</a></li>
+        @if(Auth::check() && Auth::user()->role !== 'user')
         <li><a href="{{ route('laporancm') }}" class="block px-3 py-2 border-b border-gray-50">Corrective
             Maintenance</a></li>
+        @endif
         <li><a href="{{ route('pmliberta') }}" class="block px-3 py-2 border-b border-gray-50">Preventive
             Maintenance</a></li>
         <li><a href="{{ route('summarypm') }}" class="block px-3 py-2 border-b border-gray-50">Summary PM</a></li>
@@ -425,23 +442,29 @@
         </li>
         <li><a href="{{ route('detailticket') }}" class="block px-3 py-2 border-b border-gray-50">Detail Tiket</a></li>
 
-        <!-- Log Perangkat -->
-        <li class="font-bold px-3 pt-4 text-blue-600 text-sm">LOG PERANGKAT</li>
-        <li><a href="{{ route('pergantianperangkat') }}" class="block px-3 py-2 border-b border-gray-50">Pergantian
-            Perangkat</a></li>
-        <li><a href="{{ route('logpergantian') }}" class="block px-3 py-2 border-b border-gray-50">Log Pergantian</a>
-        </li>
-        <li><a href="{{ route('sparetracker') }}" class="block px-3 py-2 border-b border-gray-50">Spare Tracker</a></li>
-        <li><a href="{{ route('summaryperangkat') }}" class="block px-3 py-2 border-b border-gray-50">PM Summary</a>
-        </li>
+        @auth
+          @if(Auth::user()->role !== 'user')
+          <!-- Log Perangkat -->
+          <li class="font-bold px-3 pt-4 text-blue-600 text-sm">LOG PERANGKAT</li>
+          <li><a href="{{ route('pergantianperangkat') }}" class="block px-3 py-2 border-b border-gray-50">Pergantian
+              Perangkat</a></li>
+          <li><a href="{{ route('logpergantian') }}" class="block px-3 py-2 border-b border-gray-50">Log Pergantian</a>
+          </li>
+          <li><a href="{{ route('sparetracker') }}" class="block px-3 py-2 border-b border-gray-50">Spare Tracker</a></li>
+          <li><a href="{{ route('summaryperangkat') }}" class="block px-3 py-2 border-b border-gray-50">PM Summary</a>
+          </li>
 
-        <!-- Operasional -->
-        <li class="font-bold px-3 pt-4 text-blue-600 text-sm">LAINNYA</li>
-        <li><a href="{{ route('jadwalpiket') }}" class="block px-3 py-2 border-b border-gray-50">Jadwal Piket</a></li>
+          @if(Auth::user()->role === 'superadmin')
+          <!-- Operasional -->
+          <li class="font-bold px-3 pt-4 text-blue-600 text-sm">LAINNYA</li>
+          <li><a href="{{ route('jadwalpiket') }}" class="block px-3 py-2 border-b border-gray-50">Jadwal Piket</a></li>
+          @endif
+          @endif
+        @endauth
         <li><a href="{{ route('todolist') }}" class="block px-3 py-2 border-b border-gray-50">To Do List</a></li>
 
         @auth
-          @if (in_array(Auth::user()->role, ['admin', 'superadmin']))
+          @if (Auth::user()->role === 'superadmin')
             <li class="font-bold px-3 pt-4 text-slate-500 text-sm">SLA / REPORT</li>
             <li><a href="{{ url('rekap-bmn') }}" class="block px-3 py-2 border-b border-gray-50">Rekap BMN</a></li>
             <li><a href="{{ url('rekap-sl') }}" class="block px-3 py-2 border-b border-gray-50">Rekap SL</a></li>
@@ -485,31 +508,6 @@
       mobileMenu.classList.toggle('hidden');
     });
 
-    // Auto Logout Script based on Inactivity
-    (function () {
-      let timeout;
-      const maxIdleTime = 3600000; // 1 jam (3.600.000 ms)
-
-      function resetTimer() {
-        clearTimeout(timeout);
-        timeout = setTimeout(logoutUser, maxIdleTime);
-      }
-
-      function logoutUser() {
-        const logoutBtn = document.querySelector('form[action="{{ route('logout') }}"]');
-        if (logoutBtn) {
-          logoutBtn.submit();
-        }
-      }
-
-      window.onload = resetTimer;
-      window.onmousemove = resetTimer;
-      window.onmousedown = resetTimer;
-      window.ontouchstart = resetTimer;
-      window.onclick = resetTimer;
-      window.onkeydown = resetTimer;
-      window.addEventListener('scroll', resetTimer, true);
-    })();
   </script>
 </body>
 

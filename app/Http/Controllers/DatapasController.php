@@ -41,6 +41,8 @@ class DatapasController extends Controller
             'adop' => 'required',
             'pass_ap1' => 'required',
             'pass_ap2' => 'required',
+            'ip_ap1' => 'nullable|string',
+            'ip_ap2' => 'nullable|string',
         ]);
 
         DataPass::create($request->all());
@@ -76,6 +78,8 @@ class DatapasController extends Controller
             'adop' => 'required',
             'pass_ap1' => 'required',
             'pass_ap2' => 'required',
+            'ip_ap1' => 'nullable|string',
+            'ip_ap2' => 'nullable|string',
         ]);
 
         $data = DataPass::findOrFail($id);
