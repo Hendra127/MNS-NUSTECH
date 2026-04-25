@@ -168,8 +168,24 @@
                             <td class="sticky-col col-site-id">{{ $row->nama_lokasi }}</td>
                             <td>{{ $row->kabupaten }}</td>
                             <td class="text-center">{{ $row->adop }}</td>
-                            <td>{{ $row->pass_ap1 }}</td>
-                            <td>{{ $row->pass_ap2 }}</td>
+                            <td>
+                                @if($row->ip_ap1)
+                                    <a href="{{ str_starts_with($row->ip_ap1, 'http') ? $row->ip_ap1 : 'http://' . $row->ip_ap1 }}" target="_blank" title="Go to AP1 Server" style="text-decoration: none; color: inherit;">
+                                        {{ $row->pass_ap1 }}
+                                    </a>
+                                @else
+                                    {{ $row->pass_ap1 }}
+                                @endif
+                            </td>
+                            <td>
+                                @if($row->ip_ap2)
+                                    <a href="{{ str_starts_with($row->ip_ap2, 'http') ? $row->ip_ap2 : 'http://' . $row->ip_ap2 }}" target="_blank" title="Go to AP2 Server" style="text-decoration: none; color: inherit;">
+                                        {{ $row->pass_ap2 }}
+                                    </a>
+                                @else
+                                    {{ $row->pass_ap2 }}
+                                @endif
+                            </td>
                             @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
                                 <td class="text-center sticky-col-right">
                                     <button class="btn btn-sm bi bi-pencil" onclick="editData({{ json_encode($row) }})"
@@ -271,6 +287,21 @@
                                         required>
                                 </div>
                             </div>
+                            {{-- Baris 5: Link AP1 & Link AP2 --}}
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Link Server AP1 (IP)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+                                    <input type="text" name="ip_ap1" class="form-control" placeholder="Contoh: 10.x.x.x">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Link Server AP2 (IP)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+                                    <input type="text" name="ip_ap2" class="form-control" placeholder="Contoh: 10.x.x.x">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     {{-- Modal Footer --}}
@@ -356,11 +387,27 @@
                                 </div>
                             </div>
                             {{-- Baris 4: Full Width (Atau setengah jika ingin ditambah field lain) --}}
-                            <div class="col-md-6 offset-md-6"> {{-- Diletakkan di kanan bawah --}}
+                            <div class="col-md-6">
                                 <label class="form-label fw-bold">PASS AP2</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
                                     <input type="text" name="pass_ap2" id="edit_pass_ap2" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Link Server AP1 (IP)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+                                    <input type="text" name="ip_ap1" id="edit_ip_ap1" class="form-control"
+                                        placeholder="Contoh: 10.x.x.x">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Link Server AP2 (IP)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+                                    <input type="text" name="ip_ap2" id="edit_ip_ap2" class="form-control"
+                                        placeholder="Contoh: 10.x.x.x">
                                 </div>
                             </div>
                         </div>
@@ -402,8 +449,8 @@
                             <tr><td style="color:#888; width:120px;">Nama Lokasi</td><td><b>${data.nama_lokasi}</b></td></tr>
                             <tr><td style="color:#888;">Kabupaten</td><td>${data.kabupaten}</td></tr>
                             <tr><td style="color:#888;">ADOP</td><td>${data.adop}</td></tr>
-                            <tr><td style="color:#888;">PASS AP1</td><td><code>${data.pass_ap1}</code></td></tr>
-                            <tr><td style="color:#888;">PASS AP2</td><td><code>${data.pass_ap2}</code></td></tr>
+                            <tr><td style="color:#888;">PASS AP1</td><td>${data.ip_ap1 ? `<a href="${data.ip_ap1.startsWith('http') ? data.ip_ap1 : 'http://' + data.ip_ap1}" target="_blank" style="text-decoration:none; color:inherit;"><code>${data.pass_ap1}</code></a>` : `<code>${data.pass_ap1}</code>`}</td></tr>
+                            <tr><td style="color:#888;">PASS AP2</td><td>${data.ip_ap2 ? `<a href="${data.ip_ap2.startsWith('http') ? data.ip_ap2 : 'http://' + data.ip_ap2}" target="_blank" style="text-decoration:none; color:inherit;"><code>${data.pass_ap2}</code></a>` : `<code>${data.pass_ap2}</code>`}</td></tr>
                         </table>
                     </div>`,
                 confirmButtonText: 'Tutup',
@@ -423,6 +470,8 @@
             document.getElementById('edit_adop').value = data.adop;
             document.getElementById('edit_pass_ap1').value = data.pass_ap1;
             document.getElementById('edit_pass_ap2').value = data.pass_ap2;
+            document.getElementById('edit_ip_ap1').value = data.ip_ap1 || '';
+            document.getElementById('edit_ip_ap2').value = data.ip_ap2 || '';
             editModal.style.display = 'block';
         }
         // 4. Handle Upload Excel (Smooth Loading)

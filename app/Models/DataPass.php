@@ -18,6 +18,8 @@ class DataPass extends Model
         'adop',
         'pass_ap1',
         'pass_ap2',
+        'ip_ap1',
+        'ip_ap2',
     ];
 
     public function site()

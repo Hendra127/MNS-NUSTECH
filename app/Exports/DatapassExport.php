@@ -30,6 +30,8 @@ class DatapassExport implements FromCollection, WithHeadings, WithMapping
             'ADOP',
             'PASS AP1',
             'PASS AP2',
+            'IP AP1',
+            'IP AP2',
         ];
     }
 
@@ -45,6 +47,8 @@ class DatapassExport implements FromCollection, WithHeadings, WithMapping
             $datapass->adop,
             $datapass->pass_ap1,
             $datapass->pass_ap2,
+            $datapass->ip_ap1,
+            $datapass->ip_ap2,
         ];
     }
 }
