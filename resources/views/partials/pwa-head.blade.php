@@ -366,11 +366,42 @@
         }
     }
 
+    // --- Idle Auto Logout Logic ---
+    let idleTimer;
+    const idleTimeLimit = 30 * 60 * 1000; // 30 Minutes
+    let isUserIdle = false;
+
+    function resetIdleTimer() {
+        if (isUserIdle) {
+            isUserIdle = false;
+        }
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(autoLogout, idleTimeLimit);
+    }
+
+    function autoLogout() {
+        isUserIdle = true;
+        console.log('User idle for 30 minutes, logging out...');
+        // Redirect to timeout-logout route to avoid 405 Method Not Allowed conflicts
+        window.location.href = '/timeout-logout';
+    }
+
+    function initIdleLogout() {
+        // Events that indicate activity
+        const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+        events.forEach(name => {
+            document.addEventListener(name, resetIdleTimer, true);
+        });
+        resetIdleTimer();
+    }
+
     // --- Session Keep-Alive Pulse ---
     // Pings the server every 5 minutes to prevent session timeout and keep the CSRF token fresh
     function initSessionPulse() {
         console.log('Session pulse initialized');
         setInterval(async () => {
+            if (isUserIdle) return; // Don't pulse if user is idle
+            
             try {
                 const response = await fetch('{{ route("csrf.refresh") }}');
                 const data = await response.json();
@@ -400,6 +431,7 @@
                 initNotificationBell();
                 initNavLogo();
                 initSessionPulse();
+                initIdleLogout();
                 updateChartsTheme(localStorage.getItem('theme') || 'light');
             });
         } else {
@@ -408,6 +440,7 @@
             initNotificationBell();
             initNavLogo();
             initSessionPulse();
+            initIdleLogout();
             updateChartsTheme(localStorage.getItem('theme') || 'light');
         }
     @else
@@ -417,12 +450,14 @@
                 showInstallButton();
                 initDarkMode();
                 initNavLogo();
-                // Notifikasi & Pulse dilewati
+                initSessionPulse();
+                // Notifikasi dilewati
             });
         } else {
             showInstallButton();
             initDarkMode();
             initNavLogo();
+            initSessionPulse();
         }
     @endauth
 </script>

@@ -18,6 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
     })
+    ->withSchedule(function ($schedule) {
+        $schedule->command('notifications:prune')->daily();
+    })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, $request) {
+            return redirect()->route('login')->with('error', 'Sesi Anda telah berakhir, silakan login kembali.');
+        });
     })->create();
