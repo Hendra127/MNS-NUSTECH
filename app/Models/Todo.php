@@ -13,6 +13,7 @@ class Todo extends Model
         'checklists', 
         'is_done', 
         'is_pinned',
+        'is_urgent',
         'color'
     ];
 
@@ -20,6 +21,7 @@ class Todo extends Model
     protected $casts = [
         'checklists' => 'array',
         'is_pinned' => 'boolean',
+        'is_urgent' => 'boolean',
     ];
 
     // Relasi ke User (pembuat)

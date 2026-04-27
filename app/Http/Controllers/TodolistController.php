@@ -18,14 +18,14 @@ class TodolistController extends Controller
                   ->orWhereHas('sharedUsers', function($q) use ($userId) {
                       $q->where('users.id', $userId);
                   });
-        })->where('is_done', false)->orderBy('is_pinned', 'desc')->latest()->get();
+        })->where('is_done', false)->orderBy('is_urgent', 'desc')->orderBy('is_pinned', 'desc')->latest()->get();
 
         $dones = Todo::where(function($query) use ($userId) {
             $query->where('user_id', $userId)
                   ->orWhereHas('sharedUsers', function($q) use ($userId) {
                       $q->where('users.id', $userId);
                   });
-        })->where('is_done', true)->orderBy('is_pinned', 'desc')->latest()->get();
+        })->where('is_done', true)->orderBy('is_urgent', 'desc')->orderBy('is_pinned', 'desc')->latest()->get();
 
         $users = \App\Models\User::where('id', '!=', auth()->id())->get();
 
@@ -159,6 +159,46 @@ class TodolistController extends Controller
 
         $todo->update(['checklists' => $checklists]);
         $this->notifyOwnerIfShared($todo, 'mengubah teks subtask');
+        return response()->json(['success' => true]);
+    }
+
+    // Update Komentar Sub-task
+    public function updateCommentSubTask(Request $request, $id) {
+        $todo = $this->findTodoWithAccess($id);
+        $checklists = $todo->checklists;
+
+        foreach ($checklists as &$item) {
+            if ($item['id'] == $request->subtask_id) {
+                $item['comment'] = $request->comment;
+            }
+        }
+
+        $todo->update(['checklists' => $checklists]);
+        $this->notifyOwnerIfShared($todo, 'memberikan komentar pada subtask');
+        return response()->json(['success' => true]);
+    }
+
+    public function toggleUrgent($id)
+    {
+        $todo = $this->findTodoWithAccess($id);
+        $todo->update(['is_urgent' => !$todo->is_urgent]);
+        
+        return response()->json(['success' => true, 'is_urgent' => $todo->is_urgent]);
+    }
+
+    // Toggle Urgency Sub-task
+    public function toggleSubTaskUrgent(Request $request, $id) {
+        $todo = $this->findTodoWithAccess($id);
+        $checklists = $todo->checklists;
+
+        foreach ($checklists as &$item) {
+            if ($item['id'] == $request->subtask_id) {
+                $item['is_urgent'] = !($item['is_urgent'] ?? false);
+            }
+        }
+
+        $todo->update(['checklists' => $checklists]);
+        $this->notifyOwnerIfShared($todo, 'mengubah prioritas subtask');
         return response()->json(['success' => true]);
     }
 

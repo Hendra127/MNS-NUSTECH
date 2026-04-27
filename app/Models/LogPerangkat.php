@@ -11,10 +11,14 @@ class LogPerangkat extends Model
     protected $fillable = [
         'site_id',
         'perangkat',
+        'qty',
         'sn_lama',
         'sn_baru',
         'tanggal_penggantian',
-        'keterangan'
+        'keterangan',
+        'layanan',
+        'status',
+        'foto_perangkat_baru',
     ];
 
     public function site()

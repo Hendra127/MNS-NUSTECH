@@ -37,7 +37,7 @@ Route::get('/tickets/filter', [MyDashboardController::class, 'getFilteredTickets
 Route::get('/dashboard/stats', [MyDashboardController::class, 'fetchStats'])->name('dashboard.stats');
 
 // --- SPAREPART NEEDED DASHBOARD ROUTES ---
-Route::get('/sparepart-needed', [\App\Http\Controllers\SparepartNeededController::class, 'index'])->name('sparepart.needed.index');
+Route::get('/sparepartneeded', [\App\Http\Controllers\SparepartNeededController::class, 'index'])->name('sparepart_needed');
 Route::post('/sparepart-needed/store', [\App\Http\Controllers\SparepartNeededController::class, 'store'])->name('sparepart.needed.store');
 Route::put('/sparepart-needed/update/{id}', [\App\Http\Controllers\SparepartNeededController::class, 'update'])->name('sparepart.needed.update');
 Route::delete('/sparepart-needed/delete/{id}', [\App\Http\Controllers\SparepartNeededController::class, 'destroy'])->name('sparepart.needed.destroy');
@@ -49,7 +49,7 @@ Route::post('/remote-log/store', [RemoteLogController::class, 'store'])->name('r
 
 // Halaman Utama (Landing Page) via mns.nustech.co.id
 Route::domain('mns.nustech.co.id')->group(function () {
-    Route::get('/', [LandingpageController::class, 'index'])->name('landingpage');
+    Route::get('/', [MyDashboardController::class, 'index'])->name('mydashboard');
 });
 
 // Halaman Utama (Home) via nustech.co.id
@@ -141,6 +141,7 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/{id}', [OpenTicketController::class, 'update'])->name('open.ticket.update');
             Route::delete('/{id}', [OpenTicketController::class, 'destroy'])->name('open.ticket.destroy');
             Route::post('/import', [OpenTicketController::class, 'import'])->name('open.ticket.import');
+            Route::post('/ce-contacts/update', [OpenTicketController::class, 'updateCeContacts'])->name('open.ticket.ce.update');
 
             // 3. Rute Proses Close
             Route::put('/close/{id}', [OpenTicketController::class, 'closeTicket'])->name('open.ticket.close');
@@ -189,12 +190,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/todolist/store', [TodolistController::class, 'store'])->name('todolist.store');
     Route::post('/todolist/toggle/{id}', [TodolistController::class, 'toggle'])->name('todolist.toggle');
     Route::post('/todolist/pin/{id}', [TodolistController::class, 'togglePin'])->name('todolist.pin');
+    Route::post('/todolist/urgent/{id}', [TodolistController::class, 'toggleUrgent'])->name('todolist.urgent');
     Route::post('/todolist/update/{id}', [TodolistController::class, 'update'])->name('todolist.update');
     Route::delete('/todolist/delete/{id}', [TodolistController::class, 'destroy'])->name('todolist.destroy');
     Route::post('/todolist/subtask/add/{id}', [TodolistController::class, 'addSubTask'])->name('subtask.add');
     Route::post('/todolist/subtask/toggle/{id}', [TodolistController::class, 'toggleSubTask'])->name('subtask.toggle');
+    Route::post('/todolist/subtask/urgent/{id}', [TodolistController::class, 'toggleSubTaskUrgent'])->name('subtask.urgent');
     Route::post('/todolist/update-title/{id}', [TodolistController::class, 'updateTitle']);
     Route::post('/todolist/subtask/update/{id}', [TodolistController::class, 'updateSubTask']);
+    Route::post('/todolist/subtask/comment/{id}', [TodolistController::class, 'updateCommentSubTask'])->name('subtask.comment');
     Route::delete('/todolist/subtask/delete/{id}', [TodolistController::class, 'deleteSubTask']);
     Route::post('/todolist/share/{id}', [TodolistController::class, 'share']);
     Route::get('/notifications/check', [TodolistController::class, 'checkNotifications']);
