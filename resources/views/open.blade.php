@@ -40,6 +40,14 @@
             background: #f8f9fa;
             border: 1px solid #dee2e6;
             margin-right: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .summary-badge:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         .search-box {
@@ -259,6 +267,39 @@
         .modal-header .modal-title {
             font-weight: 800 !important;
         }
+
+        /* Evidence Drop Zone Styles */
+        .evidence-drop-zone {
+            border: 2px dashed #dee2e6;
+            transition: all 0.2s ease-in-out;
+            background: #fdfdfd;
+            cursor: pointer;
+        }
+
+        .evidence-drop-zone.drag-over {
+            background-color: #f0f7ff !important;
+            border-color: #0d6efd !important;
+            transform: scale(1.01);
+        }
+
+        .preview-container img, .preview-container video {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .preview-item {
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 
@@ -330,10 +371,10 @@
         <a href="{{ url('/summaryticket') }}" class="tab {{ request()->is('summaryticket*') ? 'active' : '' }}"
             style="text-decoration: none; color: Black;">Summary Tiket</a>
         <div id="summary-badges" class="ms-auto d-flex align-items-center">
-            <span class="summary-badge text-black">Total Open: <b>{{ $openAllCount }}</b></span>
-            <span class="summary-badge text-black">Open Hari Ini: <b>{{ $openTodayCount }}</b></span>
-            <span class="summary-badge text-dark">BMN: <b>{{ $countBMN }}</b></span>
-            <span class="summary-badge text-dark">SL: <b>{{ $countSL }}</b></span>
+            <span class="summary-badge text-black" onclick="quickFilter('total')" title="Click to show all open tickets">Total Open: <b>{{ $openAllCount }}</b></span>
+            <span class="summary-badge text-black" onclick="quickFilter('today')" title="Click to show tickets from today">Open Hari Ini: <b>{{ $openTodayCount }}</b></span>
+            <span class="summary-badge text-dark" onclick="quickFilter('BMN')" title="Filter by BMN">BMN: <b>{{ $countBMN }}</b></span>
+            <span class="summary-badge text-dark" onclick="quickFilter('SL')" title="Filter by SL">SL: <b>{{ $countSL }}</b></span>
         </div>
     </div>
     <!-- CONTENT -->
@@ -341,7 +382,7 @@
         <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3"
             style="margin-bottom: 20px;">
             <div class="actions flex-shrink-0">
-                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                @if(auth()->check())
                     <button class="btn-action bi bi-plus" title="Add" data-bs-toggle="modal"
                         data-bs-target="#modalTambahTicket">
                     </button>
@@ -456,7 +497,7 @@
                             <th>DETAIL PROBLEM</th>
                             <th>ACTION PLAN</th>
                             <th>CE</th>
-                            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                            @if(auth()->check())
                                 <th class="sticky-col-right">AKSI</th>
                             @elseif(auth()->check() && auth()->user()->role === 'user')
                                 <th class="sticky-col-right">INFO</th>
@@ -498,7 +539,7 @@
                                 <td class="text-truncate" style="max-width: 200px;">{{ $t->detail_problem }}</td>
                                 <td class="text-truncate" style="max-width: 200px;">{{ $t->plan_actions }}</td>
                                 <td>{{ $t->ce }}</td>
-                                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                                @if(auth()->check())
                                     <td class="text-center sticky-col-right">
                                         <button type="button" class="btn btn-sm bi bi-x-lg" data-bs-toggle="modal"
                                             data-bs-target="#modalCloseTicket{{ $t->id }}" data-id="{{ $t->id }}"
@@ -673,8 +714,15 @@
                                         </div>
                                         <div class="col-md-8">
                                             <label class="form-label fw-bold text-primary">Evidence (Foto/Video)</label>
-                                            <input type="file" name="evidence[]" class="form-control"
-                                                accept="image/*,video/*" multiple>
+                                            <div class="evidence-drop-zone rounded-3 p-3 text-center position-relative">
+                                                <input type="file" name="evidence[]" class="form-control mb-2"
+                                                    accept="image/*,video/*" multiple>
+                                                <div class="drop-zone-msg small text-muted">
+                                                    <i class="bi bi-cloud-arrow-up fs-4 d-block mb-1"></i>
+                                                    Drag & drop files here or browse
+                                                </div>
+                                                <div class="preview-container d-flex flex-wrap gap-2 mt-2 justify-content-center"></div>
+                                            </div>
                                             
                                             <div class="mt-2 d-flex flex-wrap gap-2">
                                                 @if($t->evidences->count() > 0)
@@ -1045,7 +1093,14 @@
                         </div>
                         <div class="col-md-8">
                             <label class="form-label fw-bold">Evidence (Foto/Video)</label>
-                            <input type="file" name="evidence[]" class="form-control" accept="image/*,video/*" multiple>
+                            <div class="evidence-drop-zone rounded-3 p-3 text-center position-relative">
+                                <input type="file" name="evidence[]" class="form-control mb-2" accept="image/*,video/*" multiple>
+                                <div class="drop-zone-msg small text-muted">
+                                    <i class="bi bi-cloud-arrow-up fs-4 d-block mb-1"></i>
+                                    Drag & drop files from WhatsApp or folder here
+                                </div>
+                                <div class="preview-container d-flex flex-wrap gap-2 mt-2 justify-content-center"></div>
+                            </div>
                             <small class="text-muted">Pilih satu atau beberapa file. Format: jpg, png, mp4. Maks 20MB/file.</small>
                         </div>
                     </div>
@@ -1580,6 +1635,92 @@
             window.onpopstate = function () {
                 loadTable(window.location.href);
             };
+
+            /**
+             * 6. Quick Filter from Badges
+             */
+            window.quickFilter = function(type) {
+                const form = $('#filterForm');
+                
+                // Clear inputs
+                form.find('select[name="kategori"]').val('');
+                form.find('input[name="tgl_mulai"]').val('');
+                form.find('input[name="tgl_selesai"]').val('');
+                form.find('input[name="q"]').val('');
+                
+                if (type === 'today') {
+                    const today = new Date().toISOString().split('T')[0];
+                    form.find('input[name="tgl_mulai"]').val(today);
+                    form.find('input[name="tgl_selesai"]').val(today);
+                } else if (type === 'BMN') {
+                    form.find('select[name="kategori"]').val('BMN');
+                } else if (type === 'SL') {
+                    form.find('select[name="kategori"]').val('SL');
+                }
+                
+                form.trigger('submit');
+            };
+
+            /**
+             * 7. Drag & Drop Evidence Logic
+             */
+            function initEvidenceDropZones() {
+                $('.evidence-drop-zone').each(function() {
+                    const zone = this;
+                    const input = $(zone).find('input[type="file"]')[0];
+                    const previewContainer = $(zone).find('.preview-container')[0];
+                    
+                    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                        zone.addEventListener(eventName, e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }, false);
+                    });
+
+                    ['dragenter', 'dragover'].forEach(eventName => {
+                        zone.addEventListener(eventName, () => $(zone).addClass('drag-over'), false);
+                    });
+                    ['dragleave', 'drop'].forEach(eventName => {
+                        zone.addEventListener(eventName, () => $(zone).removeClass('drag-over'), false);
+                    });
+
+                    zone.addEventListener('drop', e => {
+                        const files = e.dataTransfer.files;
+                        if (files.length > 0) {
+                            input.files = files; // Standard browser support for updating input.files from drop
+                            $(input).trigger('change');
+                        }
+                    });
+
+                    input.addEventListener('change', function() {
+                        previewContainer.innerHTML = '';
+                        if (this.files) {
+                            Array.from(this.files).forEach(file => {
+                                const reader = new FileReader();
+                                reader.onload = (e) => {
+                                    const item = document.createElement('div');
+                                    item.className = 'preview-item';
+                                    if (file.type.startsWith('image/')) {
+                                        item.innerHTML = `<img src="${e.target.result}" alt="preview">`;
+                                    } else if (file.type.startsWith('video/')) {
+                                        item.innerHTML = `<video src="${e.target.result}"></video>`;
+                                    }
+                                    previewContainer.appendChild(item);
+                                };
+                                reader.readAsDataURL(file);
+                            });
+                        }
+                    });
+                });
+            }
+
+            // Initialize on load
+            initEvidenceDropZones();
+
+            // Also call when modals are opened to ensure zones are ready (in case of re-rendering)
+            $(document).on('shown.bs.modal', function() {
+                initEvidenceDropZones();
+            });
         });
     </script>
 </body>

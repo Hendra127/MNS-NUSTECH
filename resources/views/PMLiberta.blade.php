@@ -131,6 +131,14 @@
             margin-right: 10px;
             display: inline-flex;
             align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .summary-badge:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         .tabs-section {
@@ -495,10 +503,10 @@
         <a href="{{ route('summarypm') }}" class="tab {{ request()->is('summarypm*') ? 'active' : '' }}"
             style="text-decoration: none;">PM Summary</a>
         <div class="ms-auto d-flex align-items-center flex-wrap gap-2">
-            <span class="summary-badge text-black">BMN Done: <b>&nbsp;{{ $totalBMNDone }}</b></span>
-            <span class="summary-badge text-black">SL Done: <b>&nbsp;{{ $totalSLDone }}</b></span>
-            <span class="summary-badge text-black">HOLD: <b>&nbsp;{{ $totalHold }}</b></span>
-            <span class="summary-badge text-dark">Pending: <b>&nbsp;{{ $totalPending }}</b></span>
+            <span class="summary-badge text-black" onclick="quickFilter('BMN_DONE')" title="Filter BMN Done">BMN Done: <b>&nbsp;{{ $totalBMNDone }}</b></span>
+            <span class="summary-badge text-black" onclick="quickFilter('SL_DONE')" title="Filter SL Done">SL Done: <b>&nbsp;{{ $totalSLDone }}</b></span>
+            <span class="summary-badge text-black" onclick="quickFilter('HOLD')" title="Filter Status HOLD">HOLD: <b>&nbsp;{{ $totalHold }}</b></span>
+            <span class="summary-badge text-dark" onclick="quickFilter('PENDING')" title="Filter Status PENDING">Pending: <b>&nbsp;{{ $totalPending }}</b></span>
         </div>
     </div>
     <!-- CONTENT -->
@@ -506,7 +514,7 @@
         <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3"
             style="margin-bottom: 20px;">
             <div class="actions flex-shrink-0">
-                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                @if(auth()->check())
                     <button type="button" class="btn-action bi bi-plus" title="Tambah Data" data-bs-toggle="modal"
                         data-bs-target="#modalTambah"></button>
                     <form action="{{ route('pmliberta.import') }}" method="POST" enctype="multipart/form-data"
@@ -605,7 +613,7 @@
                         <th>STATUS</th>
                         <th>KATEGORI</th>
                         <th>FILE PM</th>
-                        @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                        @if(auth()->check())
                             <th class="sticky-col-right">AKSI</th>
                         @elseif(auth()->check() && auth()->user()->role === 'user')
                             <th class="sticky-col-right">INFO</th>
@@ -656,7 +664,7 @@
                                 <span class="text-muted small">No File</span>
                             @endif
                         </td>
-                        @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                        @if(auth()->check())
                             <td class="text-center sticky-col-right">
                                 <div class="btn-group btn-group-sm">
                                     @if(!(auth()->user()->role === 'admin' && strtoupper($item->status ?: 'PENDING') === 'DONE'))
@@ -1305,6 +1313,34 @@
         $('select[name="kategori"]').on('change', function () {
             $('#searchForm').submit();
         });
+
+        // Quick Filter from Badges
+        function quickFilter(type) {
+            const form = $('#searchForm');
+            
+            // Clear inputs
+            form.find('select[name="kategori"]').val('');
+            form.find('select[name="status"]').val('');
+            form.find('select[name="provinsi"]').val('').trigger('change');
+            form.find('select[name="kab"]').val('');
+            form.find('input[name="tgl_mulai"]').val('');
+            form.find('input[name="tgl_selesai"]').val('');
+            form.find('input[name="search"]').val('');
+            
+            if (type === 'BMN_DONE') {
+                form.find('select[name="kategori"]').val('BMN');
+                form.find('select[name="status"]').val('DONE');
+            } else if (type === 'SL_DONE') {
+                form.find('select[name="kategori"]').val('SL');
+                form.find('select[name="status"]').val('DONE');
+            } else if (type === 'HOLD') {
+                form.find('select[name="status"]').val('HOLD');
+            } else if (type === 'PENDING') {
+                form.find('select[name="status"]').val('PENDING');
+            }
+            
+            form.submit();
+        }
     </script>
 </body>
 
