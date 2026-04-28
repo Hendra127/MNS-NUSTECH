@@ -283,17 +283,47 @@
         }
 
         .preview-container img, .preview-container video {
-            width: 90px;
-            height: 90px;
+            width: 100px;
+            height: 100px;
             object-fit: cover;
-            border-radius: 10px;
-            border: 2px solid #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            border: 1px solid #ddd;
         }
 
         .preview-item {
             position: relative;
+            display: inline-block;
+            margin-right: 10px;
+            margin-bottom: 10px;
             animation: fadeIn 0.3s ease;
+        }
+
+        .btn-remove-preview {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: red;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        .btn-remove-preview:hover {
+            background: #cc0000;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes fadeIn {
@@ -728,14 +758,15 @@
                                         </div>
                                         <div class="col-md-8">
                                             <label class="form-label fw-bold text-primary">Evidence (Foto/Video)</label>
-                                            <div class="evidence-drop-zone rounded-3 p-3 text-center position-relative">
-                                                <input type="file" name="evidence[]" class="form-control mb-2"
+                                            <div class="evidence-drop-zone rounded-3 p-4 text-center position-relative mb-2">
+                                                <input type="file" name="evidence[]" class="d-none"
                                                     accept="image/*,video/*" multiple>
-                                                <div class="drop-zone-msg small text-muted">
-                                                    <i class="bi bi-cloud-arrow-up fs-4 d-block mb-1"></i>
-                                                    Drag & drop files here or browse
+                                                <div class="drop-zone-msg text-muted">
+                                                    <i class="bi bi-cloud-arrow-up-fill fs-1 d-block mb-2 text-primary"></i>
+                                                    <div class="fw-bold">Drag & drop files or Paste (Ctrl+V)</div>
+                                                    <div class="small">from WhatsApp or your folder</div>
                                                 </div>
-                                                <div class="preview-container d-flex flex-wrap gap-2 mt-2 justify-content-center"></div>
+                                                <div class="preview-container d-flex flex-wrap gap-2 mt-3 justify-content-center"></div>
                                             </div>
                                             
                                             <div class="mt-2 d-flex flex-wrap gap-2">
@@ -1107,13 +1138,14 @@
                         </div>
                         <div class="col-md-8">
                             <label class="form-label fw-bold">Evidence (Foto/Video)</label>
-                            <div class="evidence-drop-zone rounded-3 p-3 text-center position-relative">
-                                <input type="file" name="evidence[]" class="form-control mb-2" accept="image/*,video/*" multiple>
-                                <div class="drop-zone-msg small text-muted">
-                                    <i class="bi bi-cloud-arrow-up fs-4 d-block mb-1"></i>
-                                    Drag & drop files from WhatsApp or folder here
+                            <div class="evidence-drop-zone rounded-3 p-4 text-center position-relative mb-2">
+                                <input type="file" name="evidence[]" class="d-none" accept="image/*,video/*" multiple>
+                                <div class="drop-zone-msg text-muted">
+                                    <i class="bi bi-cloud-arrow-up-fill fs-1 d-block mb-2 text-primary"></i>
+                                    <div class="fw-bold">Drag & drop files or Paste (Ctrl+V)</div>
+                                    <div class="small">from WhatsApp or your folder</div>
                                 </div>
-                                <div class="preview-container d-flex flex-wrap gap-2 mt-2 justify-content-center"></div>
+                                <div class="preview-container d-flex flex-wrap gap-2 mt-3 justify-content-center"></div>
                             </div>
                             <small class="text-muted">Pilih satu atau beberapa file. Format: jpg, png, mp4. Maks 20MB/file.</small>
                         </div>
@@ -1723,14 +1755,93 @@
             };
 
             /**
-             * 7. Drag & Drop Evidence Logic
+             * 7. Drag & Drop + Paste Evidence Logic (WhatsApp Support)
              */
             function initEvidenceDropZones() {
                 $('.evidence-drop-zone').each(function() {
                     const zone = this;
+                    // Mencegah inisialisasi ganda pada elemen yang sama
+                    if ($(zone).data('initialized')) return;
+                    $(zone).data('initialized', true);
+
                     const input = $(zone).find('input[type="file"]')[0];
                     const previewContainer = $(zone).find('.preview-container')[0];
                     
+                    // Store files in an array to allow cumulative selection and removal
+                    let selectedFiles = [];
+
+                    const updateInputFiles = () => {
+                        try {
+                            const dataTransfer = new DataTransfer();
+                            selectedFiles.forEach(file => dataTransfer.items.add(file));
+                            input.files = dataTransfer.files;
+                        } catch (e) {
+                            console.error("DataTransfer API not supported, fallback needed", e);
+                        }
+                        
+                        // Show/hide message based on files
+                        if (selectedFiles.length > 0) {
+                            $(zone).find('.drop-zone-msg').addClass('d-none');
+                        } else {
+                            $(zone).find('.drop-zone-msg').removeClass('d-none');
+                        }
+                    };
+
+                    const addFiles = (files) => {
+                        let invalidFiles = 0;
+                        Array.from(files).forEach(file => {
+                            // Check file type
+                            if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
+                                selectedFiles.push(file);
+                                
+                                const reader = new FileReader();
+                                reader.onload = (e) => {
+                                    const item = document.createElement('div');
+                                    item.className = 'preview-item';
+                                    
+                                    let mediaHtml = '';
+                                    if (file.type.startsWith('image/')) {
+                                        mediaHtml = `<img src="${e.target.result}" alt="preview">`;
+                                    } else if (file.type.startsWith('video/')) {
+                                        mediaHtml = `<video src="${e.target.result}"></video>`;
+                                    }
+
+                                    item.innerHTML = `
+                                        ${mediaHtml}
+                                        <div class="btn-remove-preview" title="Hapus">×</div>
+                                    `;
+
+                                    // Remove logic
+                                    item.querySelector('.btn-remove-preview').addEventListener('click', (ev) => {
+                                        ev.stopPropagation();
+                                        const index = selectedFiles.indexOf(file);
+                                        if (index > -1) {
+                                            selectedFiles.splice(index, 1);
+                                            item.remove();
+                                            updateInputFiles();
+                                        }
+                                    });
+
+                                    previewContainer.appendChild(item);
+                                };
+                                reader.readAsDataURL(file);
+                            } else {
+                                invalidFiles++;
+                            }
+                        });
+                        
+                        if (invalidFiles > 0) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Format Tidak Didukung',
+                                text: 'Hanya file gambar (JPG/PNG) dan video (MP4) yang diperbolehkan.'
+                            });
+                        }
+                        
+                        updateInputFiles();
+                    };
+
+                    // Drag & Drop events
                     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
                         zone.addEventListener(eventName, e => {
                             e.preventDefault();
@@ -1748,28 +1859,50 @@
                     zone.addEventListener('drop', e => {
                         const files = e.dataTransfer.files;
                         if (files.length > 0) {
-                            input.files = files; // Standard browser support for updating input.files from drop
-                            $(input).trigger('change');
+                            addFiles(files);
                         }
                     });
 
+                    // Input file change event (via Browse)
                     input.addEventListener('change', function() {
-                        previewContainer.innerHTML = '';
-                        if (this.files) {
-                            Array.from(this.files).forEach(file => {
-                                const reader = new FileReader();
-                                reader.onload = (e) => {
-                                    const item = document.createElement('div');
-                                    item.className = 'preview-item';
-                                    if (file.type.startsWith('image/')) {
-                                        item.innerHTML = `<img src="${e.target.result}" alt="preview">`;
-                                    } else if (file.type.startsWith('video/')) {
-                                        item.innerHTML = `<video src="${e.target.result}"></video>`;
+                        if (this.files.length > 0) {
+                            addFiles(this.files);
+                            // Clear input so selecting the same file again triggers change
+                            this.value = '';
+                        }
+                    });
+
+                    // Paste event (from WhatsApp or clipboard)
+                    // Gunakan $(document) lalu delegasikan ke zone yang aktif untuk menghindari duplicate binding
+                    $(zone).closest('.modal').off('paste').on('paste', function(e) {
+                        // Pastikan modal ini sedang terlihat
+                        if (!$(this).hasClass('show')) return;
+                        
+                        const clipboardData = e.originalEvent.clipboardData;
+                        if (clipboardData && clipboardData.items) {
+                            const items = clipboardData.items;
+                            const files = [];
+                            for (let i = 0; i < items.length; i++) {
+                                if (items[i].type.indexOf('image') !== -1 || items[i].type.indexOf('video') !== -1) {
+                                    const blob = items[i].getAsFile();
+                                    if (blob) {
+                                        const ext = blob.type.split('/')[1] || 'png';
+                                        const file = new File([blob], `pasted-image-${Date.now()}-${i}.${ext}`, { type: blob.type });
+                                        files.push(file);
                                     }
-                                    previewContainer.appendChild(item);
-                                };
-                                reader.readAsDataURL(file);
-                            });
+                                }
+                            }
+                            if (files.length > 0) {
+                                e.preventDefault(); // Mencegah paste ke elemen lain jika gambar ditemukan
+                                addFiles(files);
+                            }
+                        }
+                    });
+
+                    // Clicking the zone triggers input click
+                    $(zone).off('click').on('click', function(e) {
+                        if (e.target !== input && !$(e.target).closest('.preview-item').length) {
+                            input.click();
                         }
                     });
                 });
@@ -1778,8 +1911,8 @@
             // Initialize on load
             initEvidenceDropZones();
 
-            // Also call when modals are opened to ensure zones are ready (in case of re-rendering)
-            $(document).on('shown.bs.modal', function() {
+            // Also call when modals are opened to ensure zones are ready (in case of re-rendering via AJAX)
+            $(document).on('shown.bs.modal', '.modal', function() {
                 initEvidenceDropZones();
             });
         });
