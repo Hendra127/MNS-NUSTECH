@@ -110,6 +110,66 @@
             font-size: 13px !important;
         }
 
+        .subtask-comment {
+            font-size: 11px;
+            color: #64748b;
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+            margin-top: 4px;
+            display: inline-block;
+            max-width: 100%;
+            word-break: break-word;
+        }
+
+        .comment-btn-wrapper {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .comment-btn {
+            color: #94a3b8;
+            transition: color 0.2s;
+            font-size: 14px;
+        }
+
+        .comment-btn:hover {
+            color: #3b82f6;
+        }
+
+        .comment-btn.active {
+            color: #3b82f6;
+        }
+
+        .comment-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 7px;
+            height: 7px;
+            background-color: #22c55e;
+            border-radius: 50%;
+            border: 1px solid white;
+        }
+
+        .urgent-card {
+            border: 2px solid #ef4444 !important;
+        }
+
+        .urgent-active {
+            color: #ef4444 !important;
+        }
+
+        .urgent-icon {
+            color: #94a3b8;
+            transition: color 0.2s;
+        }
+
+        .urgent-icon:hover {
+            color: #ef4444;
+        }
+
         /* Done Column Styling */
         .done-column {
             background: #e2e8f0;
@@ -345,7 +405,7 @@
                             $completed = collect($todo->checklists ?? [])->where('completed', true)->count();
                             $percent = $total > 0 ? round(($completed / $total) * 100) : 0;
                         @endphp
-                        <div class="note-item {{ $todo->is_pinned ? 'pinned-card' : '' }}" id="todo-card-{{ $todo->id }}" data-id="{{ $todo->id }}">
+                        <div class="note-item {{ $todo->is_pinned ? 'pinned-card' : '' }} {{ $todo->is_urgent ? 'urgent-card' : '' }}" id="todo-card-{{ $todo->id }}" data-id="{{ $todo->id }}">
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <div style="flex: 1;">
                                     <h5 style="font-weight: 700; margin: 0; color: #1e293b; display: inline-block;" contenteditable="true"
@@ -373,6 +433,8 @@
                                     @endif
                                     <i class="bi {{ $todo->is_pinned ? 'bi-pin-fill pin-active' : 'bi-pin' }} fs-5 cursor-pointer pin-btn"
                                         onclick="togglePin({{ $todo->id }}, this)" title="Sematkan"></i>
+                                    <i class="bi {{ $todo->is_urgent ? 'bi-exclamation-octagon-fill urgent-active' : 'bi-exclamation-octagon' }} fs-5 cursor-pointer urgent-btn"
+                                        onclick="toggleUrgent({{ $todo->id }}, this)" title="Prioritas Tinggi"></i>
                                     <i class="bi bi-check-circle-fill text-success fs-5 cursor-pointer"
                                         onclick="toggleStatus({{ $todo->id }})"></i>
                                     <i class="bi bi-trash text-danger cursor-pointer fs-5"
@@ -391,21 +453,38 @@
                             </div>
                             <div class="checklist-area mb-3"
                                 style="max-height: 250px; overflow-y: auto; overflow-x: hidden; flex-grow: 1;">
-                                @foreach($todo->checklists ?? [] as $item)
+                                @foreach(collect($todo->checklists ?? [])->sortByDesc(function($item) {
+                                    return $item['is_urgent'] ?? false;
+                                }) as $item)
                                     <div class="checklist-item" style="justify-content: space-between;" id="sub-{{ $item['id'] }}">
                                         <div style="display: flex; align-items: flex-start; gap: 10px; flex: 1;">
                                             <input type="checkbox" {{ $item['completed'] ? 'checked' : '' }}
                                                 onchange="toggleSub('{{ $todo->id }}', '{{ $item['id'] }}', this)"
                                                 class="form-check-input cursor-pointer" style="min-width: 18px;">
-                                            <span class="{{ $item['completed'] ? 'strikethrough' : '' }}" style="font-size: 13px; flex: 1;"
-                                                contenteditable="true"
-                                                onkeydown="if(event.key==='Enter'){event.preventDefault();saveSub('{{ $todo->id }}','{{ $item['id'] }}',this);}"
-                                                onblur="saveSub('{{ $todo->id }}', '{{ $item['id'] }}', this)">
-                                                {{ $item['text'] }}
-                                            </span>
+                                            <div style="flex: 1;">
+                                                <span class="{{ $item['completed'] ? 'strikethrough' : '' }} {{ ($item['is_urgent'] ?? false) ? 'text-danger fw-bold' : '' }}" style="font-size: 13px; display: block;"
+                                                    contenteditable="true"
+                                                    onkeydown="if(event.key==='Enter'){event.preventDefault();saveSub('{{ $todo->id }}','{{ $item['id'] }}',this);}"
+                                                    onblur="saveSub('{{ $todo->id }}', '{{ $item['id'] }}', this)">
+                                                    {{ $item['text'] }}
+                                                </span>
+                                                {{-- Komentar disimpan di hidden text agar bisa diambil JS --}}
+                                                <span class="d-none comment-storage" id="comment-text-{{ $item['id'] }}">{{ $item['comment'] ?? '' }}</span>
+                                            </div>
                                         </div>
-                                        <i class="bi bi-trash text-danger cursor-pointer ms-2" style="font-size: 14px; margin-top: 2px;" title="Hapus sub-task"
-                                            onclick="deleteSub('{{ $todo->id }}', '{{ $item['id'] }}')"></i>
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi {{ ($item['is_urgent'] ?? false) ? 'bi-exclamation-circle-fill urgent-active' : 'bi-exclamation-circle' }} cursor-pointer ms-2 urgent-icon" 
+                                               style="font-size: 14px;" title="Urgen"
+                                               onclick="toggleSubUrgent('{{ $todo->id }}', '{{ $item['id'] }}', this)"></i>
+                                            <div class="comment-btn-wrapper ms-2">
+                                                <i class="bi bi-chat-dots cursor-pointer comment-btn {{ !empty($item['comment']) ? 'active' : '' }}" 
+                                                   title="Komentar"
+                                                   onclick="commentSub('{{ $todo->id }}', '{{ $item['id'] }}')"></i>
+                                                <div class="comment-dot {{ empty($item['comment']) ? 'd-none' : '' }}" id="comment-dot-{{ $item['id'] }}"></div>
+                                            </div>
+                                            <i class="bi bi-trash text-danger cursor-pointer ms-2" style="font-size: 14px;" title="Hapus sub-task"
+                                                onclick="deleteSub('{{ $todo->id }}', '{{ $item['id'] }}')"></i>
+                                        </div>
                                     </div>
                                 @endforeach
                             </div>
@@ -567,6 +646,7 @@
                                 <div class="d-flex gap-2 ms-2">
                                     ${shareBtn}
                                     <i class="bi bi-pin fs-5 cursor-pointer pin-btn" onclick="togglePin(${id}, this)" title="Sematkan"></i>
+                                    <i class="bi bi-exclamation-octagon fs-5 cursor-pointer urgent-btn" onclick="toggleUrgent(${id}, this)" title="Prioritas Tinggi"></i>
                                     <i class="bi bi-check-circle-fill text-success fs-5 cursor-pointer" onclick="toggleStatus(${id})"></i>
                                     <i class="bi bi-trash text-danger cursor-pointer fs-5" onclick="deleteTodo(${id})"></i>
                                 </div>
@@ -624,6 +704,29 @@
                 }
             }).fail(function() {
                 Swal.fire({ icon: 'error', title: 'Error', text: 'Gagal menyematkan tugas' });
+            });
+        }
+
+        // ===== TOGGLE URGENT =====
+        function toggleUrgent(id, iconEl) {
+            $.post(`/todolist/urgent/${id}`, function(res) {
+                if (res.success) {
+                    const $card = $(`#todo-card-${id}`);
+                    const $icon = $(iconEl);
+                    if (res.is_urgent) {
+                        $card.addClass('urgent-card');
+                        $icon.removeClass('bi-exclamation-octagon').addClass('bi-exclamation-octagon-fill urgent-active');
+                        Toast.fire({ icon: 'success', title: 'Tugas ditandai Urgen!' });
+                    } else {
+                        $card.removeClass('urgent-card');
+                        $icon.removeClass('bi-exclamation-octagon-fill urgent-active').addClass('bi-exclamation-octagon');
+                        Toast.fire({ icon: 'success', title: 'Tanda Urgen dilepas.' });
+                    }
+                    // Refresh halaman agar urutan terupdate (urgent di atas)
+                    setTimeout(() => location.reload(), 1000);
+                }
+            }).fail(function() {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Gagal mengubah status urgen' });
             });
         }
 
@@ -690,6 +793,8 @@
                                             onblur="saveTitle(${id},this)">${esc(title)}</h5>
                                     </div>
                                     <div class="d-flex gap-2 ms-2">
+                                        <i class="bi bi-pin fs-5 cursor-pointer pin-btn" onclick="togglePin(${id}, this)" title="Sematkan"></i>
+                                        <i class="bi bi-exclamation-octagon fs-5 cursor-pointer urgent-btn" onclick="toggleUrgent(${id}, this)" title="Prioritas Tinggi"></i>
                                         <i class="bi bi-check-circle-fill text-success fs-5 cursor-pointer" onclick="toggleStatus(${id})"></i>
                                         <i class="bi bi-trash text-danger cursor-pointer fs-5" onclick="deleteTodo(${id})"></i>
                                     </div>
@@ -781,12 +886,24 @@
                         <div style="display:flex;align-items:flex-start;gap:10px;flex:1;">
                             <input type="checkbox" class="form-check-input cursor-pointer" style="min-width:18px;"
                                    onchange="toggleSub('${todoId}','${item.id}',this)">
-                            <span style="font-size:13px;flex:1;" contenteditable="true"
-                                  onkeydown="if(event.key==='Enter'){event.preventDefault();saveSub('${todoId}','${item.id}',this);}"
-                                  onblur="saveSub('${todoId}','${item.id}',this)">${esc(text)}</span>
+                            <div style="flex:1;">
+                                <span style="font-size:13px;display:block;" contenteditable="true"
+                                      onkeydown="if(event.key==='Enter'){event.preventDefault();saveSub('${todoId}','${item.id}',this);}"
+                                      onblur="saveSub('${todoId}','${item.id}',this)">${esc(text)}</span>
+                                <span class="d-none comment-storage" id="comment-text-${item.id}"></span>
+                            </div>
                         </div>
-                        <i class="bi bi-trash text-danger cursor-pointer ms-2" style="font-size:14px;margin-top:2px;"
-                           onclick="deleteSub('${todoId}','${item.id}')"></i>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-exclamation-circle cursor-pointer ms-2 urgent-icon" style="font-size:14px;" title="Urgen"
+                               onclick="toggleSubUrgent('${todoId}','${item.id}',this)"></i>
+                            <div class="comment-btn-wrapper ms-2">
+                                <i class="bi bi-chat-dots cursor-pointer comment-btn" title="Komentar"
+                                   onclick="commentSub('${todoId}','${item.id}')"></i>
+                                <div class="comment-dot d-none" id="comment-dot-${item.id}"></div>
+                            </div>
+                            <i class="bi bi-trash text-danger cursor-pointer ms-2" style="font-size:14px;" title="Hapus sub-task"
+                               onclick="deleteSub('${todoId}','${item.id}')"></i>
+                        </div>
                     </div>`;
                 $(`#todo-card-${todoId} .checklist-area`).append(row);
                 $(inputEl).val('');
@@ -794,6 +911,52 @@
                 Toast.fire({ icon: 'success', title: 'Sub-task ditambahkan!' });
             }).fail(function() {
                 Swal.fire({ icon: 'error', title: 'Error', text: 'Gagal menambah sub-task' });
+            });
+        }
+
+        // ===== KOMENTAR SUB-TASK =====
+        function commentSub(todoId, subtaskId) {
+            const currentComment = $(`#comment-text-${subtaskId}`).text().trim();
+            Swal.fire({
+                title: 'Komentar Sub-task',
+                input: 'textarea',
+                inputLabel: 'Masukkan komentar atau catatan untuk sub-task ini:',
+                inputValue: currentComment,
+                showCancelButton: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+                inputPlaceholder: 'Tulis komentar di sini...',
+                inputAttributes: {
+                    'aria-label': 'Tulis komentar di sini'
+                },
+                preConfirm: (value) => {
+                    return $.post(`/todolist/subtask/comment/${todoId}`, {
+                        subtask_id: subtaskId,
+                        comment: value
+                    }).then(res => {
+                        if (res.success) return value;
+                        throw new Error(res.message || 'Gagal menyimpan komentar');
+                    }).catch(err => {
+                        Swal.showValidationMessage(`Error: ${err.message || 'Gagal menyimpan komentar'}`);
+                    });
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const comment = result.value;
+                    const $commentStorage = $(`#comment-text-${subtaskId}`);
+                    const $commentDot = $(`#comment-dot-${subtaskId}`);
+                    const $commentBtn = $(`#sub-${subtaskId} .comment-btn`);
+                    
+                    $commentStorage.text(comment);
+                    if (comment && comment.trim() !== '') {
+                        $commentDot.removeClass('d-none');
+                        $commentBtn.addClass('active');
+                    } else {
+                        $commentDot.addClass('d-none');
+                        $commentBtn.removeClass('active');
+                    }
+                    Toast.fire({ icon: 'success', title: 'Komentar disimpan!' });
+                }
             });
         }
 
@@ -810,6 +973,25 @@
                 $(`#todo-card-${todoId} .pct-bar`).css('width', pct + '%');
                 $(`#todo-card-${todoId} .pct-label`).text(pct + '%');
                 Toast.fire({ icon: 'success', title: 'Status sub-task diperbarui!' });
+            });
+        }
+
+        // ===== TOGGLE URGENT SUB-TASK =====
+        function toggleSubUrgent(todoId, subId, iconEl) {
+            $.post(`/todolist/subtask/urgent/${todoId}`, { subtask_id: subId }, function() {
+                const $icon = $(iconEl);
+                const $span = $(`#sub-${subId} span`);
+                if ($icon.hasClass('bi-exclamation-circle')) {
+                    $icon.removeClass('bi-exclamation-circle').addClass('bi-exclamation-circle-fill urgent-active');
+                    $span.addClass('text-danger fw-bold');
+                    Toast.fire({ icon: 'success', title: 'Sub-task ditandai Urgen!' });
+                } else {
+                    $icon.removeClass('bi-exclamation-circle-fill urgent-active').addClass('bi-exclamation-circle');
+                    $span.removeClass('text-danger fw-bold');
+                    Toast.fire({ icon: 'success', title: 'Tanda Urgen dilepas.' });
+                }
+                // Refresh agar urutan terupdate
+                setTimeout(() => location.reload(), 1000);
             });
         }
 

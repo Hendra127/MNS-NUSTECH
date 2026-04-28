@@ -95,7 +95,9 @@ class OpenTicketController extends Controller
         $today = Ticket::whereDate('created_at', \Carbon\Carbon::today())->count();
         $wgTunnels = config('wireguard.tunnels', []);
     
-        return view('open', compact('tickets', 'sites', 'search', 'today', 'openAllCount', 'openTodayCount', 'countBMN', 'countSL', 'wgTunnels'));
+        $ceContacts = \App\Models\CeContact::all()->pluck('phone', 'name');
+    
+        return view('open', compact('tickets', 'sites', 'search', 'today', 'openAllCount', 'openTodayCount', 'countBMN', 'countSL', 'wgTunnels', 'ceContacts'));
     }
     public function store(Request $request)
     {
@@ -265,5 +267,28 @@ class OpenTicketController extends Controller
 
         return redirect()->back()->with('success', 'Tiket ' . $ticket->nama_site . ' berhasil dipindahkan ke Close Tiket.');
     }
-    
+    public function updateCeContacts(Request $request)
+    {
+        $request->validate([
+            'ce' => 'required|array',
+            'phone' => 'required|array',
+        ]);
+
+        foreach ($request->ce as $index => $name) {
+            $phone = $request->phone[$index];
+            if ($name && $phone) {
+                // Ensure phone starts with 62 or 0
+                if (strpos($phone, '0') === 0) {
+                    $phone = '62' . substr($phone, 1);
+                }
+                
+                \App\Models\CeContact::updateOrCreate(
+                    ['name' => $name],
+                    ['phone' => $phone]
+                );
+            }
+        }
+
+        return redirect()->back()->with('success', 'Daftar Nomor CE berhasil diperbarui.');
+    }
 }

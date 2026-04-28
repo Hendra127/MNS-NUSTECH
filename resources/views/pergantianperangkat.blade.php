@@ -86,15 +86,80 @@
         .search-box {
             display: flex;
             align-items: center;
+            background-color: #f1f3f4;
+            border-radius: 50px;
+            padding: 4px 16px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            width: 100%;
+            max-width: 300px;
+        }
+        .search-box:focus-within {
+            background-color: #fff;
+            border-color: #4285f4;
+            box-shadow: 0 1px 6px rgba(32,33,36,0.28);
         }
         .search-box input {
             border: none;
             outline: none;
-            padding: 10px;
+            padding: 8px 0;
             background: transparent;
             flex-grow: 1;
+            font-size: 14px;
+            color: #3c4043;
+        }
+        .search-box input::placeholder {
+            color: #70757a;
+            opacity: 0.8;
+        }
+        .search-btn {
+            background: none;
+            border: none;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #4285f4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            order: 2;
         }
 
+        /* ── Dark Mode Fixes ── */
+        [data-bs-theme="dark"] .sticky-col,
+        [data-bs-theme="dark"] .sticky-col-right {
+            background-color: #212529 !important;
+            color: #fff !important;
+            border-color: #444 !important;
+        }
+        [data-bs-theme="dark"] tbody tr:nth-child(even) .sticky-col {
+            background-color: #2c3034 !important;
+        }
+        [data-bs-theme="dark"] thead th {
+            background-color: #2c3034 !important;
+            color: #dee2e6 !important;
+            border-color: #495057 !important;
+        }
+        [data-bs-theme="dark"] .search-box {
+            background-color: #2c3034;
+            border-color: #444;
+        }
+        [data-bs-theme="dark"] .search-box input {
+            color: #fff;
+        }
+        [data-bs-theme="dark"] .search-box input::placeholder {
+            color: #999;
+        }
+        [data-bs-theme="dark"] .bi-info-circle,
+        [data-bs-theme="dark"] .bi-pencil,
+        [data-bs-theme="dark"] .bi-trash,
+        [data-bs-theme="dark"] .btn-action,
+        [data-bs-theme="dark"] .search-btn {
+            color: #fff !important;
+        }
+        [data-bs-theme="dark"] td {
+            color: #dee2e6 !important;
+        }
     </style>
 </head>
 <body>
@@ -143,6 +208,18 @@
         <a href="{{ url('/sparetracker') }}" class="tab {{ request()->is('sparetracker*') ? 'active' : '' }}" style="text-decoration: none; color: Black;">Spare Tracker</a>
         <a href="{{ url('/pm-summary') }}" class="tab {{ request()->is('pm-summary*') ? 'active' : '' }}" style="text-decoration: none; color: Black;">Summary</a>
     </div>
+
+    @if(session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: "{{ session('success') }}",
+                showConfirmButton: false,
+                timer: 1500
+            });
+        </script>
+    @endif
     @if($errors->any())
         <script>
             Swal.fire({
@@ -195,9 +272,15 @@
                         <a href="{{ route('pergantianperangkat') }}" class="btn btn-light btn-sm rounded-pill border d-flex align-items-center justify-content-center h-100" title="Reset Filter"><i class="bi bi-arrow-repeat"></i></a>
                     </div>
                     <div class="col-12 col-md-auto">
-                        <div class="search-box d-flex align-items-center w-100">
-                            <input type="text" name="search" id="searchInput" placeholder="Search" value="{{ request('search') }}" style="flex-grow: 1; border: none; outline: none; padding-left: 15px;">
-                            <button type="submit" class="search-btn">🔍</button>
+                        <div class="search-box">
+                            <input type="text" name="search" placeholder="Search..." value="{{ request('search') }}">
+                            <button type="submit" class="search-btn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="10" cy="10" r="7" stroke="#5a3592" stroke-width="2.5" fill="#4dd0e1" />
+                                    <path d="M15 15L20 20" stroke="#5a3592" stroke-width="2.5" stroke-linecap="round"/>
+                                    <circle cx="8" cy="8" r="3" fill="white" fill-opacity="0.3" />
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 </form>
@@ -222,40 +305,40 @@
                 </thead>
                 <tbody>
                     @forelse($pergantian_data as $index => $item)
-                    <tr>
-                        <td class="text-center sticky-col col-no">{{ $index + 1 }}</td>
-                        <td class="sticky-col col-site-id">{{ $item->site->site_id ?? '-' }}</td>
-                        <td class="sticky-col col-nama_site">{{ $item->site->sitename ?? '-' }}</td>
-                        <td>{{ $item->perangkat }}</td>
-                        <td>{{ $item->tanggal_penggantian }}</td>
-                        <td>{{ $item->sn_lama ?? '-' }}</td>
-                        <td>{{ $item->sn_baru ?? '-' }}</td>
-                        <td>{{ $item->keterangan ?? '-' }}</td>
-                        @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
-                        <td class="text-center sticky-col-right">
-                            <div class="d-flex justify-content-center gap-1">
-                                <button type="button" class="btn btn-sm bi bi-pencil" 
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#modalEditPergantian{{ $item->id }}"
-                                        style="background: none; border: none; color: black; font-size: 1.1rem;"></button>
-                                <form action="{{ route('pergantianperangkat.destroy', $item->id) }}" method="POST" class="form-delete">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button" class="btn btn-sm bi bi-trash btn-delete" 
-                                            data-perangkat="{{ $item->perangkat }}" 
-                                            data-site="{{ $item->site->sitename ?? $item->site->site_id }}"
-                                            style="background: none; border: none; color: black; font-size: 1.1rem;"></button>
-                                </form>
-                            </div>
-                        </td>
-                        @endif
-                    </tr>
+                        <tr>
+                            <td class="text-center sticky-col col-no">{{ $index + 1 }}</td>
+                            <td class="sticky-col col-site-id">{{ $item->site->site_id ?? '-' }}</td>
+                            <td class="sticky-col col-nama_site">{{ $item->site->sitename ?? '-' }}</td>
+                            <td>{{ $item->perangkat }}</td>
+                            <td>{{ $item->tanggal_penggantian }}</td>
+                            <td>{{ $item->sn_lama ?? '-' }}</td>
+                            <td>{{ $item->sn_baru ?? '-' }}</td>
+                            <td>{{ $item->keterangan ?? '-' }}</td>
+                            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                                <td class="text-center sticky-col-right">
+                                    <div class="d-flex justify-content-center gap-1">
+                                        <button type="button" class="btn btn-sm bi bi-pencil" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#modalEditPergantian{{ $item->id }}"
+                                                style="background: none; border: none; color: black; font-size: 1.1rem;"></button>
+                                        <form action="{{ route('pergantianperangkat.destroy', $item->id) }}" method="POST" class="form-delete">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" class="btn btn-sm bi bi-trash btn-delete" 
+                                                    data-perangkat="{{ $item->perangkat }}" 
+                                                    data-site="{{ $item->site->sitename ?? $item->site->site_id }}"
+                                                    style="background: none; border: none; color: black; font-size: 1.1rem;"></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            @endif
+                        </tr>
                     @empty
-                    <tr>
-                        <td colspan="9" class="empty text-center">
-                            Showing 0 of 0 results
-                        </td>
-                    </tr>
+                        <tr>
+                            <td colspan="9" class="empty text-center">
+                                Showing 0 of 0 results
+                            </td>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>
@@ -275,7 +358,7 @@
     <div class="modal fade" id="modalTambahPergantian" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form action="{{ route('pergantianperangkat.store') }}" method="POST">
+                <form action="{{ route('pergantianperangkat.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-header text-white d-flex justify-content-center position-relative" style="background-color: #071152;">
                         <h5 class="modal-title w-100 text-center">Tambah Log Pergantian</h5>
@@ -303,7 +386,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-8 mb-3">
                                 <label class="form-label fw-bold">Perangkat</label>
                                 <select name="perangkat" class="form-select" required>
                                     <option value="" selected disabled>Pilih Perangkat</option>
@@ -313,12 +396,31 @@
                                     <option value="AP1">AP1</option>
                                     <option value="AP2">AP2</option>
                                     <option value="STAVOL">STAVOL</option>
+                                    <option value="TRANSCEIVER">TRANSCEIVER</option>
+                                    <option value="POE">POE</option>
+                                    <option value="ADAPTOR MIKROTIK">ADAPTOR MIKROTIK</option>
+                                    <option value="KABEL LAN">KABEL LAN</option>
+                                    <option value="ACCESS POINT">ACCESS POINT</option>
                                     <option value="LAINNYA">LAINNYA</option>
                                 </select>
                             </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Qty</label>
+                                <input type="number" name="qty" class="form-control" min="1" value="1">
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Tanggal</label>
                                 <input type="date" name="tanggal_penggantian" class="form-control" value="{{ date('Y-m-d') }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Layanan</label>
+                                <select name="layanan" class="form-select">
+                                    <option value="">- Pilih Layanan -</option>
+                                    <option value="SEWA LAYANAN">SEWA LAYANAN</option>
+                                    <option value="BMN">BMN</option>
+                                </select>
                             </div>
                         </div>
                         <div class="row">
@@ -332,8 +434,23 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Keterangan</label>
-                            <textarea name="keterangan" class="form-control" rows="2" placeholder="Tambahkan keterangan jika ada..."></textarea>
+                            <label class="form-label fw-bold">Foto Perangkat Baru</label>
+                            <input type="file" name="foto_perangkat_baru" class="form-control" accept="image/*">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Status</label>
+                                <select name="status" class="form-select">
+                                    <option value="">- Pilih Status -</option>
+                                    <option value="DONE">DONE</option>
+                                    <option value="PENDING">PENDING</option>
+                                    <option value="PROSES">PROSES</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Catatan</label>
+                                <textarea name="keterangan" class="form-control" rows="2" placeholder="Catatan..."></textarea>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -345,79 +462,168 @@
         </div>
     </div>
     @foreach($pergantian_data as $item)
-    <!-- Modal Edit Pergantian -->
-    <div class="modal fade" id="modalEditPergantian{{ $item->id }}" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="{{ route('pergantianperangkat.update', $item->id) }}" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <div class="modal-header text-white d-flex justify-content-center position-relative" style="background-color: #071152;">
-                        <h5 class="modal-title w-100 text-center">Edit Log - {{ $item->site->sitename ?? $item->site->site_id }}</h5>
-                        <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Site (ID atau Nama)</label>
-                            <input list="siteList" name="site_search" class="form-control" 
-                                   value="{{ ($item->site->site_id ?? '') . ' - ' . ($item->site->sitename ?? '') }}"
-                                   onchange="updateSiteIdEdit(this, {{ $item->id }})">
-                            <input type="hidden" name="site_id" id="selected_site_id_edit_{{ $item->id }}" value="{{ $item->site_id }}" required>
+        <!-- Modal Edit Pergantian -->
+        <div class="modal fade" id="modalEditPergantian{{ $item->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form action="{{ route('pergantianperangkat.update', $item->id) }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-header text-white d-flex justify-content-center position-relative" style="background-color: #071152;">
+                            <h5 class="modal-title w-100 text-center">Edit Log - {{ $item->site->sitename ?? $item->site->site_id }}</h5>
+                            <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Site ID</label>
-                                <input type="text" id="display_site_id_edit_{{ $item->id }}" class="form-control bg-light" readonly value="{{ $item->site->site_id ?? '-' }}">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Site (ID atau Nama)</label>
+                                <input list="siteList" name="site_search" class="form-control" 
+                                       value="{{ ($item->site->site_id ?? '') . ' - ' . ($item->site->sitename ?? '') }}"
+                                       onchange="updateSiteIdEdit(this, {{ $item->id }})">
+                                <input type="hidden" name="site_id" id="selected_site_id_edit_{{ $item->id }}" value="{{ $item->site_id }}" required>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Nama Site</label>
-                                <input type="text" id="display_site_name_edit_{{ $item->id }}" class="form-control bg-light" readonly value="{{ $item->site->sitename ?? '-' }}">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Site ID</label>
+                                    <input type="text" id="display_site_id_edit_{{ $item->id }}" class="form-control bg-light" readonly value="{{ $item->site->site_id ?? '-' }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Nama Site</label>
+                                    <input type="text" id="display_site_name_edit_{{ $item->id }}" class="form-control bg-light" readonly value="{{ $item->site->sitename ?? '-' }}">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8 mb-3">
+                                    <label class="form-label fw-bold">Perangkat</label>
+                                    <select name="perangkat" class="form-select" required>
+                                        <option value="MODEM" {{ $item->perangkat == 'MODEM' ? 'selected' : '' }}>MODEM</option>
+                                        <option value="ROUTER" {{ $item->perangkat == 'ROUTER' ? 'selected' : '' }}>ROUTER</option>
+                                        <option value="SWITCH" {{ $item->perangkat == 'SWITCH' ? 'selected' : '' }}>SWITCH</option>
+                                        <option value="AP1" {{ $item->perangkat == 'AP1' ? 'selected' : '' }}>AP1</option>
+                                        <option value="AP2" {{ $item->perangkat == 'AP2' ? 'selected' : '' }}>AP2</option>
+                                        <option value="STAVOL" {{ $item->perangkat == 'STAVOL' ? 'selected' : '' }}>STAVOL</option>
+                                        <option value="TRANSCEIVER" {{ $item->perangkat == 'TRANSCEIVER' ? 'selected' : '' }}>TRANSCEIVER</option>
+                                        <option value="POE" {{ $item->perangkat == 'POE' ? 'selected' : '' }}>POE</option>
+                                        <option value="ADAPTOR MIKROTIK" {{ $item->perangkat == 'ADAPTOR MIKROTIK' ? 'selected' : '' }}>ADAPTOR MIKROTIK</option>
+                                        <option value="KABEL LAN" {{ $item->perangkat == 'KABEL LAN' ? 'selected' : '' }}>KABEL LAN</option>
+                                        <option value="ACCESS POINT" {{ $item->perangkat == 'ACCESS POINT' ? 'selected' : '' }}>ACCESS POINT</option>
+                                        <option value="LAINNYA" {{ $item->perangkat == 'LAINNYA' ? 'selected' : '' }}>LAINNYA</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label fw-bold">Qty</label>
+                                    <input type="number" name="qty" class="form-control" min="1" value="{{ $item->qty ?? 1 }}">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Tanggal</label>
+                                    <input type="date" name="tanggal_penggantian" class="form-control" value="{{ $item->tanggal_penggantian }}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Layanan</label>
+                                    <select name="layanan" class="form-select">
+                                        <option value="">- Pilih Layanan -</option>
+                                        <option value="SEWA LAYANAN" {{ $item->layanan == 'SEWA LAYANAN' ? 'selected' : '' }}>SEWA LAYANAN</option>
+                                        <option value="BMN" {{ $item->layanan == 'BMN' ? 'selected' : '' }}>BMN</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">SN Lama</label>
+                                    <input type="text" name="sn_lama" class="form-control" value="{{ $item->sn_lama }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">SN Baru</label>
+                                    <input type="text" name="sn_baru" class="form-control" value="{{ $item->sn_baru }}">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Foto Perangkat Baru</label>
+                                @if(!empty($item->foto_perangkat_baru))
+                                    <div class="mb-1"><small class="text-muted">Foto saat ini: <a href="{{ asset('storage/'.$item->foto_perangkat_baru) }}" target="_blank">{{ basename($item->foto_perangkat_baru) }}</a></small></div>
+                                @endif
+                                <input type="file" name="foto_perangkat_baru" class="form-control" accept="image/*">
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Status</label>
+                                    <select name="status" class="form-select">
+                                        <option value="">- Pilih Status -</option>
+                                        <option value="DONE" {{ $item->status == 'DONE' ? 'selected' : '' }}>DONE</option>
+                                        <option value="PENDING" {{ $item->status == 'PENDING' ? 'selected' : '' }}>PENDING</option>
+                                        <option value="PROSES" {{ $item->status == 'PROSES' ? 'selected' : '' }}>PROSES</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Catatan</label>
+                                    <textarea name="keterangan" class="form-control" rows="2">{{ $item->keterangan }}</textarea>
+                                </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Perangkat</label>
-                                <select name="perangkat" class="form-select" required>
-                                    <option value="MODEM" {{ $item->perangkat == 'MODEM' ? 'selected' : '' }}>MODEM</option>
-                                    <option value="ROUTER" {{ $item->perangkat == 'ROUTER' ? 'selected' : '' }}>ROUTER</option>
-                                    <option value="SWITCH" {{ $item->perangkat == 'SWITCH' ? 'selected' : '' }}>SWITCH</option>
-                                    <option value="AP1" {{ $item->perangkat == 'AP1' ? 'selected' : '' }}>AP1</option>
-                                    <option value="AP2" {{ $item->perangkat == 'AP2' ? 'selected' : '' }}>AP2</option>
-                                    <option value="STAVOL" {{ $item->perangkat == 'STAVOL' ? 'selected' : '' }}>STAVOL</option>
-                                    <option value="LAINNYA" {{ $item->perangkat == 'LAINNYA' ? 'selected' : '' }}>LAINNYA</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Tanggal</label>
-                                <input type="date" name="tanggal_penggantian" class="form-control" value="{{ $item->tanggal_penggantian }}" required>
-                            </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Update Data</button>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">SN Lama</label>
-                                <input type="text" name="sn_lama" class="form-control" value="{{ $item->sn_lama }}">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">SN Baru</label>
-                                <input type="text" name="sn_baru" class="form-control" value="{{ $item->sn_baru }}">
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Keterangan</label>
-                            <textarea name="keterangan" class="form-control" rows="2">{{ $item->keterangan }}</textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Update Data</button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
     @endforeach
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updateSiteId(input) {
+            const list = document.getElementById('siteList');
+            const options = list.options;
+            const val = input.value;
+            for (let i = 0; i < options.length; i++) {
+                if (options[i].value === val) {
+                    document.getElementById('selected_site_id').value = options[i].getAttribute('data-id');
+                    document.getElementById('display_site_id').value = options[i].getAttribute('data-siteid');
+                    document.getElementById('display_site_name').value = options[i].getAttribute('data-sitename');
+                    break;
+                }
+            }
+        }
+
+        function updateSiteIdEdit(input, id) {
+            const list = document.getElementById('siteList');
+            const options = list.options;
+            const val = input.value;
+            for (let i = 0; i < options.length; i++) {
+                if (options[i].value === val) {
+                    document.getElementById('selected_site_id_edit_' + id).value = options[i].getAttribute('data-id');
+                    document.getElementById('display_site_id_edit_' + id).value = options[i].getAttribute('data-siteid');
+                    document.getElementById('display_site_name_edit_' + id).value = options[i].getAttribute('data-sitename');
+                    break;
+                }
+            }
+        }
+
+        document.querySelectorAll('.btn-delete').forEach(button => {
+            button.addEventListener('click', function() {
+                const form = this.closest('form');
+                const perangkat = this.getAttribute('data-perangkat');
+                const site = this.getAttribute('data-site');
+                
+                Swal.fire({
+                    title: 'Apakah anda yakin?',
+                    text: `Data pergantian ${perangkat} di site ${site} akan dihapus!`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
 

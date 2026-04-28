@@ -17,14 +17,14 @@ class PergantianController extends Controller
 
         if ($request->search) {
             $searchTerm = trim($request->search);
-            $query->where(function($q) use ($searchTerm) {
+            $query->where(function ($q) use ($searchTerm) {
                 $q->where('perangkat', 'like', "%{$searchTerm}%")
-                  ->orWhere('sn_lama', 'like', "%{$searchTerm}%")
-                  ->orWhere('sn_baru', 'like', "%{$searchTerm}%")
-                  ->orWhereHas('site', function($sq) use ($searchTerm) {
-                      $sq->where('site_id', 'like', "%{$searchTerm}%")
-                        ->orWhere('sitename', 'like', "%{$searchTerm}%");
-                  });
+                    ->orWhere('sn_lama', 'like', "%{$searchTerm}%")
+                    ->orWhere('sn_baru', 'like', "%{$searchTerm}%")
+                    ->orWhereHas('site', function ($sq) use ($searchTerm) {
+                        $sq->where('site_id', 'like', "%{$searchTerm}%")
+                            ->orWhere('sitename', 'like', "%{$searchTerm}%");
+                    });
             });
         }
 
@@ -54,30 +54,47 @@ class PergantianController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'site_id' => 'required|exists:sites,id',
-            'perangkat' => 'required|string',
-            'sn_lama' => 'nullable|string',
-            'sn_baru' => 'nullable|string',
+            'site_id'             => 'required|exists:sites,id',
+            'perangkat'           => 'required|string',
+            'qty'                 => 'nullable|integer|min:1',
+            'sn_lama'             => 'nullable|string',
+            'sn_baru'             => 'nullable|string',
             'tanggal_penggantian' => 'required|date',
-            'keterangan' => 'nullable|string'
+            'keterangan'          => 'nullable|string',
+            'layanan'             => 'nullable|string',
+            'status'              => 'nullable|string',
+            'foto_perangkat_baru' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
+
+        // Handle foto upload
+        if ($request->hasFile('foto_perangkat_baru')) {
+            $validated['foto_perangkat_baru'] = $request->file('foto_perangkat_baru')->store('foto_perangkat', 'public');
+        } else {
+            unset($validated['foto_perangkat_baru']);
+        }
 
         $log = LogPerangkat::create($validated);
 
         // Optional: Update SN in sites table if sn_baru is provided
         if ($log->sn_baru) {
             $site = Site::where('id', $log->site_id)->first();
-            
+
             if ($site) {
                 $perangkat = strtoupper($log->perangkat);
-                
-                if (str_contains($perangkat, 'MODEM')) $site->sn_modem = $log->sn_baru;
-                elseif (str_contains($perangkat, 'ROUTER')) $site->sn_router = $log->sn_baru;
-                elseif (str_contains($perangkat, 'SWITCH')) $site->sn_switch = $log->sn_baru;
-                elseif (str_contains($perangkat, 'AP1')) $site->sn_ap1 = $log->sn_baru;
-                elseif (str_contains($perangkat, 'AP2')) $site->sn_ap2 = $log->sn_baru;
-                elseif (str_contains($perangkat, 'STAVOL') || str_contains($perangkat, 'STABILIZER')) $site->sn_stabilizer = $log->sn_baru;
-                
+
+                if (str_contains($perangkat, 'MODEM'))
+                    $site->sn_modem = $log->sn_baru;
+                elseif (str_contains($perangkat, 'ROUTER'))
+                    $site->sn_router = $log->sn_baru;
+                elseif (str_contains($perangkat, 'SWITCH'))
+                    $site->sn_switch = $log->sn_baru;
+                elseif (str_contains($perangkat, 'AP1'))
+                    $site->sn_ap1 = $log->sn_baru;
+                elseif (str_contains($perangkat, 'AP2'))
+                    $site->sn_ap2 = $log->sn_baru;
+                elseif (str_contains($perangkat, 'STAVOL') || str_contains($perangkat, 'STABILIZER'))
+                    $site->sn_stabilizer = $log->sn_baru;
+
                 $site->save();
             }
         }
@@ -93,7 +110,7 @@ class PergantianController extends Controller
 
         try {
             Excel::import(new LogPerangkatImport, $request->file('file'));
-            return back()->with('success', 'Data berhasil diimport.');
+            return back()->with('success', 'Data berhasil diimport. Site yang tidak terdaftar otomatis dilewati.');
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal mengimport data: ' . $e->getMessage());
         }
@@ -107,13 +124,24 @@ class PergantianController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'site_id' => 'required|exists:sites,id',
-            'perangkat' => 'required|string',
-            'sn_lama' => 'nullable|string',
-            'sn_baru' => 'nullable|string',
+            'site_id'             => 'required|exists:sites,id',
+            'perangkat'           => 'required|string',
+            'qty'                 => 'nullable|integer|min:1',
+            'sn_lama'             => 'nullable|string',
+            'sn_baru'             => 'nullable|string',
             'tanggal_penggantian' => 'required|date',
-            'keterangan' => 'nullable|string'
+            'keterangan'          => 'nullable|string',
+            'layanan'             => 'nullable|string',
+            'status'              => 'nullable|string',
+            'foto_perangkat_baru' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
+
+        // Handle foto upload
+        if ($request->hasFile('foto_perangkat_baru')) {
+            $validated['foto_perangkat_baru'] = $request->file('foto_perangkat_baru')->store('foto_perangkat', 'public');
+        } else {
+            unset($validated['foto_perangkat_baru']);
+        }
 
         $log = LogPerangkat::findOrFail($id);
         $log->update($validated);
@@ -123,12 +151,18 @@ class PergantianController extends Controller
             $site = Site::where('id', $log->site_id)->first();
             if ($site) {
                 $perangkat = strtoupper($log->perangkat);
-                if (str_contains($perangkat, 'MODEM')) $site->sn_modem = $log->sn_baru;
-                elseif (str_contains($perangkat, 'ROUTER')) $site->sn_router = $log->sn_baru;
-                elseif (str_contains($perangkat, 'SWITCH')) $site->sn_switch = $log->sn_baru;
-                elseif (str_contains($perangkat, 'AP1')) $site->sn_ap1 = $log->sn_baru;
-                elseif (str_contains($perangkat, 'AP2')) $site->sn_ap2 = $log->sn_baru;
-                elseif (str_contains($perangkat, 'STAVOL') || str_contains($perangkat, 'STABILIZER')) $site->sn_stabilizer = $log->sn_baru;
+                if (str_contains($perangkat, 'MODEM'))
+                    $site->sn_modem = $log->sn_baru;
+                elseif (str_contains($perangkat, 'ROUTER'))
+                    $site->sn_router = $log->sn_baru;
+                elseif (str_contains($perangkat, 'SWITCH'))
+                    $site->sn_switch = $log->sn_baru;
+                elseif (str_contains($perangkat, 'AP1'))
+                    $site->sn_ap1 = $log->sn_baru;
+                elseif (str_contains($perangkat, 'AP2'))
+                    $site->sn_ap2 = $log->sn_baru;
+                elseif (str_contains($perangkat, 'STAVOL') || str_contains($perangkat, 'STABILIZER'))
+                    $site->sn_stabilizer = $log->sn_baru;
                 $site->save();
             }
         }

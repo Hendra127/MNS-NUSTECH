@@ -300,6 +300,12 @@
             from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
     </style>
 </head>
 
@@ -385,6 +391,9 @@
                 @if(auth()->check())
                     <button class="btn-action bi bi-plus" title="Add" data-bs-toggle="modal"
                         data-bs-target="#modalTambahTicket">
+                    </button>
+                    <button class="btn-action bi bi-telephone-plus-fill" title="Kelola Nomor CE" data-bs-toggle="modal"
+                        data-bs-target="#modalManageCe">
                     </button>
                     <form action="{{ route('open.ticket.import') }}" method="POST" enctype="multipart/form-data"
                         id="importForm" class="m-0">
@@ -509,8 +518,7 @@
                             <tr>
                                 <td class="text-center sticky-col col-no">{{ $tickets->firstItem() + $i }}</td>
                                 <td class="text-center sticky-col col-site-id">{{ $t->site_code }}</td>
-                                <td class="sticky-col col-nama_site text-truncate" style="max-width: 150px;" title="{{ $t->nama_site }}">{{ $t->nama_site }}</td>
-                                <td class="text-center">
+                                <td class="sticky-col col-nama_site text-truncate" style="max-width: 150px;" title="{{ $t->nama_site }}">
                                     @php
                                         $tanggalRekap = \Carbon\Carbon::parse($t->tanggal_rekap)->startOfDay();
                                         if (in_array(strtolower($t->status), ['close', 'closed']) && $t->tanggal_close) {
@@ -520,6 +528,12 @@
                                         }
                                         $durasi = $tanggalRekap->diffInDays($hariAkhir);
                                     @endphp
+                                    @if($durasi > 5)
+                                        <i class="bi bi-exclamation-triangle-fill text-danger me-1" title="Overdue > 5 Hari" style="animation: blink 1s infinite;"></i>
+                                    @endif
+                                    {{ $t->nama_site }}
+                                </td>
+                                <td class="text-center">
                                     {{ floor($durasi) }} Hari
                                 </td>
                                 <td>{{ \Carbon\Carbon::parse($t->tanggal_rekap)->format('d M Y') }}</td>
@@ -1538,6 +1552,53 @@
             myModal.show();
         }
     </script>
+    <!-- MODAL MANAGE CE -->
+    <div class="modal fade" id="modalManageCe" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <form method="POST" action="{{ route('open.ticket.ce.update') }}" class="modal-content">
+                @csrf
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-telephone-fill"></i> Kelola Nomor WhatsApp CE</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small mb-3">Masukkan nomor WhatsApp CE (contoh: 0812xxxx atau 62812xxxx). Sistem akan otomatis mengubahnya ke format internasional.</p>
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="50%">Nama CE</th>
+                                    <th>Nomor WhatsApp</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php
+                                    $ceList = ['Eka Mahatva Yudha', 'Herman Seprianto', 'Moh. Walangadi', 'Ahmad Suhaini', 'Hasrul Fandi Serang'];
+                                @endphp
+                                @foreach($ceList as $name)
+                                    <tr>
+                                        <td>
+                                            <input type="text" name="ce[]" class="form-control bg-light" value="{{ $name }}" readonly>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="phone[]" class="form-control" 
+                                                   placeholder="08xxxxxxxxxx" 
+                                                   value="{{ $ceContacts[$name] ?? '' }}">
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary px-4">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         $(document).ready(function () {
             /**
