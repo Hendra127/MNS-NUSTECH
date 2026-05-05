@@ -40,6 +40,14 @@
             background: #f8f9fa;
             border: 1px solid #dee2e6;
             margin-right: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .summary-badge:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         .search-box {
@@ -259,6 +267,70 @@
         .modal-header .modal-title {
             font-weight: 800 !important;
         }
+
+        /* Evidence Drop Zone Styles */
+        .evidence-drop-zone {
+            border: 2px dashed #dee2e6;
+            transition: all 0.2s ease-in-out;
+            background: #fdfdfd;
+            cursor: pointer;
+        }
+
+        .evidence-drop-zone.drag-over {
+            background-color: #f0f7ff !important;
+            border-color: #0d6efd !important;
+            transform: scale(1.01);
+        }
+
+        .preview-container img, .preview-container video {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .preview-item {
+            position: relative;
+            display: inline-block;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .btn-remove-preview {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: red;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        .btn-remove-preview:hover {
+            background: #cc0000;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         @keyframes blink {
             0% { opacity: 1; }
             50% { opacity: 0.3; }
@@ -335,10 +407,10 @@
         <a href="{{ url('/summaryticket') }}" class="tab {{ request()->is('summaryticket*') ? 'active' : '' }}"
             style="text-decoration: none; color: Black;">Summary Tiket</a>
         <div id="summary-badges" class="ms-auto d-flex align-items-center">
-            <span class="summary-badge text-black">Total Open: <b>{{ $openAllCount }}</b></span>
-            <span class="summary-badge text-black">Open Hari Ini: <b>{{ $openTodayCount }}</b></span>
-            <span class="summary-badge text-dark">BMN: <b>{{ $countBMN }}</b></span>
-            <span class="summary-badge text-dark">SL: <b>{{ $countSL }}</b></span>
+            <span class="summary-badge text-black" onclick="quickFilter('total')" title="Click to show all open tickets">Total Open: <b>{{ $openAllCount }}</b></span>
+            <span class="summary-badge text-black" onclick="quickFilter('today')" title="Click to show tickets from today">Open Hari Ini: <b>{{ $openTodayCount }}</b></span>
+            <span class="summary-badge text-dark" onclick="quickFilter('BMN')" title="Filter by BMN">BMN: <b>{{ $countBMN }}</b></span>
+            <span class="summary-badge text-dark" onclick="quickFilter('SL')" title="Filter by SL">SL: <b>{{ $countSL }}</b></span>
         </div>
     </div>
     <!-- CONTENT -->
@@ -346,7 +418,7 @@
         <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3"
             style="margin-bottom: 20px;">
             <div class="actions flex-shrink-0">
-                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                @if(auth()->check())
                     <button class="btn-action bi bi-plus" title="Add" data-bs-toggle="modal"
                         data-bs-target="#modalTambahTicket">
                     </button>
@@ -466,7 +538,7 @@
                             <th>DETAIL PROBLEM</th>
                             <th>ACTION PLAN</th>
                             <th>CE</th>
-                            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                            @if(auth()->check())
                                 <th class="sticky-col-right">AKSI</th>
                             @elseif(auth()->check() && auth()->user()->role === 'user')
                                 <th class="sticky-col-right">INFO</th>
@@ -513,7 +585,7 @@
                                 <td class="text-truncate" style="max-width: 200px;">{{ $t->detail_problem }}</td>
                                 <td class="text-truncate" style="max-width: 200px;">{{ $t->plan_actions }}</td>
                                 <td>{{ $t->ce }}</td>
-                                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                                @if(auth()->check())
                                     <td class="text-center sticky-col-right">
                                         <button type="button" class="btn btn-sm bi bi-x-lg" data-bs-toggle="modal"
                                             data-bs-target="#modalCloseTicket{{ $t->id }}" data-id="{{ $t->id }}"
@@ -688,8 +760,16 @@
                                         </div>
                                         <div class="col-md-8">
                                             <label class="form-label fw-bold text-primary">Evidence (Foto/Video)</label>
-                                            <input type="file" name="evidence[]" class="form-control"
-                                                accept="image/*,video/*" multiple>
+                                            <div class="evidence-drop-zone rounded-3 p-4 text-center position-relative mb-2">
+                                                <input type="file" name="evidence[]" class="d-none"
+                                                    accept="image/*,video/*" multiple>
+                                                <div class="drop-zone-msg text-muted">
+                                                    <i class="bi bi-cloud-arrow-up-fill fs-1 d-block mb-2 text-primary"></i>
+                                                    <div class="fw-bold">Drag & drop files or Paste (Ctrl+V)</div>
+                                                    <div class="small">from WhatsApp or your folder</div>
+                                                </div>
+                                                <div class="preview-container d-flex flex-wrap gap-2 mt-3 justify-content-center"></div>
+                                            </div>
                                             
                                             <div class="mt-2 d-flex flex-wrap gap-2">
                                                 @if($t->evidences->count() > 0)
@@ -1060,7 +1140,15 @@
                         </div>
                         <div class="col-md-8">
                             <label class="form-label fw-bold">Evidence (Foto/Video)</label>
-                            <input type="file" name="evidence[]" class="form-control" accept="image/*,video/*" multiple>
+                            <div class="evidence-drop-zone rounded-3 p-4 text-center position-relative mb-2">
+                                <input type="file" name="evidence[]" class="d-none" accept="image/*,video/*" multiple>
+                                <div class="drop-zone-msg text-muted">
+                                    <i class="bi bi-cloud-arrow-up-fill fs-1 d-block mb-2 text-primary"></i>
+                                    <div class="fw-bold">Drag & drop files or Paste (Ctrl+V)</div>
+                                    <div class="small">from WhatsApp or your folder</div>
+                                </div>
+                                <div class="preview-container d-flex flex-wrap gap-2 mt-3 justify-content-center"></div>
+                            </div>
                             <small class="text-muted">Pilih satu atau beberapa file. Format: jpg, png, mp4. Maks 20MB/file.</small>
                         </div>
                     </div>
@@ -1642,6 +1730,193 @@
             window.onpopstate = function () {
                 loadTable(window.location.href);
             };
+
+            /**
+             * 6. Quick Filter from Badges
+             */
+            window.quickFilter = function(type) {
+                const form = $('#filterForm');
+                
+                // Clear inputs
+                form.find('select[name="kategori"]').val('');
+                form.find('input[name="tgl_mulai"]').val('');
+                form.find('input[name="tgl_selesai"]').val('');
+                form.find('input[name="q"]').val('');
+                
+                if (type === 'today') {
+                    const today = new Date().toISOString().split('T')[0];
+                    form.find('input[name="tgl_mulai"]').val(today);
+                    form.find('input[name="tgl_selesai"]').val(today);
+                } else if (type === 'BMN') {
+                    form.find('select[name="kategori"]').val('BMN');
+                } else if (type === 'SL') {
+                    form.find('select[name="kategori"]').val('SL');
+                }
+                
+                form.trigger('submit');
+            };
+
+            /**
+             * 7. Drag & Drop + Paste Evidence Logic (WhatsApp Support)
+             */
+            function initEvidenceDropZones() {
+                $('.evidence-drop-zone').each(function() {
+                    const zone = this;
+                    // Mencegah inisialisasi ganda pada elemen yang sama
+                    if ($(zone).data('initialized')) return;
+                    $(zone).data('initialized', true);
+
+                    const input = $(zone).find('input[type="file"]')[0];
+                    const previewContainer = $(zone).find('.preview-container')[0];
+                    
+                    // Store files in an array to allow cumulative selection and removal
+                    let selectedFiles = [];
+
+                    const updateInputFiles = () => {
+                        try {
+                            const dataTransfer = new DataTransfer();
+                            selectedFiles.forEach(file => dataTransfer.items.add(file));
+                            input.files = dataTransfer.files;
+                        } catch (e) {
+                            console.error("DataTransfer API not supported, fallback needed", e);
+                        }
+                        
+                        // Show/hide message based on files
+                        if (selectedFiles.length > 0) {
+                            $(zone).find('.drop-zone-msg').addClass('d-none');
+                        } else {
+                            $(zone).find('.drop-zone-msg').removeClass('d-none');
+                        }
+                    };
+
+                    const addFiles = (files) => {
+                        let invalidFiles = 0;
+                        Array.from(files).forEach(file => {
+                            // Check file type
+                            if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
+                                selectedFiles.push(file);
+                                
+                                const reader = new FileReader();
+                                reader.onload = (e) => {
+                                    const item = document.createElement('div');
+                                    item.className = 'preview-item';
+                                    
+                                    let mediaHtml = '';
+                                    if (file.type.startsWith('image/')) {
+                                        mediaHtml = `<img src="${e.target.result}" alt="preview">`;
+                                    } else if (file.type.startsWith('video/')) {
+                                        mediaHtml = `<video src="${e.target.result}"></video>`;
+                                    }
+
+                                    item.innerHTML = `
+                                        ${mediaHtml}
+                                        <div class="btn-remove-preview" title="Hapus">×</div>
+                                    `;
+
+                                    // Remove logic
+                                    item.querySelector('.btn-remove-preview').addEventListener('click', (ev) => {
+                                        ev.stopPropagation();
+                                        const index = selectedFiles.indexOf(file);
+                                        if (index > -1) {
+                                            selectedFiles.splice(index, 1);
+                                            item.remove();
+                                            updateInputFiles();
+                                        }
+                                    });
+
+                                    previewContainer.appendChild(item);
+                                };
+                                reader.readAsDataURL(file);
+                            } else {
+                                invalidFiles++;
+                            }
+                        });
+                        
+                        if (invalidFiles > 0) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Format Tidak Didukung',
+                                text: 'Hanya file gambar (JPG/PNG) dan video (MP4) yang diperbolehkan.'
+                            });
+                        }
+                        
+                        updateInputFiles();
+                    };
+
+                    // Drag & Drop events
+                    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                        zone.addEventListener(eventName, e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }, false);
+                    });
+
+                    ['dragenter', 'dragover'].forEach(eventName => {
+                        zone.addEventListener(eventName, () => $(zone).addClass('drag-over'), false);
+                    });
+                    ['dragleave', 'drop'].forEach(eventName => {
+                        zone.addEventListener(eventName, () => $(zone).removeClass('drag-over'), false);
+                    });
+
+                    zone.addEventListener('drop', e => {
+                        const files = e.dataTransfer.files;
+                        if (files.length > 0) {
+                            addFiles(files);
+                        }
+                    });
+
+                    // Input file change event (via Browse)
+                    input.addEventListener('change', function() {
+                        if (this.files.length > 0) {
+                            addFiles(this.files);
+                            // Clear input so selecting the same file again triggers change
+                            this.value = '';
+                        }
+                    });
+
+                    // Paste event (from WhatsApp or clipboard)
+                    // Gunakan $(document) lalu delegasikan ke zone yang aktif untuk menghindari duplicate binding
+                    $(zone).closest('.modal').off('paste').on('paste', function(e) {
+                        // Pastikan modal ini sedang terlihat
+                        if (!$(this).hasClass('show')) return;
+                        
+                        const clipboardData = e.originalEvent.clipboardData;
+                        if (clipboardData && clipboardData.items) {
+                            const items = clipboardData.items;
+                            const files = [];
+                            for (let i = 0; i < items.length; i++) {
+                                if (items[i].type.indexOf('image') !== -1 || items[i].type.indexOf('video') !== -1) {
+                                    const blob = items[i].getAsFile();
+                                    if (blob) {
+                                        const ext = blob.type.split('/')[1] || 'png';
+                                        const file = new File([blob], `pasted-image-${Date.now()}-${i}.${ext}`, { type: blob.type });
+                                        files.push(file);
+                                    }
+                                }
+                            }
+                            if (files.length > 0) {
+                                e.preventDefault(); // Mencegah paste ke elemen lain jika gambar ditemukan
+                                addFiles(files);
+                            }
+                        }
+                    });
+
+                    // Clicking the zone triggers input click
+                    $(zone).off('click').on('click', function(e) {
+                        if (e.target !== input && !$(e.target).closest('.preview-item').length) {
+                            input.click();
+                        }
+                    });
+                });
+            }
+
+            // Initialize on load
+            initEvidenceDropZones();
+
+            // Also call when modals are opened to ensure zones are ready (in case of re-rendering via AJAX)
+            $(document).on('shown.bs.modal', '.modal', function() {
+                initEvidenceDropZones();
+            });
         });
     </script>
 </body>

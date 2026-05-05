@@ -414,11 +414,42 @@
         }
     }
 
+    // --- Idle Auto Logout Logic ---
+    let idleTimer;
+    const idleTimeLimit = 30 * 60 * 1000; // 30 Minutes
+    let isUserIdle = false;
+
+    function resetIdleTimer() {
+        if (isUserIdle) {
+            isUserIdle = false;
+        }
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(autoLogout, idleTimeLimit);
+    }
+
+    function autoLogout() {
+        isUserIdle = true;
+        console.log('User idle for 30 minutes, logging out...');
+        // Redirect to timeout-logout route to avoid 405 Method Not Allowed conflicts
+        window.location.href = '/timeout-logout';
+    }
+
+    function initIdleLogout() {
+        // Events that indicate activity
+        const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+        events.forEach(name => {
+            document.addEventListener(name, resetIdleTimer, true);
+        });
+        resetIdleTimer();
+    }
+
     // --- Session Keep-Alive Pulse ---
     // Pings the server every 5 minutes to prevent session timeout and keep the CSRF token fresh
     function initSessionPulse() {
         console.log('Session pulse initialized');
         setInterval(async () => {
+            if (isUserIdle) return; // Don't pulse if user is idle
+            
             try {
                 const response = await fetch('{{ route("csrf.refresh") }}');
                 const data = await response.json();
@@ -439,35 +470,6 @@
         }, 300000); // 5 Minutes
     }
 
-    // Auto Logout Script (1 Jam AFK)
-    function initAutoLogout() {
-        let timeout;
-        const maxIdleTime = 3600000; // 1 Jam
-
-        function resetTimer() {
-            clearTimeout(timeout);
-            timeout = setTimeout(logoutUser, maxIdleTime);
-        }
-
-        function logoutUser() {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = "{{ route('logout') }}";
-            const csrfToken = document.createElement('input');
-            csrfToken.type = 'hidden';
-            csrfToken.name = '_token';
-            csrfToken.value = document.querySelector('meta[name="csrf-token"]')?.content || "{{ csrf_token() }}";
-            form.appendChild(csrfToken);
-            document.body.appendChild(form);
-            form.submit();
-        }
-
-        ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(evt => {
-            document.addEventListener(evt, resetTimer, true);
-        });
-        resetTimer();
-    }
-
     // Sesi Pulse & Notifikasi hanya untuk user yang login
     @auth
         if (document.readyState === 'loading') {
@@ -479,7 +481,7 @@
                 @endif
                 initNavLogo();
                 initSessionPulse();
-                initAutoLogout();
+                initIdleLogout();
                 updateChartsTheme(localStorage.getItem('theme') || 'light');
             });
         } else {
@@ -490,7 +492,7 @@
             @endif
             initNavLogo();
             initSessionPulse();
-            initAutoLogout();
+            initIdleLogout();
             updateChartsTheme(localStorage.getItem('theme') || 'light');
         }
     @else

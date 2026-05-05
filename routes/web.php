@@ -28,6 +28,12 @@ use App\Http\Controllers\RemoteLogController;
 use App\Http\Controllers\MikrotikController;
 
 /* |-------------------------------------------------------------------------- | Web Routes |-------------------------------------------------------------------------- */
+// Auth Routes
+Route::get('/login', [AuthController::class , 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class , 'login']);
+Route::match(['get', 'post'], '/logout', [AuthController::class , 'logout'])->name('logout');
+Route::get('/timeout-logout', [AuthController::class , 'logout'])->name('timeout.logout');
+
 // --- MY DASHBOARD & CHAT ROUTES ---
 Route::get('/dashboard', [MyDashboardController::class, 'index'])->name('mydashboard');
 Route::get('/ticket/detail/{site_code}', [MyDashboardController::class, 'getDetail']);
@@ -58,14 +64,6 @@ Route::domain('nustech.co.id')->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');
 });
 
-// Auth Routes
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-// Fallback for timeout-logout to prevent 404
-Route::get('/timeout-logout', function () {
-    return redirect('/login');
-});
 
 // CSRF Token Refresh — dipanggil JS di semua halaman agar session tidak expire
 Route::get('/csrf-refresh', function () {

@@ -712,10 +712,10 @@
                 <p class="form-title">Welcome Back</p>
                 <p class="form-subtitle">Masukkan kredensial Anda untuk melanjutkan</p>
 
-                @if ($errors->any())
+                @if ($errors->any() || session('error'))
                     <div class="error-alert">
                         <i class="fas fa-exclamation-circle me-2"></i>
-                        {{ $errors->first() }}
+                        {{ $errors->first() ?: session('error') }}
                     </div>
                 @endif
 
