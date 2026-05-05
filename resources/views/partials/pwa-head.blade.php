@@ -3,6 +3,7 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <meta name="theme-color" content="#071152">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MNS-NUSTECH">
 <link rel="apple-touch-icon" href="{{ asset('assets/img/logonustech.png') }}">
@@ -313,9 +314,12 @@
                         const isUnread = !n.read_at;
                         if (isUnread && !notifiedIds.has(n.id)) {
                             notifiedIds.add(n.id);
-                            
+                            const tempDiv = document.createElement("div");
+                            tempDiv.innerHTML = n.data.message || '';
+                            const cleanMessage = tempDiv.textContent || tempDiv.innerText || '';
+
                             new Notification(n.data.module || 'Pemberitahuan Baru', {
-                                body: n.data.message,
+                                body: cleanMessage,
                                 icon: '/assets/img/logonustech.png'
                             });
                             
@@ -326,7 +330,7 @@
                                     showConfirmButton: false,
                                     timer: 3000
                                 });
-                                Toast.fire({ icon: 'info', title: n.data.message });
+                                Toast.fire({ icon: 'info', html: n.data.message });
                             }
                         }
                     });

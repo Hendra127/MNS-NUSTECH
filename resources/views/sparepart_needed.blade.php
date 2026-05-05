@@ -187,13 +187,13 @@
             @endif
             <div class="user-profile-wrapper" style="position: relative;">
                 <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
-                        @if(auth()->check() && auth()->user()->photo)
-                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
-                                style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
-                        @else
-                            <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
-                        @endif
-                    </div>
+                    @if(auth()->check() && auth()->user()->photo)
+                        <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
+                            style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                    @else
+                        <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
+                    @endif
+                </div>
                 <div id="profileDropdownMenu" class="hidden"
                     style="position: absolute; right: 0; top: 100%; mt: 10px; width: 150px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; display: none; flex-direction: column; overflow: hidden;">
                     <div
@@ -220,7 +220,7 @@
     <div class="tabs-section d-flex align-items-center">
         <a href="{{ route('mydashboard') }}" class="tab" style="text-decoration: none; color: Black;"><i
                 class="bi bi-arrow-left"></i> Back to Dashboard</a>
-        <a href="{{ route('sparepart.needed.index') }}" class="tab active"
+        <a href="{{ route('sparepart_needed') }}" class="tab active"
             style="text-decoration: none; color: White;">Sparepart Needed</a>
         <div class="ms-auto d-flex align-items-center">
             <span class="summary-badge text-black" id="summaryBadge">Total Sparepart Needed :
@@ -239,7 +239,7 @@
                 @endif
             </div>
             <div class="w-100 mt-2 mt-lg-0">
-                <form method="GET" action="{{ route('sparepart.needed.index') }}"
+                <form method="GET" action="{{ route('sparepart_needed') }}"
                     class="search-form row g-2 align-items-center w-100 m-0 justify-content-lg-end" id="filterForm">
                     @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin', 'user']))
                         <div class="col-auto">
@@ -267,7 +267,7 @@
                         </button>
                     </div>
                     <div class="col-auto">
-                        <a href="{{ route('sparepart.needed.index') }}"
+                        <a href="{{ route('sparepart_needed') }}"
                             class="btn btn-light btn-sm rounded-pill border d-flex align-items-center justify-content-center h-100"
                             title="Reset Filter"><i class="bi bi-arrow-repeat"></i></a>
                     </div>
@@ -605,6 +605,94 @@
         </div>
     </div>
 
+    <!-- TABEL PENGAJUAN -->
+    <div class="content-container mt-4">
+        <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3"
+            style="margin-bottom: 20px;">
+            <h5 class="m-0 fw-bold"><i class="bi bi-file-earmark-text"></i> Data Formulir Pengajuan</h5>
+        </div>
+
+        <div class="table-responsive-custom" id="tablePengajuanContainer">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th style="min-width: 60px;">No</th>
+                        <th style="min-width: 150px;">Tanggal</th>
+                        <th style="min-width: 200px;">Nomor</th>
+                        <th style="min-width: 250px;">Divisi</th>
+                        <th style="min-width: 150px;">Grand Total</th>
+                        <th style="min-width: 100px;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($pengajuans as $index => $p)
+                        <tr>
+                            <td>{{ $pengajuans->firstItem() + $index }}</td>
+                            <td>{{ $p->tempat_tanggal }}</td>
+                            <td>{{ $p->nomor }}</td>
+                            <td>{{ $p->divisi }}</td>
+                            <td>Rp {{ number_format($p->grand_total, 0, ',', '.') }}</td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <form action="{{ route('sparepart.needed.print') }}" method="POST" target="_blank" class="d-inline">
+                                        @csrf
+                                        <input type="hidden" name="tempat_tanggal" value="{{ $p->tempat_tanggal }}">
+                                        <input type="hidden" name="divisi" value="{{ $p->divisi }}">
+                                        <input type="hidden" name="nomor" value="{{ $p->nomor }}">
+                                        <input type="hidden" name="terbilang" value="{{ $p->terbilang }}">
+                                        <input type="hidden" name="pemohon_nama" value="{{ $p->pemohon_nama }}">
+                                        <input type="hidden" name="pemohon_jabatan" value="{{ $p->pemohon_jabatan }}">
+                                        <input type="hidden" name="diverifikasi1_nama" value="{{ $p->diverifikasi1_nama }}">
+                                        <input type="hidden" name="diverifikasi1_jabatan" value="{{ $p->diverifikasi1_jabatan }}">
+                                        <input type="hidden" name="diverifikasi2_nama" value="{{ $p->diverifikasi2_nama }}">
+                                        <input type="hidden" name="diverifikasi2_jabatan" value="{{ $p->diverifikasi2_jabatan }}">
+                                        <input type="hidden" name="disetujui_nama" value="{{ $p->disetujui_nama }}">
+                                        <input type="hidden" name="disetujui_jabatan" value="{{ $p->disetujui_jabatan }}">
+                                        <input type="hidden" name="mengetahui_nama" value="{{ $p->mengetahui_nama }}">
+                                        <input type="hidden" name="mengetahui_jabatan" value="{{ $p->mengetahui_jabatan }}">
+                                        
+                                        @if(is_array($p->items))
+                                            @foreach($p->items as $item)
+                                                <input type="hidden" name="perangkat[]" value="{{ $item['perangkat'] ?? '' }}">
+                                                <input type="hidden" name="qty[]" value="{{ $item['qty'] ?? 1 }}">
+                                                <input type="hidden" name="harga[]" value="{{ $item['harga'] ?? 0 }}">
+                                                <input type="hidden" name="layanan[]" value="{{ $item['layanan'] ?? '' }}">
+                                                <input type="hidden" name="peruntukan[]" value="{{ $item['peruntukan'] ?? '' }}">
+                                                <input type="hidden" name="keterangan[]" value="{{ $item['keterangan'] ?? '' }}">
+                                            @endforeach
+                                        @endif
+                                        <button type="submit" class="btn btn-sm btn-success" title="Print"><i class="bi bi-printer"></i></button>
+                                    </form>
+                                    
+                                    @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                                        <form action="{{ route('sparepart.needed.pengajuan.destroy', $p->id) }}" method="POST" class="d-inline delete-form">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Hapus"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">Belum ada data pengajuan.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        <div class="pagination-wrapper">
+            <span class="pagination-info">
+                Showing {{ $pengajuans->firstItem() ?? 0 }} to {{ $pengajuans->lastItem() ?? 0 }}
+                of&nbsp;<strong>{{ $pengajuans->total() }}</strong>&nbsp;results
+            </span>
+            <nav>
+                {{ $pengajuans->appends(request()->query())->links("pagination::bootstrap-5") }}
+            </nav>
+        </div>
+    </div>
+
     <!-- Modal Print Pengajuan -->
     <div class="modal fade" id="modalPrintPengajuan" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -616,7 +704,7 @@
                         data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body pt-4">
-                    <form action="{{ route('sparepart.needed.print') }}" method="POST" target="_blank">
+                    <form action="{{ route('sparepart.needed.print') }}" method="POST" target="_blank" id="formPengajuan">
                         @csrf
                         <div class="row mb-3">
                             <div class="col-6">
@@ -759,7 +847,11 @@
                         <div class="d-flex justify-content-end gap-2 mt-4">
                             <button type="button" class="btn btn-light px-4 rounded-3 border"
                                 data-bs-dismiss="modal">Batal</button>
-                            <button type="submit"
+                            <button type="submit" onclick="document.getElementById('formPengajuan').action='{{ route('sparepart.needed.pengajuan.store') }}'; document.getElementById('formPengajuan').target='_self';"
+                                class="btn btn-primary px-4 rounded-3 d-flex align-items-center gap-2">
+                                <i class="bi bi-save"></i> Save
+                            </button>
+                            <button type="submit" onclick="document.getElementById('formPengajuan').action='{{ route('sparepart.needed.print') }}'; document.getElementById('formPengajuan').target='_blank';"
                                 class="btn btn-success px-4 rounded-3 d-flex align-items-center gap-2">
                                 <i class="bi bi-printer"></i> Print
                             </button>

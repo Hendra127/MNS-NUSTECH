@@ -19,10 +19,10 @@ class SparepartNeededController extends Controller
 
         if ($request->search) {
             $query->where('sparepart_name', 'like', "%{$request->search}%")
-                  ->orWhereHas('site', function($q) use ($request) {
-                      $q->where('sitename', 'like', "%{$request->search}%")
+                ->orWhereHas('site', function ($q) use ($request) {
+                    $q->where('sitename', 'like', "%{$request->search}%")
                         ->orWhere('site_id', 'like', "%{$request->search}%");
-                  });
+                });
         }
 
         if ($request->status) {
@@ -31,12 +31,14 @@ class SparepartNeededController extends Controller
 
         // Sort by urgency then created_at
         $sparepartsNeeded = $query->orderByRaw("CASE urgency WHEN 'Urgent' THEN 1 WHEN 'High' THEN 2 WHEN 'Medium' THEN 3 WHEN 'Low' THEN 4 ELSE 5 END")
-                                  ->latest()
-                                  ->paginate(50)
-                                  ->withQueryString();
+            ->latest()
+            ->paginate(50)
+            ->withQueryString();
         $statuses = SparepartNeeded::select('status')->distinct()->pluck('status')->filter();
 
-        return view('sparepart_needed', compact('sparepartsNeeded', 'statuses'));
+        $pengajuans = \App\Models\PengajuanSparepart::latest()->paginate(20, ['*'], 'pengajuan_page');
+
+        return view('sparepart_needed', compact('sparepartsNeeded', 'statuses', 'pengajuans'));
     }
 
     public function store(Request $request)
@@ -110,7 +112,7 @@ class SparepartNeededController extends Controller
         $request->validate([
             'status' => 'required|string'
         ]);
-        
+
         $sparepart->update(['status' => $request->status]);
 
         return redirect()->back()->with('success', 'Status updated successfully.');
@@ -119,11 +121,11 @@ class SparepartNeededController extends Controller
     public function destroy($id)
     {
         $sparepart = SparepartNeeded::findOrFail($id);
-        
+
         if ($sparepart->photo && Storage::disk('public')->exists($sparepart->photo)) {
             Storage::disk('public')->delete($sparepart->photo);
         }
-        
+
         $sparepart->delete();
 
         return redirect()->back()->with('success', 'Sparepart needed deleted successfully.');
@@ -133,5 +135,54 @@ class SparepartNeededController extends Controller
     {
         $data = $request->all();
         return view('print_pengajuan', compact('data'));
+    }
+
+    public function storePengajuan(Request $request)
+    {
+        $items = [];
+        if ($request->has('perangkat')) {
+            foreach ($request->perangkat as $index => $perangkat) {
+                $items[] = [
+                    'perangkat' => $perangkat,
+                    'qty' => $request->qty[$index] ?? 1,
+                    'harga' => $request->harga[$index] ?? 0,
+                    'total' => ($request->qty[$index] ?? 1) * ($request->harga[$index] ?? 0),
+                    'layanan' => $request->layanan[$index] ?? 'BMN',
+                    'peruntukan' => $request->peruntukan[$index] ?? 'STOK',
+                    'keterangan' => $request->keterangan[$index] ?? '-'
+                ];
+            }
+        }
+
+        $grand_total = array_sum(array_column($items, 'total'));
+
+        \App\Models\PengajuanSparepart::create([
+            'tempat_tanggal' => $request->tempat_tanggal,
+            'divisi' => $request->divisi,
+            'nomor' => $request->nomor,
+            'items' => $items,
+            'grand_total' => $grand_total,
+            'terbilang' => $request->terbilang,
+            'pemohon_nama' => $request->pemohon_nama,
+            'pemohon_jabatan' => $request->pemohon_jabatan,
+            'diverifikasi1_nama' => $request->diverifikasi1_nama,
+            'diverifikasi1_jabatan' => $request->diverifikasi1_jabatan,
+            'diverifikasi2_nama' => $request->diverifikasi2_nama,
+            'diverifikasi2_jabatan' => $request->diverifikasi2_jabatan,
+            'disetujui_nama' => $request->disetujui_nama,
+            'disetujui_jabatan' => $request->disetujui_jabatan,
+            'mengetahui_nama' => $request->mengetahui_nama,
+            'mengetahui_jabatan' => $request->mengetahui_jabatan,
+        ]);
+
+        return redirect()->back()->with('success', 'Formulir Pengajuan berhasil disimpan.');
+    }
+
+    public function deletePengajuan($id)
+    {
+        $pengajuan = \App\Models\PengajuanSparepart::findOrFail($id);
+        $pengajuan->delete();
+
+        return redirect()->back()->with('success', 'Formulir Pengajuan berhasil dihapus.');
     }
 }

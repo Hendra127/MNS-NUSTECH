@@ -63,13 +63,13 @@
             @endif
             <div class="user-profile-wrapper" style="position: relative;">
                 <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
-                        @if(auth()->check() && auth()->user()->photo)
-                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
-                                style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
-                        @else
-                            <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
-                        @endif
-                    </div>
+                    @if(auth()->check() && auth()->user()->photo)
+                        <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
+                            style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                    @else
+                        <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
+                    @endif
+                </div>
                 <div id="profileDropdownMenu" class="hidden"
                     style="position: absolute; right: 0; top: 100%; mt: 10px; width: 150px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; display: none; flex-direction: column; overflow: hidden;">
                     <div
@@ -151,7 +151,7 @@
                         <th class="sticky-col col-no">No</th>
                         <th class="sticky-col col-site-id">Nama Lokasi</th>
                         <th>Kabupaten</th>
-                        <th>ADOP</th>
+                        <th>Server</th>
                         <th>PASS AP1</th>
                         <th>PASS AP2</th>
                         @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
@@ -170,7 +170,8 @@
                             <td class="text-center">{{ $row->adop }}</td>
                             <td>
                                 @if($row->ip_ap1)
-                                    <a href="{{ str_starts_with($row->ip_ap1, 'http') ? $row->ip_ap1 : 'http://' . $row->ip_ap1 }}" target="_blank" title="Go to AP1 Server" style="text-decoration: none; color: inherit;">
+                                    <a href="{{ str_starts_with($row->ip_ap1, 'http') ? $row->ip_ap1 : 'http://' . $row->ip_ap1 }}"
+                                        target="_blank" title="Go to AP1 Server" style="text-decoration: none; color: inherit;">
                                         {{ $row->pass_ap1 }}
                                     </a>
                                 @else
@@ -179,7 +180,8 @@
                             </td>
                             <td>
                                 @if($row->ip_ap2)
-                                    <a href="{{ str_starts_with($row->ip_ap2, 'http') ? $row->ip_ap2 : 'http://' . $row->ip_ap2 }}" target="_blank" title="Go to AP2 Server" style="text-decoration: none; color: inherit;">
+                                    <a href="{{ str_starts_with($row->ip_ap2, 'http') ? $row->ip_ap2 : 'http://' . $row->ip_ap2 }}"
+                                        target="_blank" title="Go to AP2 Server" style="text-decoration: none; color: inherit;">
                                         {{ $row->pass_ap2 }}
                                     </a>
                                 @else
@@ -292,14 +294,16 @@
                                 <label class="form-label fw-bold">Link Server AP1 (IP)</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
-                                    <input type="text" name="ip_ap1" class="form-control" placeholder="Contoh: 10.x.x.x">
+                                    <input type="text" name="ip_ap1" class="form-control"
+                                        placeholder="Contoh: 10.x.x.x">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Link Server AP2 (IP)</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
-                                    <input type="text" name="ip_ap2" class="form-control" placeholder="Contoh: 10.x.x.x">
+                                    <input type="text" name="ip_ap2" class="form-control"
+                                        placeholder="Contoh: 10.x.x.x">
                                 </div>
                             </div>
                         </div>

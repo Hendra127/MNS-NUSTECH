@@ -22,7 +22,7 @@ class SendTicketWarning extends Command
      *
      * @var string
      */
-    protected $description = 'Send WhatsApp warning to CE for tickets open more than 5 days';
+    protected $description = 'Send WhatsApp warning to CE for tickets open more than 3 days';
 
     /**
      * Execute the console command.
@@ -36,7 +36,7 @@ class SendTicketWarning extends Command
             $tanggalRekap = Carbon::parse($ticket->tanggal_rekap)->startOfDay();
             $durasi = $tanggalRekap->diffInDays(now()->startOfDay());
 
-            if ($durasi > 5) {
+            if ($durasi > 3) {
                 $ceName = $ticket->ce ?: 'Unknown';
                 $overdueTickets[$ceName][] = [
                     'nama_site' => $ticket->nama_site,
@@ -60,24 +60,23 @@ class SendTicketWarning extends Command
                 continue;
             }
 
-            $message = "⚠️ *PERINGATAN TIKET OVERDUE* ⚠️\n\n";
+            $message = "*WARNING ⚠️*\n\n";
             $message .= "Halo *" . $ceName . "*,\n";
-            $message .= "Berikut adalah daftar site yang masih *OPEN* selama lebih dari 5 hari:\n\n";
+            $message .= "Berikut adalah daftar site yang *OPEN* Tiket selama *Lebih dari 3 hari* dan perlu di *Follow Up Kembali*:\n\n";
 
             foreach ($sites as $index => $site) {
-                $message .= ($index + 1) . ". *" . $site['nama_site'] . "* (" . $site['site_code'] . ")\n";
-                $message .= "   Durasi: " . $site['durasi'] . " Hari\n\n";
+                $message .= ($index + 1) . ". *" . $site['nama_site'] . "* - Durasi Open Ticket: *" . $site['durasi'] . " Hari*\n";
             }
 
-            $message .= "Mohon segera ditindaklanjuti. Terima kasih.";
+            $message .= "\nMohon segera ditindaklanjuti. Terima kasih.";
 
             $response = Http::withHeaders([
                 'Authorization' => $token,
             ])->asForm()->post('https://api.fonnte.com/send', [
-                'target' => $contact->phone,
-                'message' => $message,
-                'countryCode' => '62',
-            ]);
+                        'target' => $contact->phone,
+                        'message' => $message,
+                        'countryCode' => '62',
+                    ]);
 
             if ($response->successful()) {
                 $this->info("Message sent to $ceName ($contact->phone)");

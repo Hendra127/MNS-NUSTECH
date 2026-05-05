@@ -350,9 +350,11 @@
                     <button class="btn-action bi bi-plus" title="Add" data-bs-toggle="modal"
                         data-bs-target="#modalTambahTicket">
                     </button>
-                    <button class="btn-action bi bi-telephone-plus-fill" title="Kelola Nomor CE" data-bs-toggle="modal"
-                        data-bs-target="#modalManageCe">
-                    </button>
+                    @if(count($ceContacts) < 5)
+                        <button class="btn-action bi bi-telephone-plus-fill" title="Kelola Nomor CE" data-bs-toggle="modal"
+                            data-bs-target="#modalManageCe">
+                        </button>
+                    @endif
                     <form action="{{ route('open.ticket.import') }}" method="POST" enctype="multipart/form-data"
                         id="importForm" class="m-0">
                         @csrf

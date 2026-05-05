@@ -43,7 +43,8 @@ Route::put('/sparepart-needed/update/{id}', [\App\Http\Controllers\SparepartNeed
 Route::delete('/sparepart-needed/delete/{id}', [\App\Http\Controllers\SparepartNeededController::class, 'destroy'])->name('sparepart.needed.destroy');
 Route::patch('/sparepart-needed/status/{id}', [\App\Http\Controllers\SparepartNeededController::class, 'updateStatus'])->name('sparepart.needed.status');
 Route::post('/sparepart-needed/print', [\App\Http\Controllers\SparepartNeededController::class, 'printPengajuan'])->name('sparepart.needed.print');
-
+Route::post('/sparepart-needed/pengajuan/store', [\App\Http\Controllers\SparepartNeededController::class, 'storePengajuan'])->name('sparepart.needed.pengajuan.store');
+Route::delete('/sparepart-needed/pengajuan/{id}', [\App\Http\Controllers\SparepartNeededController::class, 'deletePengajuan'])->name('sparepart.needed.pengajuan.destroy');
 // --- REMOTE LOG (AJAX store - harus login) ---
 Route::post('/remote-log/store', [RemoteLogController::class, 'store'])->name('remotelog.store')->middleware('auth');
 

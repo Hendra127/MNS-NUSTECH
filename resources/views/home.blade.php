@@ -501,10 +501,12 @@
   <!-- Hero Section -->
 <section id="beranda" class="w-full min-h-screen flex items-center justify-center relative overflow-hidden" style="background: #0a0e27;">
 
-  <!-- Video Background -->
+  <!-- Video Background (File belum ada di folder public/assets/img/) -->
+  <!--
   <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover z-0" style="opacity: 0.65;">
     <source src="{{ asset('assets/img/videobackgroundweb.mp4') }}" type="video/mp4">
   </video>
+  -->
 
   <!-- Cinematic Overlay -->
   <div class="absolute inset-0 hero-overlay z-10"></div>
@@ -1183,31 +1185,7 @@
 </section>
 
 
-<!-- Lightbox Popups -->
-<div id="img1" class="lightbox">
-  <a href="#" class="close-lightbox">&times;</a>
-  <img src="images/gallery1.jpg" alt="Gallery 1">
-</div>
-<div id="img2" class="lightbox">
-  <a href="#" class="close-lightbox">&times;</a>
-  <img src="images/gallery2.jpg" alt="Gallery 2">
-</div>
-<div id="img3" class="lightbox">
-  <a href="#" class="close-lightbox">&times;</a>
-  <img src="images/gallery3.jpg" alt="Gallery 3">
-</div>
-<div id="img4" class="lightbox">
-  <a href="#" class="close-lightbox">&times;</a>
-  <img src="images/gallery4.jpg" alt="Gallery 4">
-</div>
-<div id="img5" class="lightbox">
-  <a href="#" class="close-lightbox">&times;</a>
-  <img src="images/gallery5.jpg" alt="Gallery 5">
-</div>
-<div id="img6" class="lightbox">
-  <a href="#" class="close-lightbox">&times;</a>
-  <img src="images/gallery6.jpg" alt="Gallery 6">
-</div>
+<!-- Lightbox Popups Removed -->
 
 <!-- FOOTER -->
 <footer class="relative text-white pt-16 pb-8 overflow-hidden" style="background: linear-gradient(135deg, #0a0e27 0%, #0c2d4a 50%, #0c4a6e 100%);">
@@ -1480,7 +1458,7 @@
                   <div class="milestone-year">2024</div>
                   <div class="milestone-line"><span class="milestone-dot"></span></div>
                   <div class="milestone-content bg-white p-4 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                    <img src="{{ asset('assets/img/vsatatm.jpg') }}" alt="VSAT 2024" onerror="this.src='/images/vsat-2024.jpg'">
+                    <img src="{{ asset('assets/img/exp-vsat.jpg') }}" alt="VSAT 2024">
                     <div class="py-2 pr-4">
                       <h6 class="font-bold text-gray-800 mb-2">Sulawesi Tengah & Kalimantan Utara</h6>
                       <p class="text-sm text-gray-500">Instalasi VSAT BAKTI di ratusan lokasi untuk mendukung pemerataan akses informasi digital.</p>
@@ -1493,7 +1471,7 @@
                   <div class="milestone-year">2023</div>
                   <div class="milestone-line"><span class="milestone-dot"></span></div>
                   <div class="milestone-content bg-white p-4 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                    <img src="{{ asset('assets/img/foto2.jpg') }}" alt="VSAT 2023" onerror="this.src='/images/vsat-2023.jpg'">
+                    <img src="{{ asset('assets/img/exp-vsat.jpg') }}" alt="VSAT 2023">
                     <div class="py-2 pr-4">
                       <h6 class="font-bold text-gray-800 mb-2">Ekspansi Wilayah Timur</h6>
                       <p class="text-sm text-gray-500">Pemberdayaan jaringan VSAT di Sulawesi Utara, Tenggara, dan Kota Sorong demi akses daerah 3T.</p>
@@ -1506,7 +1484,7 @@
                   <div class="milestone-year">2022</div>
                   <div class="milestone-line"><span class="milestone-dot"></span></div>
                   <div class="milestone-content bg-white p-4 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                    <img src="{{ asset('assets/img/vsatatm.jpg') }}" alt="VSAT 2022" onerror="this.src='/images/vsat-2022.jpg'">
+                    <img src="{{ asset('assets/img/exp-vsat.jpg') }}" alt="VSAT 2022">
                     <div class="py-2 pr-4">
                       <h6 class="font-bold text-gray-800 mb-2">Fokus Stabilitas</h6>
                       <p class="text-sm text-gray-500">Maintenance komprehensif perangkat VSAT di kawasan Maluku, Papua, dan Nusa Tenggara Barat.</p>

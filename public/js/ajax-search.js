@@ -236,9 +236,9 @@ if (document.readyState === 'loading') {
 }
 
 // Re-init setelah setiap AJAX yang mengganti tabel (MutationObserver)
-(function() {
-    // Selalu observe body untuk menangani penggantian kontainer utama
+function initObserver() {
     var observerTarget = document.body;
+    if (!observerTarget) return;
 
     var observer = new MutationObserver(function(mutations) {
         var shouldReinit = mutations.some(function(m) {
@@ -250,4 +250,10 @@ if (document.readyState === 'loading') {
     });
 
     observer.observe(observerTarget, { childList: true, subtree: true });
-})();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initObserver);
+} else {
+    initObserver();
+}
