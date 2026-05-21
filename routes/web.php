@@ -26,13 +26,14 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\RemoteLogController;
 use App\Http\Controllers\MikrotikController;
+use App\Http\Controllers\CsrController;
 
 /* |-------------------------------------------------------------------------- | Web Routes |-------------------------------------------------------------------------- */
 // Auth Routes
-Route::get('/login', [AuthController::class , 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class , 'login']);
-Route::match(['get', 'post'], '/logout', [AuthController::class , 'logout'])->name('logout');
-Route::get('/timeout-logout', [AuthController::class , 'logout'])->name('timeout.logout');
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/timeout-logout', [AuthController::class, 'logout'])->name('timeout.logout');
 
 // --- MY DASHBOARD & CHAT ROUTES ---
 Route::get('/dashboard', [MyDashboardController::class, 'index'])->name('mydashboard');
@@ -50,7 +51,34 @@ Route::delete('/sparepart-needed/delete/{id}', [\App\Http\Controllers\SparepartN
 Route::patch('/sparepart-needed/status/{id}', [\App\Http\Controllers\SparepartNeededController::class, 'updateStatus'])->name('sparepart.needed.status');
 Route::post('/sparepart-needed/print', [\App\Http\Controllers\SparepartNeededController::class, 'printPengajuan'])->name('sparepart.needed.print');
 Route::post('/sparepart-needed/pengajuan/store', [\App\Http\Controllers\SparepartNeededController::class, 'storePengajuan'])->name('sparepart.needed.pengajuan.store');
+Route::put('/sparepart-needed/pengajuan/update/{id}', [\App\Http\Controllers\SparepartNeededController::class, 'updatePengajuan'])->name('sparepart.needed.pengajuan.update');
 Route::delete('/sparepart-needed/pengajuan/{id}', [\App\Http\Controllers\SparepartNeededController::class, 'deletePengajuan'])->name('sparepart.needed.pengajuan.destroy');
+Route::post('/sparepart-needed/pengajuan/approve/{id}', [\App\Http\Controllers\SparepartNeededController::class, 'approve'])->name('sparepart.needed.approve');
+Route::post('/sparepart-needed/pengajuan/reject/{id}', [\App\Http\Controllers\SparepartNeededController::class, 'reject'])->name('sparepart.needed.reject');
+Route::post('/sparepart-needed/pengajuan/accounting-notes/{id}', [\App\Http\Controllers\SparepartNeededController::class, 'updateAccountingNotes'])->name('sparepart.needed.accounting.notes');
+Route::get('/sparepart-needed/pengajuan/print/{id}', [\App\Http\Controllers\SparepartNeededController::class, 'printPengajuanById'])->name('sparepart.needed.pengajuan.print');
+
+
+// --- CSR (Corporate Social Responsibility) ROUTES ---
+Route::get('/csr', [CsrController::class, 'index'])->name('csr.index');
+Route::post('/csr/store', [CsrController::class, 'store'])->name('csr.store');
+Route::post('/csr/approve/{id}', [CsrController::class, 'approve'])->name('csr.approve');
+Route::post('/csr/reject/{id}', [CsrController::class, 'reject'])->name('csr.reject');
+Route::get('/csr/print/{id}', [CsrController::class, 'print'])->name('csr.print');
+Route::put('/csr/update/{id}', [CsrController::class, 'update'])->name('csr.update');
+Route::delete('/csr/destroy/{id}', [CsrController::class, 'destroy'])->name('csr.destroy');
+Route::post('/csr/accounting-notes/{id}', [CsrController::class, 'updateAccountingNotes'])->name('csr.accounting.notes');
+
+// --- CM (Corrective / Preventive Maintenance) ROUTES ---
+Route::get('/cm', [\App\Http\Controllers\CmController::class, 'index'])->name('cm.index');
+Route::post('/cm/store', [\App\Http\Controllers\CmController::class, 'store'])->name('cm.store');
+Route::post('/cm/approve/{id}', [\App\Http\Controllers\CmController::class, 'approve'])->name('cm.approve');
+Route::post('/cm/reject/{id}', [\App\Http\Controllers\CmController::class, 'reject'])->name('cm.reject');
+Route::get('/cm/print/{id}', [\App\Http\Controllers\CmController::class, 'print'])->name('cm.print');
+Route::put('/cm/update/{id}', [\App\Http\Controllers\CmController::class, 'update'])->name('cm.update');
+Route::delete('/cm/destroy/{id}', [\App\Http\Controllers\CmController::class, 'destroy'])->name('cm.destroy');
+Route::post('/cm/accounting-notes/{id}', [\App\Http\Controllers\CmController::class, 'updateAccountingNotes'])->name('cm.accounting.notes');
+
 // --- REMOTE LOG (AJAX store - harus login) ---
 Route::post('/remote-log/store', [RemoteLogController::class, 'store'])->name('remotelog.store')->middleware('auth');
 
@@ -59,10 +87,8 @@ Route::domain('mns.nustech.co.id')->group(function () {
     Route::get('/', [MyDashboardController::class, 'index'])->name('mydashboard');
 });
 
-// Halaman Utama (Home) via nustech.co.id
-Route::domain('nustech.co.id')->group(function () {
-    Route::get('/', [HomeController::class, 'index'])->name('home');
-});
+// Halaman Utama (Home)
+Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 
 // CSRF Token Refresh — dipanggil JS di semua halaman agar session tidak expire
@@ -117,7 +143,7 @@ Route::get('/get-drive-title', function (Illuminate\Http\Request $request) {
 Route::middleware(['auth'])->group(function () {
 
     // --- REMOTE LOG AUDIT TRAIL ---
-    Route::get('/remote-log', [RemoteLogController::class, 'index'])->name('remotelog')->middleware('role:superadmin');
+    Route::get('/remote-log', [RemoteLogController::class, 'index'])->name('remotelog')->middleware('role:superadmin,noc_leader,manager,accounting,direktur,penasihat');
 
     // --- ACTIVITY LOG ---
 
@@ -167,7 +193,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/datapass/{id}', [DatapasController::class, 'destroy'])->name('datapas.destroy');
 
     // --- PERANGKAT & TRACKER (Admin & Superadmin) ---
-    Route::middleware(['role:admin,superadmin'])->group(function () {
+    Route::middleware(['role:admin,superadmin,noc_leader,manager,accounting,direktur,penasihat'])->group(function () {
         Route::get('/pergantianperangkat', [PergantianController::class, 'index'])->name('pergantianperangkat');
         Route::post('/pergantianperangkat/store', [PergantianController::class, 'store'])->name('pergantianperangkat.store');
         Route::post('/pergantianperangkat/import', [PergantianController::class, 'import'])->name('pergantianperangkat.import');
@@ -182,6 +208,15 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/sparetracker/update', [SparetrackerController::class, 'update'])->name('sparetracker.update');
         Route::delete('/sparetracker/delete/{id}', [SparetrackerController::class, 'destroy'])->name('sparetracker.destroy');
         Route::get('/pm-summary', [SummaryController::class, 'index'])->name('summaryperangkat');
+
+        // --- LANDING PAGE ADMIN ROUTES ---
+        Route::get('/admin/home', [\App\Http\Controllers\HomeAdminController::class, 'index'])->name('admin.home');
+        Route::post('/admin/home/portfolio', [\App\Http\Controllers\HomeAdminController::class, 'storePortfolio'])->name('admin.home.portfolio.store');
+        Route::put('/admin/home/portfolio/{id}', [\App\Http\Controllers\HomeAdminController::class, 'updatePortfolio'])->name('admin.home.portfolio.update');
+        Route::delete('/admin/home/portfolio/{id}', [\App\Http\Controllers\HomeAdminController::class, 'destroyPortfolio'])->name('admin.home.portfolio.destroy');
+        Route::post('/admin/home/news', [\App\Http\Controllers\HomeAdminController::class, 'storeNews'])->name('admin.home.news.store');
+        Route::put('/admin/home/news/{id}', [\App\Http\Controllers\HomeAdminController::class, 'updateNews'])->name('admin.home.news.update');
+        Route::delete('/admin/home/news/{id}', [\App\Http\Controllers\HomeAdminController::class, 'destroyNews'])->name('admin.home.news.destroy');
     });
 
     // --- TO DO LIST ---
@@ -203,7 +238,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/notifications/check', [TodolistController::class, 'checkNotifications']);
 
     // --- LAPORAN CM ROUTES (Admin & Superadmin) ---
-    Route::middleware(['role:admin,superadmin'])->group(function () {
+    Route::middleware(['role:admin,superadmin,noc_leader,manager,accounting,direktur,penasihat'])->group(function () {
         Route::get('/laporancm', [LaporanCMController::class, 'index'])->name('laporancm');
         Route::post('/laporancm/store', [LaporanCMController::class, 'store'])->name('laporancm.store');
         Route::put('/laporancm/{id}', [LaporanCMController::class, 'update'])->name('laporancm.update');
@@ -221,7 +256,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/PMLiberta/{id}', [PMLibertaController::class, 'destroy'])->name('pmliberta.destroy');
 
     // --- JADWAL PIKET ROUTES (Superadmin Only) ---
-    Route::middleware(['role:superadmin'])->group(function () {
+    Route::middleware(['role:superadmin,noc_leader,manager,accounting,direktur,penasihat'])->group(function () {
         Route::get('/jadwalpiket', [PiketController::class, 'index'])->name('jadwalpiket');
         Route::post('/jadwal-piket/upload', [PiketController::class, 'upload'])->name('piket.upload');
         Route::delete('/jadwal-piket/delete-all', [PiketController::class, 'deleteAll'])->name('piket.deleteAll');
@@ -244,7 +279,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
     // Setting (Superadmin Only)
-    Route::middleware(['role:superadmin'])->prefix('setting')->group(
+    Route::middleware(['role:superadmin,noc_leader,manager,accounting,direktur,penasihat'])->prefix('setting')->group(
         function () {
             Route::get('/', [SettingController::class, 'index'])->name('setting.index');
             Route::post('/store', [SettingController::class, 'store'])->name('setting.store');

@@ -48,16 +48,18 @@ class SettingController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
+            'phone' => 'nullable|string|max:20',
             'password' => 'required|string|min:8',
-            'role' => 'required|in:user,admin,superadmin',
+            'role' => 'required|in:user,admin,superadmin,noc_leader,manager,accounting,direktur,penasihat',
         ]);
 
         User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'phone' => $request->phone,
             'password' => Hash::make($request->password),
             'role' => $request->role,
-            'is_admin' => in_array($request->role, ['admin', 'superadmin']),
+            'is_admin' => in_array($request->role, ['admin', 'superadmin', 'noc_leader', 'manager', 'accounting', 'direktur', 'penasihat']),
         ]);
 
         return back()->with('success', 'User berhasil ditambahkan!');
@@ -70,14 +72,16 @@ class SettingController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
-            'role' => 'required|in:user,admin,superadmin',
+            'phone' => 'nullable|string|max:20',
+            'role' => 'required|in:user,admin,superadmin,noc_leader,manager,accounting,direktur,penasihat',
             'password' => 'nullable|string|min:8',
         ]);
 
         $user->name = $request->name;
         $user->email = $request->email;
+        $user->phone = $request->phone;
         $user->role = $request->role;
-        $user->is_admin = in_array($request->role, ['admin', 'superadmin']);
+        $user->is_admin = in_array($user->role, ['admin', 'superadmin', 'noc_leader', 'manager', 'accounting', 'direktur', 'penasihat']);
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);

@@ -366,7 +366,7 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-3">
-            @if(auth()->check() && auth()->user()->role === 'superadmin')
+            @if(auth()->check() && auth()->user()->hasAdminAccess())
                 <a href="{{ route('setting.index') }}" class="text-white opacity-75" title="Settings">
                     <i class="bi bi-gear-fill" style="font-size: 1.3rem;"></i>
                 </a>
@@ -407,7 +407,7 @@
     <div class="tabs-section">
         <a href="{{ url('/todolist') }}" class="tab {{ request()->is('todolist*') ? 'active' : '' }}"
             style="text-decoration: none;">To Do List</a>
-        @if(auth()->check() && auth()->user()->role === 'superadmin')
+        @if(auth()->check() && auth()->user()->hasAdminAccess())
             <a href="{{ route('jadwalpiket') }}" class="tab {{ request()->is('jadwalpiket*') ? 'active' : '' }}"
                 style="text-decoration: none;">Jadwal Piket</a>
             <a href="{{ route('remotelog') }}" class="tab {{ request()->is('remote-log*') ? 'active' : '' }}"
@@ -436,7 +436,7 @@
                 </form>
             </div>
             <div class="d-flex gap-2">
-                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                @if(auth()->check() && auth()->user()->hasAdminAccess())
                     <button class="btn btn-outline-success btn-sm px-4 fw-bold" onclick="saveChanges()">
                         <i class="bi bi-save me-2"></i> Simpan Jadwal
                     </button>
@@ -461,7 +461,7 @@
                         {{-- Baris 1: NAMA (rowspan) + Hari + Summary header --}}
                         <tr class="row-hari">
                             {{-- Kolom drag handle (hanya admin) --}}
-                            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                            @if(auth()->check() && auth()->user()->hasAdminAccess())
                                 <th class="name-cell-header" rowspan="2" style="min-width:22px; width:22px;"></th>
                             @endif
                             <th class="name-cell-header" rowspan="2">NAMA</th>
@@ -501,7 +501,7 @@
                             @endphp
                             <tr data-nama="{{ trim($nama) }}">
                                 {{-- Drag handle --}}
-                                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                                @if(auth()->check() && auth()->user()->hasAdminAccess())
                                     <td class="name-cell align-middle"
                                         style="min-width:22px; width:22px; padding:0 !important; cursor:grab;">
                                         <span class="drag-handle"><i class="bi bi-grip-vertical"></i></span>
@@ -533,7 +533,7 @@
                                         $isWE = in_array($cellDate->dayOfWeek, [0, 6]);
                                     @endphp
                                     <td class="{{ $isWE ? 'td-weekend' : '' }}">
-                                        @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                                        @if(auth()->check() && auth()->user()->hasAdminAccess())
                                             <select class="shift-box {{ $class }}" data-nama="{{ trim($nama) }}"
                                                 data-tanggal="{{ $tgl }}" onchange="updateData(this)">
                                                 <option value="OFF" {{ $kodeUp == 'OFF' ? 'selected' : '' }}>OFF</option>

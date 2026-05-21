@@ -56,7 +56,7 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-3">
-            @if(auth()->check() && auth()->user()->role === 'superadmin')
+            @if(auth()->check() && auth()->user()->hasAdminAccess())
                 <a href="{{ route('setting.index') }}" class="text-white opacity-75 hover-opacity-100" title="Settings">
                     <i class="bi bi-gear-fill" style="font-size: 1.3rem;"></i>
                 </a>
@@ -98,7 +98,7 @@
             style="text-decoration: none;">All Sites</a>
         <a href="{{ route('datapas') }}" class="tab {{ request()->is('datapass*') ? 'active' : '' }}"
             style="text-decoration: none;">Management Password</a>
-        @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+        @if(auth()->check() && auth()->user()->hasAdminAccess())
             <a href="{{ route('laporancm') }}" class="tab {{ request()->is('laporancm*') ? 'active' : '' }}"
                 style="text-decoration: none;">Correctiv Maintenance</a>
         @endif
@@ -112,7 +112,7 @@
         <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3"
             style="margin-bottom: 20px;">
             <div class="actions flex-shrink-0">
-                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                @if(auth()->check() && auth()->user()->hasAdminAccess())
                     <button type="button" class="btn-action bi bi-plus" title="Add" data-toggle="modal"
                         data-target="#modalSite" onclick="addSite()"></button>
                     <form action="{{ route('datapas.import') }}" method="POST" enctype="multipart/form-data" id="importForm"
@@ -154,9 +154,9 @@
                         <th>Server</th>
                         <th>PASS AP1</th>
                         <th>PASS AP2</th>
-                        @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                        @if(auth()->check() && auth()->user()->hasAdminAccess())
                             <th class="sticky-col-right">Aksi</th>
-                        @elseif(auth()->check() && auth()->user()->role === 'user')
+                        @else
                             <th class="sticky-col-right">Info</th>
                         @endif
                     </tr>
@@ -188,7 +188,7 @@
                                     {{ $row->pass_ap2 }}
                                 @endif
                             </td>
-                            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                            @if(auth()->check() && auth()->user()->hasAdminAccess())
                                 <td class="text-center sticky-col-right">
                                     <button class="btn btn-sm bi bi-pencil" onclick="editData({{ json_encode($row) }})"
                                         title="Edit">
@@ -202,7 +202,7 @@
                                         @method('DELETE')
                                     </form>
                                 </td>
-                            @elseif(auth()->check() && auth()->user()->role === 'user')
+                            @else
                                 <td class="text-center sticky-col-right">
                                     <button class="btn btn-sm bi bi-info-circle" onclick="viewInfo({{ json_encode($row) }})"
                                         title="Info">

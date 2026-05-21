@@ -181,20 +181,20 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-3">
-            @if(auth()->check() && auth()->user()->role === 'superadmin')
+            @if(auth()->check() && auth()->user()->hasAdminAccess())
                 <a href="{{ route('setting.index') }}" class="text-white opacity-75 hover-opacity-100" title="Settings">
                     <i class="bi bi-gear-fill" style="font-size: 1.3rem;"></i>
                 </a>
             @endif
             <div class="user-profile-wrapper" style="position: relative;">
                 <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
-                        @if(auth()->check() && auth()->user()->photo)
-                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
-                                style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
-                        @else
-                            <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
-                        @endif
-                    </div>
+                    @if(auth()->check() && auth()->user()->photo)
+                        <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
+                            style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                    @else
+                        <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
+                    @endif
+                </div>
                 <div id="profileDropdownMenu" class="hidden"
                     style="position: absolute; right: 0; top: 100%; mt: 10px; width: 150px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; display: none; flex-direction: column; overflow: hidden;">
                     <div
@@ -223,7 +223,7 @@
             style="text-decoration: none;">All Sites</a>
         <a href="{{ route('datapas') }}" class="tab {{ request()->is('datapass*') ? 'active' : '' }}"
             style="text-decoration: none;">Management Password</a>
-        @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+        @if(auth()->check() && auth()->user()->hasAdminAccess())
             <a href="{{ route('laporancm') }}" class="tab {{ request()->is('laporancm*') ? 'active' : '' }}"
                 style="text-decoration: none;">Correctiv Maintenance</a>
         @endif
@@ -237,7 +237,7 @@
         <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3"
             style="margin-bottom: 20px;">
             <div class="actions flex-shrink-0">
-                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                @if(auth()->check() && auth()->user()->hasAdminAccess())
                     <button type="button" class="btn-action bi bi-plus" title="Add" data-toggle="modal"
                         data-target="#modalSite" onclick="addSite()"></button>
                     <form action="{{ route('sites.import') }}" method="POST" enctype="multipart/form-data" id="importForm"
@@ -347,7 +347,7 @@
                         <th class="col-sticky-right col-ip-ap1">IP AP1</th>
                         <th class="col-sticky-right col-ip-ap2">IP AP2</th>
                         <th>EXPECTED SQF</th>
-                        @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                        @if(auth()->check() && auth()->user()->hasAdminAccess())
                             <th class="col-sticky-right col-aksi">AKSI</th>
                         @elseif(auth()->check() && auth()->user()->role === 'user')
                             <th class="col-sticky-right col-aksi">INFO</th>
@@ -390,13 +390,13 @@
                             <td class="col-sticky-right col-ip-ap1">{{ $site->ip_ap1 }}</td>
                             <td class="col-sticky-right col-ip-ap2">{{ $site->ip_ap2 }}</td>
                             <td>{{ $site->expected_sqf }}</td>
-                            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                            @if(auth()->check() && auth()->user()->hasAdminAccess())
                                 <td class="col-sticky-right col-aksi">
                                     <div class="btn-group" role="group">
                                         {{-- JANGAN pakai <a> ke route edit, tapi pakai button onclick --}}
                                             <button type="button" class="btn btn-sm bi bi-pencil"
                                                 onclick="editSite({{ $site->toJson() }})"></button>
-                                            @if($site->ip_router && in_array(auth()->user()->role ?? '', ['admin', 'superadmin']))
+                                            @if($site->ip_router && auth()->user()->hasAdminAccess())
                                                 <button type="button" class="btn btn-sm btn-remote-action" title="Remote Mikrotik"
                                                     onclick="remoteMikrotik('{{ $site->ip_router }}', '{{ $site->tipe }}', '{{ $site->sitename }}', '{{ $site->site_id }}')">
                                                     <i class="bi bi-broadcast"></i>
@@ -451,7 +451,7 @@
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
-                        </div >
+                            </div >
             @endif
     </script>
     <!-- MODAL ADD DATA -->

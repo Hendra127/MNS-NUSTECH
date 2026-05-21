@@ -227,7 +227,7 @@ class TodolistController extends Controller
     public function share(Request $request, $id)
     {
         $todo = Todo::findOrFail($id);
-        if (auth()->user()->role !== 'superadmin') {
+        if (!in_array(auth()->user()->role, ['superadmin', 'noc_leader', 'manager', 'accounting', 'direktur', 'penasihat'])) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 

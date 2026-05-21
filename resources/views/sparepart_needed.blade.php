@@ -61,6 +61,49 @@
         tbody tr:hover td {
             background-color: #f0f5fb !important;
         }
+
+        /* Approval Steps Dots */
+        .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e0e0e0;
+        }
+
+        .step-dot.active {
+            background: #198754;
+            box-shadow: 0 0 5px rgba(25, 135, 84, 0.5);
+        }
+
+        .step-dot.rejected {
+            background: #dc3545;
+            box-shadow: 0 0 5px rgba(220, 53, 69, 0.5);
+        }
+
+        .btn-action-premium {
+            width: 46px;
+            height: 46px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white !important;
+            border: none;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            cursor: pointer;
+        }
+
+        .btn-action-premium:hover {
+            transform: scale(1.1) rotate(90deg);
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn-action-premium i {
+            font-size: 1.5rem;
+        }
     </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -180,7 +223,7 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-3">
-            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+            @if(auth()->check() && auth()->user()->hasAdminAccess())
                 <a href="{{ route('setting.index') }}" class="text-white opacity-75 hover-opacity-100" title="Settings">
                     <i class="bi bi-gear-fill" style="font-size: 1.3rem;"></i>
                 </a>
@@ -218,10 +261,9 @@
         </div>
     </header>
     <div class="tabs-section d-flex align-items-center">
-        <a href="{{ route('mydashboard') }}" class="tab" style="text-decoration: none; color: Black;"><i
-                class="bi bi-arrow-left"></i> Back to Dashboard</a>
-        <a href="{{ route('sparepart_needed') }}" class="tab active"
-            style="text-decoration: none; color: White;">Sparepart Needed</a>
+        <a href="{{ route('sparepart_needed') }}" class="tab active">Pengajuan Perangkat</a>
+        <a href="{{ route('csr.index') }}" class="tab">Pengajuan CSR</a>
+        <a href="{{ route('cm.index') }}" class="tab">Pengajuan CM</a>
         <div class="ms-auto d-flex align-items-center">
             <span class="summary-badge text-black" id="summaryBadge">Total Sparepart Needed :
                 <b>{{ $sparepartsNeeded->total() }}</b></span>
@@ -233,24 +275,16 @@
         <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3"
             style="margin-bottom: 20px;">
             <div class="actions flex-shrink-0">
-                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin', 'user']))
-                    <button type="button" class="btn-action bi bi-plus" title="Tambah Data" data-bs-toggle="modal"
-                        data-bs-target="#modalTambahSparepart"></button>
+                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin', 'user', 'noc_leader']))
+                    <button type="button" class="btn-action-premium" title="Tambah Data" data-bs-toggle="modal"
+                        data-bs-target="#modalTambahSparepart">
+                        <i class="bi bi-plus-lg"></i>
+                    </button>
                 @endif
             </div>
             <div class="w-100 mt-2 mt-lg-0">
                 <form method="GET" action="{{ route('sparepart_needed') }}"
                     class="search-form row g-2 align-items-center w-100 m-0 justify-content-lg-end" id="filterForm">
-                    @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin', 'user']))
-                        <div class="col-auto">
-                            <button type="button"
-                                class="btn btn-primary btn-sm rounded-pill d-flex align-items-center gap-2 px-3 fw-semibold shadow-sm"
-                                data-bs-toggle="modal" data-bs-target="#modalPrintPengajuan"
-                                style="height: 38px; border: none; background: linear-gradient(135deg, #0d6efd, #0b5ed7);">
-                                <i class="bi bi-plus-lg"></i> Buat Pengajuan
-                            </button>
-                        </div>
-                    @endif
 
                     <div class="col-12 col-md-auto">
                         <select name="status" class="form-select form-select-sm w-100">
@@ -285,7 +319,7 @@
 
             <!-- MODAL TAMBAH -->
             <div class="modal fade" id="modalTambahSparepart" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
                     <div class="modal-content rounded-4 border-0 shadow-lg">
                         <div class="modal-header text-white d-flex justify-content-center position-relative"
                             style="background-color: #0d6efd; border-radius: 15px 15px 0 0;">
@@ -343,12 +377,34 @@
                                     </div>
                                 </div>
 
-                                <div class="mb-3">
-                                    <label class="form-label" style="font-size: 0.85rem; font-weight: 600;">Upload Foto
-                                        (Resi) <i>(Opsional)</i></label>
-                                    <input type="file" name="photo" class="form-control" accept="image/*">
-                                    <div class="form-text" style="font-size: 0.75rem;">Format diperbolehkan: JPG, PNG,
-                                        GIF. Maks: 5MB.</div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label" style="font-size: 0.85rem; font-weight: 600;">Foto
+                                            Resi <i>(Opsional)</i></label>
+                                        <input type="file" name="foto_resi" class="form-control" accept="image/*">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label" style="font-size: 0.85rem; font-weight: 600;">Foto
+                                            Terpasang <i>(Opsional)</i></label>
+                                        <input type="file" name="foto_terpasang" class="form-control" accept="image/*">
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label" style="font-size: 0.85rem; font-weight: 600;">Foto SN
+                                            Baru <i>(Opsional)</i></label>
+                                        <input type="file" name="foto_sn" class="form-control" accept="image/*">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label" style="font-size: 0.85rem; font-weight: 600;">Foto
+                                            Lainnya <i>(Opsional)</i></label>
+                                        <input type="file" name="photo" class="form-control" accept="image/*">
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-text" style="font-size: 0.75rem;">Format: JPG, PNG, GIF. Maks:
+                                            5MB per file.</div>
+                                    </div>
                                 </div>
 
                                 <div class="mb-4">
@@ -385,12 +441,12 @@
                             <th class="text-center">QTY</th>
                             <th>NAMA SITE</th>
                             <th>SITE ID</th>
-                            <th class="text-center">FOTO RESI</th>
+                            <th class="text-center">FOTO LAIN - LAIN</th>
                             <th class="text-center">URGENSI</th>
                             <th class="text-center">STATUS</th>
                             <th>KETERANGAN</th>
                             <th>TANGGAL REQUEST</th>
-                            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin', 'user']))
+                            @if(auth()->check() && auth()->user()->role === 'noc_leader')
                                 <th class="text-center">AKSI</th>
                             @endif
                         </tr>
@@ -408,19 +464,40 @@
                                 <td>{{ $item->site ? $item->site->sitename : '-' }}</td>
                                 <td>{{ $item->site_id }}</td>
                                 <td class="text-center">
-                                    @if($item->photo)
-                                        <a href="javascript:void(0)" onclick="showImage(this.querySelector('img').src)">
-                                            <img src="{{ asset('storage/' . $item->photo) }}"
-                                                onerror="this.onerror=null; this.src='{{ asset('storage_public/' . $item->photo) }}';"
-                                                alt="Foto"
-                                                style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #ddd; transition: transform 0.2s;"
-                                                onmouseover="this.style.transform='scale(1.1)'"
-                                                onmouseout="this.style.transform='scale(1)'">
-                                        </a>
-                                    @else
-                                        <span class="text-muted"><i class="bi bi-image"
-                                                style="font-size: 1.5rem; opacity: 0.3;"></i></span>
-                                    @endif
+                                    <div class="d-flex flex-column gap-2 align-items-center">
+                                        @php
+                                            $displayPhotos = [
+                                                'Resi' => $item->foto_resi,
+                                                'Terpasang' => $item->foto_terpasang,
+                                                'SN' => $item->foto_sn,
+                                                'Lain' => $item->photo
+                                            ];
+                                        @endphp
+
+                                        @php $hasAnyPhoto = false; @endphp
+                                        @foreach($displayPhotos as $label => $path)
+                                            @if($path)
+                                                @php $hasAnyPhoto = true; @endphp
+                                                <div class="d-flex flex-column align-items-center">
+                                                    <a href="javascript:void(0)" onclick="showImage(this.querySelector('img').src)">
+                                                        <img src="{{ asset('storage/' . $path) }}"
+                                                            onerror="this.onerror=null; this.src='{{ asset('storage_public/' . $path) }}';"
+                                                            alt="{{ $label }}"
+                                                            style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #ddd; transition: transform 0.2s;"
+                                                            onmouseover="this.style.transform='scale(1.1)'"
+                                                            onmouseout="this.style.transform='scale(1)'">
+                                                    </a>
+                                                    <small
+                                                        style="font-size: 0.65rem; color: #666; margin-top: 2px;">{{ $label }}</small>
+                                                </div>
+                                            @endif
+                                        @endforeach
+
+                                        @if(!$hasAnyPhoto)
+                                            <span class="text-muted"><i class="bi bi-image"
+                                                    style="font-size: 1.5rem; opacity: 0.3;"></i></span>
+                                        @endif
+                                    </div>
                                 </td>
                                 <td class="text-center">
                                     @if($item->urgency == 'Urgent')
@@ -455,7 +532,7 @@
                                 <td>{{ $item->description ?: '-' }}</td>
                                 <td>{{ $item->created_at->format('d M Y, H:i') }}</td>
 
-                                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin', 'user']))
+                                @if(auth()->check() && auth()->user()->role === 'noc_leader')
                                     <td class="text-center">
                                         <div class="d-flex gap-2 justify-content-center align-items-center">
                                             <button class="btn btn-sm btn-light border shadow-sm text-primary"
@@ -478,9 +555,9 @@
                             </tr>
 
                             <!-- Modal Edit -->
-                            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin', 'user']))
+                            @if(auth()->check() && auth()->user()->role === 'noc_leader')
                                 <div class="modal fade" id="modalEditSparepart{{ $item->id }}" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-dialog modal-lg modal-dialog-centered">
                                         <div class="modal-content rounded-4 border-0 shadow-lg text-start">
                                             <div class="modal-header text-white d-flex justify-content-center position-relative"
                                                 style="background-color: #0d6efd; border-radius: 15px 15px 0 0;">
@@ -546,21 +623,72 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="mb-3">
-                                                        <label class="form-label"
-                                                            style="font-size: 0.85rem; font-weight: 600;">Update Foto</label>
-                                                        @if($item->photo)
-                                                            <div class="mb-2">
-                                                                <img src="{{ asset('storage/' . $item->photo) }}"
-                                                                    onerror="this.onerror=null; this.src='{{ asset('storage_public/' . $item->photo) }}';"
-                                                                    alt="Foto Lama"
-                                                                    style="height: 60px; border-radius: 6px; border: 1px solid #ddd; object-fit: cover;">
-                                                            </div>
-                                                        @endif
-                                                        <input type="file" name="photo" class="form-control" accept="image/*">
-                                                        <div class="form-text" style="font-size: 0.75rem;">Biarkan kosong jika
-                                                            tidak
-                                                            ingin mengubah foto.</div>
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-6">
+                                                            <label class="form-label"
+                                                                style="font-size: 0.85rem; font-weight: 600;">Update Foto
+                                                                Resi</label>
+                                                            @if($item->foto_resi)
+                                                                <div class="mb-2">
+                                                                    <img src="{{ asset('storage/' . $item->foto_resi) }}"
+                                                                        onerror="this.onerror=null; this.src='{{ asset('storage_public/' . $item->foto_resi) }}';"
+                                                                        alt="Resi"
+                                                                        style="height: 60px; border-radius: 6px; border: 1px solid #ddd; object-fit: cover;">
+                                                                </div>
+                                                            @endif
+                                                            <input type="file" name="foto_resi" class="form-control"
+                                                                accept="image/*">
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label"
+                                                                style="font-size: 0.85rem; font-weight: 600;">Update Foto
+                                                                Terpasang</label>
+                                                            @if($item->foto_terpasang)
+                                                                <div class="mb-2">
+                                                                    <img src="{{ asset('storage/' . $item->foto_terpasang) }}"
+                                                                        onerror="this.onerror=null; this.src='{{ asset('storage_public/' . $item->foto_terpasang) }}';"
+                                                                        alt="Terpasang"
+                                                                        style="height: 60px; border-radius: 6px; border: 1px solid #ddd; object-fit: cover;">
+                                                                </div>
+                                                            @endif
+                                                            <input type="file" name="foto_terpasang" class="form-control"
+                                                                accept="image/*">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-6">
+                                                            <label class="form-label"
+                                                                style="font-size: 0.85rem; font-weight: 600;">Update Foto SN
+                                                                Baru</label>
+                                                            @if($item->foto_sn)
+                                                                <div class="mb-2">
+                                                                    <img src="{{ asset('storage/' . $item->foto_sn) }}"
+                                                                        onerror="this.onerror=null; this.src='{{ asset('storage_public/' . $item->foto_sn) }}';"
+                                                                        alt="SN"
+                                                                        style="height: 60px; border-radius: 6px; border: 1px solid #ddd; object-fit: cover;">
+                                                                </div>
+                                                            @endif
+                                                            <input type="file" name="foto_sn" class="form-control"
+                                                                accept="image/*">
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label"
+                                                                style="font-size: 0.85rem; font-weight: 600;">Update Foto
+                                                                Lainnya</label>
+                                                            @if($item->photo)
+                                                                <div class="mb-2">
+                                                                    <img src="{{ asset('storage/' . $item->photo) }}"
+                                                                        onerror="this.onerror=null; this.src='{{ asset('storage_public/' . $item->photo) }}';"
+                                                                        alt="Lainnya"
+                                                                        style="height: 60px; border-radius: 6px; border: 1px solid #ddd; object-fit: cover;">
+                                                                </div>
+                                                            @endif
+                                                            <input type="file" name="photo" class="form-control"
+                                                                accept="image/*">
+                                                            <div class="form-text" style="font-size: 0.75rem;">Biarkan kosong
+                                                                jika tidak ingin mengubah foto.</div>
+                                                        </div>
                                                     </div>
 
                                                     <div class="mb-4">
@@ -610,6 +738,12 @@
         <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3"
             style="margin-bottom: 20px;">
             <h5 class="m-0 fw-bold"><i class="bi bi-file-earmark-text"></i> Data Formulir Pengajuan</h5>
+            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin', 'user', 'noc_leader']))
+                <button type="button" class="btn-action-premium" data-bs-toggle="modal"
+                    data-bs-target="#modalPrintPengajuan" title="Buat Pengajuan Baru">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
+            @endif
         </div>
 
         <div class="table-responsive-custom" id="tablePengajuanContainer">
@@ -620,8 +754,10 @@
                         <th style="min-width: 150px;">Tanggal</th>
                         <th style="min-width: 200px;">Nomor</th>
                         <th style="min-width: 250px;">Divisi</th>
+                        <th style="min-width: 300px;">Detail Perangkat</th>
                         <th style="min-width: 150px;">Grand Total</th>
-                        <th style="min-width: 100px;">Aksi</th>
+                        <th style="min-width: 150px;">Status Approval</th>
+                        <th style="min-width: 150px;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -631,52 +767,112 @@
                             <td>{{ $p->tempat_tanggal }}</td>
                             <td>{{ $p->nomor }}</td>
                             <td>{{ $p->divisi }}</td>
-                            <td>Rp {{ number_format($p->grand_total, 0, ',', '.') }}</td>
                             <td>
-                                <div class="d-flex gap-2">
-                                    <form action="{{ route('sparepart.needed.print') }}" method="POST" target="_blank" class="d-inline">
-                                        @csrf
-                                        <input type="hidden" name="tempat_tanggal" value="{{ $p->tempat_tanggal }}">
-                                        <input type="hidden" name="divisi" value="{{ $p->divisi }}">
-                                        <input type="hidden" name="nomor" value="{{ $p->nomor }}">
-                                        <input type="hidden" name="terbilang" value="{{ $p->terbilang }}">
-                                        <input type="hidden" name="pemohon_nama" value="{{ $p->pemohon_nama }}">
-                                        <input type="hidden" name="pemohon_jabatan" value="{{ $p->pemohon_jabatan }}">
-                                        <input type="hidden" name="diverifikasi1_nama" value="{{ $p->diverifikasi1_nama }}">
-                                        <input type="hidden" name="diverifikasi1_jabatan" value="{{ $p->diverifikasi1_jabatan }}">
-                                        <input type="hidden" name="diverifikasi2_nama" value="{{ $p->diverifikasi2_nama }}">
-                                        <input type="hidden" name="diverifikasi2_jabatan" value="{{ $p->diverifikasi2_jabatan }}">
-                                        <input type="hidden" name="disetujui_nama" value="{{ $p->disetujui_nama }}">
-                                        <input type="hidden" name="disetujui_jabatan" value="{{ $p->disetujui_jabatan }}">
-                                        <input type="hidden" name="mengetahui_nama" value="{{ $p->mengetahui_nama }}">
-                                        <input type="hidden" name="mengetahui_jabatan" value="{{ $p->mengetahui_jabatan }}">
-                                        
-                                        @if(is_array($p->items))
-                                            @foreach($p->items as $item)
-                                                <input type="hidden" name="perangkat[]" value="{{ $item['perangkat'] ?? '' }}">
-                                                <input type="hidden" name="qty[]" value="{{ $item['qty'] ?? 1 }}">
-                                                <input type="hidden" name="harga[]" value="{{ $item['harga'] ?? 0 }}">
-                                                <input type="hidden" name="layanan[]" value="{{ $item['layanan'] ?? '' }}">
-                                                <input type="hidden" name="peruntukan[]" value="{{ $item['peruntukan'] ?? '' }}">
-                                                <input type="hidden" name="keterangan[]" value="{{ $item['keterangan'] ?? '' }}">
-                                            @endforeach
+                                @if(is_array($p->items))
+                                    <div class="d-flex flex-column gap-0" style="font-size: 0.8rem;">
+                                        @foreach($p->items as $item)
+                                            <div class="p-1 px-2 border rounded bg-white shadow-sm mb-1">
+                                                <div class="d-flex justify-content-between fw-bold text-dark">
+                                                    <span>{{ $item['perangkat'] ?? '-' }}</span>
+                                                    <span>{{ $item['qty'] ?? 1 }} Unit</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between text-muted mt-1"
+                                                    style="font-size: 0.75rem;">
+                                                    <span>@ Rp {{ number_format($item['harga'] ?? 0, 0, ',', '.') }}</span>
+                                                    <span class="text-success fw-bold">Rp
+                                                        {{ number_format(($item['qty'] ?? 1) * ($item['harga'] ?? 0), 0, ',', '.') }}</span>
+                                                </div>
+                                                <div class="mt-1 pt-1 border-top" style="font-size: 0.7rem; color: #777;">
+                                                    <div><i class="bi bi-tag"></i> {{ $item['layanan'] ?? '-' }} | <i
+                                                            class="bi bi-pin-map"></i> {{ $item['peruntukan'] ?? '-' }}</div>
+                                                    <div class="text-truncate" title="{{ $item['keterangan'] ?? '-' }}">
+                                                        <i class="bi bi-info-circle"></i> {{ $item['keterangan'] ?? '-' }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    -
+                                @endif
+                            </td>
+                            <td class="fw-bold text-success">Rp {{ number_format($p->grand_total, 0, ',', '.') }}</td>
+                            <td>
+                                <span class="badge bg-{{ $p->status_color }} mb-1" style="font-size: 0.7rem;">
+                                    {{ $p->status_label }}
+                                </span>
+                                <div class="d-flex align-items-center gap-1 mt-1">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <div class="step-dot {{ $p->step >= $i ? ($p->approval_status === 'rejected' ? 'rejected' : 'active') : '' }}"
+                                            title="{{ $p->status_label }}"></div>
+                                    @endfor
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex gap-2 justify-content-center align-items-center">
+                                    @if($p->can_approve)
+                                        @if($p->approval_status === 'approved_manager' && auth()->user()->role === 'accounting')
+                                            {{-- Accounting: buka modal isi no_surat + catatan dulu --}}
+                                            <button type="button" class="btn btn-sm btn-success shadow-sm"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalApproveAccSP{{ $p->id }}"
+                                                title="Setujui &amp; Isi Catatan">
+                                                <i class="bi bi-check-circle"></i>
+                                            </button>
+                                        @else
+                                            <button class="btn btn-sm btn-success shadow-sm"
+                                                onclick="confirmApproval('{{ route('sparepart.needed.approve', $p->id) }}')">
+                                                <i class="bi bi-check-circle"></i>
+                                            </button>
                                         @endif
-                                        <button type="submit" class="btn btn-sm btn-success" title="Print"><i class="bi bi-printer"></i></button>
-                                    </form>
-                                    
-                                    @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
-                                        <form action="{{ route('sparepart.needed.pengajuan.destroy', $p->id) }}" method="POST" class="d-inline delete-form">
+                                        <button class="btn btn-sm btn-danger shadow-sm"
+                                            onclick="showRejectModal('{{ route('sparepart.needed.reject', $p->id) }}')">
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
+                                    @endif
+
+                                    <div class="dropdown d-inline-block">
+                                        <button class="btn btn-sm btn-success border shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Cetak">
+                                            <i class="bi bi-printer"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                            <li><a class="dropdown-item" href="{{ route('sparepart.needed.pengajuan.print', ['id' => $p->id, 'with_ttd' => 1]) }}" target="_blank"><i class="bi bi-file-earmark-pdf text-danger me-2"></i>Cetak Full TTD</a></li>
+                                            <li><a class="dropdown-item" href="{{ route('sparepart.needed.pengajuan.print', ['id' => $p->id, 'with_ttd' => 0]) }}" target="_blank"><i class="bi bi-file-earmark-pdf me-2"></i>Cetak Tanpa TTD</a></li>
+                                        </ul>
+                                    </div>
+
+                                    @if(auth()->check() && auth()->user()->role === 'noc_leader')
+                                        <button class="btn btn-sm btn-light border shadow-sm text-primary"
+                                            data-bs-toggle="modal" data-bs-target="#modalEditPengajuan{{ $p->id }}"
+                                            title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <form action="{{ route('sparepart.needed.pengajuan.destroy', $p->id) }}" method="POST"
+                                            class="m-0 delete-form">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger" title="Hapus"><i class="bi bi-trash"></i></button>
+                                            <button type="submit" class="btn btn-sm btn-light border shadow-sm text-danger"
+                                                title="Hapus">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
                                         </form>
+                                    @endif
+
+                                    {{-- Tombol Edit Catatan/No Surat khusus Accounting --}}
+                                    @if(auth()->check() && auth()->user()->role === 'accounting')
+                                        <button type="button" class="btn btn-sm"
+                                            style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;border:none;border-radius:8px;padding:6px 10px;"
+                                            data-bs-toggle="modal" data-bs-target="#modalNotesSP{{ $p->id }}"
+                                            title="Isi / Edit Catatan & No Surat">
+                                            <i class="bi bi-journal-text"></i>
+                                        </button>
                                     @endif
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center py-4 text-muted">Belum ada data pengajuan.</td>
+                            <td colspan="7" class="text-center py-4 text-muted">Belum ada data pengajuan.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -693,6 +889,106 @@
         </div>
     </div>
 
+    {{-- ===== MODALS APPROVE ACCOUNTING + NOTES SPAREPART ===== --}}
+    @if(auth()->check() && auth()->user()->role === 'accounting')
+    @foreach($pengajuans as $p)
+        {{-- MODAL APPROVE ACCOUNTING SPAREPART --}}
+        <div class="modal fade" id="modalApproveAccSP{{ $p->id }}" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg" style="border-radius:15px;">
+                    <div class="modal-header text-white"
+                        style="background:linear-gradient(135deg,#10b981,#059669);border-radius:15px 15px 0 0;">
+                        <h5 class="modal-title fw-bold mb-0">
+                            <i class="bi bi-check-circle me-2"></i>Setujui &amp; Isi Data Accounting
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form action="{{ route('sparepart.needed.approve', $p->id) }}" method="POST">
+                        @csrf
+                        <div class="modal-body p-4">
+                            <div class="alert alert-info border-0 small mb-3" style="background:#eff6ff;">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Isi data berikut sebelum menyetujui pengajuan perangkat ini.
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">Nomor Surat <span class="text-muted">(opsional)</span></label>
+                                <input type="text" name="no_surat" class="form-control"
+                                    value="{{ $p->no_surat }}"
+                                    placeholder="Contoh: 001/ACC/SP/V/2026">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">Catatan <span class="text-muted">(opsional)</span></label>
+                                <textarea name="catatan" class="form-control" rows="3"
+                                    placeholder="Catatan dari Accounting...">{{ $p->catatan }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">Keterangan <span class="text-muted">(opsional)</span></label>
+                                <textarea name="keterangan" class="form-control" rows="2"
+                                    placeholder="Keterangan tambahan...">{{ $p->keterangan }}</textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn rounded-pill px-5 fw-bold text-white"
+                                style="background:linear-gradient(135deg,#10b981,#059669);border:none;">
+                                <i class="bi bi-check-lg me-1"></i>Setujui Pengajuan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {{-- MODAL EDIT CATATAN / NO SURAT SPAREPART (Accounting saja) --}}
+        <div class="modal fade" id="modalNotesSP{{ $p->id }}" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg" style="border-radius:15px;">
+                    <div class="modal-header text-white"
+                        style="background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:15px 15px 0 0;">
+                        <h5 class="modal-title fw-bold mb-0">
+                            <i class="bi bi-journal-text me-2"></i>Isi / Edit Catatan &amp; No Surat
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form action="{{ route('sparepart.needed.accounting.notes', $p->id) }}" method="POST">
+                        @csrf
+                        <div class="modal-body p-4">
+                            <div class="alert alert-warning border-0 small mb-3" style="background:#fffbeb;">
+                                <i class="bi bi-lock me-1"></i>
+                                Hanya <strong>Accounting</strong> yang dapat mengisi/mengubah data ini.
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">Nomor Surat</label>
+                                <input type="text" name="no_surat" class="form-control"
+                                    value="{{ $p->no_surat }}"
+                                    placeholder="Contoh: 001/ACC/SP/V/2026">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">Catatan</label>
+                                <textarea name="catatan" class="form-control" rows="3"
+                                    placeholder="Catatan dari Accounting...">{{ $p->catatan }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">Keterangan</label>
+                                <textarea name="keterangan" class="form-control" rows="2"
+                                    placeholder="Keterangan tambahan...">{{ $p->keterangan }}</textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn rounded-pill px-5 fw-bold text-white"
+                                style="background:linear-gradient(135deg,#f59e0b,#d97706);border:none;">
+                                <i class="bi bi-save me-1"></i>Simpan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endforeach
+    @endif
+    {{-- ===== /MODALS APPROVE ACCOUNTING + NOTES SPAREPART ===== --}}
+
     <!-- Modal Print Pengajuan -->
     <div class="modal fade" id="modalPrintPengajuan" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -704,7 +1000,8 @@
                         data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body pt-4">
-                    <form action="{{ route('sparepart.needed.print') }}" method="POST" target="_blank" id="formPengajuan">
+                    <form action="{{ route('sparepart.needed.print') }}" method="POST" target="_blank"
+                        id="formPengajuan">
                         @csrf
                         <div class="row mb-3">
                             <div class="col-6">
@@ -731,11 +1028,11 @@
                         <hr>
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h6 class="fw-bold text-muted mb-0">Detail Perangkat</h6>
-                            <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddItem"><i
+                            <button type="button" class="btn btn-sm btn-outline-primary btn-add-item-trigger" id="btnAddItem"><i
                                     class="bi bi-plus"></i></button>
                         </div>
 
-                        <div id="itemsContainer">
+                        <div id="itemsContainer" class="items-container-dynamic">
                             <div class="item-row border p-3 mb-3 rounded position-relative bg-white">
                                 <button type="button"
                                     class="btn btn-sm btn-outline-danger position-absolute btn-remove-item"
@@ -792,7 +1089,7 @@
                                 <div class="input-group">
                                     <span class="input-group-text bg-success text-white">Rp</span>
                                     <input type="text" id="grand_total_display"
-                                        class="form-control bg-light fw-bold text-success" readonly>
+                                        class="form-control bg-light fw-bold text-success grand-total-display" readonly>
                                 </div>
                             </div>
                         </div>
@@ -800,7 +1097,7 @@
                         <div class="mb-3">
                             <label class="form-label fw-bold" style="font-size: 0.85rem;">Terbilang</label>
                             <input type="text" id="input_terbilang" name="terbilang"
-                                class="form-control bg-light text-primary fw-bold" readonly>
+                                class="form-control bg-light text-primary fw-bold input-terbilang" readonly>
                         </div>
 
                         <hr>
@@ -847,11 +1144,13 @@
                         <div class="d-flex justify-content-end gap-2 mt-4">
                             <button type="button" class="btn btn-light px-4 rounded-3 border"
                                 data-bs-dismiss="modal">Batal</button>
-                            <button type="submit" onclick="document.getElementById('formPengajuan').action='{{ route('sparepart.needed.pengajuan.store') }}'; document.getElementById('formPengajuan').target='_self';"
+                            <button type="submit"
+                                onclick="document.getElementById('formPengajuan').action='{{ route('sparepart.needed.pengajuan.store') }}'; document.getElementById('formPengajuan').target='_self';"
                                 class="btn btn-primary px-4 rounded-3 d-flex align-items-center gap-2">
                                 <i class="bi bi-save"></i> Save
                             </button>
-                            <button type="submit" onclick="document.getElementById('formPengajuan').action='{{ route('sparepart.needed.print') }}'; document.getElementById('formPengajuan').target='_blank';"
+                            <button type="submit"
+                                onclick="document.getElementById('formPengajuan').action='{{ route('sparepart.needed.print') }}'; document.getElementById('formPengajuan').target='_blank';"
                                 class="btn btn-success px-4 rounded-3 d-flex align-items-center gap-2">
                                 <i class="bi bi-printer"></i> Print
                             </button>
@@ -862,80 +1161,274 @@
         </div>
     </div>
 
+    @if(auth()->check() && auth()->user()->role === 'noc_leader')
+        @foreach($pengajuans as $p)
+            <!-- Modal Edit Pengajuan {{ $p->id }} -->
+            <div class="modal fade" id="modalEditPengajuan{{ $p->id }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content rounded-4 border-0 shadow-lg text-start">
+                        <div class="modal-header text-white d-flex justify-content-center position-relative"
+                            style="background-color: #0d6efd; border-radius: 15px 15px 0 0;">
+                            <h5 class="modal-title w-100 text-center fw-bold">Edit Formulir Pengajuan</h5>
+                            <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
+                                data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body pt-4">
+                            <form action="{{ route('sparepart.needed.pengajuan.update', $p->id) }}" method="POST">
+                                @csrf
+                                @method('PUT')
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Tempat, Tanggal</label>
+                                        <input type="text" name="tempat_tanggal" class="form-control"
+                                            value="{{ $p->tempat_tanggal }}" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Divisi / Bagian</label>
+                                        <input type="text" name="divisi" class="form-control"
+                                            value="{{ $p->divisi }}" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold" style="font-size: 0.85rem;">No. Pengajuan</label>
+                                    <input type="text" name="nomor" class="form-control" 
+                                        value="{{ $p->nomor }}"
+                                        placeholder="Contoh: 001/SP/2026" required>
+                                </div>
+
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="fw-bold text-muted mb-0">Detail Perangkat</h6>
+                                    <button type="button" class="btn btn-sm btn-outline-primary btn-add-item-trigger">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                </div>
+
+                                <div id="itemsContainerEdit{{ $p->id }}" class="items-container-dynamic">
+                                    @if(is_array($p->items))
+                                        @foreach($p->items as $itemIdx => $item)
+                                            <div class="item-row border p-3 mb-3 rounded position-relative bg-white">
+                                                <button type="button"
+                                                    class="btn btn-sm btn-outline-danger position-absolute btn-remove-item"
+                                                    style="top: 10px; right: 10px; z-index: 10; {{ count($p->items) <= 1 ? 'display: none;' : '' }}" title="Hapus"><i
+                                                        class="bi bi-x"></i></button>
+                                                <div class="row mb-2">
+                                                    <div class="col-md-4">
+                                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Perangkat</label>
+                                                        <input type="text" name="perangkat[]" class="form-control" required
+                                                            value="{{ $item['perangkat'] ?? '' }}"
+                                                            placeholder="Contoh: ROUTER">
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Qty</label>
+                                                        <input type="number" name="qty[]" class="form-control input-qty" min="1"
+                                                            value="{{ $item['qty'] ?? 1 }}" required>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Harga Satuan</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text">Rp</span>
+                                                            <input type="number" name="harga[]" class="form-control input-harga"
+                                                                value="{{ $item['harga'] ?? 0 }}"
+                                                                required placeholder="50000">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Total</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text">Rp</span>
+                                                            <input type="text" class="form-control bg-light input-subtotal" 
+                                                                value="{{ number_format(($item['qty'] ?? 1) * ($item['harga'] ?? 0), 0, ',', '.') }}"
+                                                                readonly>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Layanan</label>
+                                                        <input type="text" name="layanan[]" class="form-control" value="{{ $item['layanan'] ?? 'BMN' }}">
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Peruntukan</label>
+                                                        <input type="text" name="peruntukan[]" class="form-control" value="{{ $item['peruntukan'] ?? 'STOK' }}">
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Keterangan</label>
+                                                        <input type="text" name="keterangan[]" class="form-control" value="{{ $item['keterangan'] ?? '-' }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                </div>
+
+                                <div class="row mb-3 align-items-center">
+                                    <div class="col-md-4 text-end fw-bold">Grand Total :</div>
+                                    <div class="col-md-8">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-success text-white">Rp</span>
+                                            <input type="text"
+                                                class="form-control bg-light fw-bold text-success grand-total-display" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold" style="font-size: 0.85rem;">Terbilang</label>
+                                    <input type="text" name="terbilang"
+                                        class="form-control bg-light text-primary fw-bold input-terbilang" readonly>
+                                </div>
+
+                                <hr>
+                                <h6 class="fw-bold text-muted mb-3">Tertanda</h6>
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Pemohon</label>
+                                        <input type="text" name="pemohon_nama" class="form-control mb-1"
+                                            value="{{ $p->pemohon_nama }}" required>
+                                        <input type="text" name="pemohon_jabatan" class="form-control"
+                                            value="{{ $p->pemohon_jabatan }}" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Diverifikasi 1</label>
+                                        <input type="text" name="diverifikasi1_nama" class="form-control mb-1"
+                                            value="{{ $p->diverifikasi1_nama }}">
+                                        <input type="text" name="diverifikasi1_jabatan" class="form-control" 
+                                            value="{{ $p->diverifikasi1_jabatan }}">
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-4">
+                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Diverifikasi 2</label>
+                                        <input type="text" name="diverifikasi2_nama" class="form-control mb-1"
+                                            value="{{ $p->diverifikasi2_nama }}">
+                                        <input type="text" name="diverifikasi2_jabatan" class="form-control" 
+                                            value="{{ $p->diverifikasi2_jabatan }}">
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Disetujui</label>
+                                        <input type="text" name="disetujui_nama" class="form-control mb-1"
+                                            value="{{ $p->disetujui_nama }}">
+                                        <input type="text" name="disetujui_jabatan" class="form-control" 
+                                            value="{{ $p->disetujui_jabatan }}">
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Mengetahui</label>
+                                        <input type="text" name="mengetahui_nama" class="form-control mb-1"
+                                            value="{{ $p->mengetahui_nama }}">
+                                        <input type="text" name="mengetahui_jabatan" class="form-control" 
+                                            value="{{ $p->mengetahui_jabatan }}">
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-end gap-2 mt-4">
+                                    <button type="button" class="btn btn-light px-4 rounded-3 border"
+                                        data-bs-dismiss="modal">Batal</button>
+                                    <button type="submit"
+                                        class="btn btn-primary px-4 rounded-3 d-flex align-items-center gap-2">
+                                        <i class="bi bi-save"></i> Update
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    @endif
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            function terbilangRupiah(angka) {
-                var bilangan = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
-                var bg = "";
-                if (angka < 12) { bg = " " + bilangan[angka]; }
-                else if (angka < 20) { bg = terbilangRupiah(angka - 10) + " Belas"; }
-                else if (angka < 100) { bg = terbilangRupiah(Math.floor(angka / 10)) + " Puluh" + terbilangRupiah(angka % 10); }
-                else if (angka < 200) { bg = " Seratus" + terbilangRupiah(angka - 100); }
-                else if (angka < 1000) { bg = terbilangRupiah(Math.floor(angka / 100)) + " Ratus" + terbilangRupiah(angka % 100); }
-                else if (angka < 2000) { bg = " Seribu" + terbilangRupiah(angka - 1000); }
-                else if (angka < 1000000) { bg = terbilangRupiah(Math.floor(angka / 1000)) + " Ribu" + terbilangRupiah(angka % 1000); }
-                else if (angka < 1000000000) { bg = terbilangRupiah(Math.floor(angka / 1000000)) + " Juta" + terbilangRupiah(angka % 1000000); }
-                else if (angka < 1000000000000) { bg = terbilangRupiah(Math.floor(angka / 1000000000)) + " Milyar" + terbilangRupiah(angka % 1000000000); }
-                return bg;
-            }
+            // For both Add and Edit modals:
+            function setupModalCalculations(modalElement) {
+                const itemsContainer = modalElement.querySelector('.items-container-dynamic');
+                if (!itemsContainer) return;
 
-            function calculateTotal() {
-                let grandTotal = 0;
-                document.querySelectorAll('.item-row').forEach(row => {
-                    let qty = parseInt(row.querySelector('.input-qty').value) || 0;
-                    let harga = parseInt(row.querySelector('.input-harga').value) || 0;
-                    let subTotal = qty * harga;
-                    grandTotal += subTotal;
-                    row.querySelector('.input-subtotal').value = new Intl.NumberFormat('id-ID').format(subTotal);
-                });
+                function terbilangRupiah(angka) {
+                    var bilangan = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
+                    var bg = "";
+                    if (angka < 12) { bg = " " + bilangan[angka]; }
+                    else if (angka < 20) { bg = terbilangRupiah(angka - 10) + " Belas"; }
+                    else if (angka < 100) { bg = terbilangRupiah(Math.floor(angka / 10)) + " Puluh" + terbilangRupiah(angka % 10); }
+                    else if (angka < 200) { bg = " Seratus" + terbilangRupiah(angka - 100); }
+                    else if (angka < 1000) { bg = terbilangRupiah(Math.floor(angka / 100)) + " Ratus" + terbilangRupiah(angka % 100); }
+                    else if (angka < 2000) { bg = " Seribu" + terbilangRupiah(angka - 1000); }
+                    else if (angka < 1000000) { bg = terbilangRupiah(Math.floor(angka / 1000)) + " Ribu" + terbilangRupiah(angka % 1000); }
+                    else if (angka < 1000000000) { bg = terbilangRupiah(Math.floor(angka / 1000000)) + " Juta" + terbilangRupiah(angka % 1000000); }
+                    else if (angka < 1000000000000) { bg = terbilangRupiah(Math.floor(angka / 1000000000)) + " Milyar" + terbilangRupiah(angka % 1000000000); }
+                    return bg;
+                }
 
-                const gtDisplay = document.getElementById('grand_total_display');
-                if (gtDisplay) gtDisplay.value = new Intl.NumberFormat('id-ID').format(grandTotal);
+                function calculateTotal() {
+                    let grandTotal = 0;
+                    itemsContainer.querySelectorAll('.item-row').forEach(row => {
+                        let qty = parseInt(row.querySelector('.input-qty').value) || 0;
+                        let harga = parseInt(row.querySelector('.input-harga').value) || 0;
+                        let subTotal = qty * harga;
+                        grandTotal += subTotal;
+                        row.querySelector('.input-subtotal').value = new Intl.NumberFormat('id-ID').format(subTotal);
+                    });
 
-                const inputTerbilang = document.getElementById('input_terbilang');
-                if (inputTerbilang) {
-                    if (grandTotal > 0) {
-                        inputTerbilang.value = terbilangRupiah(grandTotal).trim() + " Rupiah";
-                    } else {
-                        inputTerbilang.value = "";
+                    const gtDisplay = modalElement.querySelector('.grand-total-display');
+                    if (gtDisplay) gtDisplay.value = new Intl.NumberFormat('id-ID').format(grandTotal);
+
+                    const inputTerbilang = modalElement.querySelector('.input-terbilang');
+                    if (inputTerbilang) {
+                        if (grandTotal > 0) {
+                            inputTerbilang.value = terbilangRupiah(grandTotal).trim() + " Rupiah";
+                        } else {
+                            inputTerbilang.value = "";
+                        }
                     }
                 }
-            }
 
-            const itemsContainer = document.getElementById('itemsContainer');
-
-            // Event delegation for input fields
-            if (itemsContainer) {
+                // Event delegation for input fields
                 itemsContainer.addEventListener('input', function (e) {
                     if (e.target.classList.contains('input-qty') || e.target.classList.contains('input-harga')) {
                         calculateTotal();
                     }
                 });
-            }
 
-            // Add Item button
-            const btnAddItem = document.getElementById('btnAddItem');
-            if (btnAddItem) {
-                btnAddItem.addEventListener('click', function () {
-                    if (!itemsContainer) return;
-                    const firstRow = itemsContainer.querySelector('.item-row').cloneNode(true);
+                // Add Item button
+                const btnAddItem = modalElement.querySelector('.btn-add-item-trigger');
+                if (btnAddItem) {
+                    btnAddItem.addEventListener('click', function () {
+                        const firstRow = itemsContainer.querySelector('.item-row').cloneNode(true);
 
-                    // Clear values in cloned row
-                    firstRow.querySelectorAll('input').forEach(input => {
-                        if (input.name == 'layanan[]') input.value = 'BMN';
-                        else if (input.name == 'peruntukan[]') input.value = 'STOK';
-                        else if (input.name == 'keterangan[]') input.value = '-';
-                        else if (input.name == 'qty[]') input.value = '1';
-                        else input.value = '';
+                        // Clear values in cloned row
+                        firstRow.querySelectorAll('input').forEach(input => {
+                            if (input.name == 'layanan[]' || input.getAttribute('name') == 'layanan[]') input.value = 'BMN';
+                            else if (input.name == 'peruntukan[]' || input.getAttribute('name') == 'peruntukan[]') input.value = 'STOK';
+                            else if (input.name == 'keterangan[]' || input.getAttribute('name') == 'keterangan[]') input.value = '-';
+                            else if (input.name == 'qty[]' || input.getAttribute('name') == 'qty[]') input.value = '1';
+                            else if (input.name == 'harga[]' || input.getAttribute('name') == 'harga[]') input.value = '';
+                            else if (input.classList.contains('input-subtotal')) input.value = '0';
+                            else input.value = '';
+                        });
+
+                        // Make sure there is a remove button
+                        let btnRemove = firstRow.querySelector('.btn-remove-item');
+                        if (!btnRemove) {
+                            btnRemove = document.createElement('button');
+                            btnRemove.type = 'button';
+                            btnRemove.className = 'btn btn-sm btn-outline-danger position-absolute btn-remove-item';
+                            btnRemove.style.cssText = 'top: 10px; right: 10px; z-index: 10;';
+                            btnRemove.title = 'Hapus';
+                            btnRemove.innerHTML = '<i class="bi bi-x"></i>';
+                            firstRow.appendChild(btnRemove);
+                        } else {
+                            btnRemove.style.display = 'block';
+                        }
+
+                        itemsContainer.appendChild(firstRow);
+                        calculateTotal();
                     });
+                }
 
-                    itemsContainer.appendChild(firstRow);
-                    calculateTotal();
-                });
-            }
-
-            // Remove Item button (delegation)
-            if (itemsContainer) {
+                // Remove Item button (delegation)
                 itemsContainer.addEventListener('click', function (e) {
                     const btnRemove = e.target.closest('.btn-remove-item');
                     if (btnRemove) {
@@ -955,12 +1448,17 @@
                         }
                     }
                 });
+
+                // Initial calculate
+                calculateTotal();
             }
 
-            // Initial calculate
-            calculateTotal();
+            // Bind to all modals that have itemsContainer
+            document.querySelectorAll('.modal').forEach(modal => {
+                setupModalCalculations(modal);
+            });
 
-            // Date Picker Logic
+            // Date Picker Logic (only for Add modal with id picker_tanggal)
             const pickerTanggal = document.getElementById('picker_tanggal');
             const hiddenTempatTanggal = document.getElementById('hidden_tempat_tanggal');
 
@@ -1000,6 +1498,14 @@
                 text: "{{ session('success') }}",
                 showConfirmButton: false,
                 timer: 2000
+            });
+        @endif
+
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: "{{ session('error') }}"
             });
         @endif
 
@@ -1094,10 +1600,81 @@
             });
         }
 
+
         // Trigger on dropdown change
         const statusSelect = document.querySelector('select[name="status"]');
         if (statusSelect) {
             statusSelect.addEventListener('change', () => fetchTableData());
+        }
+    </script>
+
+    <!-- Modal Reject -->
+    <div class="modal fade" id="modalReject" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 shadow-lg border-0">
+                <div class="modal-header bg-danger text-white rounded-top-4">
+                    <h5 class="modal-title fw-bold">Alasan Penolakan</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="formReject" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <textarea name="reason" rows="4" class="form-control" placeholder="Masukkan alasan penolakan..."
+                            required></textarea>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-light border px-4" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-danger px-4">Kirim Penolakan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function confirmApproval(url) {
+            Swal.fire({
+                title: 'Konfirmasi Persetujuan',
+                text: "Apakah Anda yakin ingin menyetujui pengajuan ini?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#198754',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Setujui!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = url;
+                    form.innerHTML = `@csrf`;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+
+        function showRejectModal(url) {
+            const form = document.getElementById('formReject');
+            form.action = url;
+            new bootstrap.Modal(document.getElementById('modalReject')).show();
+        }
+
+        // Simpan pengajuan ke DB saat form diproses (sebelum print)
+        const formPengajuan = document.getElementById('formPengajuan');
+        if (formPengajuan) {
+            formPengajuan.addEventListener('submit', function (e) {
+                // Gunakan Fetch untuk simpan ke database secara background agar print tetap jalan
+                const formData = new FormData(this);
+                fetch("{{ route('sparepart.needed.pengajuan.store') }}", {
+                    method: "POST",
+                    body: formData,
+                    headers: { "X-Requested-With": "XMLHttpRequest" }
+                }).then(() => {
+                    // Refresh table pengajuan setelah simpan sukses
+                    setTimeout(() => window.location.reload(), 1000);
+                });
+            });
         }
     </script>
 </body>

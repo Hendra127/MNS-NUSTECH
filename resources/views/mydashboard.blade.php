@@ -342,7 +342,7 @@
                     <div class="menu-content" style="padding: 10px 15px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(0,0,0,0.05);">
                             <span style="font-size: 0.85rem; font-weight: 600; color: #555;">Daftar Kebutuhan</span>
-                            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin', 'user']))
+                            @if(auth()->check() && (auth()->user()->hasAdminAccess() || auth()->user()->role === 'user'))
                             <button class="btn btn-sm" onclick="openSparepartModal('add')" style="background: transparent; border: none; padding: 0; color: #0d6efd; display: flex; align-items: center; justify-content: center;" title="Tambah Kebutuhan">
                                 <i class="ph ph-plus-circle" style="font-size: 1.35rem; transition: color 0.2s;" onmouseover="this.style.color='#0b5ed7'" onmouseout="this.style.color='#0d6efd'"></i>
                             </button>
@@ -362,7 +362,7 @@
                                         <span style="background: #f1f3f5; padding: 1px 5px; border-radius: 4px; font-size: 0.7rem; color: #555; border: 1px solid #eaeaea; font-weight: 600;">x{{ $sp->quantity }}</span>
                                     </div>
                                     
-                                    @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin', 'user']))
+                                    @if(auth()->check() && (auth()->user()->hasAdminAccess() || auth()->user()->role === 'user'))
                                     <div class="actions d-flex gap-2 flex-shrink-0 ms-2">
                                         <button class="btn btn-sm p-0" onclick="openSparepartModal('edit', {{ $sp->id }}, '{{ $sp->site_id }}', '{{ htmlspecialchars($sp->sparepart_name) }}', {{ $sp->quantity }}, '{{ htmlspecialchars($sp->description) }}', '{{ $sp->status }}')" style="border: none; background: transparent; color: #6c757d;" title="Edit" onmouseover="this.style.color='#0d6efd'" onmouseout="this.style.color='#6c757d'">
                                             <i class="ph ph-pencil-simple" style="font-size: 1rem;"></i>

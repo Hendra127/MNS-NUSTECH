@@ -351,7 +351,7 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-3">
-            @if(auth()->check() && auth()->user()->role === 'superadmin')
+            @if(auth()->check() && auth()->user()->hasAdminAccess())
                 <a href="{{ route('setting.index') }}" class="text-white opacity-75 hover-opacity-100" title="Settings">
                     <i class="bi bi-gear-fill" style="font-size: 1.3rem;"></i>
                 </a>
@@ -538,9 +538,9 @@
                             <th>DETAIL PROBLEM</th>
                             <th>ACTION PLAN</th>
                             <th>CE</th>
-                            @if(auth()->check())
+                            @if(auth()->check() && auth()->user()->hasAdminAccess())
                                 <th class="sticky-col-right">AKSI</th>
-                            @elseif(auth()->check() && auth()->user()->role === 'user')
+                            @else
                                 <th class="sticky-col-right">INFO</th>
                             @endif
                         </tr>
@@ -560,8 +560,8 @@
                                         }
                                         $durasi = $tanggalRekap->diffInDays($hariAkhir);
                                     @endphp
-                                    @if($durasi > 5)
-                                        <i class="bi bi-exclamation-triangle-fill text-danger me-1" title="Overdue > 5 Hari" style="animation: blink 1s infinite;"></i>
+                                    @if($durasi >= 3)
+                                        <i class="bi bi-exclamation-triangle-fill text-danger me-1" title="Overdue >= 3 Hari" style="animation: blink 1s infinite;"></i>
                                     @endif
                                     {{ $t->nama_site }}
                                 </td>
@@ -585,7 +585,7 @@
                                 <td class="text-truncate" style="max-width: 200px;">{{ $t->detail_problem }}</td>
                                 <td class="text-truncate" style="max-width: 200px;">{{ $t->plan_actions }}</td>
                                 <td>{{ $t->ce }}</td>
-                                @if(auth()->check())
+                                @if(auth()->check() && auth()->user()->hasAdminAccess())
                                     <td class="text-center sticky-col-right">
                                         <button type="button" class="btn btn-sm bi bi-x-lg" data-bs-toggle="modal"
                                             data-bs-target="#modalCloseTicket{{ $t->id }}" data-id="{{ $t->id }}"
@@ -605,14 +605,14 @@
                                         <button type="button" class="btn btn-sm bi bi-info-circle" data-bs-toggle="modal"
                                             data-bs-target="#modalInfo{{ $t->id }}">
                                         </button>
-                                        @if($t->site && $t->site->ip_router && in_array(auth()->user()->role ?? '', ['admin', 'superadmin']))
+                                        @if($t->site && $t->site->ip_router && auth()->user()->hasAdminAccess())
                                             <button type="button" class="btn btn-sm btn-remote-action" title="Remote Mikrotik"
                                                 onclick="remoteMikrotik('{{ $t->site->ip_router }}', '{{ $t->kategori }}', '{{ $t->nama_site }}', '{{ $t->site_code }}', '{{ $t->site->gateway_area }}', '{{ $t->site->hub }}')">
                                                 <i class="bi bi-broadcast"></i>
                                             </button>
                                         @endif
                                     </td>
-                                @elseif(auth()->check() && auth()->user()->role === 'user')
+                                @else
                                     <td class="text-center sticky-col-right">
                                         <button type="button" class="btn btn-sm bi bi-info-circle" data-bs-toggle="modal"
                                             data-bs-target="#modalInfo{{ $t->id }}">
@@ -801,8 +801,8 @@
 
                     {{-- MODAL CLOSE TICKET --}}
                     <div class="modal fade" id="modalCloseTicket{{ $t->id }}" tabindex="-1">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <form method="POST" action="{{ route('open.ticket.close', $t->id) }}" class="modal-content">
+                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                            <form method="POST" action="{{ route('open.ticket.close', $t->id) }}" class="modal-content" enctype="multipart/form-data">
                                 @csrf
                                 @method('PUT')
                                 <div class="modal-header text-white position-relative"
@@ -818,20 +818,46 @@
                                         data-bs-dismiss="modal"></button>
                                 </div>
                                 <div class="modal-body p-3">
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Tanggal Close</label>
-                                        <input type="date" name="tanggal_close" class="form-control"
-                                            value="{{ date('Y-m-d') }}" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Detil Problem</label>
-                                        <textarea name="detail_problem" class="form-control" rows="3"
-                                            required>{{ $t->detail_problem }}</textarea>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold">Action</label>
-                                        <textarea name="plan_actions" class="form-control" rows="3"
-                                            required>{{ $t->plan_actions }}</textarea>
+                                    <div class="row g-3">
+                                        <div class="col-md-12">
+                                            <label class="form-label fw-bold">Tanggal Close</label>
+                                            <input type="date" name="tanggal_close" class="form-control"
+                                                value="{{ date('Y-m-d') }}" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Detil Problem</label>
+                                            <textarea name="detail_problem" class="form-control" rows="3"
+                                                required>{{ $t->detail_problem }}</textarea>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Action</label>
+                                            <textarea name="plan_actions" class="form-control" rows="3"
+                                                required>{{ $t->plan_actions }}</textarea>
+                                        </div>
+                                        <div class="col-md-12 mt-3">
+                                            <label class="form-label fw-bold text-success">Capture Evidence Zabbix (Wajib saat Close)</label>
+                                            <div class="evidence-drop-zone rounded-3 p-4 text-center position-relative mb-2" style="border-color: #198754; background: #f8fff9;">
+                                                <input type="file" name="zabbix_evidence[]" class="d-none" accept="image/*,video/*" multiple>
+                                                <div class="drop-zone-msg text-muted">
+                                                    <i class="bi bi-graph-up-arrow fs-1 d-block mb-2 text-success"></i>
+                                                    <div class="fw-bold">Drag & drop Zabbix Capture</div>
+                                                    <div class="small">from WhatsApp or Dashboard</div>
+                                                </div>
+                                                <div class="preview-container d-flex flex-wrap gap-2 mt-3 justify-content-center"></div>
+                                            </div>
+                                            
+                                            <div class="mt-2 d-flex flex-wrap gap-2">
+                                                @php $zFiles = array_filter(explode(',', $t->zabbix_evidence ?? '')); @endphp
+                                                @if(count($zFiles) > 0)
+                                                    @foreach($zFiles as $index => $zPath)
+                                                        <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage_public/' . $zPath) }}')" class="badge bg-success text-white text-decoration-none">
+                                                            <i class="bi bi-graph-up"></i> Zabbix #{{ $index + 1 }}
+                                                        </a>
+                                                    @endforeach
+                                                @endif
+                                            </div>
+                                            <small class="text-muted">Silahkan upload bukti monitoring Zabbix sebelum menutup tiket.</small>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -962,6 +988,21 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <div class="col-md-12 mt-3">
+                                                        <div class="p-2 bg-white rounded-3 border" style="border-left: 4px solid #198754 !important;">
+                                                            <div class="text-success small fw-bold mb-1">CAPTURE EVIDENCE ZABBIX</div>
+                                                            <div class="d-flex flex-wrap gap-2">
+                                                                @php $zFiles = array_filter(explode(',', $t->zabbix_evidence ?? '')); @endphp
+                                                                @forelse($zFiles as $index => $zPath)
+                                                                    <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage_public/' . $zPath) }}')" class="btn btn-sm btn-outline-success rounded-pill">
+                                                                        <i class="bi bi-graph-up-arrow me-1"></i> Capture #{{ $index + 1 }}
+                                                                    </a>
+                                                                @empty
+                                                                    <span class="text-muted small">Tidak ada capture Zabbix.</span>
+                                                                @endforelse
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                     <div class="col-12">
                                                         <div class="p-2 bg-light rounded-3 mb-3 border-start border-4 border-primary">
                                                             <div class="text-muted small fw-bold px-2 mb-2">DETAIL PER PERANGKAT</div>
@@ -994,7 +1035,7 @@
                                     </div>
                                 </div>
                                 <div class="modal-footer border-0 p-3 bg-white d-flex justify-content-between">
-                                    @if($t->site && $t->site->ip_router && in_array(auth()->user()->role ?? '', ['admin', 'superadmin']))
+                                    @if($t->site && $t->site->ip_router && auth()->user()->hasAdminAccess())
                                         <button type="button" class="btn btn-outline-primary px-4 rounded-pill shadow-sm"
                                             onclick="remoteMikrotik('{{ $t->site->ip_router }}', '{{ $t->kategori }}', '{{ $t->nama_site }}', '{{ $t->site_code }}', '{{ $t->site->gateway_area }}', '{{ $t->site->hub }}')">
                                             <i class="bi bi-broadcast me-2"></i>Remote Mikrotik
@@ -1875,34 +1916,51 @@
                     });
 
                     // Paste event (from WhatsApp or clipboard)
-                    // Gunakan $(document) lalu delegasikan ke zone yang aktif untuk menghindari duplicate binding
-                    $(zone).closest('.modal').off('paste').on('paste', function(e) {
-                        // Pastikan modal ini sedang terlihat
-                        if (!$(this).hasClass('show')) return;
-                        
-                        const clipboardData = e.originalEvent.clipboardData;
-                        if (clipboardData && clipboardData.items) {
-                            const items = clipboardData.items;
-                            const files = [];
-                            for (let i = 0; i < items.length; i++) {
-                                if (items[i].type.indexOf('image') !== -1 || items[i].type.indexOf('video') !== -1) {
-                                    const blob = items[i].getAsFile();
-                                    if (blob) {
-                                        const ext = blob.type.split('/')[1] || 'png';
-                                        const file = new File([blob], `pasted-image-${Date.now()}-${i}.${ext}`, { type: blob.type });
-                                        files.push(file);
+                    // We bind paste to the window but only handle it if this zone is 'active'
+                    // An 'active' zone is the one last clicked or currently hovered
+                    $(zone).on('mouseenter', () => $(zone).addClass('zone-active'));
+                    $(zone).on('mouseleave', () => $(zone).removeClass('zone-active'));
+                    $(zone).on('click', () => {
+                        $('.evidence-drop-zone').removeClass('zone-active');
+                        $(zone).addClass('zone-active');
+                    });
+
+                    $(document).off('paste.evidence').on('paste.evidence', function(e) {
+                        const activeZone = $('.evidence-drop-zone.zone-active').first();
+                        if (activeZone.length && activeZone.closest('.modal').hasClass('show')) {
+                            const clipboardData = e.originalEvent.clipboardData;
+                            if (clipboardData && clipboardData.items) {
+                                const items = clipboardData.items;
+                                const files = [];
+                                for (let i = 0; i < items.length; i++) {
+                                    if (items[i].type.indexOf('image') !== -1 || items[i].type.indexOf('video') !== -1) {
+                                        const blob = items[i].getAsFile();
+                                        if (blob) {
+                                            const ext = blob.type.split('/')[1] || 'png';
+                                            const file = new File([blob], `pasted-image-${Date.now()}-${i}.${ext}`, { type: blob.type });
+                                            files.push(file);
+                                        }
                                     }
                                 }
-                            }
-                            if (files.length > 0) {
-                                e.preventDefault(); // Mencegah paste ke elemen lain jika gambar ditemukan
-                                addFiles(files);
+                                if (files.length > 0) {
+                                    // Trigger addFiles for the correct zone
+                                    // We need a way to call addFiles of the active zone.
+                                    // Let's store addFiles in the data of the zone.
+                                    const zoneHandler = activeZone.data('addFilesHandler');
+                                    if (zoneHandler) {
+                                        e.preventDefault();
+                                        zoneHandler(files);
+                                    }
+                                }
                             }
                         }
                     });
 
+                    // Store the handler so the global paste event can find it
+                    $(zone).data('addFilesHandler', addFiles);
+
                     // Clicking the zone triggers input click
-                    $(zone).off('click').on('click', function(e) {
+                    $(zone).on('click', function(e) {
                         if (e.target !== input && !$(e.target).closest('.preview-item').length) {
                             input.click();
                         }

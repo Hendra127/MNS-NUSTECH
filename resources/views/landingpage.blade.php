@@ -245,8 +245,7 @@
           <span class="font-bold text-[15px]">Explore Dashboard</span>
           <i class="fa-solid fa-circle-arrow-right text-[1.1rem] group-hover:translate-x-1 transition-transform"></i>
         </a>
-        <a href="http://nustech.co.id"
-          class="px-8 py-3.5 flex items-center space-x-3 group text-white no-underline"
+        <a href="http://nustech.co.id" class="px-8 py-3.5 flex items-center space-x-3 group text-white no-underline"
           style="border-radius: 9999px; border: 1px solid rgba(255,255,255,0.4); background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); transition: all 0.3s ease;"
           onmouseover="this.style.background='rgba(255,255,255,0.18)'; this.style.borderColor='rgba(255,255,255,0.7)';"
           onmouseout="this.style.background='rgba(255,255,255,0.08)'; this.style.borderColor='rgba(255,255,255,0.4)';">
@@ -287,9 +286,9 @@
               <i class="fa-solid fa-lock"></i> Manajemen Password
             </a>
             @if(Auth::check() && Auth::user()->role !== 'user')
-            <a href="{{ route('laporancm') }}" class="dropdown-item">
-              <i class="fa-solid fa-tools"></i> Corrective Maintenance
-            </a>
+              <a href="{{ route('laporancm') }}" class="dropdown-item">
+                <i class="fa-solid fa-tools"></i> Corrective Maintenance
+              </a>
             @endif
             <a href="{{ route('pmliberta') }}" class="dropdown-item">
               <i class="fa-solid fa-shield-heart"></i> Preventive Maintenance
@@ -326,56 +325,56 @@
 
         @auth
           @if(Auth::user()->role !== 'user')
-          <li class="relative group">
-          <a href="#" class="nav-link px-4 py-2 flex items-center">
-            Log Perangkat
-          </a>
-          <div
-            class="dropdown-menu absolute top-full left-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl z-50 overflow-hidden py-2 border border-blue-50">
-            <a href="{{ route('pergantianperangkat') }}" class="dropdown-item">
-              <i class="fa-solid fa-recycle"></i> Pergantian Perangkat
-            </a>
-            <a href="{{ route('logpergantian') }}" class="dropdown-item">
-              <i class="fa-solid fa-clock-rotate-left"></i> Log Pergantian
-            </a>
-            <a href="{{ route('sparetracker') }}" class="dropdown-item">
-              <i class="fa-solid fa-microchip"></i> Spare Tracker
-            </a>
-            <a href="{{ route('summaryperangkat') }}" class="dropdown-item">
-              <i class="fa-solid fa-clipboard-list"></i> PM Summary
-            </a>
-          </div>
-          @endif
-
-          @if(Auth::user()->role === 'superadmin')
-        <li class="relative group">
-          <a href="#" class="nav-link px-4 py-2 flex items-center">
-            Jadwal Piket
-          </a>
-          <div
-            class="dropdown-menu absolute top-full left-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl z-50 overflow-hidden py-2 border border-blue-50">
-            <a href="{{ route('jadwalpiket') }}" class="dropdown-item">
-              <i class="fa-solid fa-calendar-days"></i> Lihat Jadwal
-            </a>
-          </div>
-        </li>
-          @endif
-        @endauth
-
-        @auth
-          @php $role = Auth::user()->role; @endphp
-          @if ($role === 'superadmin')
             <li class="relative group">
               <a href="#" class="nav-link px-4 py-2 flex items-center">
-                SLA
+                Log Perangkat
               </a>
               <div
-                class="dropdown-menu absolute top-full left-0 mt-3 w-52 bg-white rounded-2xl shadow-2xl z-50 overflow-hidden py-2 border border-blue-50">
-                <a href="{{ url('rekap-bmn') }}" class="dropdown-item">
-                  <i class="fa-solid fa-file-export"></i> Rekap BMN
+                class="dropdown-menu absolute top-full left-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl z-50 overflow-hidden py-2 border border-blue-50">
+                <a href="{{ route('pergantianperangkat') }}" class="dropdown-item">
+                  <i class="fa-solid fa-recycle"></i> Pergantian Perangkat
                 </a>
-                <a href="{{ url('rekap-sl') }}" class="dropdown-item">
-                  <i class="fa-solid fa-file-contract"></i> Rekap SL
+                <a href="{{ route('logpergantian') }}" class="dropdown-item">
+                  <i class="fa-solid fa-clock-rotate-left"></i> Log Pergantian
+                </a>
+                <a href="{{ route('sparetracker') }}" class="dropdown-item">
+                  <i class="fa-solid fa-microchip"></i> Spare Tracker
+                </a>
+                <a href="{{ route('summaryperangkat') }}" class="dropdown-item">
+                  <i class="fa-solid fa-clipboard-list"></i> PM Summary
+                </a>
+              </div>
+          @endif
+
+            @if(Auth::user()->role !== 'user')
+              <li class="relative group">
+                <a href="#" class="nav-link px-4 py-2 flex items-center">
+                  Pengajuan
+                </a>
+                <div
+                  class="dropdown-menu absolute top-full left-0 mt-3 w-60 bg-white rounded-2xl shadow-2xl z-50 overflow-hidden py-2 border border-blue-50">
+                  <a href="{{ route('csr.index') }}" class="dropdown-item">
+                    <i class="fa-solid fa-file-invoice-dollar"></i> Pengajuan CSR
+                  </a>
+                  <a href="{{ route('cm.index') }}" class="dropdown-item">
+                    <i class="fa-solid fa-screwdriver-wrench"></i> Pengajuan CM
+                  </a>
+                  <a href="{{ route('sparepart_needed') }}" class="dropdown-item">
+                    <i class="fa-solid fa-gears"></i> Pengajuan Perangkat
+                  </a>
+                </div>
+              </li>
+            @endif
+
+          @if(Auth::user()->hasAdminAccess())
+            <li class="relative group">
+              <a href="#" class="nav-link px-4 py-2 flex items-center">
+                Jadwal Piket
+              </a>
+              <div
+                class="dropdown-menu absolute top-full left-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl z-50 overflow-hidden py-2 border border-blue-50">
+                <a href="{{ route('jadwalpiket') }}" class="dropdown-item">
+                  <i class="fa-solid fa-calendar-days"></i> Lihat Jadwal
                 </a>
               </div>
             </li>
@@ -385,9 +384,6 @@
         <li><a href="{{ route('todolist') }}" class="nav-link px-4 py-2">To Do List</a></li>
 
         @auth
-          @if (Auth::user()->role === 'superadmin')
-            <li><a href="{{ url('users') }}" class="nav-link px-4 py-2 text-cyan-200 hover:text-cyan-400">Users</a></li>
-          @endif
 
           <div class="h-6 w-px bg-white/20 mx-2"></div>
 
@@ -427,8 +423,8 @@
         <li><a href="{{ route('datasite') }}" class="block px-3 py-2 border-b border-gray-50">Data Site</a></li>
         <li><a href="{{ route('datapas') }}" class="block px-3 py-2 border-b border-gray-50">Manajemen Password</a></li>
         @if(Auth::check() && Auth::user()->role !== 'user')
-        <li><a href="{{ route('laporancm') }}" class="block px-3 py-2 border-b border-gray-50">Corrective
-            Maintenance</a></li>
+          <li><a href="{{ route('laporancm') }}" class="block px-3 py-2 border-b border-gray-50">Corrective
+              Maintenance</a></li>
         @endif
         <li><a href="{{ route('pmliberta') }}" class="block px-3 py-2 border-b border-gray-50">Preventive
             Maintenance</a></li>
@@ -444,32 +440,36 @@
 
         @auth
           @if(Auth::user()->role !== 'user')
-          <!-- Log Perangkat -->
-          <li class="font-bold px-3 pt-4 text-blue-600 text-sm">LOG PERANGKAT</li>
-          <li><a href="{{ route('pergantianperangkat') }}" class="block px-3 py-2 border-b border-gray-50">Pergantian
-              Perangkat</a></li>
-          <li><a href="{{ route('logpergantian') }}" class="block px-3 py-2 border-b border-gray-50">Log Pergantian</a>
-          </li>
-          <li><a href="{{ route('sparetracker') }}" class="block px-3 py-2 border-b border-gray-50">Spare Tracker</a></li>
-          <li><a href="{{ route('summaryperangkat') }}" class="block px-3 py-2 border-b border-gray-50">PM Summary</a>
-          </li>
+            <!-- Log Perangkat -->
+            <li class="font-bold px-3 pt-4 text-blue-600 text-sm">LOG PERANGKAT</li>
+            <li><a href="{{ route('pergantianperangkat') }}" class="block px-3 py-2 border-b border-gray-50">Pergantian
+                Perangkat</a></li>
+            <li><a href="{{ route('logpergantian') }}" class="block px-3 py-2 border-b border-gray-50">Log Pergantian</a>
+            </li>
+            <li><a href="{{ route('sparetracker') }}" class="block px-3 py-2 border-b border-gray-50">Spare Tracker</a></li>
+            <li><a href="{{ route('summaryperangkat') }}" class="block px-3 py-2 border-b border-gray-50">PM Summary</a>
+            </li>
 
-          @if(Auth::user()->role === 'superadmin')
-          <!-- Operasional -->
-          <li class="font-bold px-3 pt-4 text-blue-600 text-sm">LAINNYA</li>
-          <li><a href="{{ route('jadwalpiket') }}" class="block px-3 py-2 border-b border-gray-50">Jadwal Piket</a></li>
-          @endif
+            @if(Auth::user()->hasAdminAccess())
+              <!-- Operasional -->
+              <li class="font-bold px-3 pt-4 text-blue-600 text-sm">LAINNYA</li>
+              <li><a href="{{ route('jadwalpiket') }}" class="block px-3 py-2 border-b border-gray-50">Jadwal Piket</a></li>
+            @endif
           @endif
         @endauth
-        <li><a href="{{ route('todolist') }}" class="block px-3 py-2 border-b border-gray-50">To Do List</a></li>
 
         @auth
-          @if (Auth::user()->role === 'superadmin')
-            <li class="font-bold px-3 pt-4 text-slate-500 text-sm">SLA / REPORT</li>
-            <li><a href="{{ url('rekap-bmn') }}" class="block px-3 py-2 border-b border-gray-50">Rekap BMN</a></li>
-            <li><a href="{{ url('rekap-sl') }}" class="block px-3 py-2 border-b border-gray-50">Rekap SL</a></li>
+          @if(Auth::user()->role !== 'user')
+            <!-- Pengajuan -->
+            <li class="font-bold px-3 pt-4 text-blue-600 text-sm">PENGAJUAN</li>
+            <li><a href="{{ route('csr.index') }}" class="block px-3 py-2 border-b border-gray-50">Pengajuan CSR</a></li>
+            <li><a href="{{ route('cm.index') }}" class="block px-3 py-2 border-b border-gray-50">Pengajuan CM</a></li>
+            <li><a href="{{ route('sparepart_needed') }}" class="block px-3 py-2 border-b border-gray-50">Sparepart
+                Needed</a></li>
           @endif
         @endauth
+
+        <li><a href="{{ route('todolist') }}" class="block px-3 py-2 border-b border-gray-50">To Do List</a></li>
 
         @auth
           <li class="mt-4"><a href="{{ route('profile.edit') }}"

@@ -476,7 +476,7 @@
             document.addEventListener('DOMContentLoaded', () => {
                 showInstallButton();
                 initDarkMode();
-                @if(in_array(auth()->user()->role, ['admin', 'superadmin']))
+                @if(auth()->user()->hasAdminAccess())
                 initNotificationBell();
                 @endif
                 initNavLogo();
@@ -487,7 +487,7 @@
         } else {
             showInstallButton();
             initDarkMode();
-            @if(in_array(auth()->user()->role, ['admin', 'superadmin']))
+            @if(auth()->user()->hasAdminAccess())
             initNotificationBell();
             @endif
             initNavLogo();

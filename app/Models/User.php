@@ -20,6 +20,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone',
         'password',
         'is_admin',
         'role',
@@ -50,5 +51,10 @@ class User extends Authenticatable
             'last_seen_at' => 'datetime',
             'is_online' => 'boolean',
         ];
+    }
+
+    public function hasAdminAccess()
+    {
+        return in_array($this->role, ['admin', 'superadmin', 'noc_leader', 'manager', 'accounting', 'direktur', 'penasihat']);
     }
 }

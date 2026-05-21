@@ -138,7 +138,9 @@ class OpenTicketController extends Controller
             $data['hardware_problem'] = implode(',', $data['hardware_problem']);
         }
 
-        // Handle File Upload (Support Multiple)
+
+
+        // Handle File Upload (Support Multiple for General Evidence)
         $files = $request->file('evidence');
         if ($files) {
             if (!is_array($files)) {
@@ -209,6 +211,8 @@ class OpenTicketController extends Controller
         $ticket->plan_actions    = $request->plan_actions;
         $ticket->ce             = $request->ce;
         
+
+
         // Handle File Upload (Append Multiple)
         $files = $request->file('evidence');
         if ($files) {
@@ -247,9 +251,21 @@ class OpenTicketController extends Controller
             'tanggal_close' => 'required|date',
             'detail_problem' => 'required',
             'plan_actions' => 'required',
+            'zabbix_evidence' => 'nullable|array',
+            'zabbix_evidence.*' => 'file|mimes:jpg,jpeg,png,mp4,mov,avi|max:20480',
         ]);
 
         $ticket = Ticket::findOrFail($id);
+
+        // Handle Zabbix Evidence
+        $zabbixFiles = $request->file('zabbix_evidence');
+        if ($zabbixFiles) {
+            $zabbixPaths = [];
+            foreach ($zabbixFiles as $file) {
+                $zabbixPaths[] = $file->store('zabbix_evidence', 'public');
+            }
+            $ticket->zabbix_evidence = implode(',', $zabbixPaths);
+        }
 
         $tanggalOpen = \Carbon\Carbon::parse($ticket->tanggal_rekap);
         $tanggalClose = \Carbon\Carbon::parse($request->tanggal_close);

@@ -23,6 +23,7 @@ class Ticket extends Model
                 'plan_actions',
                 'ce',
                 'durasi_akhir',
+                'zabbix_evidence',
     ];
 
     public function site()

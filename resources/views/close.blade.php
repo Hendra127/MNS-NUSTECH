@@ -189,7 +189,7 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-3">
-            @if(auth()->check() && auth()->user()->role === 'superadmin')
+            @if(auth()->check() && auth()->user()->hasAdminAccess())
                 <a href="{{ route('setting.index') }}" class="text-white opacity-75 hover-opacity-100" title="Settings">
                     <i class="bi bi-gear-fill" style="font-size: 1.3rem;"></i>
                 </a>
@@ -350,7 +350,7 @@
                             </th>
                             <th class="text-center">STATUS</th>
                             <th class="text-center">CE</th>
-                            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                            @if(auth()->check() && auth()->user()->hasAdminAccess())
                                 <th class="text-center sticky-col-right">AKSI</th>
                             @elseif(auth()->check() && auth()->user()->role === 'user')
                                 <th class="text-center sticky-col-right">INFO</th>
@@ -371,7 +371,7 @@
                                 <td class="text-center">{{ number_format($t->durasi, 0) }} Hari</td>
                                 <td class="text-center"><span class="status-badge">CLOSED</span></td>
                                 <td class="text-center">{{ $t->ce }}</td>
-                                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                                @if(auth()->check() && auth()->user()->hasAdminAccess())
                                     <td class="text-center sticky-col-right">
                                         <button class="btn btn-sm bi bi-pencil" data-bs-toggle="modal"
                                             data-bs-target="#modalEditTicket{{ $t->id }}">
@@ -387,7 +387,7 @@
                                         <button type="button" class="btn btn-sm bi bi-info-circle" data-bs-toggle="modal"
                                             data-bs-target="#modalInfo{{ $t->id }}">
                                         </button>
-                                        @if($t->site && $t->site->ip_router && in_array(auth()->user()->role ?? '', ['admin', 'superadmin']))
+                                        @if($t->site && $t->site->ip_router && auth()->user()->hasAdminAccess())
                                             <button type="button" class="btn btn-sm btn-remote-action" title="Remote Mikrotik"
                                                 onclick="remoteMikrotik('{{ $t->site->ip_router }}', '{{ $t->kategori }}', '{{ $t->nama_site }}', '{{ $t->site_code }}', '{{ $t->site->gateway_area }}', '{{ $t->site->hub }}')">
                                                 <i class="bi bi-broadcast"></i>
@@ -615,7 +615,7 @@
                         </div>
                     </div>
                     <div class="modal-footer border-0 p-3 bg-white d-flex justify-content-between">
-                        @if($t->site && $t->site->ip_router && in_array(auth()->user()->role ?? '', ['admin', 'superadmin']))
+                        @if($t->site && $t->site->ip_router && auth()->user()->hasAdminAccess())
                             <button type="button" class="btn btn-outline-primary px-4 rounded-pill shadow-sm"
                                 onclick="remoteMikrotik('{{ $t->site->ip_router }}', '{{ $t->kategori }}', '{{ $t->nama_site }}', '{{ $t->site_code }}', '{{ $t->site->gateway_area }}', '{{ $t->site->hub }}')">
                                 <i class="bi bi-broadcast me-2"></i>Remote Mikrotik
@@ -940,3 +940,4 @@
 </body>
 
 </html>
+

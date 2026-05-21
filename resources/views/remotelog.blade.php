@@ -425,7 +425,7 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-3">
-            @if(auth()->check() && auth()->user()->role === 'superadmin')
+            @if(auth()->check() && auth()->user()->hasAdminAccess())
                 <a href="{{ route('setting.index') }}" class="text-white opacity-75 hover-opacity-100" title="Settings">
                     <i class="bi bi-gear-fill" style="font-size: 1.3rem;"></i>
                 </a>
@@ -465,7 +465,7 @@
     <div class="tabs-section">
         <a href="{{ url('/todolist') }}" class="tab {{ request()->is('todolist*') ? 'active' : '' }}"
             style="text-decoration: none;">To Do List</a>
-        @if(auth()->check() && auth()->user()->role === 'superadmin')
+        @if(auth()->check() && auth()->user()->hasAdminAccess())
             <a href="{{ route('jadwalpiket') }}" class="tab {{ request()->is('jadwalpiket*') ? 'active' : '' }}"
                 style="text-decoration: none;">Jadwal Piket</a>
             <a href="{{ route('remotelog') }}" class="tab {{ request()->is('remote-log*') ? 'active' : '' }}"

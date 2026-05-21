@@ -578,6 +578,36 @@
             border-color: #cbd5e1;
         }
 
+        .role-noc_leader {
+            background: #fdf2f8;
+            color: #9d174d;
+            border-color: #fbcfe8;
+        }
+
+        .role-manager {
+            background: #ecfdf5;
+            color: #065f46;
+            border-color: #6ee7b7;
+        }
+
+        .role-accounting {
+            background: #fffbeb;
+            color: #92400e;
+            border-color: #fcd34d;
+        }
+
+        .role-direktur {
+            background: #f5f3ff;
+            color: #5b21b6;
+            border-color: #ddd6fe;
+        }
+
+        .role-penasihat {
+            background: #f0f9ff;
+            color: #075985;
+            border-color: #7dd3fc;
+        }
+
         .btn-action-premium {
             width: 42px;
             height: 42px;
@@ -721,7 +751,7 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-3">
-            @if(auth()->user()->role === 'superadmin')
+            @if(auth()->user()->hasAdminAccess())
                 <a href="{{ route('setting.index') }}" class="text-white opacity-75 hover-opacity-100" title="Settings">
                     <i class="bi bi-gear-fill" style="font-size: 1.3rem;"></i>
                 </a>
@@ -812,10 +842,14 @@
 
                     <select name="role" class="select-luxury" onchange="this.form.submit()">
                         <option value="">Role</option>
-                        <option value="superadmin" {{ request('role') == 'superadmin' ? 'selected' : '' }}>Superadmin
-                        </option>
+                        <option value="superadmin" {{ request('role') == 'superadmin' ? 'selected' : '' }}>Superadmin</option>
                         <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
                         <option value="user" {{ request('role') == 'user' ? 'selected' : '' }}>User</option>
+                        <option value="noc_leader" {{ request('role') == 'noc_leader' ? 'selected' : '' }}>NOC Leader</option>
+                        <option value="manager" {{ request('role') == 'manager' ? 'selected' : '' }}>Manager</option>
+                        <option value="accounting" {{ request('role') == 'accounting' ? 'selected' : '' }}>Accounting</option>
+                        <option value="direktur" {{ request('role') == 'direktur' ? 'selected' : '' }}>Direktur</option>
+                        <option value="penasihat" {{ request('role') == 'penasihat' ? 'selected' : '' }}>Penasihat</option>
                     </select>
 
                     <button type="submit" class="btn-filter-luxury">
@@ -839,7 +873,7 @@
                         <tr>
                             <th>Identitas User</th>
                             <th>Role / Akses</th>
-                            <th>Kontak Email</th>
+                            <th>Kontak</th>
                             <th class="text-end">Kelola</th>
                         </tr>
                     </thead>
@@ -886,16 +920,21 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <div class="text-navy fw-semibold opacity-75">{{ $user->email }}</div>
+                                    <div class="text-navy fw-semibold opacity-75"><i class="bi bi-envelope me-1"></i> {{ $user->email }}</div>
+                                    @if($user->phone)
+                                        <div class="text-success fw-semibold opacity-75"><i class="bi bi-whatsapp me-1"></i> {{ $user->phone }}</div>
+                                    @else
+                                        <div class="text-muted small opacity-50"><i class="bi bi-whatsapp me-1"></i> Belum diset</div>
+                                    @endif
                                     @if($user->is_online)
-                                        <div class="text-success small fw-bold"><i class="bi bi-activity me-1"></i> Sedang Aktif
+                                        <div class="text-success small fw-bold mt-1"><i class="bi bi-activity me-1"></i> Sedang Aktif
                                         </div>
                                     @elseif($user->last_seen_at)
-                                        <div class="text-muted small"><i class="bi bi-eye me-1"></i> Terakhir terlihat
+                                        <div class="text-muted small mt-1"><i class="bi bi-eye me-1"></i> Terakhir terlihat
                                             {{ $user->last_seen_at->diffForHumans() }}
                                         </div>
                                     @else
-                                        <div class="text-muted small"><i class="bi bi-clock me-1"></i> Bergabung
+                                        <div class="text-muted small mt-1"><i class="bi bi-clock me-1"></i> Bergabung
                                             {{ $user->created_at->diffForHumans() }}
                                         </div>
                                     @endif
@@ -949,6 +988,11 @@
                                 placeholder="john@example.com">
                         </div>
                         <div class="mb-4">
+                            <label class="form-label small fw-bold text-navy"><i class="bi bi-whatsapp me-1"></i> No. WhatsApp</label>
+                            <input type="text" name="phone" class="form-control form-control-premium"
+                                placeholder="Ex: 081234567890 atau 6281234567890">
+                        </div>
+                        <div class="mb-4">
                             <label class="form-label small fw-bold text-navy"><i class="bi bi-key me-1"></i>
                                 Password</label>
                             <input type="password" name="password" class="form-control form-control-premium" required
@@ -961,6 +1005,11 @@
                                 <option value="user">User</option>
                                 <option value="admin">Admin</option>
                                 <option value="superadmin">Superadmin</option>
+                                <option value="noc_leader">NOC Leader</option>
+                                <option value="manager">Manager</option>
+                                <option value="accounting">Accounting</option>
+                                <option value="direktur">Direktur</option>
+                                <option value="penasihat">Penasihat</option>
                             </select>
                         </div>
                     </div>
@@ -999,6 +1048,11 @@
                                 required>
                         </div>
                         <div class="mb-4">
+                            <label class="form-label small fw-bold text-navy"><i class="bi bi-whatsapp me-1"></i> No. WhatsApp</label>
+                            <input type="text" name="phone" id="edit_phone" class="form-control form-control-premium"
+                                placeholder="Ex: 081234567890 atau 6281234567890">
+                        </div>
+                        <div class="mb-4">
                             <label class="form-label small fw-bold text-navy"><i class="bi bi-key me-1"></i> Password
                                 <span class="opacity-50 fw-normal">(Opsional)</span></label>
                             <input type="password" name="password" class="form-control form-control-premium"
@@ -1011,6 +1065,11 @@
                                 <option value="user">User</option>
                                 <option value="admin">Admin</option>
                                 <option value="superadmin">Superadmin</option>
+                                <option value="noc_leader">NOC Leader</option>
+                                <option value="manager">Manager</option>
+                                <option value="accounting">Accounting</option>
+                                <option value="direktur">Direktur</option>
+                                <option value="penasihat">Penasihat</option>
                             </select>
                         </div>
                     </div>
@@ -1030,6 +1089,7 @@
             form.action = `/setting/update/${user.id}`;
             document.getElementById('edit_name').value = user.name;
             document.getElementById('edit_email').value = user.email;
+            document.getElementById('edit_phone').value = user.phone || '';
             document.getElementById('edit_role').value = user.role;
             new bootstrap.Modal(document.getElementById('editUserModal')).show();
         }

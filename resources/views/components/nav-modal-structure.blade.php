@@ -19,7 +19,7 @@
                 <ul>
                     <li><a href="{{ route('datasite') }}"><i class="bi bi-geo-alt me-2"></i> Data Site</a></li>
                     <li><a href="{{ route('datapas') }}"><i class="bi bi-shield-lock me-2"></i> Manajemen Password</a></li>
-                    @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                    @if(auth()->check() && auth()->user()->hasAdminAccess())
                         <li><a href="{{ route('laporancm') }}"><i class="bi bi-tools me-2"></i> Correctiv Maintenance</a></li>
                     @endif
                     <li><a href="{{ route('pmliberta') }}"><i class="bi bi-shield-check me-2"></i> Preventive Maintenance</a></li>
@@ -42,13 +42,13 @@
             </div>
 
             <!-- GROUP 3: LOG & TRACKER -->
-            @if(auth()->check() && auth()->user()->role !== 'user')
+            @if(auth()->check() && auth()->user()->hasAdminAccess())
             <div class="nav-column">
                 <div class="column-header">
                     <div class="icon-box purple"><i class="bi bi-gear-wide-connected"></i></div>
                     <h3>Log Perangkat</h3>
                 </div>
-                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                @if(auth()->check() && auth()->user()->hasAdminAccess())
                 <ul>
                     <li><a href="{{ route('pergantianperangkat') }}"><i class="bi bi-arrow-repeat me-2"></i> Pergantian Perangkat</a></li>
                     <li><a href="{{ route('logpergantian') }}"><i class="bi bi-journal-text me-2"></i> Log Pergantian</a></li>
@@ -62,7 +62,6 @@
                 @endif
             </div>
             @endif
-
             <!-- GROUP 4: PROJECT MANAGEMENT -->
             <div class="nav-column">
                 <div class="column-header">
@@ -71,13 +70,26 @@
                 </div>
                 <ul>
                     <li><a href="{{ route('todolist') }}"><i class="bi bi-check2-square me-2"></i> My Todo List</a></li>
-                    @if(auth()->check() && auth()->user()->role === 'superadmin')
+                    @if(auth()->check() && auth()->user()->hasAdminAccess())
                         <li><a href="{{ route('jadwalpiket') }}"><i class="bi bi-calendar-event me-2"></i> Jadwal Piket</a></li>
                         <li><a href="{{ route('remotelog') }}"><i class="bi bi-shield-lock me-2"></i> Log Remote</a></li>
+                        <li><a href="{{ route('admin.home') }}"><i class="bi bi-sliders me-2"></i> Kelola Landing Page</a></li>
                     @endif
                 </ul>
             </div>
-            
+
+            <!-- GROUP 5: APPROVAL WORKFLOW -->
+            <div class="nav-column">
+                <div class="column-header">
+                    <div class="icon-box orange"><i class="bi bi-patch-check"></i></div>
+                    <h3>Pengajuan Dana</h3>
+                </div>
+                <ul>
+                    <li><a href="{{ route('sparepart_needed') }}"><i class="bi bi-tools me-2"></i> Pengajuan Perangkat</a></li>
+                    <li><a href="{{ route('csr.index') }}"><i class="bi bi-file-earmark-medical me-2"></i> Pengajuan CSR</a></li>
+                    <li><a href="{{ route('cm.index') }}"><i class="bi bi-file-earmark-check me-2"></i> Pengajuan CM</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>

@@ -724,15 +724,15 @@
                       id="loginForm">
                     @csrf
 
-                    <!-- Username / Email -->
+                    <!-- Email -->
                     <div class="group">
-                        <label class="form-label">Username</label>
+                        <label class="form-label">Email</label>
                         <div class="input-group">
                             <div class="icon-circle" id="userIcon">
                                 <i class="fas fa-user" id="userIconInner"></i>
                             </div>
                             <input type="email" name="email"
-                                id="usernameInput"
+                                id="emailInput"
                                 class="cyber-input"
                                 placeholder="email@example.com"
                                 value="{{ old('email') }}"

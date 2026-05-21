@@ -452,7 +452,7 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-3">
-            @if(auth()->check() && auth()->user()->role === 'superadmin')
+            @if(auth()->check() && auth()->user()->hasAdminAccess())
                 <a href="{{ route('setting.index') }}" class="text-white opacity-75 hover-opacity-100" title="Settings">
                     <i class="bi bi-gear-fill" style="font-size: 1.3rem;"></i>
                 </a>
@@ -494,7 +494,7 @@
             style="text-decoration: none;">All Sites</a>
         <a href="{{ route('datapas') }}" class="tab {{ request()->is('datapass*') ? 'active' : '' }}"
             style="text-decoration: none;">Management Password</a>
-        @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+        @if(auth()->check() && auth()->user()->hasAdminAccess())
             <a href="{{ route('laporancm') }}" class="tab {{ request()->is('laporancm*') ? 'active' : '' }}"
                 style="text-decoration: none;">Correctiv Maintenance</a>
         @endif
@@ -514,7 +514,7 @@
         <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3"
             style="margin-bottom: 20px;">
             <div class="actions flex-shrink-0">
-                @if(auth()->check())
+                @if(auth()->check() && auth()->user()->hasAdminAccess())
                     <button type="button" class="btn-action bi bi-plus" title="Tambah Data" data-bs-toggle="modal"
                         data-bs-target="#modalTambah"></button>
                     <form action="{{ route('pmliberta.import') }}" method="POST" enctype="multipart/form-data"
@@ -613,9 +613,9 @@
                         <th>STATUS</th>
                         <th>KATEGORI</th>
                         <th>FILE PM</th>
-                        @if(auth()->check())
+                        @if(auth()->check() && auth()->user()->hasAdminAccess())
                             <th class="sticky-col-right">AKSI</th>
-                        @elseif(auth()->check() && auth()->user()->role === 'user')
+                        @else
                             <th class="sticky-col-right">INFO</th>
                         @endif
                     </tr>
@@ -664,10 +664,10 @@
                                 <span class="text-muted small">No File</span>
                             @endif
                         </td>
-                        @if(auth()->check())
+                        @if(auth()->check() && auth()->user()->hasAdminAccess())
                             <td class="text-center sticky-col-right">
                                 <div class="btn-group btn-group-sm">
-                                    @if(!(auth()->user()->role === 'admin' && strtoupper($item->status ?: 'PENDING') === 'DONE'))
+                                    @if(!(auth()->user()->hasAdminAccess() && strtoupper($item->status ?: 'PENDING') === 'DONE'))
                                         <button type="button" class="btn bi bi-pencil btn-edit" data-id="{{ $item->id }}"
                                             data-site_id="{{ $item->site_id }}" data-nama_lokasi="{{ $item->nama_lokasi }}"
                                             data-provinsi="{{ $item->provinsi }}" data-kabupaten="{{ $item->kabupaten }}"
@@ -691,7 +691,7 @@
                                     @endif
                                 </div>
                             </td>
-                        @elseif(auth()->check() && auth()->user()->role === 'user')
+                        @else
                             <td class="text-center sticky-col-right">
                                 <button type="button" class="btn btn-sm bi bi-info-circle btn-info-pm"
                                     data-id="{{ $item->id }}"
@@ -777,7 +777,7 @@
                             <div class="col-md-6">
                                 <label class="form-label">Status</label>
                                 <select name="status" id="edit_status" class="form-select">
-                                    @if(auth()->user()->role !== 'admin')
+                                    @if(auth()->user()->hasAdminAccess())
                                         <option value="DONE">DONE</option>
                                         <option value="PENDING">PENDING</option>
                                         <option value="ON PROGRESS">ON PROGRESS</option>

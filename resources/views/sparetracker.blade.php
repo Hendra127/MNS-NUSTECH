@@ -153,7 +153,7 @@
             </a>
         </div>
         <div class="d-flex align-items-center gap-3">
-            @if(auth()->check() && auth()->user()->role === 'superadmin')
+            @if(auth()->check() && auth()->user()->hasAdminAccess())
                 <a href="{{ route('setting.index') }}" class="text-white opacity-75 hover-opacity-100" title="Settings">
                     <i class="bi bi-gear-fill" style="font-size: 1.3rem;"></i>
                 </a>
@@ -199,7 +199,7 @@
     <div class="content-container">
         <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3" style="margin-bottom: 20px;">
             <div class="actions flex-shrink-0">
-                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                @if(auth()->check() && auth()->user()->hasAdminAccess())
                     <button type="button" class="btn-action bi bi-plus" title="Tambah Data" data-bs-toggle="modal" data-bs-target="#modalTambahSpare"></button>
                     <!-- Form Import -->
                     <form action="{{ route('sparetracker.import') }}" method="POST" enctype="multipart/form-data" id="importForm" class="m-0">
@@ -380,7 +380,7 @@
                     <th>KABUPATEN</th>
                     <th>LAYANAN AI</th>
                     <th>KETERANGAN</th>
-                    @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                    @if(auth()->check() && auth()->user()->hasAdminAccess())
                         <th class="sticky-col-right">AKSI</th>
                     @endif
                 </tr>
@@ -414,7 +414,7 @@
                     <td>{{ $item->kabupaten }}</td>
                     <td>{{ $item->layanan_ai }}</td>
                     <td>{{ $item->keterangan }}</td>
-                    @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin']))
+                    @if(auth()->check() && auth()->user()->hasAdminAccess())
                     <td class="text-center sticky-col-right">
                         <div class="d-flex gap-2 justify-content-center align-items-center">
                             <button class="btn btn-sm bi bi-pencil text-dark p-0 border-0 shadow-none" 
@@ -560,4 +560,5 @@
 </div>
 </body>
 </html>
+
 
