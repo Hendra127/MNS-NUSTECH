@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('pmliberta', 'file_pm')) {
-            Schema::table('pmliberta', function (Blueprint $table) {
-                $table->string('file_pm')->nullable()->after('kategori');
-            });
-        }
+        Schema::table('home_news', function (Blueprint $table) {
+            $table->enum('type', ['instagram', 'general'])->default('instagram')->after('id');
+        });
     }
 
     /**
@@ -23,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('pmliberta', function (Blueprint $table) {
-            $table->dropColumn('file_pm');
+        Schema::table('home_news', function (Blueprint $table) {
+            $table->dropColumn('type');
         });
     }
 };

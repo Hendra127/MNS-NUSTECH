@@ -377,7 +377,7 @@
                                     <div class="sign-img">
                                         @if($csr->ttd_pemohon && $withTtd)
                                             @php
-                                                $ttdUrl = str_replace('storage/', 'storage_public/', $csr->ttd_pemohon);
+                                                $ttdUrl = str_replace('storage/', 'storage/', $csr->ttd_pemohon);
                                             @endphp
                                             <img src="{{ asset($ttdUrl) }}" alt="TTD Pemohon">
                                         @endif
@@ -391,7 +391,7 @@
                                     <div class="sign-img">
                                         @if($csr->ttd_manager && $withTtd)
                                             @php
-                                                $ttdUrl = str_replace('storage/', 'storage_public/', $csr->ttd_manager);
+                                                $ttdUrl = str_replace('storage/', 'storage/', $csr->ttd_manager);
                                             @endphp
                                             <img src="{{ asset($ttdUrl) }}" alt="TTD Manager">
                                         @endif
@@ -405,7 +405,7 @@
                                     <div class="sign-img sign-accounting">
                                         @if($csr->ttd_accounting && $withTtd)
                                             @php
-                                                $ttdUrl = str_replace('storage/', 'storage_public/', $csr->ttd_accounting);
+                                                $ttdUrl = str_replace('storage/', 'storage/', $csr->ttd_accounting);
                                             @endphp
                                             <img src="{{ asset($ttdUrl) }}" alt="TTD Accounting">
                                         @endif
@@ -419,7 +419,7 @@
                                     <div class="sign-img sign-direktur">
                                         @if($csr->ttd_direktur && $withTtd)
                                             @php
-                                                $ttdUrl = str_replace('storage/', 'storage_public/', $csr->ttd_direktur);
+                                                $ttdUrl = str_replace('storage/', 'storage/', $csr->ttd_direktur);
                                             @endphp
                                             <img src="{{ asset($ttdUrl) }}" alt="TTD Direktur">
                                         @endif
@@ -436,7 +436,7 @@
                                     <div class="sign-img">
                                         @if($csr->ttd_penasihat && $withTtd)
                                             @php
-                                                $ttdUrl = str_replace('storage/', 'storage_public/', $csr->ttd_penasihat);
+                                                $ttdUrl = str_replace('storage/', 'storage/', $csr->ttd_penasihat);
                                             @endphp
                                             <img src="{{ asset($ttdUrl) }}" alt="TTD Penasihat">
                                         @endif

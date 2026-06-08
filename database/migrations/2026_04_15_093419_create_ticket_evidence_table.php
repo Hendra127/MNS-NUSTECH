@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ticket_evidences', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('ticket_id')->constrained()->onDelete('cascade');
-            $table->string('path');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('ticket_evidences')) {
+            Schema::create('ticket_evidences', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('ticket_id')->constrained()->onDelete('cascade');
+                $table->string('path');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

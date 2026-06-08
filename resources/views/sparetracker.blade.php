@@ -161,7 +161,7 @@
             <div class="user-profile-wrapper" style="position: relative;">
                 <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
                         @if(auth()->check() && auth()->user()->photo)
-                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                            <img src="{{ asset('storage/' . auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                         @else
                             <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
                         @endif

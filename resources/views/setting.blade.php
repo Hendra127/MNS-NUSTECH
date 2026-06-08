@@ -760,7 +760,7 @@
                 <div class="user-profile-icon" id="profileDropdownTrigger"
                     style="cursor: pointer; text-decoration: none; color: inherit;">
                     @if(auth()->user()->photo)
-                        <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
+                        <img src="{{ asset('storage/' . auth()->user()->photo) }}" alt="Profile"
                             style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                     @else
                         <i class="bi bi-person-circle" style="font-size: 1.5rem; color: white;"></i>
@@ -884,7 +884,7 @@
                                     <div class="user-info">
                                         <div class="user-avatar-premium">
                                             @if($user->photo)
-                                                <img src="{{ asset('storage_public/' . $user->photo) }}" alt="Profile">
+                                                <img src="{{ asset('storage/' . $user->photo) }}" alt="Profile">
                                             @else
                                                 <div class="placeholder"><i class="bi bi-person text-navy"></i></div>
                                             @endif

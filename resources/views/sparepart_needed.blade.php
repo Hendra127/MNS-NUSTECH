@@ -231,7 +231,7 @@
             <div class="user-profile-wrapper" style="position: relative;">
                 <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
                     @if(auth()->check() && auth()->user()->photo)
-                        <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
+                        <img src="{{ asset('storage/' . auth()->user()->photo) }}" alt="Profile"
                             style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                     @else
                         <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
@@ -481,7 +481,7 @@
                                                 <div class="d-flex flex-column align-items-center">
                                                     <a href="javascript:void(0)" onclick="showImage(this.querySelector('img').src)">
                                                         <img src="{{ asset('storage/' . $path) }}"
-                                                            onerror="this.onerror=null; this.src='{{ asset('storage_public/' . $path) }}';"
+                                                            onerror="this.onerror=null; this.src='{{ asset('storage/' . $path) }}';"
                                                             alt="{{ $label }}"
                                                             style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #ddd; transition: transform 0.2s;"
                                                             onmouseover="this.style.transform='scale(1.1)'"
@@ -631,7 +631,7 @@
                                                             @if($item->foto_resi)
                                                                 <div class="mb-2">
                                                                     <img src="{{ asset('storage/' . $item->foto_resi) }}"
-                                                                        onerror="this.onerror=null; this.src='{{ asset('storage_public/' . $item->foto_resi) }}';"
+                                                                        onerror="this.onerror=null; this.src='{{ asset('storage/' . $item->foto_resi) }}';"
                                                                         alt="Resi"
                                                                         style="height: 60px; border-radius: 6px; border: 1px solid #ddd; object-fit: cover;">
                                                                 </div>
@@ -646,7 +646,7 @@
                                                             @if($item->foto_terpasang)
                                                                 <div class="mb-2">
                                                                     <img src="{{ asset('storage/' . $item->foto_terpasang) }}"
-                                                                        onerror="this.onerror=null; this.src='{{ asset('storage_public/' . $item->foto_terpasang) }}';"
+                                                                        onerror="this.onerror=null; this.src='{{ asset('storage/' . $item->foto_terpasang) }}';"
                                                                         alt="Terpasang"
                                                                         style="height: 60px; border-radius: 6px; border: 1px solid #ddd; object-fit: cover;">
                                                                 </div>
@@ -664,7 +664,7 @@
                                                             @if($item->foto_sn)
                                                                 <div class="mb-2">
                                                                     <img src="{{ asset('storage/' . $item->foto_sn) }}"
-                                                                        onerror="this.onerror=null; this.src='{{ asset('storage_public/' . $item->foto_sn) }}';"
+                                                                        onerror="this.onerror=null; this.src='{{ asset('storage/' . $item->foto_sn) }}';"
                                                                         alt="SN"
                                                                         style="height: 60px; border-radius: 6px; border: 1px solid #ddd; object-fit: cover;">
                                                                 </div>
@@ -679,7 +679,7 @@
                                                             @if($item->photo)
                                                                 <div class="mb-2">
                                                                     <img src="{{ asset('storage/' . $item->photo) }}"
-                                                                        onerror="this.onerror=null; this.src='{{ asset('storage_public/' . $item->photo) }}';"
+                                                                        onerror="this.onerror=null; this.src='{{ asset('storage/' . $item->photo) }}';"
                                                                         alt="Lainnya"
                                                                         style="height: 60px; border-radius: 6px; border: 1px solid #ddd; object-fit: cover;">
                                                                 </div>
@@ -733,6 +733,151 @@
         </div>
     </div>
 
+    <style>
+        .modal-print-preview {
+            background: white;
+            margin: 20px auto;
+            padding: 30px;
+            max-width: 760px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            font-family: Tahoma, Geneva, Verdana, sans-serif;
+            color: #000;
+            line-height: 1.45;
+        }
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        .preview-logo {
+            width: 150px;
+        }
+        .preview-header-text {
+            text-align: right;
+        }
+        .preview-header-text h2 {
+            margin: 0;
+            font-size: 14pt;
+            font-weight: 700;
+            color: #3f3f46;
+            text-transform: uppercase;
+        }
+        .preview-header-text .subtitle {
+            margin: 2px 0 0 0;
+            font-size: 14pt;
+            font-weight: 700;
+            color: #3f3f46;
+            text-transform: uppercase;
+        }
+        .preview-info-section {
+            margin-bottom: 15px;
+        }
+        .preview-info-row {
+            display: flex;
+            margin-bottom: 3px;
+            font-size: 10pt;
+        }
+        .preview-info-label {
+            width: 120px;
+            flex-shrink: 0;
+        }
+        .preview-info-separator {
+            width: 15px;
+            text-align: center;
+        }
+        .modal-body .modal-print-preview table.preview-table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            margin: 15px 0 !important;
+            font-size: 10pt !important;
+            background-color: #ffffff !important;
+            border: 1px solid #000000 !important;
+        }
+        .modal-body .modal-print-preview table.preview-table th,
+        .modal-body .modal-print-preview table.preview-table td {
+            border: 1px solid #000000 !important;
+            padding: 6px 10px !important;
+            vertical-align: middle !important;
+            color: #000000 !important;
+            background-color: #ffffff !important;
+        }
+        .modal-body .modal-print-preview table.preview-table th,
+        .modal-body .modal-print-preview table.preview-table td.bg-gray-label {
+            background-color: #ffffff !important;
+            font-weight: bold !important;
+        }
+        .modal-body .modal-print-preview table.preview-table th {
+            text-align: center !important;
+        }
+        .preview-total {
+            font-weight: bold;
+        }
+        .preview-terbilang {
+            font-style: italic;
+        }
+        .preview-signature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            row-gap: 15px;
+            column-gap: 20px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 9pt;
+        }
+        .preview-sign-img {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .preview-sign-img img {
+            height: 80px;
+            max-width: 150px;
+            object-fit: contain;
+            filter: contrast(3) brightness(0.5);
+        }
+        .preview-sign-name {
+            font-weight: bold;
+            text-decoration: underline;
+            margin-top: 5px;
+        }
+        .preview-sign-jabatan {
+            font-weight: bold;
+        }
+        .workflow-step {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 6px;
+        }
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        .step-dot.completed, .step-dot.active {
+            background: #10b981;
+            box-shadow: 0 0 4px rgba(16, 185, 129, 0.4);
+        }
+        .step-dot.rejected {
+            background: #ef4444;
+            box-shadow: 0 0 4px rgba(239, 68, 68, 0.4);
+        }
+    </style>
+
     <!-- TABEL PENGAJUAN -->
     <div class="content-container mt-4">
         <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3"
@@ -750,62 +895,58 @@
             <table class="table-custom">
                 <thead>
                     <tr>
-                        <th style="min-width: 60px;">No</th>
-                        <th style="min-width: 150px;">Tanggal</th>
-                        <th style="min-width: 200px;">Nomor</th>
-                        <th style="min-width: 250px;">Divisi</th>
-                        <th style="min-width: 300px;">Detail Perangkat</th>
-                        <th style="min-width: 150px;">Grand Total</th>
-                        <th style="min-width: 150px;">Status Approval</th>
-                        <th style="min-width: 150px;">Aksi</th>
+                        <th class="text-center" style="width: 50px;">NO</th>
+                        <th style="min-width: 150px;">TANGGAL & NOMOR</th>
+                        <th style="min-width: 200px;">DIVISI</th>
+                        <th style="min-width: 300px;">DETAIL PERANGKAT</th>
+                        <th class="text-end" style="min-width: 130px;">TOTAL DANA</th>
+                        <th class="text-center" style="min-width: 150px;">PROGRESS APPROVAL</th>
+                        <th class="text-center">AKSI</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($pengajuans as $index => $p)
                         <tr>
-                            <td>{{ $pengajuans->firstItem() + $index }}</td>
-                            <td>{{ $p->tempat_tanggal }}</td>
-                            <td>{{ $p->nomor }}</td>
-                            <td>{{ $p->divisi }}</td>
+                            <td class="text-center">{{ $pengajuans->firstItem() + $index }}</td>
                             <td>
-                                @if(is_array($p->items))
-                                    <div class="d-flex flex-column gap-0" style="font-size: 0.8rem;">
-                                        @foreach($p->items as $item)
-                                            <div class="p-1 px-2 border rounded bg-white shadow-sm mb-1">
-                                                <div class="d-flex justify-content-between fw-bold text-dark">
-                                                    <span>{{ $item['perangkat'] ?? '-' }}</span>
-                                                    <span>{{ $item['qty'] ?? 1 }} Unit</span>
-                                                </div>
-                                                <div class="d-flex justify-content-between text-muted mt-1"
-                                                    style="font-size: 0.75rem;">
-                                                    <span>@ Rp {{ number_format($item['harga'] ?? 0, 0, ',', '.') }}</span>
-                                                    <span class="text-success fw-bold">Rp
-                                                        {{ number_format(($item['qty'] ?? 1) * ($item['harga'] ?? 0), 0, ',', '.') }}</span>
-                                                </div>
-                                                <div class="mt-1 pt-1 border-top" style="font-size: 0.7rem; color: #777;">
-                                                    <div><i class="bi bi-tag"></i> {{ $item['layanan'] ?? '-' }} | <i
-                                                            class="bi bi-pin-map"></i> {{ $item['peruntukan'] ?? '-' }}</div>
-                                                    <div class="text-truncate" title="{{ $item['keterangan'] ?? '-' }}">
-                                                        <i class="bi bi-info-circle"></i> {{ $item['keterangan'] ?? '-' }}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @else
-                                    -
-                                @endif
+                                <div class="fw-bold text-dark">{{ $p->tempat_tanggal }}</div>
+                                <div class="small text-muted">{{ $p->nomor }}</div>
                             </td>
-                            <td class="fw-bold text-success">Rp {{ number_format($p->grand_total, 0, ',', '.') }}</td>
                             <td>
-                                <span class="badge bg-{{ $p->status_color }} mb-1" style="font-size: 0.7rem;">
+                                <div class="small text-dark">{{ $p->divisi }}</div>
+                            </td>
+                            <td style="max-width: 300px;">
+                                <div class="small text-dark text-truncate">
+                                    @if(is_array($p->items))
+                                        @php
+                                            $perangkatList = array_map(function($i) { return ($i['perangkat'] ?? '') . ' (' . ($i['qty'] ?? 1) . ')'; }, $p->items);
+                                        @endphp
+                                        {{ implode(', ', $perangkatList) }}
+                                    @else
+                                        -
+                                    @endif
+                                </div>
+                            </td>
+                            <td class="text-end">
+                                <div class="fw-bold text-success">Rp {{ number_format($p->grand_total, 0, ',', '.') }}</div>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-{{ $p->status_color }} mb-1 rounded-pill px-3 py-2" style="font-size: 0.75rem;">
+                                    @if($p->approval_status == 'approved_penasihat')
+                                        <i class="bi bi-check-circle-fill"></i>
+                                    @elseif($p->approval_status == 'rejected')
+                                        <i class="bi bi-x-circle-fill"></i>
+                                    @else
+                                        <i class="bi bi-clock-history"></i>
+                                    @endif
                                     {{ $p->status_label }}
                                 </span>
-                                <div class="d-flex align-items-center gap-1 mt-1">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <div class="step-dot {{ $p->step >= $i ? ($p->approval_status === 'rejected' ? 'rejected' : 'active') : '' }}"
-                                            title="{{ $p->status_label }}"></div>
-                                    @endfor
+                                <div class="workflow-step">
+                                    @foreach(['NOC Leader', 'Manager', 'Accounting', 'Direktur', 'Penasihat'] as $idx => $label)
+                                        <div class="step-item" title="{{ $label }}">
+                                            <div class="step-dot {{ $p->step > ($idx + 1) ? 'completed' : ($p->approval_status == 'rejected' && $p->rejected_by == $label ? 'rejected' : ($p->step == ($idx + 1) ? 'active' : '')) }}"></div>
+                                        </div>
+                                    @endforeach
                                 </div>
                             </td>
                             <td class="text-center">
@@ -830,6 +971,11 @@
                                             <i class="bi bi-x-circle"></i>
                                         </button>
                                     @endif
+
+                                    <button type="button" class="btn btn-sm btn-info text-white shadow-sm" data-bs-toggle="modal"
+                                        data-bs-target="#modalInfoPengajuan{{ $p->id }}" title="View Pengajuan">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
 
                                     <div class="dropdown d-inline-block">
                                         <button class="btn btn-sm btn-success border shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Cetak">
@@ -868,7 +1014,174 @@
                                         </button>
                                     @endif
                                 </div>
-                            </td>
+                            
+                        <!-- Modal Info Pengajuan -->
+                        <div class="modal fade" id="modalInfoPengajuan{{ $p->id }}" tabindex="-1">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content border-0 shadow-lg" style="border-radius:12px; overflow: hidden;">
+                                    <div class="modal-header py-3" style="background:linear-gradient(135deg,#1e3a8a,#3b82f6); color:white;">
+                                        <h6 class="modal-title fw-bold mb-0">Detail Pengajuan Sparepart</h6>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-0" style="background:#f1f5f9; max-height: 85vh; overflow-y: auto;">
+                                        <div class="modal-print-preview">
+                                            <div class="preview-header">
+                                                <img src="{{ asset('assets/img/logo2.jpg') }}" class="preview-logo"
+                                                    onerror="this.src='{{ asset('assets/img/logonustech.png') }}'">
+                                                <div class="preview-header-text">
+                                                    <h2>FORMULIR PENGAJUAN</h2>
+                                                    <div class="subtitle">PENGADAAN BARANG INVENTARIS</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="preview-info-section mt-4">
+                                                <div class="preview-info-row">
+                                                    <div class="preview-info-label">Tempat, Tanggal</div>
+                                                    <div class="preview-info-separator">:</div>
+                                                    <div>{{ $p->tempat_tanggal }}</div>
+                                                </div>
+                                                <div class="preview-info-row">
+                                                    <div class="preview-info-label">Divisi / Bagian</div>
+                                                    <div class="preview-info-separator">:</div>
+                                                    <div>{{ $p->divisi }}</div>
+                                                </div>
+                                                <div class="preview-info-row">
+                                                    <div class="preview-info-label">No. Surat</div>
+                                                    <div class="preview-info-separator">:</div>
+                                                    <div>{{ $p->no_surat ?? '-' }}</div>
+                                                </div>
+                                            </div>
+
+                                            <p style="font-size: 10pt; text-align: justify; margin-bottom: 10px;">
+                                                Dengan ini saya mengajukan perangkat sparepart untuk pergantian perangkat yang rusak dengan perincian sebagai berikut :
+                                            </p>
+
+                                            <div class="table-responsive" style="width: 100%; overflow-x: auto;">
+                                                <table class="preview-table">
+                                                    <tr style="background-color: #f2f2f2;">
+                                                        <th>No.</th>
+                                                        <th>Perangkat</th>
+                                                        <th>Qty</th>
+                                                        <th>Harga</th>
+                                                        <th>TOTAL</th>
+                                                        <th>Layanan</th>
+                                                        <th>Peruntukan</th>
+                                                        <th>Keterangan</th>
+                                                    </tr>
+                                                     @if(is_array($p->items) && count($p->items) > 0)
+                                                         @foreach($p->items as $idx => $item)
+                                                         <tr>
+                                                             <td style="text-align: center;">{{ $idx + 1 }}.</td>
+                                                             <td style="text-align: left;">{{ $item['perangkat'] ?? '-' }}</td>
+                                                             <td style="text-align: center;">{{ $item['qty'] ?? 1 }}</td>
+                                                             <td style="text-align: left;">Rp {{ number_format($item['harga'] ?? 0, 0, ',', '.') }}</td>
+                                                             <td class="bg-gray-label" style="text-align: left;">Rp {{ number_format(($item['qty'] ?? 1) * ($item['harga'] ?? 0), 0, ',', '.') }}</td>
+                                                             <td style="text-align: center;">{{ $item['layanan'] ?? '-' }}</td>
+                                                             <td style="text-align: center;">{{ $item['peruntukan'] ?? '-' }}</td>
+                                                             <td style="text-align: center;">{{ $item['keterangan'] ?? '-' }}</td>
+                                                         </tr>
+                                                         @endforeach
+                                                     @else
+                                                         <tr>
+                                                             <td colspan="8" style="text-align: center;">Belum ada perangkat.</td>
+                                                         </tr>
+                                                     @endif
+                                                     <tr>
+                                                         <td colspan="4" class="bg-gray-label" style="text-align: center;">TOTAL</td>
+                                                         <td colspan="4" class="bg-gray-label" style="text-align: left;">Rp {{ number_format($p->grand_total ?? 0, 0, ',', '.') }}</td>
+                                                     </tr>
+                                                     <tr>
+                                                         <td colspan="4" class="bg-gray-label" style="text-align: center;">Terbilang</td>
+                                                         <td colspan="4" style="text-align: left; font-style: italic; color: #b71c1c !important;">
+                                                             @php
+                                                                 $terbilang = '';
+                                                                 if($p->data_json) {
+                                                                     $decoded = json_decode($p->data_json, true);
+                                                                     $terbilang = $decoded['terbilang'] ?? '';
+                                                                 }
+                                                             @endphp
+                                                             {{ $terbilang }}
+                                                         </td>
+                                                     </tr>
+                                                     <tr>
+                                                         <td colspan="4" class="bg-gray-label" style="text-align: center;">Catatan</td>
+                                                         <td colspan="4" style="text-align: left;">{{ $p->catatan ?? '-' }}</td>
+                                                     </tr>
+                                                </table>
+                                            </div>
+
+                                            <p style="font-size: 10pt; margin-bottom: 15px;">Demikian surat pengajuan ini dibuat, atas perhatiannya saya ucapkan terima kasih.</p>
+
+                                            @php
+                                                $dataJson = json_decode($p->data_json, true) ?? [];
+                                            @endphp
+
+                                            @if(!empty($dataJson['mengetahui_nama']) && $dataJson['mengetahui_nama'] != '-')
+                                                <div style="text-align: center; margin-bottom: 15px; font-size: 10pt;">
+                                                    Mataram, {{ $p->updated_at->format('d F Y') }}
+                                                </div>
+                                            @endif
+
+                                            <div class="preview-signature-grid">
+                                                <div>
+                                                    <p class="mb-1">Pemohon,</p>
+                                                    <div class="preview-sign-img">
+                                                        <img src="{{ asset('assets/img/ttd/pemohon.png') }}">
+                                                    </div>
+                                                    <p class="preview-sign-name">{{ $dataJson['pemohon_nama'] ?? 'Rossie Maulana Septian, S.Kom' }}</p>
+                                                    <p class="preview-sign-jabatan">{{ $dataJson['pemohon_jabatan'] ?? 'NOC Leader' }}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="mb-1">Diverifikasi,</p>
+                                                    <div class="preview-sign-img">
+                                                        @if($p->approved_manager_at)
+                                                            <img src="{{ asset('assets/img/ttd/manager.png') }}">
+                                                        @endif
+                                                    </div>
+                                                    <p class="preview-sign-name">{{ $dataJson['diverifikasi1_nama'] ?? 'Dimas Farid Awaludin, S.Kom' }}</p>
+                                                    <p class="preview-sign-jabatan">{{ $dataJson['diverifikasi1_jabatan'] ?? 'Manager' }}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="mb-1">Diverifikasi,</p>
+                                                    <div class="preview-sign-img" style="height: 70px;">
+                                                        @if($p->approved_accounting_at)
+                                                            <img src="{{ asset('assets/img/ttd/accounting.png') }}" style="bottom: -20px; position: relative;">
+                                                        @endif
+                                                    </div>
+                                                    <p class="preview-sign-name">{{ $dataJson['diverifikasi2_nama'] ?? 'Baiq Nana Erlina, A.Md' }}</p>
+                                                    <p class="preview-sign-jabatan">{{ $dataJson['diverifikasi2_jabatan'] ?? 'Accounting' }}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="mb-1">Disetujui,</p>
+                                                    <div class="preview-sign-img">
+                                                        @if($p->approved_direktur_at)
+                                                            <img src="{{ asset('assets/img/ttd/direktur.png') }}">
+                                                        @endif
+                                                    </div>
+                                                    <p class="preview-sign-name">{{ $dataJson['disetujui_nama'] ?? 'Galuh Zakiyatun, S.Kom' }}</p>
+                                                    <p class="preview-sign-jabatan">{{ $dataJson['disetujui_jabatan'] ?? 'Direktur' }}</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="d-flex justify-content-center mt-3">
+                                                <div style="text-align: center; font-size: 9pt; width: 50%;">
+                                                    <p class="mb-1">Mengetahui,</p>
+                                                    <div class="preview-sign-img">
+                                                        @if($p->approved_penasihat_at)
+                                                            <img src="{{ asset('assets/img/ttd/penasihat.png') }}">
+                                                        @endif
+                                                    </div>
+                                                    <p class="preview-sign-name">{{ $dataJson['mengetahui_nama'] ?? 'Raden Yuniarta Alba, S.Kom' }}</p>
+                                                    <p class="preview-sign-jabatan">{{ $dataJson['mengetahui_jabatan'] ?? 'Penasihat' }}</p>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        </td>
                         </tr>
                     @empty
                         <tr>
@@ -908,7 +1221,7 @@
                         <div class="modal-body p-4">
                             <div class="alert alert-info border-0 small mb-3" style="background:#eff6ff;">
                                 <i class="bi bi-info-circle me-1"></i>
-                                Isi data berikut sebelum menyetujui pengajuan perangkat ini.
+                                Nomor Surat dan Catatan <strong>tidak wajib diisi</strong>. Anda tetap bisa menyetujui tanpa mengisinya.
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold small">Nomor Surat <span class="text-muted">(opsional)</span></label>
@@ -920,11 +1233,6 @@
                                 <label class="form-label fw-bold small">Catatan <span class="text-muted">(opsional)</span></label>
                                 <textarea name="catatan" class="form-control" rows="3"
                                     placeholder="Catatan dari Accounting...">{{ $p->catatan }}</textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold small">Keterangan <span class="text-muted">(opsional)</span></label>
-                                <textarea name="keterangan" class="form-control" rows="2"
-                                    placeholder="Keterangan tambahan...">{{ $p->keterangan }}</textarea>
                             </div>
                         </div>
                         <div class="modal-footer border-0">
@@ -955,7 +1263,7 @@
                         <div class="modal-body p-4">
                             <div class="alert alert-warning border-0 small mb-3" style="background:#fffbeb;">
                                 <i class="bi bi-lock me-1"></i>
-                                Hanya <strong>Accounting</strong> yang dapat mengisi/mengubah data ini.
+                                Hanya <strong>Accounting</strong> yang dapat mengisi/mengubah data ini. Semua field bersifat opsional.
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold small">Nomor Surat</label>
@@ -967,11 +1275,6 @@
                                 <label class="form-label fw-bold small">Catatan</label>
                                 <textarea name="catatan" class="form-control" rows="3"
                                     placeholder="Catatan dari Accounting...">{{ $p->catatan }}</textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold small">Keterangan</label>
-                                <textarea name="keterangan" class="form-control" rows="2"
-                                    placeholder="Keterangan tambahan...">{{ $p->keterangan }}</textarea>
                             </div>
                         </div>
                         <div class="modal-footer border-0">
@@ -1017,7 +1320,7 @@
                             <div class="col-6">
                                 <label class="form-label fw-bold" style="font-size: 0.85rem;">Divisi / Bagian</label>
                                 <input type="text" name="divisi" class="form-control"
-                                    value="Manage Service AI BAKTI 2026 APROTECH" required>
+                                    value="Manage Service AI BAKTI" required>
                             </div>
                         </div>
                         <div class="mb-3">

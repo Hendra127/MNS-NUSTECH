@@ -433,7 +433,7 @@
             <div class="user-profile-wrapper" style="position: relative;">
                 <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
                         @if(auth()->check() && auth()->user()->photo)
-                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
+                            <img src="{{ asset('storage/' . auth()->user()->photo) }}" alt="Profile"
                                 style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                         @else
                             <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
@@ -558,7 +558,7 @@
                                 <td>
                                     <div class="user-cell">
                                         @if($log->user && $log->user->photo)
-                                            <img src="{{ asset('storage_public/' . $log->user->photo) }}" class="user-avatar-sm"
+                                            <img src="{{ asset('storage/' . $log->user->photo) }}" class="user-avatar-sm"
                                                 alt="">
                                         @else
                                             <img src="https://ui-avatars.com/api/?name={{ urlencode($log->user_name) }}&background=random&size=32"

@@ -347,7 +347,7 @@
                 <div class="user-profile-icon" id="profileDropdownTrigger"
                     style="cursor: pointer; text-decoration: none; color: inherit;">
                     @if(auth()->check() && auth()->user()->photo)
-                        <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
+                        <img src="{{ asset('storage/' . auth()->user()->photo) }}" alt="Profile"
                             style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                     @else
                         <i class="bi bi-person-circle" style="font-size: 1.5rem; color: white;"></i>
@@ -382,7 +382,7 @@
             <div class="visual-card">
                 <div class="avatar-container">
                     @if(auth()->user()->photo)
-                        <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile Photo"
+                        <img src="{{ asset('storage/' . auth()->user()->photo) }}" alt="Profile Photo"
                             class="profile-photo-preview" id="photoPreview" onclick="openPhotoViewer(this.src)">
                     @else
                         <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=random&size=200"

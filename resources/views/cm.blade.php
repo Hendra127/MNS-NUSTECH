@@ -21,6 +21,9 @@
     <!-- Tom Select (searchable dropdown) -->
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+    <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -204,7 +207,7 @@
             <div class="user-profile-wrapper" style="position: relative;">
                 <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
                     @if(auth()->check() && auth()->user()->photo)
-                        <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
+                        <img src="{{ asset('storage/' . auth()->user()->photo) }}" alt="Profile"
                             style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                     @else
                         <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
@@ -559,7 +562,7 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-bold small">Divisi / Bagian</label>
                                 <input type="text" name="divisi" class="form-control"
-                                    value="Manage Service AI BAKTI 2025 APROTECH" required>
+                                    value="Manage Service AI BAKTI" required>
                             </div>
                             <div class="col-md-12">
                                 <label class="form-label fw-bold small">Nomor Pengajuan</label>
@@ -582,8 +585,8 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold small">Tanggal Kunjungan</label>
-                                <input type="date" name="tanggal_kunjungan" class="form-control"
-                                    value="{{ date('Y-m-d') }}" required>
+                                <input type="text" name="tanggal_kunjungan" class="form-control date-range-picker"
+                                    placeholder="Pilih rentang tanggal" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold small">Nama Teknisi</label>
@@ -972,7 +975,7 @@
                                     <div class="preview-sign-img">
                                         @if($cm->ttd_pemohon)
                                             <img
-                                                src="{{ asset(str_replace('storage/', 'storage_public/', $cm->ttd_pemohon)) }}">
+                                                src="{{ asset(str_replace('storage/', 'storage/', $cm->ttd_pemohon)) }}">
                                         @endif
                                     </div>
                                     <p class="preview-sign-name">Rossie Maulana Septian, S.Kom</p>
@@ -983,7 +986,7 @@
                                     <div class="preview-sign-img">
                                         @if($cm->ttd_manager)
                                             <img
-                                                src="{{ asset(str_replace('storage/', 'storage_public/', $cm->ttd_manager)) }}">
+                                                src="{{ asset(str_replace('storage/', 'storage/', $cm->ttd_manager)) }}">
                                         @endif
                                     </div>
                                     <p class="preview-sign-name">{{ $cm->diverifikasi1_nama }}</p>
@@ -994,7 +997,7 @@
                                     <div class="preview-sign-img">
                                         @if($cm->ttd_accounting)
                                             <img
-                                                src="{{ asset(str_replace('storage/', 'storage_public/', $cm->ttd_accounting)) }}">
+                                                src="{{ asset(str_replace('storage/', 'storage/', $cm->ttd_accounting)) }}">
                                         @endif
                                     </div>
                                     <p class="preview-sign-name">{{ $cm->diverifikasi2_nama }}</p>
@@ -1005,7 +1008,7 @@
                                     <div class="preview-sign-img">
                                         @if($cm->ttd_direktur)
                                             <img
-                                                src="{{ asset(str_replace('storage/', 'storage_public/', $cm->ttd_direktur)) }}">
+                                                src="{{ asset(str_replace('storage/', 'storage/', $cm->ttd_direktur)) }}">
                                         @endif
                                     </div>
                                     <p class="preview-sign-name">{{ $cm->disetujui_nama }}</p>
@@ -1018,7 +1021,7 @@
                                     <div class="preview-sign-img">
                                         @if($cm->ttd_penasihat)
                                             <img
-                                                src="{{ asset(str_replace('storage/', 'storage_public/', $cm->ttd_penasihat)) }}">
+                                                src="{{ asset(str_replace('storage/', 'storage/', $cm->ttd_penasihat)) }}">
                                         @endif
                                     </div>
                                     <p class="preview-sign-name">{{ $cm->mengetahui_nama }}</p>
@@ -1201,8 +1204,8 @@
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold small">Tanggal Kunjungan</label>
-                                    <input type="text" name="tanggal_kunjungan" class="form-control"
-                                        value="{{ $cm->tanggal_kunjungan }}" required>
+                                    <input type="text" name="tanggal_kunjungan" class="form-control date-range-picker"
+                                        value="{{ $cm->tanggal_kunjungan }}" placeholder="Pilih rentang tanggal" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold small">Nama Teknisi</label>
@@ -1481,6 +1484,17 @@
                 text: "{{ session('error') }}"
             });
         @endif
+
+        document.addEventListener("DOMContentLoaded", function() {
+            flatpickr(".date-range-picker", {
+                mode: "range",
+                dateFormat: "d/m/Y",
+                rangeSeparator: " s/d ",
+                locale: {
+                    rangeSeparator: " s/d "
+                }
+            });
+        });
     </script>
 </body>
 

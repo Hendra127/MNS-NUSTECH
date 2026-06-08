@@ -322,10 +322,6 @@
                 <td colspan="4" class="bg-light" style="text-align: center;">Catatan</td>
                 <td colspan="4" style="text-align: left;">{{ $pengajuan->catatan ?? '-' }}</td>
             </tr>
-            <tr>
-                <td colspan="4" class="bg-light" style="text-align: center;">Keterangan</td>
-                <td colspan="4" style="text-align: left;">{!! nl2br(e($pengajuan->keterangan ?? '-')) !!}</td>
-            </tr>
         </table>
 
         <!-- SIGNATURES TIER 1 -->

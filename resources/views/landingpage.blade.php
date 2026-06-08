@@ -416,7 +416,7 @@
     </div>
 
     <div id="mobile-menu"
-      class="hidden md:hidden bg-white text-gray-800 w-full absolute top-full left-0 shadow-2xl border-t border-gray-100 max-h-[80vh] overflow-y-auto">
+      class="hidden lg:hidden bg-white text-gray-800 w-full absolute top-full left-0 shadow-2xl border-t border-gray-100 max-h-[80vh] overflow-y-auto">
       <ul class="flex flex-col p-4 space-y-1">
         <!-- Data Site -->
         <li class="font-bold px-3 pt-3 text-blue-600 text-sm">DATA SITE</li>

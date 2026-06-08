@@ -281,6 +281,7 @@ class CmController extends Controller
             } else {
                 \App\Services\WhatsAppService::send(null, $waMessage);
             }
+            \App\Services\WhatsAppService::sendToRole('accounting', $waMessage);
         }
 
         if ($newStatus === CmPengajuan::STATUS_APPROVED_PENASIHAT) {

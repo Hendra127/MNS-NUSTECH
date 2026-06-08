@@ -213,7 +213,7 @@
             <div class="user-profile-wrapper" style="position: relative;">
                 <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
                     @if(auth()->check() && auth()->user()->photo)
-                        <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
+                        <img src="{{ asset('storage/' . auth()->user()->photo) }}" alt="Profile"
                             style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                     @else
                         <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
@@ -744,7 +744,7 @@
                                     <div class="preview-sign-img">
                                         @if($csr->ttd_pemohon)
                                             <img
-                                                src="{{ asset(str_replace('storage/', 'storage_public/', $csr->ttd_pemohon)) }}">
+                                                src="{{ asset(str_replace('storage/', 'storage/', $csr->ttd_pemohon)) }}">
                                         @endif
                                     </div>
                                     <p class="preview-sign-name">Rossie Maulana Septian, S.Kom</p>
@@ -755,7 +755,7 @@
                                     <div class="preview-sign-img">
                                         @if($csr->ttd_manager)
                                             <img
-                                                src="{{ asset(str_replace('storage/', 'storage_public/', $csr->ttd_manager)) }}">
+                                                src="{{ asset(str_replace('storage/', 'storage/', $csr->ttd_manager)) }}">
                                         @endif
                                     </div>
                                     <p class="preview-sign-name">{{ $csr->diverifikasi2_nama }}</p>
@@ -766,7 +766,7 @@
                                     <div class="preview-sign-img">
                                         @if($csr->ttd_accounting)
                                             <img
-                                                src="{{ asset(str_replace('storage/', 'storage_public/', $csr->ttd_accounting)) }}">
+                                                src="{{ asset(str_replace('storage/', 'storage/', $csr->ttd_accounting)) }}">
                                         @endif
                                     </div>
                                     <p class="preview-sign-name">{{ $csr->diverifikasi3_nama }}</p>
@@ -777,7 +777,7 @@
                                     <div class="preview-sign-img">
                                         @if($csr->ttd_direktur)
                                             <img
-                                                src="{{ asset(str_replace('storage/', 'storage_public/', $csr->ttd_direktur)) }}">
+                                                src="{{ asset(str_replace('storage/', 'storage/', $csr->ttd_direktur)) }}">
                                         @endif
                                     </div>
                                     <p class="preview-sign-name">{{ $csr->disetujui_nama }}</p>
@@ -790,7 +790,7 @@
                                     <div class="preview-sign-img">
                                         @if($csr->ttd_penasihat)
                                             <img
-                                                src="{{ asset(str_replace('storage/', 'storage_public/', $csr->ttd_penasihat)) }}">
+                                                src="{{ asset(str_replace('storage/', 'storage/', $csr->ttd_penasihat)) }}">
                                         @endif
                                     </div>
                                     <p class="preview-sign-name">{{ $csr->mengetahui_nama }}</p>
@@ -1135,7 +1135,7 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-bold small">Divisi / Bagian</label>
                                 <input type="text" name="divisi" class="form-control"
-                                    value="Manage Service AI BAKTI 2026 APROTECH" required>
+                                    value="Manage Service AI BAKTI" required>
                             </div>
                             <div class="col-md-12">
                                 <label class="form-label fw-bold small">Nomor Pengajuan</label>

@@ -373,6 +373,7 @@ class SparepartNeededController extends Controller
             } else {
                 \App\Services\WhatsAppService::send(null, $waMessage);
             }
+            \App\Services\WhatsAppService::sendToRole('accounting', $waMessage);
         }
     }
 
@@ -453,18 +454,16 @@ class SparepartNeededController extends Controller
         $pengajuan = PengajuanSparepart::findOrFail($id);
 
         $request->validate([
-            'no_surat'   => 'nullable|string|max:255',
-            'catatan'    => 'nullable|string',
-            'keterangan' => 'nullable|string',
+            'no_surat' => 'nullable|string|max:255',
+            'catatan'  => 'nullable|string',
         ]);
 
         $pengajuan->update([
-            'no_surat'   => $request->no_surat,
-            'catatan'    => $request->catatan,
-            'keterangan' => $request->keterangan,
+            'no_surat' => $request->no_surat,
+            'catatan'  => $request->catatan,
         ]);
 
-        return redirect()->back()->with('success', '✅ Catatan, Nomor Surat, dan Keterangan berhasil disimpan.');
+        return redirect()->back()->with('success', '✅ Nomor Surat dan Catatan berhasil disimpan.');
     }
 
     // -------------------------------------------------------------------------

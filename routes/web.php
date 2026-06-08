@@ -113,6 +113,34 @@ Route::post('/notifications/mark-read', function () {
     return response()->json(['success' => true]);
 })->name('notifications.markRead');
 
+Route::get('/assets/{path}', function ($path) {
+    // Membaca file dari folder assets di LUAR public (yaitu di root project)
+    $filePath = base_path('assets/' . $path);
+    
+    if (file_exists($filePath)) {
+        $extension = pathinfo($filePath, PATHINFO_EXTENSION);
+        $mime = @mime_content_type($filePath);
+        
+        // Perbaikan MIME type manual jika fungsi mime_content_type tidak akurat
+        switch (strtolower($extension)) {
+            case 'css': $mime = 'text/css'; break;
+            case 'js': $mime = 'application/javascript'; break;
+            case 'mp4': $mime = 'video/mp4'; break;
+            case 'svg': $mime = 'image/svg+xml'; break;
+            case 'png': $mime = 'image/png'; break;
+            case 'jpg':
+            case 'jpeg': $mime = 'image/jpeg'; break;
+        }
+        
+        if (!$mime) $mime = 'application/octet-stream';
+        
+        return response()->file($filePath, ['Content-Type' => $mime]);
+    }
+
+    // DEBUGGING INFO: Jangan abort 404, tampilkan path yang dicari agar user tahu letak salahnya
+    return response("File gambar tidak ditemukan secara fisik di server hosting Anda.<br>Laravel sedang mencari file ini di path: <b>" . $filePath . "</b><br><br>Silakan cek File Manager Hostinger Anda, pastikan file tersebut BENAR-BENAR ADA di path tersebut dan huruf besar/kecilnya sama persis.", 404);
+})->where('path', '.*')->name('assets.serve');
+
 Route::get('/get-drive-title', function (Illuminate\Http\Request $request) {
     $url = $request->query('url');
     if (!$url)
@@ -217,6 +245,11 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/admin/home/news', [\App\Http\Controllers\HomeAdminController::class, 'storeNews'])->name('admin.home.news.store');
         Route::put('/admin/home/news/{id}', [\App\Http\Controllers\HomeAdminController::class, 'updateNews'])->name('admin.home.news.update');
         Route::delete('/admin/home/news/{id}', [\App\Http\Controllers\HomeAdminController::class, 'destroyNews'])->name('admin.home.news.destroy');
+        Route::post('/admin/home/news/{id}/toggle', [\App\Http\Controllers\HomeAdminController::class, 'toggleNewsActive'])->name('admin.home.news.toggle');
+        Route::put('/admin/home/content', [\App\Http\Controllers\HomeAdminController::class, 'updateContent'])->name('admin.home.content.update');
+        Route::post('/admin/home/modal-items', [\App\Http\Controllers\HomeAdminController::class, 'storeModalItem'])->name('admin.home.modal.store');
+        Route::put('/admin/home/modal-items/{id}', [\App\Http\Controllers\HomeAdminController::class, 'updateModalItem'])->name('admin.home.modal.update');
+        Route::delete('/admin/home/modal-items/{id}', [\App\Http\Controllers\HomeAdminController::class, 'destroyModalItem'])->name('admin.home.modal.destroy');
     });
 
     // --- TO DO LIST ---

@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('pmliberta', 'file_pm')) {
-            Schema::table('pmliberta', function (Blueprint $table) {
-                $table->string('file_pm')->nullable()->after('kategori');
-            });
-        }
+        Schema::create('landing_page_views', function (Blueprint $table) {
+            $table->id();
+            $table->date('date')->unique();
+            $table->unsignedInteger('views')->default(0);
+            $table->timestamps();
+        });
     }
 
     /**
@@ -23,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('pmliberta', function (Blueprint $table) {
-            $table->dropColumn('file_pm');
-        });
+        Schema::dropIfExists('landing_page_views');
     }
 };

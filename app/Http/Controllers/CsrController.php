@@ -298,6 +298,7 @@ class CsrController extends Controller
             } else {
                 \App\Services\WhatsAppService::send(null, $waMessage);
             }
+            \App\Services\WhatsAppService::sendToRole('accounting', $waMessage);
         }
 
         $approvedByLabels = [

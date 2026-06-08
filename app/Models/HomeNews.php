@@ -12,14 +12,17 @@ class HomeNews extends Model
     protected $table = 'home_news';
 
     protected $fillable = [
+        'type',
         'title',
         'instagram_url',
         'image_path',
         'caption',
         'published_at',
+        'is_active',
     ];
 
     protected $casts = [
         'published_at' => 'datetime',
+        'is_active' => 'boolean',
     ];
 }

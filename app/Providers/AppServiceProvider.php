@@ -12,7 +12,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Load helper functions (compatible dengan shared hosting tanpa composer dump-autoload)
+        require_once app_path('helpers.php');
     }
 
     /**
@@ -22,5 +23,4 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useBootstrapFive();
     }
-    
 }
