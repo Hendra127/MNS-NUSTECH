@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SparepartNeeded;
 use App\Models\PengajuanSparepart;
+use App\Models\Sparetracker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -63,7 +64,15 @@ class SparepartNeededController extends Controller
 
         $statuses = SparepartNeeded::select('status')->distinct()->pluck('status')->filter();
 
-        $pengajuans = PengajuanSparepart::with('user')->latest()->paginate(20, ['*'], 'pengajuan_page');
+        $pengajuansQuery = PengajuanSparepart::with('user')->latest();
+        if ($request->status_pembayaran) {
+            $pengajuansQuery->where('status_pembayaran', $request->status_pembayaran);
+        }
+        if ($request->tipe_pengajuan) {
+            $pengajuansQuery->where('tipe_pengajuan', $request->tipe_pengajuan);
+        }
+        $pengajuans = $pengajuansQuery->paginate(20, ['*'], 'pengajuan_page')->withQueryString();
+
         foreach($pengajuans as $p) {
             $p->can_approve = $this->canAct($p);
         }
@@ -74,16 +83,20 @@ class SparepartNeededController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'site_id' => 'required|exists:sites,site_id',
-            'sparepart_name' => 'required|string|max:255',
-            'quantity' => 'required|integer|min:1',
-            'description' => 'nullable|string',
-            'status' => 'nullable|string',
-            'urgency' => 'nullable|in:Low,Medium,High,Urgent',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
-            'foto_resi' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
-            'foto_terpasang' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
-            'foto_sn' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120'
+            'tipe_pengajuan'  => 'required|in:pembelian_baru,repair_perangkat',
+            'site_id'         => 'required|exists:sites,site_id',
+            'sparepart_name'  => 'required|string|max:255',
+            'quantity'        => 'required|integer|min:1',
+            'description'     => 'nullable|string',
+            'status'          => 'nullable|string',
+            'urgency'         => 'nullable|in:Low,Medium,High,Urgent',
+            'photo'           => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'foto_resi'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            // Untuk repair: foto terpasang & foto SN wajib
+            'foto_terpasang'  => $request->tipe_pengajuan === 'repair_perangkat' ? 'required|image|mimes:jpeg,png,jpg,gif|max:5120' : 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'foto_sn'         => $request->tipe_pengajuan === 'repair_perangkat' ? 'required|image|mimes:jpeg,png,jpg,gif|max:5120' : 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            // SN perangkat wajib untuk repair agar trigger pengiriman bisa bekerja
+            'sn_perangkat'    => $request->tipe_pengajuan === 'repair_perangkat' ? 'required|string|max:255' : 'nullable|string|max:255',
         ]);
 
         $photoPath = null;
@@ -98,7 +111,8 @@ class SparepartNeededController extends Controller
         $fotoSnPath = null;
         if ($request->hasFile('foto_sn')) $fotoSnPath = $request->file('foto_sn')->store('sparepart_needed', 'public');
 
-        SparepartNeeded::create([
+        $sparepart = SparepartNeeded::create([
+            'tipe_pengajuan' => $request->tipe_pengajuan,
             'site_id' => $request->site_id,
             'sparepart_name' => $request->sparepart_name,
             'quantity' => $request->quantity,
@@ -110,8 +124,34 @@ class SparepartNeededController extends Controller
             'foto_terpasang' => $fotoTerpasangPath,
             'foto_sn' => $fotoSnPath,
             'user_id' => Auth::id(),
-            'approval_status' => SparepartNeeded::STATUS_PENDING_NOC
+            'approval_status' => SparepartNeeded::STATUS_PENDING_NOC,
+            'price' => $request->tipe_pengajuan === 'repair_perangkat' ? null : $request->price
         ]);
+
+        // Insert ke sparetracker
+        $status_penggunaan = $request->tipe_pengajuan === 'repair_perangkat' ? 'Proses Repair' : 'Tahap Pengadaan';
+        $kondisi           = $request->tipe_pengajuan === 'repair_perangkat' ? null : 'BAIK';
+
+        // Untuk repair: SN wajib ada (1 pengajuan = 1 unit, SN sudah diketahui)
+        // Untuk pembelian baru: SN bisa diisi nanti di halaman Sparetracker
+        $snPerangkat = $request->sn_perangkat ?? null;
+
+        for ($i = 0; $i < $request->quantity; $i++) {
+            // Jika qty > 1 dan repair, SN tetap sama (satu perangkat)
+            // Jika qty > 1 dan pembelian, SN dibiarkan null dan diisi manual nanti
+            Sparetracker::create([
+                'sn'                          => ($i === 0) ? $snPerangkat : null, // SN hanya untuk unit pertama (repair)
+                'nama_perangkat'              => $request->sparepart_name,
+                'status_penggunaan_sparepart' => $status_penggunaan,
+                'kondisi'                     => $kondisi,
+                'pengadaan_by'                => $request->tipe_pengajuan === 'repair_perangkat' ? null : 'NUSTECH',
+                'lokasi_asal'                 => $request->tipe_pengajuan === 'repair_perangkat' ? null : 'NUSTECH',
+                'lokasi'                      => $request->tipe_pengajuan === 'repair_perangkat' ? $request->site_id : null,
+                'lokasi_realtime'             => 'Gudang NOC',
+                'tanggal_masuk'               => null, // Diisi manual nanti
+                'sparepart_needed_id'         => $sparepart->id, // traceability: asal dari pengajuan mana
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Sparepart needed added successfully.');
     }
@@ -188,7 +228,7 @@ class SparepartNeededController extends Controller
         $items = [];
         if ($request->has('perangkat')) {
             foreach ($request->perangkat as $index => $perangkat) {
-                $items[] = [
+                $itemData = [
                     'perangkat' => $perangkat,
                     'qty' => $request->qty[$index] ?? 1,
                     'harga' => $request->harga[$index] ?? 0,
@@ -197,6 +237,19 @@ class SparepartNeededController extends Controller
                     'peruntukan' => $request->peruntukan[$index] ?? 'STOK',
                     'keterangan' => $request->keterangan[$index] ?? '-'
                 ];
+
+                if ($request->tipe_pengajuan === 'Repair Perangkat') {
+                    $itemData['sn_perangkat'] = $request->sn_perangkat[$index] ?? '';
+                    
+                    if ($request->hasFile("foto_sn.{$index}")) {
+                        $itemData['foto_sn'] = $request->file("foto_sn.{$index}")->store('repairs/sn', 'public');
+                    }
+                    if ($request->hasFile("foto_perangkat.{$index}")) {
+                        $itemData['foto_perangkat'] = $request->file("foto_perangkat.{$index}")->store('repairs/perangkat', 'public');
+                    }
+                }
+
+                $items[] = $itemData;
             }
         }
 
@@ -207,6 +260,7 @@ class SparepartNeededController extends Controller
         $status = $isNocLeader ? 'pending' : PengajuanSparepart::STATUS_PENDING_NOC;
 
         $pengajuan = PengajuanSparepart::create([
+            'tipe_pengajuan' => $request->tipe_pengajuan ?? 'Pembelian Baru',
             'tempat_tanggal' => $request->tempat_tanggal,
             'divisi' => $request->divisi,
             'nomor' => $request->nomor,
@@ -387,9 +441,10 @@ class SparepartNeededController extends Controller
         $pengajuan = PengajuanSparepart::findOrFail($id);
 
         $items = [];
+        $existingItems = is_array($pengajuan->items) ? $pengajuan->items : [];
         if ($request->has('perangkat')) {
             foreach ($request->perangkat as $index => $perangkat) {
-                $items[] = [
+                $itemData = [
                     'perangkat' => $perangkat,
                     'qty' => $request->qty[$index] ?? 1,
                     'harga' => $request->harga[$index] ?? 0,
@@ -398,6 +453,23 @@ class SparepartNeededController extends Controller
                     'peruntukan' => $request->peruntukan[$index] ?? 'STOK',
                     'keterangan' => $request->keterangan[$index] ?? '-'
                 ];
+
+                if ($request->tipe_pengajuan === 'Repair Perangkat') {
+                    $itemData['sn_perangkat'] = $request->sn_perangkat[$index] ?? ($existingItems[$index]['sn_perangkat'] ?? '');
+                    
+                    if ($request->hasFile("foto_sn.{$index}")) {
+                        $itemData['foto_sn'] = $request->file("foto_sn.{$index}")->store('repairs/sn', 'public');
+                    } else {
+                        $itemData['foto_sn'] = $existingItems[$index]['foto_sn'] ?? null;
+                    }
+                    if ($request->hasFile("foto_perangkat.{$index}")) {
+                        $itemData['foto_perangkat'] = $request->file("foto_perangkat.{$index}")->store('repairs/perangkat', 'public');
+                    } else {
+                        $itemData['foto_perangkat'] = $existingItems[$index]['foto_perangkat'] ?? null;
+                    }
+                }
+
+                $items[] = $itemData;
             }
         }
 
@@ -409,6 +481,7 @@ class SparepartNeededController extends Controller
         $status = $isNocLeader ? 'pending' : PengajuanSparepart::STATUS_PENDING_NOC;
 
         $pengajuan->update([
+            'tipe_pengajuan' => $request->tipe_pengajuan ?? 'Pembelian Baru',
             'tempat_tanggal' => $request->tempat_tanggal,
             'divisi' => $request->divisi,
             'nomor' => $request->nomor,
@@ -454,16 +527,35 @@ class SparepartNeededController extends Controller
         $pengajuan = PengajuanSparepart::findOrFail($id);
 
         $request->validate([
-            'no_surat' => 'nullable|string|max:255',
-            'catatan'  => 'nullable|string',
+            'no_surat'          => 'nullable|string|max:255',
+            'catatan'           => 'nullable|string',
+            'status_pembayaran' => 'nullable|in:belum_dibayar,dp_50,lunas',
+            'bukti_dp'          => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'bukti_transfer'    => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
         ]);
 
-        $pengajuan->update([
+        $updateData = [
             'no_surat' => $request->no_surat,
             'catatan'  => $request->catatan,
-        ]);
+        ];
 
-        return redirect()->back()->with('success', '✅ Nomor Surat dan Catatan berhasil disimpan.');
+        if ($request->has('status_pembayaran')) {
+            $updateData['status_pembayaran'] = $request->status_pembayaran;
+        }
+
+        if ($request->hasFile('bukti_dp')) {
+            $path = $request->file('bukti_dp')->store('bukti_dp_sparepart', 'public');
+            $updateData['bukti_dp'] = $path;
+        }
+
+        if ($request->hasFile('bukti_transfer')) {
+            $path = $request->file('bukti_transfer')->store('bukti_transfer_sparepart', 'public');
+            $updateData['bukti_transfer'] = $path;
+        }
+
+        $pengajuan->update($updateData);
+
+        return redirect()->back()->with('success', '✅ Nomor Surat, Catatan, dan Status Pembayaran berhasil disimpan.');
     }
 
     // -------------------------------------------------------------------------

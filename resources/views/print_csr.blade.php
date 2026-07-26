@@ -348,15 +348,6 @@
                                 </td>
                                 <td class="value-cell">{{ $csr->catatan ?? '-' }}</td>
                             </tr>
-                            <tr>
-                                <td class="label-cell">
-                                    <div style="display: flex; justify-content: space-between;">
-                                        <span>Keterangan</span>
-                                        <span>:</span>
-                                    </div>
-                                </td>
-                                <td class="value-cell" style="vertical-align: top;">{!! nl2br(e($csr->keterangan ?? '-')) !!}</td>
-                            </tr>
                         </table>
 
                         <div class="footer-text">

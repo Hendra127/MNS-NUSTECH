@@ -88,7 +88,11 @@ class CmController extends Controller
             $query->where('approval_status', $request->status);
         }
 
-        $cmList = $query->paginate(20)->withQueryString();
+        if ($request->status_pembayaran) {
+            $query->where('status_pembayaran', $request->status_pembayaran);
+        }
+
+        $cmList = $query->get();
         $sites   = \App\Models\Site::orderBy('sitename')->get(['site_id', 'sitename']);
         $userRole = Auth::user()->role;
 
@@ -417,17 +421,62 @@ class CmController extends Controller
         $cm = CmPengajuan::findOrFail($id);
 
         $request->validate([
-            'no_surat'   => 'nullable|string|max:255',
-            'catatan'    => 'nullable|string',
-            'keterangan' => 'nullable|string',
+            'no_surat'          => 'nullable|string|max:255',
+            'catatan'           => 'nullable|string',
+            'keterangan'        => 'nullable|string',
+            'status_pembayaran' => 'nullable|in:belum_dibayar,dp_50,lunas',
+            'bukti_dp'          => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'bukti_transfer'    => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
         ]);
+
+        $updateData = [
+            'no_surat'          => $request->no_surat,
+            'catatan'           => $request->catatan,
+            'keterangan'        => $request->keterangan,
+        ];
+
+        if ($request->has('status_pembayaran')) {
+            $updateData['status_pembayaran'] = $request->status_pembayaran;
+        }
+
+        if ($request->hasFile('bukti_dp')) {
+            $path = $request->file('bukti_dp')->store('bukti_dp', 'public');
+            $updateData['bukti_dp'] = $path;
+        }
+
+        if ($request->hasFile('bukti_transfer')) {
+            $path = $request->file('bukti_transfer')->store('bukti_transfer', 'public');
+            $updateData['bukti_transfer'] = $path;
+        }
+
+        $cm->update($updateData);
+
+        return redirect()->back()->with('success', '✅ Catatan, Status Pembayaran, dan Data Lainnya berhasil disimpan.');
+    }
+
+    // -------------------------------------------------------------------------
+
+    public function markAsDone(Request $request, $id)
+    {
+        $cm = CmPengajuan::findOrFail($id);
 
         $cm->update([
-            'no_surat'   => $request->no_surat,
-            'catatan'    => $request->catatan,
-            'keterangan' => $request->keterangan,
+            'is_clear' => true,
         ]);
 
-        return redirect()->back()->with('success', '✅ Catatan, Nomor Surat, dan Keterangan berhasil disimpan.');
+        $accountingUsers = User::where('role', 'accounting')->get();
+        Notification::send($accountingUsers, new \App\Notifications\CmDoneNotification($cm));
+
+        $siteStr = str_contains($cm->nama_site, "\n") ? "\n" . trim($cm->nama_site) : " " . trim($cm->nama_site);
+        
+        $waMessage = "✅ *Notifikasi Pengajuan CM DONE*\n\n"
+            . "📋 *Nomor Pengajuan:* {$cm->nomor}\n"
+            . "🏢 *Site:*" . $siteStr . "\n\n"
+            . "*Pengajuan CM Site diatas sudah selesai dan laporan CM/PM sudah di terima.*\n"
+            . "*Silahkan login ke sistem untuk melihat detailnya.*";
+        
+        \App\Services\WhatsAppService::sendToRole('accounting', $waMessage);
+
+        return redirect()->back()->with('success', '✅ Site dinyatakan DONE.');
     }
 }

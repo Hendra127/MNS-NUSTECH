@@ -20,6 +20,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 
 use App\Http\Controllers\PiketController;
+use App\Http\Controllers\PengirimanController;
 use App\Http\Controllers\SummaryPMController;
 use App\Http\Controllers\LandingpageController;
 use App\Http\Controllers\ProfileController;
@@ -440,3 +441,16 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/logs/{siteId}', [MikrotikController::class, 'getCommandLogs'])->name('logs');
     });
 });
+
+use App\Http\Controllers\InventoryController;
+
+Route::prefix('inventory')->group(function () {
+    Route::post('/pengajuan', [InventoryController::class, 'storeSparepart'])->name('inventory.pengajuan.store');
+    Route::post('/pengiriman', [InventoryController::class, 'storePengiriman'])->name('inventory.pengiriman.store');
+    Route::post('/tracker/{id}/update-repair', [InventoryController::class, 'updateRepairStatus'])->name('inventory.tracker.update-repair');
+});
+
+// --- PENGIRIMAN ROUTES ---
+Route::get('/pengiriman', [PengirimanController::class, 'index'])->name('pengiriman.index');
+Route::post('/pengiriman', [PengirimanController::class, 'store'])->name('pengiriman.store');
+Route::post('/pengiriman/terima/{id}', [PengirimanController::class, 'terima'])->name('pengiriman.terima');

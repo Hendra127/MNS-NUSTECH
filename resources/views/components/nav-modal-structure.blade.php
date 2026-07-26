@@ -3,7 +3,7 @@
         <div class="nav-modal-close-wrapper">
             <span class="nav-close" onclick="closeNavModal()">&times;</span>
         </div>
-        
+
         <div class="nav-modal-header">
             <h2>Daftar Halaman Operasional</h2>
             <p>Akses cepat menu manajemen proyek operasional</p>
@@ -18,11 +18,14 @@
                 </div>
                 <ul>
                     <li><a href="{{ route('datasite') }}"><i class="bi bi-geo-alt me-2"></i> Data Site</a></li>
-                    <li><a href="{{ route('datapas') }}"><i class="bi bi-shield-lock me-2"></i> Manajemen Password</a></li>
+                    <li><a href="{{ route('datapas') }}"><i class="bi bi-shield-lock me-2"></i> Manajemen Password</a>
+                    </li>
                     @if(auth()->check() && auth()->user()->hasAdminAccess())
-                        <li><a href="{{ route('laporancm') }}"><i class="bi bi-tools me-2"></i> Correctiv Maintenance</a></li>
+                        <li><a href="{{ route('laporancm') }}"><i class="bi bi-tools me-2"></i> Correctiv Maintenance</a>
+                        </li>
                     @endif
-                    <li><a href="{{ route('pmliberta') }}"><i class="bi bi-shield-check me-2"></i> Preventive Maintenance</a></li>
+                    <li><a href="{{ route('pmliberta') }}"><i class="bi bi-shield-check me-2"></i> Preventive
+                            Maintenance</a></li>
                     <li><a href="{{ route('summarypm') }}"><i class="bi bi-graph-up me-2"></i> Summary PM</a></li>
                 </ul>
             </div>
@@ -34,33 +37,42 @@
                     <h3>Tiket</h3>
                 </div>
                 <ul>
-                    <li><a href="{{ route('open.ticket') }}"><i class="bi bi-envelope-open me-2"></i> Open Tiket</a></li>
-                    <li><a href="{{ route('close.ticket') }}"><i class="bi bi-envelope-check me-2"></i> Close Tiket</a></li>
-                    <li><a href="{{ route('detailticket') }}"><i class="bi bi-file-earmark-text me-2"></i> Detail Tiket</a></li>
-                    <li><a href="{{ route('summaryticket') }}"><i class="bi bi-pie-chart me-2"></i> Summary Tiket</a></li>
+                    <li><a href="{{ route('open.ticket') }}"><i class="bi bi-envelope-open me-2"></i> Open Tiket</a>
+                    </li>
+                    <li><a href="{{ route('close.ticket') }}"><i class="bi bi-envelope-check me-2"></i> Close Tiket</a>
+                    </li>
+                    <li><a href="{{ route('detailticket') }}"><i class="bi bi-file-earmark-text me-2"></i> Detail
+                            Tiket</a></li>
+                    <li><a href="{{ route('summaryticket') }}"><i class="bi bi-pie-chart me-2"></i> Summary Tiket</a>
+                    </li>
                 </ul>
             </div>
 
             <!-- GROUP 3: LOG & TRACKER -->
             @if(auth()->check() && auth()->user()->hasAdminAccess())
-            <div class="nav-column">
-                <div class="column-header">
-                    <div class="icon-box purple"><i class="bi bi-gear-wide-connected"></i></div>
-                    <h3>Log Perangkat</h3>
+                <div class="nav-column">
+                    <div class="column-header">
+                        <div class="icon-box purple"><i class="bi bi-gear-wide-connected"></i></div>
+                        <h3>Log Perangkat</h3>
+                    </div>
+                    @if(auth()->check() && auth()->user()->hasAdminAccess())
+                        <ul>
+                            <li><a href="{{ route('pergantianperangkat') }}"><i class="bi bi-arrow-repeat me-2"></i> Pergantian
+                                    Perangkat</a></li>
+                            <li><a href="{{ route('logpergantian') }}"><i class="bi bi-journal-text me-2"></i> Log
+                                    Pergantian</a></li>
+                            <li><a href="{{ route('sparetracker') }}"><i class="bi bi-box-seam me-2"></i> Spare Tracker</a></li>
+                            <li><a href="{{ route('summaryperangkat') }}"><i class="bi bi-bar-chart-steps me-2"></i> Summary
+                                    Perangkat</a></li>
+                        </ul>
+                    @else
+                        <ul>
+                            <li class="text-muted"
+                                style="padding: 8px 14px; font-size: 12px; color: #94a3b8; font-style: italic;"><i
+                                    class="bi bi-lock me-2"></i> Akses Terbatas</li>
+                        </ul>
+                    @endif
                 </div>
-                @if(auth()->check() && auth()->user()->hasAdminAccess())
-                <ul>
-                    <li><a href="{{ route('pergantianperangkat') }}"><i class="bi bi-arrow-repeat me-2"></i> Pergantian Perangkat</a></li>
-                    <li><a href="{{ route('logpergantian') }}"><i class="bi bi-journal-text me-2"></i> Log Pergantian</a></li>
-                    <li><a href="{{ route('sparetracker') }}"><i class="bi bi-box-seam me-2"></i> Spare Tracker</a></li>
-                    <li><a href="{{ route('summaryperangkat') }}"><i class="bi bi-bar-chart-steps me-2"></i> Summary Perangkat</a></li>
-                </ul>
-                @else
-                <ul>
-                    <li class="text-muted" style="padding: 8px 14px; font-size: 12px; color: #94a3b8; font-style: italic;"><i class="bi bi-lock me-2"></i> Akses Terbatas</li>
-                </ul>
-                @endif
-            </div>
             @endif
             <!-- GROUP 4: PROJECT MANAGEMENT -->
             <div class="nav-column">
@@ -71,9 +83,11 @@
                 <ul>
                     <li><a href="{{ route('todolist') }}"><i class="bi bi-check2-square me-2"></i> My Todo List</a></li>
                     @if(auth()->check() && auth()->user()->hasAdminAccess())
-                        <li><a href="{{ route('jadwalpiket') }}"><i class="bi bi-calendar-event me-2"></i> Jadwal Piket</a></li>
+                        <li><a href="{{ route('jadwalpiket') }}"><i class="bi bi-calendar-event me-2"></i> Jadwal Piket</a>
+                        </li>
                         <li><a href="{{ route('remotelog') }}"><i class="bi bi-shield-lock me-2"></i> Log Remote</a></li>
-                        <li><a href="{{ route('admin.home') }}"><i class="bi bi-sliders me-2"></i> Kelola Landing Page</a></li>
+                        <li><a href="{{ route('admin.home') }}"><i class="bi bi-sliders me-2"></i> Kelola Landing Page</a>
+                        </li>
                     @endif
                 </ul>
             </div>
@@ -85,9 +99,12 @@
                     <h3>Pengajuan Dana</h3>
                 </div>
                 <ul>
-                    <li><a href="{{ route('sparepart_needed') }}"><i class="bi bi-tools me-2"></i> Pengajuan Perangkat</a></li>
-                    <li><a href="{{ route('csr.index') }}"><i class="bi bi-file-earmark-medical me-2"></i> Pengajuan CSR</a></li>
-                    <li><a href="{{ route('cm.index') }}"><i class="bi bi-file-earmark-check me-2"></i> Pengajuan CM</a></li>
+                    <li><a href="{{ route('sparepart_needed') }}"><i class="bi bi-tools me-2"></i> Pengajuan
+                            Perangkat</a></li>
+                    <li><a href="{{ route('csr.index') }}"><i class="bi bi-file-earmark-medical me-2"></i> Pengajuan
+                            CSR</a></li>
+                    <li><a href="{{ route('cm.index') }}"><i class="bi bi-file-earmark-check me-2"></i> Pengajuan CM</a>
+                    </li>
                 </ul>
             </div>
         </div>

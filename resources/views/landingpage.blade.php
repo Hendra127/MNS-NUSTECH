@@ -2,7 +2,6 @@
 <html lang="id">
 
 <head>
-  @include('partials.pwa-head')
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Landing Page Nustech</title>
@@ -447,6 +446,8 @@
             <li><a href="{{ route('logpergantian') }}" class="block px-3 py-2 border-b border-gray-50">Log Pergantian</a>
             </li>
             <li><a href="{{ route('sparetracker') }}" class="block px-3 py-2 border-b border-gray-50">Spare Tracker</a></li>
+            <li><a href="{{ route('pengiriman.index') }}" class="block px-3 py-2 border-b border-gray-50">Pengiriman</a>
+            </li>
             <li><a href="{{ route('summaryperangkat') }}" class="block px-3 py-2 border-b border-gray-50">PM Summary</a>
             </li>
 
@@ -462,10 +463,10 @@
           @if(Auth::user()->role !== 'user')
             <!-- Pengajuan -->
             <li class="font-bold px-3 pt-4 text-blue-600 text-sm">PENGAJUAN</li>
+            <li><a href="{{ route('sparepart_needed') }}" class="block px-3 py-2 border-b border-gray-50">Pengajuan
+                Perangkat</a></li>
             <li><a href="{{ route('csr.index') }}" class="block px-3 py-2 border-b border-gray-50">Pengajuan CSR</a></li>
             <li><a href="{{ route('cm.index') }}" class="block px-3 py-2 border-b border-gray-50">Pengajuan CM</a></li>
-            <li><a href="{{ route('sparepart_needed') }}" class="block px-3 py-2 border-b border-gray-50">Sparepart
-                Needed</a></li>
           @endif
         @endauth
 

@@ -7,6 +7,7 @@ use App\Models\HomePortfolio;
 use App\Models\HomeNews;
 use App\Models\LandingPageContent;
 use App\Models\ServiceModalItem;
+use App\Models\HomePartner;
 use Illuminate\Support\Str;
 
 class HomeAdminController extends Controller
@@ -79,8 +80,10 @@ class HomeAdminController extends Controller
 
         // Load service modal items grouped by modal key
         $modalItems = ServiceModalItem::orderBy('order')->get()->groupBy('modal_key');
+        
+        $partners = HomePartner::all();
 
-        return view('admin.home', compact('portfolios', 'instagramNews', 'generalNews', 'totalViews', 'chartLabels', 'chartData', 'content', 'contentItems', 'modalItems'));
+        return view('admin.home', compact('portfolios', 'instagramNews', 'generalNews', 'totalViews', 'chartLabels', 'chartData', 'content', 'contentItems', 'modalItems', 'partners'));
     }
 
     /**
@@ -333,5 +336,59 @@ class HomeAdminController extends Controller
         $this->checkAccess();
         ServiceModalItem::findOrFail($id)->delete();
         return redirect()->back()->with('success', 'Item modal berhasil dihapus.');
+    }
+
+    // ==========================================
+    // PARTNERS / MITRA
+    // ==========================================
+    public function storePartner(Request $request)
+    {
+        $this->checkAccess();
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'icon' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
+        ]);
+
+        $data = $request->only(['name', 'icon']);
+        if ($request->hasFile('image')) {
+            $data['image_path'] = $this->storeImageToPublic($request->file('image'), 'partners');
+        }
+
+        HomePartner::create($data);
+
+        return redirect()->back()->with('success', 'Mitra berhasil ditambahkan.');
+    }
+
+    public function updatePartner(Request $request, $id)
+    {
+        $this->checkAccess();
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'icon' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
+        ]);
+
+        $partner = HomePartner::findOrFail($id);
+        $data = $request->only(['name', 'icon']);
+
+        if ($request->hasFile('image')) {
+            $this->deleteImageFromPublic($partner->image_path);
+            $data['image_path'] = $this->storeImageToPublic($request->file('image'), 'partners');
+        }
+
+        $partner->update($data);
+
+        return redirect()->back()->with('success', 'Mitra berhasil diperbarui.');
+    }
+
+    public function destroyPartner($id)
+    {
+        $this->checkAccess();
+        $partner = HomePartner::findOrFail($id);
+        $this->deleteImageFromPublic($partner->image_path);
+        $partner->delete();
+
+        return redirect()->back()->with('success', 'Mitra berhasil dihapus.');
     }
 }

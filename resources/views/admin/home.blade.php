@@ -140,6 +140,11 @@
                     Item Layanan (Modal)
                     <span class="ml-auto text-[10px] badge-info px-2 py-0.5 rounded-full font-bold">Kelola</span>
                 </button>
+                <button onclick="switchTab('partners')" id="sidelink-partners" class="sidebar-link w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-500 dark:text-gray-400 text-left">
+                    <span class="icon w-4 text-center"><i class="fa-solid fa-handshake text-xs"></i></span>
+                    Mitra / Instansi
+                    <span class="ml-auto text-[10px] badge-info px-2 py-0.5 rounded-full font-bold">Kelola</span>
+                </button>
             </div>
 
             <div class="border-t border-[var(--border)] my-3 pt-3">
@@ -385,6 +390,9 @@
                 <button onclick="switchTab('content')" id="tab-btn-content" class="tab-btn px-5 py-3 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 flex items-center gap-2 transition whitespace-nowrap">
                     <i class="fa-solid fa-pen-nib text-xs"></i> Konten Teks
                     <span class="badge-warn text-[10px] px-2 py-0.5 rounded-full font-bold ml-1">Edit</span>
+                </button>
+                <button onclick="switchTab('partners')" id="tab-btn-partners" class="tab-btn px-5 py-3 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 flex items-center gap-2 transition whitespace-nowrap">
+                    <i class="fa-solid fa-handshake text-xs"></i> Mitra & Instansi
                 </button>
             </div>
 
@@ -793,6 +801,63 @@
                     </div>
                 </div>
                 @endforeach
+            </div>
+
+            {{-- ====== TAB: PARTNERS ====== --}}
+            <div id="tab-partners" class="tab-pane hidden space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                        <h3 class="text-base font-bold text-gray-900 dark:text-white font-heading">Mitra & Instansi</h3>
+                        <p class="text-xs text-[var(--text-muted)] mt-0.5">Kelola logo mitra/instansi yang tampil berjalan (marquee) di halaman utama.</p>
+                    </div>
+                    <button onclick="openModal('modal-add-partner')"
+                        class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-lg shadow-indigo-600/20">
+                        <i class="fa-solid fa-plus"></i> Tambah Mitra
+                    </button>
+                </div>
+
+                @if($partners->isEmpty())
+                <div class="rounded-xl border border-[var(--border)] py-16 text-center" style="background: var(--panel);">
+                    <div class="w-14 h-14 rounded-full bg-black/5 dark:bg-white/5 border border-[var(--border)] flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-handshake text-gray-500 dark:text-gray-400 text-xl"></i>
+                    </div>
+                    <h4 class="text-gray-900 dark:text-white font-semibold text-sm">Belum Ada Mitra</h4>
+                    <p class="text-[var(--text-muted)] text-xs mt-2 max-w-xs mx-auto">Tambahkan logo instansi yang bekerja sama dengan Anda.</p>
+                    <button onclick="openModal('modal-add-partner')"
+                        class="mt-5 inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition shadow-lg shadow-indigo-600/20">
+                        <i class="fa-solid fa-plus"></i> Tambah Sekarang
+                    </button>
+                </div>
+                @else
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    @foreach($partners as $partner)
+                    <div class="card-hover rounded-xl border border-[var(--border)] overflow-hidden flex flex-col group" style="background: var(--panel);">
+                        <div class="flex-1 p-4 flex flex-col items-center justify-center text-center gap-3">
+                            @if($partner->image_path)
+                                <img src="{{ asset($partner->image_path) }}" alt="{{ $partner->name }}" class="h-10 object-contain max-w-full">
+                            @elseif($partner->icon)
+                                <i class="{{ $partner->icon }} text-3xl text-gray-400"></i>
+                            @else
+                                <i class="fa-solid fa-building text-3xl text-gray-400"></i>
+                            @endif
+                            <span class="text-xs font-semibold text-gray-900 dark:text-white line-clamp-2">{{ $partner->name }}</span>
+                        </div>
+                        <div class="px-3 pb-3 flex items-center gap-2 border-t border-[var(--border)] pt-2 mt-auto">
+                            <button onclick='openEditPartnerModal({{ $partner->id }}, @json($partner->name), @json($partner->icon))'
+                                class="flex-1 flex items-center justify-center gap-1.5 py-1.5 bg-black/5 dark:bg-white/5 hover:bg-indigo-500/10 hover:text-indigo-400 text-gray-400 dark:text-gray-600 rounded-lg text-[10px] font-semibold border border-[var(--border)] transition">
+                                <i class="fa-solid fa-pen text-[9px]"></i>
+                            </button>
+                            <form action="{{ route('admin.home.partner.destroy', $partner->id) }}" method="POST" onsubmit="return confirm('Hapus mitra ini?');" class="flex-1 flex">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="flex-1 flex items-center justify-center gap-1.5 py-1.5 bg-black/5 dark:bg-white/5 hover:bg-red-500/10 hover:text-red-400 text-gray-400 dark:text-gray-600 rounded-lg text-[10px] font-semibold border border-[var(--border)] transition">
+                                    <i class="fa-solid fa-trash text-[9px]"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                @endif
             </div>
 
             {{-- ====== PREVIEW SECTION ====== --}}
@@ -1297,6 +1362,78 @@
         </div>
     </div>
 
+    </div>
+
+    <!-- ====== MODAL ADD PARTNER ====== -->
+    <div id="modal-add-partner" class="fixed inset-0 z-50 hidden modal-overlay bg-white/90 dark:bg-black/70 flex items-center justify-center p-4">
+        <div class="modal-box w-full max-w-lg rounded-2xl border border-[var(--border)] shadow-2xl overflow-hidden" style="background: var(--panel);">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center">
+                        <i class="fa-solid fa-plus text-indigo-400 text-sm"></i>
+                    </div>
+                    <h4 class="font-bold text-gray-900 dark:text-white text-sm font-heading">Tambah Mitra / Instansi</h4>
+                </div>
+                <button onclick="closeModal('modal-add-partner')" class="w-7 h-7 rounded-lg bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:bg-white/10 text-gray-400 dark:text-gray-600 hover:text-gray-900 dark:text-white flex items-center justify-center transition cursor-pointer">&times;</button>
+            </div>
+            <form action="{{ route('admin.home.partner.store') }}" method="POST" enctype="multipart/form-data" class="p-6 space-y-4">
+                @csrf
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Nama Mitra/Instansi <span class="text-red-400">*</span></label>
+                    <input type="text" name="name" required class="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Upload Logo (Opsional)</label>
+                    <input type="file" name="image" accept="image/*" class="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none transition file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                    <p class="text-[10px] text-gray-500 mt-1">Gunakan gambar PNG/SVG berlatar transparan untuk hasil terbaik.</p>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Class Ikon FontAwesome (Jika tanpa logo)</label>
+                    <input type="text" name="icon" placeholder="Contoh: fa-solid fa-building" class="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none transition">
+                </div>
+                <div class="flex items-center gap-3 pt-3 border-t border-[var(--border)]">
+                    <button type="button" onclick="closeModal('modal-add-partner')" class="flex-1 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:bg-white/10 text-gray-400 dark:text-gray-600 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer">Batal</button>
+                    <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-xs font-bold transition shadow-lg shadow-indigo-600/20 cursor-pointer">Simpan Mitra</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ====== MODAL EDIT PARTNER ====== -->
+    <div id="modal-edit-partner" class="fixed inset-0 z-50 hidden modal-overlay bg-white/90 dark:bg-black/70 flex items-center justify-center p-4">
+        <div class="modal-box w-full max-w-lg rounded-2xl border border-[var(--border)] shadow-2xl overflow-hidden" style="background: var(--panel);">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center">
+                        <i class="fa-solid fa-pen text-indigo-400 text-sm"></i>
+                    </div>
+                    <h4 class="font-bold text-gray-900 dark:text-white text-sm font-heading">Edit Mitra / Instansi</h4>
+                </div>
+                <button onclick="closeModal('modal-edit-partner')" class="w-7 h-7 rounded-lg bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:bg-white/10 text-gray-400 dark:text-gray-600 hover:text-gray-900 dark:text-white flex items-center justify-center transition cursor-pointer">&times;</button>
+            </div>
+            <form id="form-edit-partner" method="POST" enctype="multipart/form-data" class="p-6 space-y-4">
+                @csrf @method('PUT')
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Nama Mitra/Instansi <span class="text-red-400">*</span></label>
+                    <input type="text" name="name" id="edit-partner-name" required class="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Ganti Logo (Opsional)</label>
+                    <input type="file" name="image" accept="image/*" class="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none transition file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                    <p class="text-[10px] text-gray-500 mt-1">Kosongkan jika tidak ingin mengubah logo yang sudah ada.</p>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Class Ikon FontAwesome</label>
+                    <input type="text" name="icon" id="edit-partner-icon" placeholder="Contoh: fa-solid fa-building" class="w-full bg-[var(--bg)] border border-[var(--border)] rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:border-indigo-500 focus:outline-none transition">
+                </div>
+                <div class="flex items-center gap-3 pt-3 border-t border-[var(--border)]">
+                    <button type="button" onclick="closeModal('modal-edit-partner')" class="flex-1 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:bg-white/10 text-gray-400 dark:text-gray-600 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer">Batal</button>
+                    <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-xs font-bold transition shadow-lg shadow-indigo-600/20 cursor-pointer">Update Mitra</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- ====================================================
          SCRIPTS
     ==================================================== -->
@@ -1388,11 +1525,11 @@
             // Toggle dashboard stats and inner tab navigation
             const stats = document.getElementById('dashboard-stats');
             const innerTabNav = document.getElementById('inner-tab-navigation');
-            
+                      
             if (tabId === 'dashboard') {
                 if (stats) stats.classList.remove('hidden');
                 if (innerTabNav) innerTabNav.classList.remove('hidden');
-            } else if (tabId === 'portfolio' || tabId === 'general' || tabId === 'news' || tabId === 'content') {
+            } else if (tabId === 'portfolio' || tabId === 'general' || tabId === 'news' || tabId === 'content' || tabId === 'partners') {
                 if (stats) stats.classList.add('hidden');
                 if (innerTabNav) innerTabNav.classList.remove('hidden');
             } else {
@@ -1404,15 +1541,17 @@
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('active');
                 btn.classList.add('text-gray-500', 'dark:text-gray-400');
-                btn.classList.remove('text-blue-400', 'text-pink-400');
+                btn.classList.remove('text-blue-400', 'text-sky-400', 'text-pink-400', 'text-amber-400', 'text-indigo-400');
             });
+
+            // Highlight active inner tab button if it exists
             const activeTabBtn = document.getElementById('tab-btn-' + tabId);
             if (activeTabBtn) {
                 activeTabBtn.classList.add('active');
                 activeTabBtn.classList.remove('text-gray-500', 'dark:text-gray-400');
-                const colorMap = { portfolio: 'text-blue-400', general: 'text-sky-400', news: 'text-pink-400', content: 'text-amber-400' };
+                const colorMap = { portfolio: 'text-blue-400', general: 'text-sky-400', news: 'text-pink-400', content: 'text-amber-400', partners: 'text-indigo-400' };
                 activeTabBtn.classList.add(colorMap[tabId] || 'text-blue-400');
-            }
+            }   
 
             // Update sidebar links
             document.querySelectorAll('[id^="sidelink-"]').forEach(el => {
@@ -1507,6 +1646,13 @@
             document.getElementById('edit-mi-description').value = description || '';
             document.getElementById('form-edit-modalitem').action = `/admin/home/modal-items/${id}`;
             openModal('modal-edit-modalitem');
+        }
+
+        function openEditPartnerModal(id, name, icon) {
+            document.getElementById('edit-partner-name').value = name;
+            document.getElementById('edit-partner-icon').value = icon || '';
+            document.getElementById('form-edit-partner').action = `/admin/home/partners/${id}`;
+            openModal('modal-edit-partner');
         }
 
         // ---- LIVE CLOCK ----

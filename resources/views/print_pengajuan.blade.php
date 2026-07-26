@@ -237,7 +237,11 @@
             </div>
             <div class="judul-kanan">
                 <h2>FORMULIR PENGAJUAN</h2>
-                <h1>PENGADAAN BARANG INVENTARIS</h1>
+                @if(($data['tipe_pengajuan'] ?? ($pengajuan->tipe_pengajuan ?? '')) === 'Repair Perangkat')
+                    <h1>REPAIR PERANGKAT</h1>
+                @else
+                    <h1>PENGADAAN BARANG INVENTARIS</h1>
+                @endif
             </div>
         </div>
 
@@ -258,6 +262,13 @@
                 <div class="info-separator">:</div>
                 <div class="info-value">{{ $pengajuan->no_surat ?? '-' }}</div>
             </div>
+            @if(($data['tipe_pengajuan'] ?? ($pengajuan->tipe_pengajuan ?? '')) === 'Repair Perangkat')
+            <div class="info-row">
+                <div class="info-label">Tipe Pengajuan</div>
+                <div class="info-separator">:</div>
+                <div class="info-value">Repair Perangkat</div>
+            </div>
+            @endif
 
         </div>
 

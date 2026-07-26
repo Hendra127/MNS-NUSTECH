@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Sparetracker;
 use App\Models\Site;
+use App\Models\LogPergantian;
+use Illuminate\Support\Facades\Auth;
 
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\LogTrackerImport;
 use App\Exports\LogTrackerExport;
+
 
 class SparetrackerController extends Controller
 {
@@ -75,6 +78,59 @@ class SparetrackerController extends Controller
         return back()->with('success', 'Data berhasil diimpor.');
     }
 
+    private function isMatch($val1, $val2)
+    {
+        return strtolower(trim($val1)) === strtolower(trim($val2));
+    }
+
+    public function updateRepairStatus(Request $request, $id)
+    {
+        $spare = Sparetracker::findOrFail($id);
+
+        if ($spare->status_penggunaan_sparepart !== 'Proses Repair') {
+            return redirect()->back()->with('error', 'Item ini tidak sedang dalam proses repair.');
+        }
+
+        $request->validate([
+            'kondisi_repair' => 'required|in:Kondisi Baik,Kondisi Buruk'
+        ]);
+
+        // Simpan nilai lama untuk log
+        $statusLama  = $spare->status_penggunaan_sparepart;
+        $kondisiLama = $spare->kondisi;
+
+        // Tentukan nilai baru
+        $kondisiBaru = $request->kondisi_repair === 'Kondisi Baik' ? 'BAIK' : 'RUSAK';
+        $statusBaru  = 'Stok';
+
+        // Update Sparetracker
+        $updateData = [
+            'kondisi'                     => $kondisiBaru,
+            'status_penggunaan_sparepart' => $statusBaru,
+        ];
+
+        if ($kondisiBaru === 'BAIK') {
+            $updateData['kabupaten'] = 'KOTA BANDUNG';
+            $updateData['lokasi_realtime'] = 'NUSTECH';
+        }
+
+        $spare->update($updateData);
+
+        // Otomatis catat ke log_pergantians
+        LogPergantian::create([
+            'sn_perangkat' => $spare->sn ?? 'N/A',
+            'aksi'         => 'repair_selesai',
+            'keterangan'   => 'Repair selesai. Hasil: ' . $request->kondisi_repair . '. Perangkat: ' . ($spare->nama_perangkat ?? '-'),
+            'status_lama'  => $statusLama,
+            'status_baru'  => $statusBaru,
+            'kondisi_lama' => $kondisiLama,
+            'kondisi_baru' => $kondisiBaru,
+            'user_id'      => Auth::id(),
+        ]);
+
+        return redirect()->back()->with('success', 'Status repair berhasil diupdate dan tercatat di Log Pergantian.');
+    }
+
     public function export()
     {
         return Excel::download(new LogTrackerExport, 'logtracker.xlsx');
@@ -112,6 +168,9 @@ class SparetrackerController extends Controller
     public function update(Request $request)
     {
         $data = Sparetracker::findOrFail($request->id);
+        
+        $statusLama = $data->status_penggunaan_sparepart;
+        $snLama = $data->sn;
 
         $validated = $request->validate([
             'sn' => 'required|string|max:255',
@@ -132,6 +191,29 @@ class SparetrackerController extends Controller
             'layanan_ai' => 'nullable|string|max:255',
             'keterangan' => 'nullable|string',
         ]);
+
+        // Auto-update status jika dari 'Tahap Pengadaan' dan SN baru dimasukkan
+        $isRandomSN = str_starts_with($snLama, 'SN-');
+        if ($statusLama === 'Tahap Pengadaan' && ($isRandomSN || empty($snLama)) && !empty($validated['sn']) && $validated['sn'] !== $snLama) {
+            $validated['status_penggunaan_sparepart'] = 'Stok';
+            $validated['kondisi'] = 'BAIK'; // asumsikan kondisi selalu baik untuk barang baru
+            $validated['tanggal_masuk'] = now();
+            $validated['lokasi_realtime'] = 'NUSTECH';
+            $validated['kabupaten'] = 'MATARAM';
+            $validated['keterangan'] = 'Pembelian Baru selesai, SN ditambahkan.';
+            
+            // Catat log
+            LogPergantian::create([
+                'sn_perangkat' => $validated['sn'],
+                'aksi' => 'pengadaan_selesai',
+                'keterangan' => 'Pengadaan selesai, SN ditambahkan. Masuk sebagai Stok. Lokasi NUSTECH, MATARAM.',
+                'status_lama' => 'Tahap Pengadaan',
+                'status_baru' => 'Stok',
+                'kondisi_lama' => $data->kondisi,
+                'kondisi_baru' => 'BAIK',
+                'user_id' => Auth::id() ?? 1,
+            ]);
+        }
 
         $data->update($validated);
 

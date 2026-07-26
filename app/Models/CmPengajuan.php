@@ -11,6 +11,10 @@ class CmPengajuan extends Model
 
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'is_clear' => 'boolean',
+    ];
+
     private const TTD_PATHS = [
         'pemohon'    => 'assets/img/ttd/pemohon.png',
         'manager'    => 'assets/img/ttd/manager.png',

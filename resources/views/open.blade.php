@@ -359,7 +359,7 @@
             <div class="user-profile-wrapper" style="position: relative;">
                 <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
                         @if(auth()->check() && auth()->user()->photo)
-                            <img src="{{ asset('storage/' . auth()->user()->photo) }}" alt="Profile"
+                            <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
                                 style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                         @else
                             <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
@@ -693,7 +693,7 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label fw-bold">Problem</label>
-                                            @php $kendalaOpts = ['PERANGKAT TIDAK ADA INTERNET', 'INTERNET TIDAK BISA DIGUNAKAN', 'PASSWORD SALAH', 'PERANGKAT INTERNET RUSAK']; @endphp
+                                            @php $kendalaOpts = ['PERANGKAT TIDAK ADA INTERNET', 'INTERNET TIDAK BISA TERSAMBUNG', 'PERANGKAT MATI', 'PERANGKAT INTERNET RUSAK']; @endphp
                                             <select name="kendala" class="form-select" required>
                                                 <option value="">-- Pilih Kendala --</option>
                                                 @foreach($kendalaOpts as $opt)
@@ -715,7 +715,7 @@
                                                     <select class="form-select form-select-sm" onchange="addHardwareChip('{{ $t->id }}', this.value); this.value='';"
                                                         style="border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-color: #dee2e6 !important;">
                                                         <option value="">-- Pilih Perangkat Yang Bermasalah --</option>
-                                                        @foreach(['MODEM', 'ROUTER', 'AP1', 'AP2', 'TRANSCEIVER', 'STAVOLT', 'RAK', 'ANTENA', 'LAIN LAIN'] as $opt)
+                                                        @foreach(['KELISTRIKAN', 'MODEM', 'ROUTER', 'AP1', 'AP2', 'TRANSCEIVER', 'STAVOLT', 'RAK', 'ANTENA', 'LIBUR SEKOLAH', 'LAIN LAIN'] as $opt)
                                                             <option value="{{ $opt }}">{{ $opt }}</option>
                                                         @endforeach
                                                     </select>
@@ -775,13 +775,13 @@
                                                 @if($t->evidences->count() > 0)
                                                     @foreach($t->evidences as $ev)
                                                         <div class="position-relative">
-                                                            <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage/' . $ev->path) }}')" class="badge bg-info text-white text-decoration-none">
+                                                            <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage_public/' . $ev->path) }}')" class="badge bg-info text-white text-decoration-none">
                                                                 <i class="bi bi-paperclip"></i> Bukti #{{ $loop->iteration }}
                                                             </a>
                                                         </div>
                                                     @endforeach
                                                 @elseif($t->evidence && str_contains($t->evidence, '.'))
-                                                    <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage/' . $t->evidence) }}')" class="badge bg-secondary text-white text-decoration-none">
+                                                    <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage_public/' . $t->evidence) }}')" class="badge bg-secondary text-white text-decoration-none">
                                                         <i class="bi bi-paperclip"></i> Bukti Lama
                                                     </a>
                                                 @else
@@ -850,7 +850,7 @@
                                                 @php $zFiles = array_filter(explode(',', $t->zabbix_evidence ?? '')); @endphp
                                                 @if(count($zFiles) > 0)
                                                     @foreach($zFiles as $index => $zPath)
-                                                        <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage/' . $zPath) }}')" class="badge bg-success text-white text-decoration-none">
+                                                        <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage_public/' . $zPath) }}')" class="badge bg-success text-white text-decoration-none">
                                                             <i class="bi bi-graph-up"></i> Zabbix #{{ $index + 1 }}
                                                         </a>
                                                     @endforeach
@@ -974,12 +974,12 @@
                                                             <div class="d-flex flex-column gap-1">
                                                                 @if($t->evidences->count() > 0)
                                                                     @foreach($t->evidences as $ev)
-                                                                        <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage/' . $ev->path) }}')" class="text-primary text-decoration-none small">
+                                                                        <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage_public/' . $ev->path) }}')" class="text-primary text-decoration-none small">
                                                                             <i class="bi bi-eye"></i> Lihat Bukti #{{ $loop->iteration }}
                                                                         </a>
                                                                     @endforeach
                                                                 @elseif($t->evidence && str_contains($t->evidence, '.'))
-                                                                     <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage/' . $t->evidence) }}')" class="text-primary text-decoration-none small">
+                                                                     <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage_public/' . $t->evidence) }}')" class="text-primary text-decoration-none small">
                                                                         <i class="bi bi-eye"></i> Lihat Bukti Utama
                                                                     </a>
                                                                 @else
@@ -994,7 +994,7 @@
                                                             <div class="d-flex flex-wrap gap-2">
                                                                 @php $zFiles = array_filter(explode(',', $t->zabbix_evidence ?? '')); @endphp
                                                                 @forelse($zFiles as $index => $zPath)
-                                                                    <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage/' . $zPath) }}')" class="btn btn-sm btn-outline-success rounded-pill">
+                                                                    <a href="javascript:void(0)" onclick="viewEvidence('{{ asset('storage_public/' . $zPath) }}')" class="btn btn-sm btn-outline-success rounded-pill">
                                                                         <i class="bi bi-graph-up-arrow me-1"></i> Capture #{{ $index + 1 }}
                                                                     </a>
                                                                 @empty
@@ -1117,7 +1117,7 @@
                                 required>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Tanggal Rekap</label>
+                            <label class="form-label">Tanggal Open</label>
                             <input type="date" name="tanggal_rekap" class="form-control" value="{{ date('Y-m-d') }}">
                         </div>
                         <div class="col-md-4">
@@ -1131,7 +1131,7 @@
                                 <option value="">-- Pilih Kendala --</option>
                                 <option value="PERANGKAT TIDAK ADA INTERNET">PERANGKAT TIDAK ADA INTERNET</option>
                                 <option value="INTERNET TIDAK BISA TERSAMBUNG">INTERNET TIDAK BISA TERSAMBUNG</option>
-                                <option value="PASSWORD SALAH">PASSWORD SALAH</option>
+                                <option value="PERANGKAT MATI">PERANGKAT MATI</option>
                                 <option value="PERANGKAT INTERNET RUSAK">PERANGKAT INTERNET RUSAK</option>
                             </select>
                         </div>
@@ -1144,7 +1144,7 @@
                                     <select class="form-select form-select-sm" onchange="addHardwareChip('tambah', this.value); this.value='';"
                                         style="border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-color: #dee2e6 !important;">
                                         <option value="">-- Pilih Perangkat Yang Bermasalah --</option>
-                                        @foreach(['MODEM', 'ROUTER', 'AP1', 'AP2', 'TRANSCEIVER', 'STAVOLT', 'RAK', 'ANTENA', 'LAIN LAIN'] as $opt)
+                                        @foreach(['KELISTRIKAN', 'MODEM', 'ROUTER', 'AP1', 'AP2', 'TRANSCEIVER', 'STAVOLT', 'RAK', 'ANTENA', 'LIBUR SEKOLAH', 'LAIN LAIN'] as $opt)
                                             <option value="{{ $opt }}">{{ $opt }}</option>
                                         @endforeach
                                     </select>

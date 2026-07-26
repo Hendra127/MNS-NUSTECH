@@ -9,8 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}?v=1.1">
     <script src="{{ asset('js/nav-modal.js') }}"></script>
     <script src="{{ asset('js/profile-dropdown.js') }}"></script>
-    @include('components.nav-modal-structure')
-    <meta charset="UTF-8">
+        <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CSR Pengajuan | Project Operational</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -191,6 +190,144 @@
         .penerima-info {
             line-height: 1.2;
         }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            padding: 5px 15px;
+            border-radius: 50px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            margin-right: 10px;
+            height: 100%;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            background: transparent;
+            padding: 5px;
+            font-size: 13px;
+        }
+
+        .btn-filter-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
+        }
+
+        .btn-filter-pill:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
+        }
+
+        [data-bs-theme="dark"] .btn-filter-pill {
+            background: linear-gradient(135deg, #1a6fc4, #0d5dbc);
+        }
+        
+        [data-bs-theme="dark"] .search-box {
+            background: #2b3035;
+            border-color: #495057;
+        }
+        [data-bs-theme="dark"] .search-box input {
+            color: #f8f9fa;
+        }
+
+        /* Dark Mode overrides for btn-outline-dark */
+        [data-bs-theme="dark"] .btn-outline-dark {
+            color: #f8f9fa;
+            border-color: #f8f9fa;
+        }
+        [data-bs-theme="dark"] .btn-outline-dark:hover {
+            color: #212529;
+            background-color: #f8f9fa;
+            border-color: #f8f9fa;
+        }
+        [data-bs-theme="dark"] .text-dark {
+            color: #f8f9fa !important;
+        }
+    </style>
+    <style>
+        /* Mobile & Desktop mode responsiveness */
+        body {
+            overflow-x: hidden;
+        }
+        
+        .content-container {
+            max-width: 100vw;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+        
+        .table-responsive-custom {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            display: block;
+        }
+        
+        .tabs-section {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            max-width: 100vw;
+        }
+        
+        .tabs-section::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .tabs-section .tab {
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .content-container {
+                padding: 15px !important;
+                margin: 10px !important;
+                border-radius: 12px;
+                width: calc(100vw - 20px);
+            }
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            .search-form {
+                width: 100%;
+            }
+            .search-box {
+                width: 100%;
+                margin-right: 0;
+            }
+            .search-box input {
+                width: 100%;
+            }
+            .btn-premium, .btn-action-premium {
+                width: 100%;
+                border-radius: 8px;
+                height: 45px;
+            }
+            .btn-premium::after, .btn-action-premium::after {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 
@@ -213,7 +350,7 @@
             <div class="user-profile-wrapper" style="position: relative;">
                 <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
                     @if(auth()->check() && auth()->user()->photo)
-                        <img src="{{ asset('storage/' . auth()->user()->photo) }}" alt="Profile"
+                       <img src="{{ asset('storage_public/' . auth()->user()->photo) }}" alt="Profile"
                             style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
                     @else
                         <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
@@ -252,19 +389,71 @@
     </div>
 
     <div class="content-container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h4 class="fw-bold mb-1">Corporate Social Responsibility</h4>
+        <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3" style="margin-bottom: 20px;">
+            <div class="actions flex-shrink-0">
+                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin', 'user', 'noc_leader']))
+                    <button class="btn btn-primary text-white fw-bold d-flex align-items-center gap-2 rounded-pill px-4 py-2 mt-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambahCsr"
+                        title="Buat Pengajuan Baru" style="background: linear-gradient(135deg, #0d6efd, #0b5ed7); border: none; transition: transform 0.2s; color: white !important;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        <i class="bi bi-plus-lg"></i> Buat Pengajuan
+                    </button>
+                @endif
             </div>
-            @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin', 'user', 'noc_leader']))
-                <button class="btn-premium" data-bs-toggle="modal" data-bs-target="#modalTambahCsr"
-                    title="Buat Pengajuan Baru">
-                    <i class="bi bi-plus-lg"></i>
-                </button>
-            @endif
+            <div class="w-100 mt-2 mt-lg-0">
+                <form method="GET" action="{{ route('csr.index') }}"
+                    class="search-form row g-2 align-items-center w-100 m-0 justify-content-lg-end" id="filterForm">
+
+                    @if(request('status_pembayaran'))
+                        <input type="hidden" name="status_pembayaran" value="{{ request('status_pembayaran') }}">
+                    @endif
+                    
+                    <div class="col-12 col-md-auto">
+                        <select name="status_pembayaran" class="form-select form-select-sm w-100" style="border-radius: 50px;">
+                            <option value="">Semua Status Bayar</option>
+                            <option value="belum_dibayar" {{ request('status_pembayaran') === 'belum_dibayar' ? 'selected' : '' }}>Belum Dibayar</option>
+                            <option value="dp_50" {{ request('status_pembayaran') === 'dp_50' ? 'selected' : '' }}>Sudah di DP 50%</option>
+                            <option value="lunas" {{ request('status_pembayaran') === 'lunas' ? 'selected' : '' }}>Sudah Lunas</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-12 col-md-auto">
+                        <select name="status" class="form-select form-select-sm w-100" style="border-radius: 50px;">
+                            <option value="">Semua Status</option>
+                            <option value="pending_noc" {{ request('status') == 'pending_noc' ? 'selected' : '' }}>Pending NOC Leader</option>
+                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending Manager</option>
+                            <option value="approved_manager" {{ request('status') == 'approved_manager' ? 'selected' : '' }}>Disetujui Manager</option>
+                            <option value="approved_accounting" {{ request('status') == 'approved_accounting' ? 'selected' : '' }}>Disetujui Accounting</option>
+                            <option value="approved_direktur" {{ request('status') == 'approved_direktur' ? 'selected' : '' }}>Disetujui Direktur</option>
+                            <option value="approved_penasihat" {{ request('status') == 'approved_penasihat' ? 'selected' : '' }}>Disetujui Penasihat</option>
+                            <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Ditolak</option>
+                        </select>
+                    </div>
+
+                    <div class="col-auto">
+                        <button type="submit" class="btn-filter-pill w-100 justify-content-center">
+                            <i class="bi bi-funnel"></i> Filter
+                        </button>
+                    </div>
+                    <div class="col-auto">
+                        <a href="{{ route('csr.index') }}"
+                            class="btn btn-light btn-sm rounded-pill border d-flex align-items-center justify-content-center h-100"
+                            style="padding: 8px 12px;"
+                            title="Reset Filter"><i class="bi bi-arrow-repeat"></i></a>
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <div class="search-box d-flex align-items-center w-100">
+                            <input type="text" name="search" id="searchInput" placeholder="Cari No / Divisi / Site / Penerima"
+                                value="{{ request('search') }}"
+                                style="flex-grow: 1; border: none; outline: none; padding-left: 10px;">
+                            <button type="submit" class="search-btn" style="border: none; background: transparent;"><i
+                                    class="bi bi-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
 
-        <div class="table-responsive-custom">
+        <div id="tableCsrContainer">
+            <div class="table-responsive-custom">
             <table class="table-custom">
                 <thead>
                     <tr>
@@ -274,6 +463,7 @@
                         <th style="min-width: 180px;">Penerima & Bank</th>
                         <th>Rincian Kebutuhan</th>
                         <th class="text-end" style="min-width: 130px;">Total Dana</th>
+                        <th class="text-center" style="min-width: 150px;">Status Pembayaran</th>
                         <th class="text-center" style="min-width: 150px;">Progress Approval</th>
                         <th class="text-center">Aksi</th>
                     </tr>
@@ -320,6 +510,28 @@
                             </td>
                             <td class="text-end">
                                 <div class="fw-bold text-success">Rp {{ number_format($csr->total, 0, ',', '.') }}</div>
+                            </td>
+                            <td class="text-center">
+                                  @if($csr->status_pembayaran === 'lunas')
+                                      <span class="badge bg-success" style="min-width: 85px; padding: 5px;">Lunas</span>
+                                  @elseif($csr->status_pembayaran === 'dp_50')
+                                      <span class="badge bg-warning text-dark" style="min-width: 85px; padding: 5px;">DP 50%</span>
+                                  @else
+                                      <span class="badge bg-danger" style="min-width: 85px; padding: 5px;">Belum Dibayar</span>
+                                  @endif
+
+                                  @if(in_array($csr->status_pembayaran, ['lunas', 'dp_50']) && ($csr->bukti_transfer || $csr->bukti_dp))
+                                      <div class="mt-1">
+                                          <button type="button"
+                                              class="btn btn-sm btn-info text-white shadow-sm d-inline-flex align-items-center justify-content-center gap-1"
+                                              style="font-size: 0.72rem; padding: 4px; border-radius: 6px; min-width: 85px;"
+                                              title="Lihat Bukti Pembayaran"
+                                              data-bs-toggle="modal"
+                                              data-bs-target="#modalBuktiCsr{{ $csr->id }}">
+                                              <i class="bi bi-info-circle-fill"></i> Info
+                                          </button>
+                                      </div>
+                                  @endif
                             </td>
                             <td class="text-center">
                                 <span class="badge-status bg-{{ $csr->status_color }}-subtle text-{{ $csr->status_color }}">
@@ -439,11 +651,10 @@
 
                                     {{-- Tombol Edit Catatan/No Surat khusus Accounting --}}
                                     @if(auth()->user()->role === 'accounting')
-                                        <button type="button" class="btn btn-sm"
-                                            style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white;border:none;border-radius:8px;padding:6px 10px;"
+                                        <button type="button" class="btn btn-sm btn-outline-dark"
                                             data-bs-toggle="modal" data-bs-target="#modalNotesCsr{{ $csr->id }}"
                                             title="Isi / Edit Catatan & No Surat">
-                                            <i class="bi bi-journal-text"></i>
+                                            <i class="bi bi-pencil-square"></i>
                                         </button>
                                     @endif
                                 </div>
@@ -478,6 +689,118 @@
                             </div>
                         </div>
 
+                    {{-- Modal Bukti Pembayaran CSR (Dual Tab) --}}
+                    @if(in_array($csr->status_pembayaran, ['lunas', 'dp_50']) && ($csr->bukti_transfer || $csr->bukti_dp))
+                    <div class="modal fade" id="modalBuktiCsr{{ $csr->id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
+                            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+                                <div class="modal-header text-white border-0 py-3"
+                                    style="background: linear-gradient(135deg, #0ea5e9, #0284c7);">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-cash-coin fs-5"></i>
+                                        <div>
+                                            <h6 class="modal-title fw-bold mb-0">Bukti Pembayaran</h6>
+                                            <div style="font-size: 0.72rem; opacity: 0.85;">
+                                                CSR #{{ $csr->nomor }} &bull;
+                                                @if($csr->status_pembayaran === 'lunas')
+                                                    <span class="badge bg-success">Lunas</span>
+                                                @else
+                                                    <span class="badge bg-warning text-dark">DP 50%</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body p-0" style="background: #f1f5f9;">
+                                    @php
+                                        $csrHasDp = !empty($csr->bukti_dp);
+                                        $csrHasLunas = !empty($csr->bukti_transfer);
+                                        $csrShowTabs = $csrHasDp && $csrHasLunas;
+                                    @endphp
+
+                                    @if($csrShowTabs)
+                                    <ul class="nav nav-tabs nav-fill px-3 pt-3 border-0 gap-2" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link active fw-semibold d-flex align-items-center justify-content-center gap-1"
+                                                data-bs-toggle="tab" data-bs-target="#csr-tab-dp-{{ $csr->id }}"
+                                                type="button" role="tab"
+                                                style="border-radius: 10px; border: 2px solid #f59e0b; color:#d97706; font-size:0.82rem;">
+                                                <i class="bi bi-percent"></i> DP / Uang Muka
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link fw-semibold d-flex align-items-center justify-content-center gap-1"
+                                                data-bs-toggle="tab" data-bs-target="#csr-tab-lunas-{{ $csr->id }}"
+                                                type="button" role="tab"
+                                                style="border-radius: 10px; border: 2px solid #10b981; color:#059669; font-size:0.82rem;">
+                                                <i class="bi bi-check-circle-fill"></i> Lunas
+                                            </button>
+                                        </li>
+                                    </ul>
+                                    @endif
+
+                                    <div class="tab-content p-3">
+                                        @if($csrHasDp)
+                                        <div class="tab-pane fade {{ !$csrShowTabs || $csrHasDp ? 'show active' : '' }}" id="csr-tab-dp-{{ $csr->id }}" role="tabpanel">
+                                            <div class="text-center mb-2">
+                                                <span class="badge bg-warning text-dark px-3 py-1" style="font-size:0.78rem;">
+                                                    <i class="bi bi-percent me-1"></i>Bukti DP / Uang Muka
+                                                </span>
+                                            </div>
+                                            <div class="rounded-3 overflow-hidden shadow-sm border" style="background: white;">
+                                                <img src="{{ asset('storage_public/' . $csr->bukti_dp) }}" alt="Bukti DP" class="w-100"
+                                                    style="max-height: 400px; object-fit: contain; display: block;"
+                                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                                <div class="align-items-center justify-content-center p-4 text-muted" style="display:none;">
+                                                    <i class="bi bi-image-alt me-2 fs-4"></i> Gambar tidak ditemukan
+                                                </div>
+                                            </div>
+                                            <div class="mt-2 d-flex justify-content-end">
+                                                <a href="{{ asset('storage_public/' . $csr->bukti_dp) }}" target="_blank"
+                                                    class="btn btn-sm btn-outline-warning d-inline-flex align-items-center gap-1"
+                                                    style="font-size: 0.75rem; border-radius: 8px;">
+                                                    <i class="bi bi-box-arrow-up-right"></i> Buka
+                                                </a>
+                                            </div>
+                                        </div>
+                                        @endif
+
+                                        @if($csrHasLunas)
+                                        <div class="tab-pane fade {{ $csrShowTabs ? '' : 'show active' }}" id="csr-tab-lunas-{{ $csr->id }}" role="tabpanel">
+                                            <div class="text-center mb-2">
+                                                <span class="badge bg-success px-3 py-1" style="font-size:0.78rem;">
+                                                    <i class="bi bi-check-circle-fill me-1"></i>Bukti Lunas
+                                                </span>
+                                            </div>
+                                            <div class="rounded-3 overflow-hidden shadow-sm border" style="background: white;">
+                                                <img src="{{ asset('storage_public/' . $csr->bukti_transfer) }}" alt="Bukti Lunas" class="w-100"
+                                                    style="max-height: 400px; object-fit: contain; display: block;"
+                                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                                <div class="align-items-center justify-content-center p-4 text-muted" style="display:none;">
+                                                    <i class="bi bi-image-alt me-2 fs-4"></i> Gambar tidak ditemukan
+                                                </div>
+                                            </div>
+                                            <div class="mt-2 d-flex justify-content-end">
+                                                <a href="{{ asset('storage_public/' . $csr->bukti_transfer) }}" target="_blank"
+                                                    class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1"
+                                                    style="font-size: 0.75rem; border-radius: 8px;">
+                                                    <i class="bi bi-box-arrow-up-right"></i> Buka
+                                                </a>
+                                            </div>
+                                        </div>
+                                        @endif
+                                    </div>
+
+                                    <div class="px-3 pb-3 small text-muted">
+                                        <i class="bi bi-person me-1"></i> {{ $csr->nama_penerima }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
                     @empty
                         <tr>
                             <td colspan="7" class="text-center py-5 text-muted">
@@ -494,6 +817,7 @@
                 {{ $csrList->links() }}
             </div>
         @endif
+        </div>
     </div>
 
     {{-- ===== MODALS INFO CSR (outside table) ===== --}}
@@ -743,8 +1067,7 @@
                                     <p class="mb-1">Pemohon,</p>
                                     <div class="preview-sign-img">
                                         @if($csr->ttd_pemohon)
-                                            <img
-                                                src="{{ asset(str_replace('storage/', 'storage/', $csr->ttd_pemohon)) }}">
+                                            <img src="{{ asset('assets/img/ttd/pemohon.png') }}">
                                         @endif
                                     </div>
                                     <p class="preview-sign-name">Rossie Maulana Septian, S.Kom</p>
@@ -754,8 +1077,7 @@
                                     <p class="mb-1">Diverifikasi,</p>
                                     <div class="preview-sign-img">
                                         @if($csr->ttd_manager)
-                                            <img
-                                                src="{{ asset(str_replace('storage/', 'storage/', $csr->ttd_manager)) }}">
+                                            <img src="{{ asset('assets/img/ttd/manager.png') }}">
                                         @endif
                                     </div>
                                     <p class="preview-sign-name">{{ $csr->diverifikasi2_nama }}</p>
@@ -763,10 +1085,9 @@
                                 </div>
                                 <div>
                                     <p class="mb-1">Diverifikasi,</p>
-                                    <div class="preview-sign-img">
+                                    <div class="preview-sign-img" style="height: 70px;">
                                         @if($csr->ttd_accounting)
-                                            <img
-                                                src="{{ asset(str_replace('storage/', 'storage/', $csr->ttd_accounting)) }}">
+                                            <img src="{{ asset('assets/img/ttd/accounting.png') }}" style="bottom: -20px; position: relative;">
                                         @endif
                                     </div>
                                     <p class="preview-sign-name">{{ $csr->diverifikasi3_nama }}</p>
@@ -776,8 +1097,7 @@
                                     <p class="mb-1">Disetujui,</p>
                                     <div class="preview-sign-img">
                                         @if($csr->ttd_direktur)
-                                            <img
-                                                src="{{ asset(str_replace('storage/', 'storage/', $csr->ttd_direktur)) }}">
+                                            <img src="{{ asset('assets/img/ttd/direktur.png') }}">
                                         @endif
                                     </div>
                                     <p class="preview-sign-name">{{ $csr->disetujui_nama }}</p>
@@ -789,8 +1109,7 @@
                                     <p class="mb-1">Mengetahui,</p>
                                     <div class="preview-sign-img">
                                         @if($csr->ttd_penasihat)
-                                            <img
-                                                src="{{ asset(str_replace('storage/', 'storage/', $csr->ttd_penasihat)) }}">
+                                            <img src="{{ asset('assets/img/ttd/penasihat.png') }}">
                                         @endif
                                     </div>
                                     <p class="preview-sign-name">{{ $csr->mengetahui_nama }}</p>
@@ -838,11 +1157,7 @@
                                 <textarea name="catatan" class="form-control" rows="3"
                                     placeholder="Catatan dari Accounting...">{{ $csr->catatan }}</textarea>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold small">Keterangan <span class="text-muted">(opsional)</span></label>
-                                <textarea name="keterangan" class="form-control" rows="2"
-                                    placeholder="Keterangan tambahan...">{{ $csr->keterangan }}</textarea>
-                            </div>
+
                         </div>
                         <div class="modal-footer border-0">
                             <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
@@ -863,16 +1178,51 @@
                     <div class="modal-header text-white"
                         style="background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:15px 15px 0 0;">
                         <h5 class="modal-title fw-bold mb-0">
-                            <i class="bi bi-journal-text me-2"></i>Isi / Edit Catatan &amp; No Surat
+                            <i class="bi bi-journal-text me-2"></i>Isi / Edit Catatan & Status
                         </h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
-                    <form action="{{ route('csr.accounting.notes', $csr->id) }}" method="POST">
+                    <form action="{{ route('csr.accounting.notes', $csr->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="modal-body p-4">
                             <div class="alert alert-warning border-0 small mb-3" style="background:#fffbeb;">
                                 <i class="bi bi-lock me-1"></i>
                                 Hanya <strong>Accounting</strong> yang dapat mengisi/mengubah data ini.
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">Status Pembayaran</label>
+                                <select name="status_pembayaran" class="form-select" id="status_pembayaran_csr_{{ $csr->id }}" onchange="toggleBuktiTransferCsr({{ $csr->id }})">
+                                    <option value="belum_dibayar" {{ $csr->status_pembayaran === 'belum_dibayar' ? 'selected' : '' }}>Belum Dibayar</option>
+                                    <option value="dp_50" {{ $csr->status_pembayaran === 'dp_50' ? 'selected' : '' }}>Sudah di DP 50%</option>
+                                    <option value="lunas" {{ $csr->status_pembayaran === 'lunas' ? 'selected' : '' }}>Sudah Lunas</option>
+                                </select>
+                            </div>
+                            <div class="mb-3" id="bukti_dp_container_csr_{{ $csr->id }}"
+                                style="display: {{ in_array($csr->status_pembayaran, ['dp_50', 'lunas']) ? 'block' : 'none' }};">
+                                <label class="form-label fw-bold small text-warning">
+                                    <i class="bi bi-image me-1"></i>Foto Bukti DP / Uang Muka
+                                    <span class="text-muted fw-normal">(Opsional)</span>
+                                </label>
+                                <input type="file" name="bukti_dp" class="form-control" accept="image/*">
+                                @if($csr->bukti_dp)
+                                    <div class="mt-2 d-flex align-items-center gap-2">
+                                        <img src="{{ asset('storage_public/' . $csr->bukti_dp) }}" class="rounded border" style="height:50px;object-fit:cover;">
+                                        <a href="{{ asset('storage_public/' . $csr->bukti_dp) }}" target="_blank" class="small text-primary">Lihat Bukti DP</a>
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="mb-3" id="bukti_transfer_container_csr_{{ $csr->id }}" style="display: {{ $csr->status_pembayaran === 'lunas' ? 'block' : 'none' }};">
+                                <label class="form-label fw-bold small text-success">
+                                    <i class="bi bi-image me-1"></i>Foto Bukti Lunas
+                                    <span class="text-muted fw-normal">(Opsional)</span>
+                                </label>
+                                <input type="file" name="bukti_transfer" class="form-control" accept="image/*">
+                                @if($csr->bukti_transfer)
+                                    <div class="mt-2 d-flex align-items-center gap-2">
+                                        <img src="{{ asset('storage_public/' . $csr->bukti_transfer) }}" class="rounded border" style="height:50px;object-fit:cover;">
+                                        <a href="{{ asset('storage_public/' . $csr->bukti_transfer) }}" target="_blank" class="small text-primary">Lihat Bukti Lunas</a>
+                                    </div>
+                                @endif
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold small">Nomor Surat</label>
@@ -884,11 +1234,6 @@
                                 <label class="form-label fw-bold small">Catatan</label>
                                 <textarea name="catatan" class="form-control" rows="3"
                                     placeholder="Catatan dari Accounting...">{{ $csr->catatan }}</textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold small">Keterangan</label>
-                                <textarea name="keterangan" class="form-control" rows="2"
-                                    placeholder="Keterangan tambahan...">{{ $csr->keterangan }}</textarea>
                             </div>
                         </div>
                         <div class="modal-footer border-0">
@@ -1447,7 +1792,77 @@
                 text: "{{ session('error') }}"
             });
         @endif
+
+        function toggleBuktiTransferCsr(id) {
+            const status = document.getElementById('status_pembayaran_csr_' + id).value;
+            const dpContainer = document.getElementById('bukti_dp_container_csr_' + id);
+            const lunasContainer = document.getElementById('bukti_transfer_container_csr_' + id);
+            const isDpOrLunas = status === 'dp_50' || status === 'lunas';
+            const isLunas = status === 'lunas';
+
+            if (dpContainer) dpContainer.style.display = isDpOrLunas ? 'block' : 'none';
+            if (lunasContainer) lunasContainer.style.display = isLunas ? 'block' : 'none';
+        }
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterForm = document.getElementById('filterForm');
+            if (filterForm) {
+                filterForm.addEventListener('change', function(e) {
+                    if (e.target.tagName === 'SELECT') {
+                        e.preventDefault();
+                        fetchTableData();
+                    }
+                });
+                
+                filterForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    fetchTableData();
+                });
+
+                document.addEventListener('click', function(e) {
+                    const pageLink = e.target.closest('#tableCsrContainer .pagination a');
+                    if (pageLink) {
+                        e.preventDefault();
+                        fetchTableData(pageLink.href);
+                    }
+                });
+            }
+
+            function fetchTableData(url = null) {
+                if (!url && filterForm) {
+                    const formData = new FormData(filterForm);
+                    const params = new URLSearchParams(formData);
+                    url = filterForm.action + '?' + params.toString();
+                }
+
+                const container = document.getElementById('tableCsrContainer');
+                if (container) container.style.opacity = '0.5';
+
+                fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(res => res.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newTable = doc.getElementById('tableCsrContainer');
+                    if (newTable && container) {
+                        container.innerHTML = newTable.innerHTML;
+                        container.style.opacity = '1';
+                        window.history.pushState({}, '', url);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    if (container) container.style.opacity = '1';
+                });
+            }
+        });
+    </script>
+    @include('components.nav-modal-structure')
 </body>
 
 </html>

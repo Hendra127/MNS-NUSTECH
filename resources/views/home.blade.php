@@ -5,7 +5,7 @@
   @include('partials.pwa-head')
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CV. Nustech – Solusi IT, Pengadaan & Engineering NTB</title>
+  <title>NUSTECH – Solusi IT, Pengadaan & Engineering NTB</title>
   <meta name="description" content="CV. Nustech – Penyedia solusi teknologi informasi, pengadaan barang, kelistrikan, dan engineering terpercaya di Nusa Tenggara Barat.">
 
   <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}">
@@ -276,6 +276,17 @@
     .lightbox-zoom-out {
       animation: lightboxZoomOut 0.35s cubic-bezier(0.55, 0, 1, 0.45) forwards;
     }
+
+    /* Marquee Animation Left to Right */
+    @keyframes marquee-ltr {
+      from { transform: translateX(-50%); }
+      to { transform: translateX(0%); }
+    }
+    .animate-marquee-ltr {
+      display: flex;
+      width: max-content;
+      animation: marquee-ltr 25s linear infinite;
+    }
   </style>
 </head>
 
@@ -300,266 +311,203 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
-
-          <!-- DROPDOWN LOGIN -->
-          <div id="loginDropdownMenu" class="absolute left-0 mt-4 hidden opacity-0 translate-y-[-10px] transition-all duration-300 w-[340px] bg-white backdrop-blur-2xl rounded-3xl border border-slate-200/80 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.2)] overflow-hidden" style="z-index: 100;">
-            <!-- Top gradient accent -->
-            <div class="h-1 bg-gradient-to-r from-sky-500 via-cyan-400 to-sky-600"></div>
-
-            <!-- Header -->
-            <div class="px-5 pt-5 pb-3">
-              <div class="flex items-center gap-2.5 mb-1">
-                <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center shadow-md shadow-sky-500/20">
-                  <i class="fa-solid fa-right-to-bracket text-white text-[10px]"></i>
-                </div>
-                <div>
-                  <h4 class="text-xs font-extrabold text-slate-800 tracking-tight">Portal Login</h4>
-                  <p class="text-[9px] text-slate-400 font-medium">Pilih sistem yang ingin diakses</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Divider -->
-            <div class="mx-5 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
-
-            <!-- Portal Items -->
-            <div class="p-3 flex flex-col gap-2">
-              <!-- MNS Nustech -->
-              <a href="http://mns.nustech.co.id/login" target="_blank" class="relative flex items-center gap-4 p-4 rounded-2xl border border-slate-100 hover:border-sky-200 bg-gradient-to-r from-white to-slate-50/50 hover:from-sky-50/80 hover:to-cyan-50/40 transition-all duration-400 group hover:shadow-lg hover:shadow-sky-100/50 hover:-translate-y-0.5">
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-100 to-cyan-100 text-sky-600 flex items-center justify-center text-xl group-hover:from-sky-500 group-hover:to-cyan-500 group-hover:text-white transition-all duration-500 group-hover:scale-105 shadow-sm group-hover:shadow-lg group-hover:shadow-sky-500/25 shrink-0">
-                  <i class="fa-solid fa-chart-line"></i>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <div class="text-sm font-bold text-slate-800 group-hover:text-sky-700 transition-colors flex items-center gap-2">
-                    MNS Nustech
-                    <span class="text-[8px] font-extrabold uppercase tracking-widest bg-sky-500/10 text-sky-600 px-2 py-0.5 rounded-full border border-sky-500/15">Portal</span>
-                  </div>
-                  <div class="text-[11px] text-slate-400 mt-0.5 font-medium">Monitoring & Network System</div>
-                </div>
-                <div class="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-sky-500 flex items-center justify-center transition-all duration-300 shrink-0 group-hover:shadow-md group-hover:shadow-sky-500/20">
-                  <i class="fa-solid fa-arrow-right text-[10px] text-slate-400 group-hover:text-white transition-colors group-hover:translate-x-0.5 transform duration-300"></i>
-                </div>
-              </a>
-
-              <!-- Engineering -->
-              <a href="http://enginering.nustech.co.id/login" target="_blank" class="relative flex items-center gap-4 p-4 rounded-2xl border border-slate-100 hover:border-orange-200 bg-gradient-to-r from-white to-slate-50/50 hover:from-orange-50/80 hover:to-amber-50/40 transition-all duration-400 group hover:shadow-lg hover:shadow-orange-100/50 hover:-translate-y-0.5">
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-100 to-amber-100 text-orange-600 flex items-center justify-center text-xl group-hover:from-orange-500 group-hover:to-amber-500 group-hover:text-white transition-all duration-500 group-hover:scale-105 shadow-sm group-hover:shadow-lg group-hover:shadow-orange-500/25 shrink-0">
-                  <i class="fa-solid fa-gears"></i>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <div class="text-sm font-bold text-slate-800 group-hover:text-orange-700 transition-colors flex items-center gap-2">
-                    Engineering
-                    <span class="text-[8px] font-extrabold uppercase tracking-widest bg-orange-500/10 text-orange-600 px-2 py-0.5 rounded-full border border-orange-500/15">Inventory</span>
-                  </div>
-                  <div class="text-[11px] text-slate-400 mt-0.5 font-medium">Engineering Inventory System</div>
-                </div>
-                <div class="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-orange-500 flex items-center justify-center transition-all duration-300 shrink-0 group-hover:shadow-md group-hover:shadow-orange-500/20">
-                  <i class="fa-solid fa-arrow-right text-[10px] text-slate-400 group-hover:text-white transition-colors group-hover:translate-x-0.5 transform duration-300"></i>
-                </div>
-              </a>
-            </div>
-
-            <!-- Footer -->
-            <div class="mx-5 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
-            <div class="px-5 py-3 flex items-center justify-center gap-1.5">
-              <i class="fa-solid fa-lock text-[8px] text-slate-300"></i>
-              <span class="text-[9px] text-slate-400 font-semibold">Koneksi aman & terenkripsi</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- MENU DESKTOP -->
-        <div class="hidden md:flex items-center space-x-1">
-          <a href="#beranda" class="nav-link text-white hover:text-sky-300 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-200">Beranda</a>
-          <a href="#tentang" class="nav-link text-white hover:text-sky-300 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-200">Tentang</a>
-          <a href="#visimisi" class="nav-link text-white hover:text-sky-300 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-200">Visi Misi</a>
-
-          <div id="layananDropdown" class="relative">
-            <button id="layananToggle" class="text-white hover:text-sky-300 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-200 flex items-center gap-1 cursor-pointer focus:outline-none">
-              Layanan
-              <svg class="w-3 h-3 transition-transform duration-300" id="layananArrow" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-
-            <!-- MEGA MENU -->
-            <div id="layananMenu" class="fixed left-1/2 -translate-x-1/2 w-[90vw] max-w-4xl bg-white shadow-2xl rounded-3xl border border-slate-200/60 hidden opacity-0 translate-y-[-10px] transition-all duration-300 overflow-hidden mt-4" style="z-index: 100;">
-              <div class="h-1 bg-gradient-to-r from-sky-500 via-cyan-400 to-sky-600"></div>
-              <div class="p-6 md:p-8">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-                  <!-- Col 1 -->
-                  <div>
-                    <h4 class="text-xs font-extrabold text-sky-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                      <span class="w-1.5 h-4 rounded-full bg-gradient-to-b from-sky-400 to-cyan-500"></span> Layanan Utama
-                    </h4>
-                    <div class="flex flex-col gap-1">
-                      <button onclick="showLayanan('networking')" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-sky-50 text-left transition duration-300 group">
-                        <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center text-sm group-hover:bg-sky-500 group-hover:text-white transition duration-300 group-hover:scale-110"><i class="fa-solid fa-network-wired"></i></div>
-                        <div><div class="text-xs font-bold text-slate-800">Networking</div><div class="text-[10px] text-slate-400">Jaringan & Mikrotik</div></div>
-                      </button>
-                      <button onclick="showLayanan('aplikasi')" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-sky-50 text-left transition duration-300 group">
-                        <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center text-sm group-hover:bg-sky-500 group-hover:text-white transition duration-300 group-hover:scale-110"><i class="fa-solid fa-code"></i></div>
-                        <div><div class="text-xs font-bold text-slate-800">Aplikasi</div><div class="text-[10px] text-slate-400">Web & Software</div></div>
-                      </button>
-                      <button onclick="showLayanan('reklame')" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-sky-50 text-left transition duration-300 group">
-                        <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center text-sm group-hover:bg-sky-500 group-hover:text-white transition duration-300 group-hover:scale-110"><i class="fa-solid fa-palette"></i></div>
-                        <div><div class="text-xs font-bold text-slate-800">Reklame</div><div class="text-[10px] text-slate-400">Promo & Percetakan</div></div>
-                      </button>
-                      <button onclick="showLayanan('kelistrikan')" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-sky-50 text-left transition duration-300 group">
-                        <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center text-sm group-hover:bg-sky-500 group-hover:text-white transition duration-300 group-hover:scale-110"><i class="fa-solid fa-bolt"></i></div>
-                        <div><div class="text-xs font-bold text-slate-800">Kelistrikan</div><div class="text-[10px] text-slate-400">Instalasi & Panel Listrik</div></div>
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Col 2 -->
-                  <div>
-                    <h4 class="text-xs font-extrabold text-sky-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                      <span class="w-1.5 h-4 rounded-full bg-gradient-to-b from-sky-400 to-cyan-500"></span> Pendukung
-                    </h4>
-                    <div class="flex flex-col gap-1">
-                      <button onclick="showLayanan('ac')" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-sky-50 text-left transition duration-300 group">
-                        <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center text-sm group-hover:bg-sky-500 group-hover:text-white transition duration-300 group-hover:scale-110"><i class="fa-solid fa-snowflake"></i></div>
-                        <div class="text-xs font-bold text-slate-800">Pendingin Ruangan (AC)</div>
-                      </button>
-                      <button onclick="showLayanan('komputer')" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-sky-50 text-left transition duration-300 group">
-                        <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center text-sm group-hover:bg-sky-500 group-hover:text-white transition duration-300 group-hover:scale-110"><i class="fa-solid fa-print"></i></div>
-                        <div class="text-xs font-bold text-slate-800">Komputer & Printer</div>
-                      </button>
-                      <button onclick="showLayanan('elektronik')" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-sky-50 text-left transition duration-300 group">
-                        <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center text-sm group-hover:bg-sky-500 group-hover:text-white transition duration-300 group-hover:scale-110"><i class="fa-solid fa-tv"></i></div>
-                        <div class="text-xs font-bold text-slate-800">Alat Elektronik</div>
-                      </button>
-                      <button onclick="showLayanan('kantor')" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-sky-50 text-left transition duration-300 group">
-                        <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center text-sm group-hover:bg-sky-500 group-hover:text-white transition duration-300 group-hover:scale-110"><i class="fa-solid fa-briefcase"></i></div>
-                        <div class="text-xs font-bold text-slate-800">Peralatan Kantor</div>
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Col 3 -->
-                  <div class="bg-gradient-to-br from-sky-950 to-brand-900 p-5 rounded-2xl flex flex-col justify-between text-white relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-cyan-400/10 rounded-full blur-2xl pointer-events-none"></div>
-                    <div>
-                      <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-cyan-300 mb-3 text-lg">
-                        <i class="fa-solid fa-headset"></i>
-                      </div>
-                      <h4 class="text-sm font-extrabold text-white mb-2">Butuh Konsultasi?</h4>
-                      <p class="text-[11px] text-slate-300 leading-relaxed mb-4">Tim kami siap melayani kebutuhan konsultasi teknis terkait proyek IT dan pengadaan barang secara gratis.</p>
-                    </div>
-                    <div class="flex flex-col gap-2 relative z-10">
-                      <a href="https://wa.me/6281332809923" target="_blank" class="flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-white py-2.5 px-4 rounded-xl text-xs font-bold transition-all duration-300 shadow-lg shadow-emerald-900/30">
-                        <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp Kami
-                      </a>
-                      <a href="#kontak" class="text-center text-xs text-sky-300 hover:text-white font-bold transition">Lihat Kontak Lainnya →</a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <!-- DROPDOWN LOGIN -->
+        <div id="loginDropdownMenu" class="absolute left-0 mt-3 hidden opacity-0 translate-y-[-8px] transition-all duration-200 w-64 bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/60 shadow-xl overflow-hidden" style="z-index: 100;">
+          <!-- Header -->
+          <div class="px-4 py-3 bg-slate-50/80 border-b border-slate-100/80">
+            <h4 class="text-xs font-semibold text-slate-500 tracking-wide uppercase">Portal Akses</h4>
           </div>
 
-          <a href="#gallery" class="nav-link text-white hover:text-sky-300 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-200">Galeri</a>
-          <a href="#news" class="nav-link text-white hover:text-sky-300 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-200">Berita</a>
-          <a href="#kontak" class="ml-2 bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-400 hover:to-cyan-400 text-white text-xs font-bold px-5 py-2.5 rounded-full transition-all duration-300 shadow-lg shadow-sky-500/20 hover:shadow-sky-400/30 hover:scale-105">Kontak</a>
-        </div>
-
-        <!-- Hamburger (Mobile) -->
-        <div class="md:hidden flex items-center">
-          <button id="menu-toggle" type="button" class="focus:outline-none p-2 -mr-2 cursor-pointer">
-            <svg id="hamburgerIcon" class="w-6 h-6 text-white pointer-events-none transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- MOBILE MENU -->
-    <div id="mobile-menu" class="md:hidden hidden mx-4 mt-3 bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-100 overflow-hidden transition-all duration-300 p-5">
-      <div class="flex flex-col gap-1.5">
-        <a href="#beranda" class="mobile-nav-link p-3 rounded-xl hover:bg-sky-50 hover:text-sky-600 font-semibold transition-colors flex items-center gap-2.5"><i class="fa-solid fa-house text-sky-400 text-sm w-4"></i>Beranda</a>
-        <a href="#tentang" class="mobile-nav-link p-3 rounded-xl hover:bg-sky-50 hover:text-sky-600 font-semibold transition-colors flex items-center gap-2.5"><i class="fa-solid fa-building text-sky-400 text-sm w-4"></i>Tentang Kami</a>
-        <a href="#visimisi" class="mobile-nav-link p-3 rounded-xl hover:bg-sky-50 hover:text-sky-600 font-semibold transition-colors flex items-center gap-2.5"><i class="fa-solid fa-bullseye text-sky-400 text-sm w-4"></i>Visi & Misi</a>
-
-        <!-- Mobile Layanan -->
-        <div class="rounded-xl overflow-hidden bg-slate-50/80 border border-slate-100">
-          <button onclick="document.getElementById('mobileLayananMenu').classList.toggle('hidden'); document.getElementById('mobileLayananArrow').classList.toggle('rotate-180')" class="w-full flex items-center justify-between p-3 text-left font-semibold text-slate-700 focus:outline-none">
-            <span class="flex items-center gap-2.5"><i class="fa-solid fa-concierge-bell text-sky-400 text-sm w-4"></i>Layanan</span>
-            <svg id="mobileLayananArrow" class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          <div id="mobileLayananMenu" class="hidden flex flex-col bg-white border-t border-slate-100 py-1.5 px-3">
-            <button onclick="showLayanan('networking')" class="w-full text-left p-2.5 text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">Networking</button>
-            <button onclick="showLayanan('aplikasi')" class="w-full text-left p-2.5 text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">Aplikasi</button>
-            <button onclick="showLayanan('reklame')" class="w-full text-left p-2.5 text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">Reklame</button>
-            <button onclick="showLayanan('kelistrikan')" class="w-full text-left p-2.5 text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">Kelistrikan</button>
-            <button onclick="showLayanan('ac')" class="w-full text-left p-2.5 text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">Pendingin Ruangan (AC)</button>
-            <button onclick="showLayanan('komputer')" class="w-full text-left p-2.5 text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">Komputer & Printer</button>
-            <button onclick="showLayanan('elektronik')" class="w-full text-left p-2.5 text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">Alat Elektronik</button>
-            <button onclick="showLayanan('kantor')" class="w-full text-left p-2.5 text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">Peralatan Kantor</button>
-          </div>
-        </div>
-
-        <!-- Mobile Login -->
-        <div class="rounded-2xl overflow-hidden bg-slate-50/80 border border-slate-100">
-          <button onclick="document.getElementById('mobileLoginMenu').classList.toggle('hidden'); document.getElementById('mobileLoginArrow').classList.toggle('rotate-180')" class="w-full flex items-center justify-between p-3.5 text-left font-semibold text-slate-700 focus:outline-none">
-            <span class="flex items-center gap-2.5">
-              <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center shadow-sm">
-                <i class="fa-solid fa-right-to-bracket text-white text-[9px]"></i>
-              </div>
-              <div>
-                <span class="text-sm font-bold text-slate-800">Login Portal</span>
-                <span class="block text-[9px] text-slate-400 font-medium -mt-0.5">Pilih sistem yang ingin diakses</span>
-              </div>
-            </span>
-            <svg id="mobileLoginArrow" class="w-4 h-4 transition-transform duration-300 text-slate-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          <div id="mobileLoginMenu" class="hidden flex flex-col bg-white border-t border-slate-100 p-2.5 gap-2">
-            <a href="http://mns.nustech.co.id/login" target="_blank" class="flex items-center gap-3.5 p-3.5 rounded-xl border border-slate-100 hover:border-sky-200 hover:bg-sky-50/60 transition-all duration-300 group">
-              <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-sky-100 to-cyan-100 text-sky-600 flex items-center justify-center text-lg shrink-0 group-active:from-sky-500 group-active:to-cyan-500 group-active:text-white transition-all duration-300 shadow-sm">
-                <i class="fa-solid fa-chart-line"></i>
+          <!-- Portal Items -->
+          <div class="p-2 flex flex-col gap-1">
+            <!-- MNS Nustech -->
+            <a href="http://mns.nustech.co.id/login" target="_blank" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors group">
+              <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 group-hover:bg-sky-500 group-hover:text-white flex items-center justify-center transition-colors shrink-0">
+                <i class="fa-solid fa-chart-line text-sm"></i>
               </div>
               <div class="flex-1 min-w-0">
-                <div class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                <div class="text-sm font-semibold text-slate-700 group-hover:text-sky-600 transition-colors">
                   MNS Nustech
-                  <span class="text-[7px] font-extrabold uppercase tracking-widest bg-sky-500/10 text-sky-600 px-1.5 py-0.5 rounded-full border border-sky-500/15">Portal</span>
                 </div>
-                <div class="text-[10px] text-slate-400 mt-0.5 font-medium">Monitoring & Network System</div>
-              </div>
-              <div class="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
-                <i class="fa-solid fa-arrow-right text-[9px] text-slate-400"></i>
               </div>
             </a>
-            <a href="http://enginering.nustech.co.id/login" target="_blank" class="flex items-center gap-3.5 p-3.5 rounded-xl border border-slate-100 hover:border-orange-200 hover:bg-orange-50/60 transition-all duration-300 group">
-              <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-orange-100 to-amber-100 text-orange-600 flex items-center justify-center text-lg shrink-0 group-active:from-orange-500 group-active:to-amber-500 group-active:text-white transition-all duration-300 shadow-sm">
-                <i class="fa-solid fa-gears"></i>
+
+            <!-- Engineering -->
+            <a href="http://enginering.nustech.co.id/login" target="_blank" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors group">
+              <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white flex items-center justify-center transition-colors shrink-0">
+                <i class="fa-solid fa-gears text-sm"></i>
               </div>
               <div class="flex-1 min-w-0">
-                <div class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                <div class="text-sm font-semibold text-slate-700 group-hover:text-emerald-600 transition-colors">
                   Engineering
-                  <span class="text-[7px] font-extrabold uppercase tracking-widest bg-orange-500/10 text-orange-600 px-1.5 py-0.5 rounded-full border border-orange-500/15">Inventory</span>
                 </div>
-                <div class="text-[10px] text-slate-400 mt-0.5 font-medium">Engineering Inventory System</div>
-              </div>
-              <div class="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
-                <i class="fa-solid fa-arrow-right text-[9px] text-slate-400"></i>
               </div>
             </a>
-            <div class="flex items-center justify-center gap-1.5 pt-1 pb-0.5">
-              <i class="fa-solid fa-lock text-[7px] text-slate-300"></i>
-              <span class="text-[8px] text-slate-400 font-semibold">Koneksi aman & terenkripsi</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MENU DESKTOP -->
+      <div class="hidden md:flex items-center space-x-1">
+        <a href="#beranda" class="nav-link text-white hover:text-sky-300 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-200">Beranda</a>
+        <a href="#tentang" class="nav-link text-white hover:text-sky-300 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-200">Tentang</a>
+        <a href="#visimisi" class="nav-link text-white hover:text-sky-300 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-200">Visi Misi</a>
+
+        <div id="layananDropdown" class="relative">
+          <button id="layananToggle" class="text-white hover:text-sky-300 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-200 flex items-center gap-1 cursor-pointer focus:outline-none">
+            Layanan
+            <svg class="w-3 h-3 transition-transform duration-300" id="layananArrow" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          <!-- MEGA MENU -->
+          <div id="layananMenu" class="fixed left-1/2 -translate-x-1/2 w-[85vw] max-w-3xl bg-white/95 backdrop-blur-xl shadow-2xl rounded-2xl border border-slate-200/60 hidden opacity-0 translate-y-[-8px] transition-all duration-300 overflow-hidden mt-4" style="z-index: 100;">
+            <div class="p-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Col 1: Layanan Utama -->
+                <div>
+                  <h4 class="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-3">Layanan Utama</h4>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <button onclick="showLayanan('networking')" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-left transition-colors group">
+                      <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 group-hover:bg-sky-500 group-hover:text-white flex items-center justify-center transition-colors"><i class="fa-solid fa-network-wired text-sm"></i></div>
+                      <div><div class="text-xs font-semibold text-slate-700 group-hover:text-sky-600 transition-colors">Networking</div></div>
+                    </button>
+                    <button onclick="showLayanan('aplikasi')" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-left transition-colors group">
+                      <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white flex items-center justify-center transition-colors"><i class="fa-solid fa-code text-sm"></i></div>
+                      <div><div class="text-xs font-semibold text-slate-700 group-hover:text-emerald-600 transition-colors">Software</div></div>
+                    </button>
+                    <button onclick="showLayanan('reklame')" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-left transition-colors group">
+                      <div class="w-8 h-8 rounded-lg bg-pink-50 text-pink-600 group-hover:bg-pink-500 group-hover:text-white flex items-center justify-center transition-colors"><i class="fa-solid fa-palette text-sm"></i></div>
+                      <div><div class="text-xs font-semibold text-slate-700 group-hover:text-pink-600 transition-colors">Reklame</div></div>
+                    </button>
+                    <button onclick="showLayanan('kelistrikan')" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-left transition-colors group">
+                      <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 group-hover:bg-amber-500 group-hover:text-white flex items-center justify-center transition-colors"><i class="fa-solid fa-bolt text-sm"></i></div>
+                      <div><div class="text-xs font-semibold text-slate-700 group-hover:text-amber-600 transition-colors">Kelistrikan</div></div>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Col 2: Pendukung -->
+                <div>
+                  <h4 class="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-3">Pendukung</h4>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <button onclick="showLayanan('ac')" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-left transition-colors group">
+                      <div class="w-8 h-8 rounded-lg bg-cyan-50 text-cyan-600 group-hover:bg-cyan-500 group-hover:text-white flex items-center justify-center transition-colors"><i class="fa-solid fa-snowflake text-sm"></i></div>
+                      <div class="text-xs font-semibold text-slate-700 group-hover:text-cyan-600 transition-colors">AC</div>
+                    </button>
+                    <button onclick="showLayanan('komputer')" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-left transition-colors group">
+                      <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 group-hover:bg-indigo-500 group-hover:text-white flex items-center justify-center transition-colors"><i class="fa-solid fa-print text-sm"></i></div>
+                      <div class="text-xs font-semibold text-slate-700 group-hover:text-indigo-600 transition-colors">IT & Printer</div>
+                    </button>
+                    <button onclick="showLayanan('elektronik')" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-left transition-colors group">
+                      <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 group-hover:bg-rose-500 group-hover:text-white flex items-center justify-center transition-colors"><i class="fa-solid fa-tv text-sm"></i></div>
+                      <div class="text-xs font-semibold text-slate-700 group-hover:text-rose-600 transition-colors">Elektronik</div>
+                    </button>
+                    <button onclick="showLayanan('kantor')" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 text-left transition-colors group">
+                      <div class="w-8 h-8 rounded-lg bg-violet-50 text-violet-600 group-hover:bg-violet-500 group-hover:text-white flex items-center justify-center transition-colors"><i class="fa-solid fa-briefcase text-sm"></i></div>
+                      <div class="text-xs font-semibold text-slate-700 group-hover:text-violet-600 transition-colors">Alat Kantor</div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Bottom Action -->
+              <div class="mt-6 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div>
+                  <h4 class="text-sm font-semibold text-slate-800">Butuh Bantuan?</h4>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Konsultasikan kebutuhan proyek Anda dengan tim kami.</p>
+                </div>
+                <a href="https://wa.me/6281332809923" target="_blank" class="flex items-center justify-center gap-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white py-2 px-5 rounded-lg text-xs font-semibold transition-colors shrink-0">
+                  <i class="fa-brands fa-whatsapp text-sm"></i> Hubungi Kami
+                </a>
+              </div>
             </div>
           </div>
         </div>
 
-        <a href="#gallery" class="mobile-nav-link p-3 rounded-xl hover:bg-sky-50 hover:text-sky-600 font-semibold transition-colors flex items-center gap-2.5"><i class="fa-solid fa-images text-sky-400 text-sm w-4"></i>Galeri</a>
-        <a href="#news" class="mobile-nav-link p-3 rounded-xl hover:bg-sky-50 hover:text-sky-600 font-semibold transition-colors flex items-center gap-2.5"><i class="fa-brands fa-instagram text-sky-400 text-sm w-4"></i>Berita</a>
-        <a href="#kontak" class="mt-1 bg-gradient-to-r from-sky-500 to-cyan-500 text-white font-bold text-sm py-3 px-5 rounded-xl text-center transition shadow-lg">Kontak Kami</a>
+        <a href="#gallery" class="nav-link text-white hover:text-sky-300 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-200">Galeri</a>
+        <a href="#news" class="nav-link text-white hover:text-sky-300 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-200">Berita</a>
+        <a href="#kontak" class="ml-2 bg-sky-500 hover:bg-sky-600 text-white text-xs font-semibold px-5 py-2.5 rounded-full transition-colors shadow-sm">Kontak</a>
+      </div>
+
+      <!-- Hamburger (Mobile) -->
+      <div class="md:hidden flex items-center">
+        <button id="menu-toggle" type="button" class="focus:outline-none p-2 -mr-2 cursor-pointer">
+          <svg id="hamburgerIcon" class="w-6 h-6 text-white pointer-events-none transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MOBILE MENU -->
+  <div id="mobile-menu" class="md:hidden hidden mx-4 mt-3 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-200/60 overflow-hidden transition-all duration-300 p-4">
+    <div class="flex flex-col gap-1">
+      <a href="#beranda" class="p-3 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-sky-600 font-medium transition-colors flex items-center gap-3"><i class="fa-solid fa-house text-slate-400 text-sm w-5 text-center"></i>Beranda</a>
+      <a href="#tentang" class="p-3 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-sky-600 font-medium transition-colors flex items-center gap-3"><i class="fa-solid fa-building text-slate-400 text-sm w-5 text-center"></i>Tentang Kami</a>
+      <a href="#visimisi" class="p-3 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-sky-600 font-medium transition-colors flex items-center gap-3"><i class="fa-solid fa-bullseye text-slate-400 text-sm w-5 text-center"></i>Visi & Misi</a>
+
+      <!-- Mobile Layanan -->
+      <div class="rounded-xl overflow-hidden bg-slate-50/50 border border-slate-100">
+        <button onclick="document.getElementById('mobileLayananMenu').classList.toggle('hidden'); document.getElementById('mobileLayananArrow').classList.toggle('rotate-180')" class="w-full flex items-center justify-between p-3 text-left font-medium text-slate-700 hover:bg-slate-50 transition-colors focus:outline-none">
+          <span class="flex items-center gap-3"><i class="fa-solid fa-concierge-bell text-slate-400 text-sm w-5 text-center"></i>Layanan</span>
+          <svg id="mobileLayananArrow" class="w-4 h-4 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div id="mobileLayananMenu" class="hidden flex flex-col bg-white/50 border-t border-slate-100 p-1.5 gap-1">
+          <button onclick="showLayanan('networking')" class="w-full text-left p-2.5 rounded-lg text-sm text-slate-600 hover:text-sky-600 hover:bg-slate-50 transition-colors">Networking</button>
+          <button onclick="showLayanan('aplikasi')" class="w-full text-left p-2.5 rounded-lg text-sm text-slate-600 hover:text-sky-600 hover:bg-slate-50 transition-colors">Aplikasi</button>
+          <button onclick="showLayanan('reklame')" class="w-full text-left p-2.5 rounded-lg text-sm text-slate-600 hover:text-sky-600 hover:bg-slate-50 transition-colors">Reklame</button>
+          <button onclick="showLayanan('kelistrikan')" class="w-full text-left p-2.5 rounded-lg text-sm text-slate-600 hover:text-sky-600 hover:bg-slate-50 transition-colors">Kelistrikan</button>
+          <button onclick="showLayanan('ac')" class="w-full text-left p-2.5 rounded-lg text-sm text-slate-600 hover:text-sky-600 hover:bg-slate-50 transition-colors">Pendingin Ruangan (AC)</button>
+          <button onclick="showLayanan('komputer')" class="w-full text-left p-2.5 rounded-lg text-sm text-slate-600 hover:text-sky-600 hover:bg-slate-50 transition-colors">Komputer & Printer</button>
+          <button onclick="showLayanan('elektronik')" class="w-full text-left p-2.5 rounded-lg text-sm text-slate-600 hover:text-sky-600 hover:bg-slate-50 transition-colors">Alat Elektronik</button>
+          <button onclick="showLayanan('kantor')" class="w-full text-left p-2.5 rounded-lg text-sm text-slate-600 hover:text-sky-600 hover:bg-slate-50 transition-colors">Peralatan Kantor</button>
+        </div>
+      </div>
+
+      <!-- Mobile Login -->
+      <div class="rounded-xl overflow-hidden bg-slate-50/50 border border-slate-100 mt-1">
+        <button onclick="document.getElementById('mobileLoginMenu').classList.toggle('hidden'); document.getElementById('mobileLoginArrow').classList.toggle('rotate-180')" class="w-full flex items-center justify-between p-3 text-left font-medium text-slate-700 hover:bg-slate-50 transition-colors focus:outline-none">
+          <span class="flex items-center gap-3">
+            <i class="fa-solid fa-right-to-bracket text-slate-400 text-sm w-5 text-center"></i>
+            <span>Login Portal</span>
+          </span>
+          <svg id="mobileLoginArrow" class="w-4 h-4 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div id="mobileLoginMenu" class="hidden flex flex-col bg-white/50 border-t border-slate-100 p-2 gap-2">
+          <a href="http://mns.nustech.co.id/login" target="_blank" class="flex items-center gap-3 p-3 rounded-xl border border-transparent hover:border-slate-100 hover:bg-slate-50 transition-colors">
+            <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-slate-50 text-slate-600 flex items-center justify-center text-lg shrink-0">
+              <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-semibold text-slate-800">MNS Nustech</div>
+              <div class="text-[10px] text-slate-500 mt-0.5">Monitoring & Network</div>
+            </div>
+          </a>
+          <a href="http://enginering.nustech.co.id/login" target="_blank" class="flex items-center gap-3 p-3 rounded-xl border border-transparent hover:border-slate-100 hover:bg-slate-50 transition-colors">
+            <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-slate-50 text-slate-600 flex items-center justify-center text-lg shrink-0">
+              <i class="fa-solid fa-gears"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-semibold text-slate-800">Engineering</div>
+              <div class="text-[10px] text-slate-500 mt-0.5">Inventory System</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <a href="#gallery" class="p-3 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-sky-600 font-medium transition-colors flex items-center gap-3 mt-1"><i class="fa-solid fa-images text-slate-400 text-sm w-5 text-center"></i>Galeri</a>
+      <a href="#news" class="p-3 rounded-xl hover:bg-slate-50 text-slate-700 hover:text-sky-600 font-medium transition-colors flex items-center gap-3"><i class="fa-brands fa-instagram text-slate-400 text-sm w-5 text-center"></i>Berita</a>
+      <a href="#kontak" class="mt-2 bg-sky-500 hover:bg-sky-600 text-white font-semibold text-sm py-3 px-5 rounded-xl text-center transition-colors shadow-sm">Kontak Kami</a>
+    </div>
+  </div>
       </div>
     </div>
   </nav>
@@ -606,7 +554,7 @@
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
           <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
         </span>
-        {{ $content['hero_badge'] ?? 'Professional Technology Solutions · Since 2014' }}
+        {{ $content['hero_badge'] ?? 'Professional Technology Solutions' }}
       </div>
 
       <!-- Main Heading -->
@@ -630,37 +578,9 @@
         <span class="text-sky-300/70 text-xs font-semibold tracking-widest mt-2 block">{{ $content['hero_keywords'] ?? 'Jaringan · VSAT · Kelistrikan · Reklame · Aplikasi' }}</span>
       </p>
 
-      <!-- CTA Buttons -->
-      <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center justify-center w-full px-4 sm:px-0">
-        <a href="#tentang" class="group flex items-center justify-center gap-2.5 bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-400 hover:to-cyan-400 text-white font-bold px-6 sm:px-8 py-3.5 sm:py-4 rounded-full shadow-2xl shadow-sky-500/30 hover:shadow-sky-400/40 hover:-translate-y-0.5 transition-all duration-300 text-sm w-full sm:w-auto">
-          Tentang Kami
-          <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform duration-300"></i>
-        </a>
-        <a href="#layanan" class="group flex items-center justify-center gap-2.5 glass hover:bg-white/10 text-white font-bold px-6 sm:px-8 py-3.5 sm:py-4 rounded-full hover:border-sky-400/40 transition-all duration-300 text-sm hover:-translate-y-0.5 w-full sm:w-auto">
-          <i class="fa-solid fa-concierge-bell text-xs text-sky-300 group-hover:scale-110 transition-transform"></i>
-          Layanan Kami
-        </a>
-        <a href="https://wa.me/{{ $content['hero_whatsapp'] ?? '6281332809923' }}" target="_blank" class="group flex items-center justify-center gap-2.5 bg-emerald-500/20 hover:bg-emerald-500 text-emerald-300 hover:text-white font-bold px-6 sm:px-8 py-3.5 sm:py-4 rounded-full border border-emerald-500/30 hover:border-emerald-400 transition-all duration-300 text-sm hover:-translate-y-0.5 w-full sm:w-auto">
-          <i class="fa-brands fa-whatsapp text-sm group-hover:scale-110 transition-transform"></i>
-          WhatsApp
-        </a>
-      </div>
 
-      <!-- Stats -->
-      <div class="mt-10 sm:mt-16 grid grid-cols-3 gap-2 sm:gap-16 w-full max-w-lg">
-        <div class="text-center group">
-          <div class="text-3xl sm:text-5xl font-heading font-black text-white text-glow-soft stat-number" data-count="{{ $content['hero_stat1_count'] ?? 50 }}">0+</div>
-          <div class="text-[8px] sm:text-[10px] text-sky-300/60 font-bold uppercase tracking-widest mt-1 sm:mt-2">{{ $content['hero_stat1_label'] ?? 'Proyek Selesai' }}</div>
-        </div>
-        <div class="text-center border-x border-white/10 px-2 sm:px-4 group">
-          <div class="text-3xl sm:text-5xl font-heading font-black text-white text-glow-soft stat-number" data-count="{{ $content['hero_stat2_count'] ?? 30 }}">0+</div>
-          <div class="text-[8px] sm:text-[10px] text-sky-300/60 font-bold uppercase tracking-widest mt-1 sm:mt-2">{{ $content['hero_stat2_label'] ?? 'Klien Puas' }}</div>
-        </div>
-        <div class="text-center group">
-          <div class="text-3xl sm:text-5xl font-heading font-black text-white text-glow-soft stat-number" data-count="{{ $content['hero_stat3_count'] ?? 8 }}">0+</div>
-          <div class="text-[8px] sm:text-[10px] text-sky-300/60 font-bold uppercase tracking-widest mt-1 sm:mt-2">{{ $content['hero_stat3_label'] ?? 'Bidang Layanan' }}</div>
-        </div>
-      </div>
+
+
     </div>
 
     <!-- Scroll Indicator -->
@@ -707,25 +627,7 @@
             <div class="absolute inset-3 bg-gradient-to-br from-sky-500/20 to-cyan-500/10 rounded-[2.5rem] blur-xl"></div>
             <img src="{{ asset('assets/img/tentangkami.png') }}" alt="Tentang CV. Nustech" class="relative w-full rounded-[2.5rem] shadow-2xl border border-white/60 object-cover hover:scale-[1.02] transition-transform duration-700">
 
-            <!-- Floating badge 1 -->
-            <div class="absolute -bottom-5 -right-5 bg-white rounded-2xl shadow-2xl p-4 border border-slate-100/80 flex items-center gap-3">
-              <div class="w-11 h-11 bg-gradient-to-br from-sky-500 to-cyan-500 rounded-xl flex items-center justify-center text-white">
-                <i class="fa-solid fa-shield-check text-lg"></i>
-              </div>
-              <div>
-                <div class="text-xs font-black text-slate-800">Terpercaya</div>
-                <div class="text-[10px] text-slate-400">ISO & SNI Compliant</div>
-              </div>
-            </div>
 
-            <!-- Floating badge 2 -->
-            <div class="absolute -top-5 -right-5 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl shadow-xl p-3.5 text-white flex items-center gap-2">
-              <i class="fa-solid fa-star text-sm text-yellow-300"></i>
-              <div>
-                <div class="text-xs font-black">Sejak 2014</div>
-                <div class="text-[9px] opacity-80">Berpengalaman</div>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -741,7 +643,7 @@
           </h2>
 
           <p class="text-slate-600 leading-relaxed text-base">
-            {{ $content['about_desc1'] ?? 'CV. NUSTECH adalah perusahaan yang bergerak di bidang pengadaan barang dan jasa.' }}
+            {{ $content['about_desc1'] ?? 'NUSTECH adalah perusahaan yang bergerak di bidang pengadaan barang dan jasa.' }}
           </p>
 
           <p class="text-slate-500 leading-relaxed text-sm">
@@ -749,7 +651,7 @@
           </p>
 
           <!-- Feature Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <div class="group flex items-center gap-3 bg-white rounded-2xl border border-slate-100 shadow-sm p-4 hover:border-sky-200 hover:shadow-md transition-all duration-300 card-hover">
               <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-sky-50 to-sky-100 text-sky-600 flex items-center justify-center shrink-0 group-hover:from-sky-500 group-hover:to-cyan-500 group-hover:text-white transition-all duration-500">
                 <i class="fa-solid fa-certificate"></i>
@@ -768,15 +670,6 @@
                 <div class="text-[10px] text-slate-400">Dinas & Instansi NTB</div>
               </div>
             </div>
-            <div class="group flex items-center gap-3 bg-white rounded-2xl border border-slate-100 shadow-sm p-4 hover:border-orange-200 hover:shadow-md transition-all duration-300 card-hover">
-              <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-orange-50 to-amber-100 text-orange-500 flex items-center justify-center shrink-0 group-hover:from-orange-500 group-hover:to-amber-500 group-hover:text-white transition-all duration-500">
-                <i class="fa-solid fa-satellite-dish"></i>
-              </div>
-              <div>
-                <div class="text-xs font-bold text-slate-800">VSAT & Fiber</div>
-                <div class="text-[10px] text-slate-400">Jaringan 3T Indonesia</div>
-              </div>
-            </div>
             <div class="group flex items-center gap-3 bg-white rounded-2xl border border-slate-100 shadow-sm p-4 hover:border-purple-200 hover:shadow-md transition-all duration-300 card-hover">
               <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-purple-50 to-violet-100 text-purple-600 flex items-center justify-center shrink-0 group-hover:from-purple-500 group-hover:to-violet-500 group-hover:text-white transition-all duration-500">
                 <i class="fa-solid fa-headset"></i>
@@ -793,12 +686,6 @@
               Pelajari Selengkapnya
               <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
             </button>
-            <a href="https://wa.me/6281332809923" target="_blank" class="group inline-flex items-center gap-2 text-slate-600 hover:text-emerald-600 font-bold text-sm transition-colors">
-              <div class="w-9 h-9 rounded-full bg-emerald-100 group-hover:bg-emerald-500 text-emerald-500 group-hover:text-white flex items-center justify-center transition-all duration-300">
-                <i class="fa-brands fa-whatsapp text-base"></i>
-              </div>
-              Hubungi Kami
-            </a>
           </div>
         </div>
 
@@ -841,7 +728,7 @@
             </li>
             <li class="flex items-start gap-2.5">
               <span class="w-6 h-6 rounded-lg bg-gradient-to-br from-sky-500 to-cyan-500 text-white font-bold flex items-center justify-center text-[10px] shrink-0 mt-0.5">4</span>
-              <span>{{ $content['modal_strategy_4'] ?? 'Kompetensi SDM: Teknisi lapangan dibekali sertifikasi keahlian.' }}</span>
+              <span>{{ $content['modal_strategy_4'] ?? 'Kompetensi SDM: Teknisi lapangan dibekali kompetensi dan keahlian teknis.' }}</span>
             </li>
           </ul>
         </div>
@@ -852,49 +739,15 @@
     </div>
   </div>
 
-  <!-- ======================================================
-       PARTNER MARQUEE
-  ====================================================== -->
-  <section class="py-14 relative overflow-hidden" style="background: linear-gradient(135deg, #020817 0%, #0a1628 50%, #020817 100%);">
-    <div class="absolute inset-0 opacity-5" style="background-image: linear-gradient(rgba(14,165,233,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(14,165,233,0.2) 1px, transparent 1px); background-size: 40px 40px;"></div>
-    <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-sky-500/30 to-transparent"></div>
-    <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-sky-500/20 to-transparent"></div>
 
-    <div class="w-full max-w-[95%] 2xl:max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8 mb-8 text-center reveal">
-      <p class="text-[10px] text-sky-400/70 font-extrabold uppercase tracking-[0.3em]">
-        <span class="inline-block w-8 h-px bg-sky-500/40 mr-3 align-middle"></span>
-        Dipercaya oleh Instansi & Mitra di NTB
-        <span class="inline-block w-8 h-px bg-sky-500/40 ml-3 align-middle"></span>
-      </p>
-    </div>
-
-    <div class="flex flex-wrap justify-center gap-5 w-full max-w-4xl mx-auto px-4">
-        @php
-          $partners = [
-            ['icon'=>'fa-solid fa-shield-halved','name'=>'POLDA NTB (RESKRIMSUS)','color'=>'blue'],
-            ['icon'=>'fa-solid fa-building-shield','name'=>'BNNP NTB','color'=>'sky'],
-          ];
-        @endphp
-
-        @foreach($partners as $p)
-          <div class="inline-flex items-center gap-3 glass border border-white/8 rounded-2xl px-6 py-3.5 flex-shrink-0 hover:border-sky-500/30 transition-all duration-300 group">
-            <div class="w-9 h-9 rounded-lg bg-white/5 text-white/70 flex items-center justify-center text-sm flex-shrink-0 group-hover:text-sky-300 transition-colors">
-              <i class="{{ $p['icon'] }}"></i>
-            </div>
-            <span class="text-white/70 font-bold text-sm group-hover:text-white transition-colors">{{ $p['name'] }}</span>
-          </div>
-        @endforeach
-      </div>
-  </section>
 
   <!-- ======================================================
        VISI MISI SECTION
   ====================================================== -->
-  <section id="visimisi" class="w-full relative py-24 sm:py-32 overflow-hidden" style="background: linear-gradient(135deg,#020817 0%, #0a1628 40%, #0d1b3e 70%, #020817 100%);">
+  <section id="visimisi" class="w-full relative py-24 sm:py-32 overflow-hidden" style="background: linear-gradient(180deg, #f8faff 0%, #f1f5fb 100%);">
     <!-- Decorative -->
-    <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-sky-500/5 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-cyan-500/5 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute inset-0 opacity-[0.03]" style="background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 60px 60px;"></div>
+    <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-sky-200/40 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-cyan-200/40 rounded-full blur-3xl pointer-events-none"></div>
 
     <!-- Top wave -->
     <div class="absolute top-0 left-0 w-full">
@@ -907,11 +760,11 @@
 
       <!-- Section Title -->
       <div class="text-center mb-16 reveal">
-        <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 text-sky-300 px-5 py-2 rounded-full text-xs font-bold tracking-widest uppercase mb-6">
-          <i class="fa-solid fa-bullseye text-[10px] text-sky-400"></i> Visi & Misi
+        <div class="inline-flex items-center gap-2 bg-sky-50 border border-sky-100 text-sky-600 px-5 py-2 rounded-full text-xs font-bold tracking-widest uppercase mb-6">
+          <i class="fa-solid fa-bullseye text-[10px] text-sky-500"></i> Visi & Misi
         </div>
-        <h2 class="text-4xl sm:text-5xl font-heading font-black text-white text-glow-soft">{{ $content['visimisi_title'] ?? 'Komitmen & Arah Masa Depan' }}</h2>
-        <p class="mt-4 text-slate-400/80 text-sm max-w-xl mx-auto leading-relaxed">{{ $content['visimisi_subtitle'] ?? 'Landasan nilai yang membimbing setiap langkah CV. NUSTECH menuju profesionalisme dan kepercayaan nasional.' }}</p>
+        <h2 class="text-4xl sm:text-5xl font-heading font-black text-slate-900">{{ $content['visimisi_title'] ?? 'Komitmen & Arah Masa Depan' }}</h2>
+        <p class="mt-4 text-slate-500 text-sm max-w-xl mx-auto leading-relaxed">{{ $content['visimisi_subtitle'] ?? 'Landasan nilai yang membimbing setiap langkah CV. NUSTECH menuju profesionalisme dan kepercayaan nasional.' }}</p>
       </div>
 
       <!-- Cards Grid -->
@@ -919,25 +772,25 @@
 
         <!-- VISI Card -->
         <div class="relative group reveal-left">
-          <div class="absolute inset-0 bg-gradient-to-br from-sky-500/10 to-cyan-500/5 rounded-3xl blur-xl group-hover:from-sky-500/20 group-hover:to-cyan-500/10 transition-all duration-500"></div>
-          <div class="relative bg-white/[0.04] backdrop-blur-md rounded-3xl p-8 border border-white/8 flex flex-col h-full hover:border-sky-500/30 transition-all duration-500 hover:bg-white/[0.07]">
+          <div class="absolute inset-0 bg-gradient-to-br from-sky-100 to-cyan-50 rounded-3xl blur-xl group-hover:from-sky-200 group-hover:to-cyan-100 transition-all duration-500"></div>
+          <div class="relative bg-white rounded-3xl p-8 border border-slate-100 shadow-sm flex flex-col h-full hover:border-sky-200 transition-all duration-500 hover:shadow-md">
             <!-- Header -->
             <div class="flex items-start gap-5 mb-8">
-              <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-500/20 to-cyan-500/10 text-sky-300 flex items-center justify-center text-2xl border border-sky-500/20 shrink-0 group-hover:from-sky-500/30 group-hover:to-cyan-500/20 transition-all duration-500">
+              <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-50 to-cyan-50 text-sky-500 flex items-center justify-center text-2xl border border-sky-100 shrink-0 group-hover:from-sky-100 group-hover:to-cyan-100 transition-all duration-500">
                 <i class="fa-solid fa-eye"></i>
               </div>
               <div>
-                <div class="inline-flex items-center gap-1.5 bg-sky-500/10 border border-sky-500/20 text-sky-400 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest mb-2">Visi Perusahaan</div>
-                <h3 class="text-3xl font-heading font-black text-white text-glow-soft">VISI</h3>
+                <div class="inline-flex items-center gap-1.5 bg-sky-50 border border-sky-100 text-sky-600 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest mb-2">Visi Perusahaan</div>
+                <h3 class="text-3xl font-heading font-black text-slate-800">VISI</h3>
               </div>
             </div>
 
             <!-- Content -->
-            <blockquote class="text-slate-300 leading-relaxed text-base italic text-justify flex-1 border-l-2 border-sky-500/30 pl-5">
+            <blockquote class="text-slate-600 leading-relaxed text-base italic text-justify flex-1 border-l-2 border-sky-300 pl-5">
               "{{ $content['visi_text'] ?? 'Menjadi perusahaan penyedia barang dan jasa di bidang teknologi informasi yang profesional dan terpercaya.' }}"
             </blockquote>
 
-            <div class="mt-8 pt-6 border-t border-white/8 flex items-center gap-3 text-sky-400 text-xs font-bold uppercase tracking-wider">
+            <div class="mt-8 pt-6 border-t border-slate-100 flex items-center gap-3 text-sky-600 text-xs font-bold uppercase tracking-wider">
               <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
               Integritas & Kredibilitas Utama
             </div>
@@ -946,16 +799,16 @@
 
         <!-- MISI Card -->
         <div class="relative group reveal-right">
-          <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-sky-500/5 rounded-3xl blur-xl group-hover:from-cyan-500/20 group-hover:to-sky-500/10 transition-all duration-500"></div>
-          <div class="relative bg-white/[0.04] backdrop-blur-md rounded-3xl p-8 border border-white/8 flex flex-col h-full hover:border-cyan-500/30 transition-all duration-500 hover:bg-white/[0.07]">
+          <div class="absolute inset-0 bg-gradient-to-br from-cyan-100 to-sky-50 rounded-3xl blur-xl group-hover:from-cyan-200 group-hover:to-sky-100 transition-all duration-500"></div>
+          <div class="relative bg-white rounded-3xl p-8 border border-slate-100 shadow-sm flex flex-col h-full hover:border-cyan-200 transition-all duration-500 hover:shadow-md">
             <!-- Header -->
             <div class="flex items-start gap-5 mb-8">
-              <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-sky-500/10 text-cyan-300 flex items-center justify-center text-2xl border border-cyan-500/20 shrink-0 group-hover:from-cyan-500/30 transition-all duration-500">
+              <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-50 to-sky-50 text-cyan-500 flex items-center justify-center text-2xl border border-cyan-100 shrink-0 group-hover:from-cyan-100 transition-all duration-500">
                 <i class="fa-solid fa-rocket"></i>
               </div>
               <div>
-                <div class="inline-flex items-center gap-1.5 bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest mb-2">Misi Perusahaan</div>
-                <h3 class="text-3xl font-heading font-black text-white text-glow-soft">MISI</h3>
+                <div class="inline-flex items-center gap-1.5 bg-cyan-50 border border-cyan-100 text-cyan-600 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest mb-2">Misi Perusahaan</div>
+                <h3 class="text-3xl font-heading font-black text-slate-800">MISI</h3>
               </div>
             </div>
 
@@ -969,8 +822,8 @@
               ]; @endphp
               @foreach($missions as $i => $m)
               <li class="flex items-start gap-4 group/item">
-                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-500 text-white flex items-center justify-center font-black text-xs shrink-0 mt-0.5 shadow-lg shadow-sky-500/20">{{ $i+1 }}</div>
-                <p class="text-slate-300 text-sm leading-relaxed group-hover/item:text-slate-200 transition-colors">{{ $m }}</p>
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-500 text-white flex items-center justify-center font-black text-xs shrink-0 mt-0.5 shadow-sm shadow-sky-500/20">{{ $i+1 }}</div>
+                <p class="text-slate-600 text-sm leading-relaxed group-hover/item:text-slate-800 transition-colors">{{ $m }}</p>
               </li>
               @endforeach
             </ul>
@@ -1006,7 +859,7 @@
         @php
           $keunggulan = [
             ['icon'=>'fa-solid fa-wand-magic-sparkles','color'=>'sky','title'=>'Solusi Terintegrasi','desc'=>'Kelola seluruh kebutuhan IT, kelistrikan, dan pengadaan di bawah satu koordinasi teknis.'],
-            ['icon'=>'fa-solid fa-wifi','color'=>'indigo','title'=>'Konektivitas Handal','desc'=>'Kestabilan koneksi via satelit VSAT maupun fiber optik, dikerjakan teknisi bersertifikasi.'],
+            ['icon'=>'fa-solid fa-wifi','color'=>'indigo','title'=>'Konektivitas Handal','desc'=>'Kestabilan koneksi via satelit VSAT maupun fiber optik, dikerjakan oleh teknisi ahli kami.'],
             ['icon'=>'fa-solid fa-shield-halved','color'=>'emerald','title'=>'Layanan Purna Jual','desc'=>'Garansi pekerjaan & tim NOC tanggap darurat untuk meminimalkan kendala sistem.'],
             ['icon'=>'fa-solid fa-clock-rotate-left','color'=>'orange','title'=>'Tepat Waktu','desc'=>'Setiap proyek dikerjakan sesuai timeline kontrak dengan manajemen proyek terstruktur.'],
           ];
@@ -1075,10 +928,10 @@
       </div>
 
       <!-- Tab Content -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+      <div class="max-w-6xl mx-auto items-stretch">
 
-        <!-- Left: Detail Box -->
-        <div class="lg:col-span-6">
+        <!-- Detail Box -->
+        <div>
           <div class="relative bg-white rounded-3xl border border-slate-100 shadow-sm p-7 sm:p-9 h-full overflow-hidden">
             <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-sky-50 to-transparent rounded-bl-full pointer-events-none"></div>
             <div class="relative z-10">
@@ -1094,38 +947,38 @@
                   </div>
                 </div>
                 <p class="text-slate-500 text-sm leading-relaxed">{{ $content['layanan_networking_desc'] ?? 'Solusi infrastruktur jaringan internet lokal, inter-koneksi antar kantor, hingga maintenance periodik perangkat jaringan.' }}</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 bg-white hover:border-sky-200 hover:shadow-md cursor-pointer transition group" onclick="openJaringanModal()">
-                    <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-500 flex items-center justify-center shrink-0 group-hover:bg-sky-500 group-hover:text-white transition-all"><i class="fa-solid fa-network-wired"></i></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                  <div class="flex items-center gap-4 sm:gap-5 p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl border border-slate-100 bg-white hover:border-sky-200 hover:shadow-md cursor-pointer transition group" onclick="openJaringanModal()">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-sky-50 text-sky-500 flex items-center justify-center shrink-0 group-hover:bg-sky-500 group-hover:text-white transition-all"><i class="fa-solid fa-network-wired"></i></div>
                     <div class="flex-1">
-                      <span class="block text-[13px] font-bold text-slate-800 group-hover:text-sky-600 leading-tight">Jaringan LAN & WiFi</span>
-                      <span class="block text-[10px] text-slate-500 mt-0.5">Lihat Portofolio</span>
+                      <span class="block text-sm sm:text-base md:text-lg font-bold text-slate-800 group-hover:text-sky-600 leading-tight">Jaringan LAN & WiFi</span>
+                      <span class="block text-xs sm:text-sm text-slate-500 mt-1">Lihat Portofolio</span>
                     </div>
-                    <div class="w-6 h-6 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-sky-100 group-hover:text-sky-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-[10px]"></i></div>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-sky-100 group-hover:text-sky-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-xs sm:text-sm"></i></div>
                   </div>
-                  <div class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 bg-white hover:border-sky-200 hover:shadow-md cursor-pointer transition group" onclick="openVsatModal()">
-                    <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-500 flex items-center justify-center shrink-0 group-hover:bg-sky-500 group-hover:text-white transition-all"><i class="fa-solid fa-satellite-dish"></i></div>
+                  <div class="flex items-center gap-4 sm:gap-5 p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl border border-slate-100 bg-white hover:border-sky-200 hover:shadow-md cursor-pointer transition group" onclick="openVsatModal()">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-sky-50 text-sky-500 flex items-center justify-center shrink-0 group-hover:bg-sky-500 group-hover:text-white transition-all"><i class="fa-solid fa-satellite-dish"></i></div>
                     <div class="flex-1">
-                      <span class="block text-[13px] font-bold text-slate-800 group-hover:text-sky-600 leading-tight">Instalasi VSAT</span>
-                      <span class="block text-[10px] text-slate-500 mt-0.5">Lihat Portofolio</span>
+                      <span class="block text-sm sm:text-base md:text-lg font-bold text-slate-800 group-hover:text-sky-600 leading-tight">Instalasi VSAT</span>
+                      <span class="block text-xs sm:text-sm text-slate-500 mt-1">Lihat Portofolio</span>
                     </div>
-                    <div class="w-6 h-6 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-sky-100 group-hover:text-sky-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-[10px]"></i></div>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-sky-100 group-hover:text-sky-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-xs sm:text-sm"></i></div>
                   </div>
-                  <div class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 bg-white hover:border-sky-200 hover:shadow-md cursor-pointer transition group" onclick="openBasebandModal()">
-                    <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-500 flex items-center justify-center shrink-0 group-hover:bg-sky-500 group-hover:text-white transition-all"><i class="fa-solid fa-server"></i></div>
+                  <div class="flex items-center gap-4 sm:gap-5 p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl border border-slate-100 bg-white hover:border-sky-200 hover:shadow-md cursor-pointer transition group" onclick="openBasebandModal()">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-sky-50 text-sky-500 flex items-center justify-center shrink-0 group-hover:bg-sky-500 group-hover:text-white transition-all"><i class="fa-solid fa-server"></i></div>
                     <div class="flex-1">
-                      <span class="block text-[13px] font-bold text-slate-800 group-hover:text-sky-600 leading-tight">Instalasi Baseband</span>
-                      <span class="block text-[10px] text-slate-500 mt-0.5">Lihat Portofolio</span>
+                      <span class="block text-sm sm:text-base md:text-lg font-bold text-slate-800 group-hover:text-sky-600 leading-tight">Instalasi Baseband</span>
+                      <span class="block text-xs sm:text-sm text-slate-500 mt-1">Lihat Portofolio</span>
                     </div>
-                    <div class="w-6 h-6 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-sky-100 group-hover:text-sky-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-[10px]"></i></div>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-sky-100 group-hover:text-sky-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-xs sm:text-sm"></i></div>
                   </div>
-                  <div class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 bg-white hover:border-sky-200 hover:shadow-md cursor-pointer transition group" onclick="openCctvModal()">
-                    <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-500 flex items-center justify-center shrink-0 group-hover:bg-sky-500 group-hover:text-white transition-all"><i class="fa-solid fa-camera"></i></div>
+                  <div class="flex items-center gap-4 sm:gap-5 p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl border border-slate-100 bg-white hover:border-sky-200 hover:shadow-md cursor-pointer transition group" onclick="openCctvModal()">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-sky-50 text-sky-500 flex items-center justify-center shrink-0 group-hover:bg-sky-500 group-hover:text-white transition-all"><i class="fa-solid fa-camera"></i></div>
                     <div class="flex-1">
-                      <span class="block text-[13px] font-bold text-slate-800 group-hover:text-sky-600 leading-tight">Keamanan CCTV</span>
-                      <span class="block text-[10px] text-slate-500 mt-0.5">Lihat Portofolio</span>
+                      <span class="block text-sm sm:text-base md:text-lg font-bold text-slate-800 group-hover:text-sky-600 leading-tight">Keamanan CCTV</span>
+                      <span class="block text-xs sm:text-sm text-slate-500 mt-1">Lihat Portofolio</span>
                     </div>
-                    <div class="w-6 h-6 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-sky-100 group-hover:text-sky-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-[10px]"></i></div>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-sky-100 group-hover:text-sky-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-xs sm:text-sm"></i></div>
                   </div>
                 </div>
                 <div class="pt-2">
@@ -1145,22 +998,22 @@
                   </div>
                 </div>
                 <p class="text-slate-500 text-sm leading-relaxed">{{ $content['layanan_aplikasi_desc'] ?? 'Merancang software kustom sesuai alur bisnis instansi, mulai dari program kasir, inventory, hingga sistem manajemen.' }}</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 bg-white hover:border-indigo-200 hover:shadow-md cursor-pointer transition group" onclick="openAplikasiSoftwareModal()">
-                    <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-500 flex items-center justify-center shrink-0 group-hover:bg-indigo-500 group-hover:text-white transition-all"><i class="fa-solid fa-globe"></i></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                  <div class="flex items-center gap-4 sm:gap-5 p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl border border-slate-100 bg-white hover:border-indigo-200 hover:shadow-md cursor-pointer transition group" onclick="openAplikasiSoftwareModal()">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-indigo-50 text-indigo-500 flex items-center justify-center shrink-0 group-hover:bg-indigo-500 group-hover:text-white transition-all"><i class="fa-solid fa-globe"></i></div>
                     <div class="flex-1">
-                      <span class="block text-[13px] font-bold text-slate-800 group-hover:text-indigo-600 leading-tight">Pembuatan Software</span>
-                      <span class="block text-[10px] text-slate-500 mt-0.5">Lihat Portofolio</span>
+                      <span class="block text-sm sm:text-base md:text-lg font-bold text-slate-800 group-hover:text-indigo-600 leading-tight">Pembuatan Software</span>
+                      <span class="block text-xs sm:text-sm text-slate-500 mt-1">Lihat Portofolio</span>
                     </div>
-                    <div class="w-6 h-6 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-indigo-100 group-hover:text-indigo-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-[10px]"></i></div>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-indigo-100 group-hover:text-indigo-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-xs sm:text-sm"></i></div>
                   </div>
-                  <div class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 bg-white hover:border-indigo-200 hover:shadow-md cursor-pointer transition group" onclick="openAplikasiJasaModal()">
-                    <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-500 flex items-center justify-center shrink-0 group-hover:bg-indigo-500 group-hover:text-white transition-all"><i class="fa-solid fa-database"></i></div>
+                  <div class="flex items-center gap-4 sm:gap-5 p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl border border-slate-100 bg-white hover:border-indigo-200 hover:shadow-md cursor-pointer transition group" onclick="openAplikasiJasaModal()">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-indigo-50 text-indigo-500 flex items-center justify-center shrink-0 group-hover:bg-indigo-500 group-hover:text-white transition-all"><i class="fa-solid fa-database"></i></div>
                     <div class="flex-1">
-                      <span class="block text-[13px] font-bold text-slate-800 group-hover:text-indigo-600 leading-tight">Jasa Pemrograman</span>
-                      <span class="block text-[10px] text-slate-500 mt-0.5">Lihat Portofolio</span>
+                      <span class="block text-sm sm:text-base md:text-lg font-bold text-slate-800 group-hover:text-indigo-600 leading-tight">Jasa Pemrograman</span>
+                      <span class="block text-xs sm:text-sm text-slate-500 mt-1">Lihat Portofolio</span>
                     </div>
-                    <div class="w-6 h-6 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-indigo-100 group-hover:text-indigo-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-[10px]"></i></div>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-indigo-100 group-hover:text-indigo-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-xs sm:text-sm"></i></div>
                   </div>
                 </div>
                 <div class="pt-2">
@@ -1180,22 +1033,22 @@
                   </div>
                 </div>
                 <p class="text-slate-500 text-sm leading-relaxed">{{ $content['layanan_reklame_desc'] ?? 'Produksi material branding promosi fisik berkualitas untuk keperluan reklame luar ruangan maupun cetak massal.' }}</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 bg-white hover:border-pink-200 hover:shadow-md cursor-pointer transition group" onclick="openReklameDesainModal()">
-                    <div class="w-10 h-10 rounded-xl bg-pink-50 text-pink-500 flex items-center justify-center shrink-0 group-hover:bg-pink-500 group-hover:text-white transition-all"><i class="fa-solid fa-sign-hanging"></i></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                  <div class="flex items-center gap-4 sm:gap-5 p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl border border-slate-100 bg-white hover:border-pink-200 hover:shadow-md cursor-pointer transition group" onclick="openReklameDesainModal()">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-pink-50 text-pink-500 flex items-center justify-center shrink-0 group-hover:bg-pink-500 group-hover:text-white transition-all"><i class="fa-solid fa-sign-hanging"></i></div>
                     <div class="flex-1">
-                      <span class="block text-[13px] font-bold text-slate-800 group-hover:text-pink-600 leading-tight">Desain Media Promosi</span>
-                      <span class="block text-[10px] text-slate-500 mt-0.5">Lihat Portofolio</span>
+                      <span class="block text-sm sm:text-base md:text-lg font-bold text-slate-800 group-hover:text-pink-600 leading-tight">Desain Media Promosi</span>
+                      <span class="block text-xs sm:text-sm text-slate-500 mt-1">Lihat Portofolio</span>
                     </div>
-                    <div class="w-6 h-6 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-pink-100 group-hover:text-pink-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-[10px]"></i></div>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-pink-100 group-hover:text-pink-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-xs sm:text-sm"></i></div>
                   </div>
-                  <div class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 bg-white hover:border-pink-200 hover:shadow-md cursor-pointer transition group" onclick="openReklameCetakModal()">
-                    <div class="w-10 h-10 rounded-xl bg-pink-50 text-pink-500 flex items-center justify-center shrink-0 group-hover:bg-pink-500 group-hover:text-white transition-all"><i class="fa-solid fa-print"></i></div>
+                  <div class="flex items-center gap-4 sm:gap-5 p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl border border-slate-100 bg-white hover:border-pink-200 hover:shadow-md cursor-pointer transition group" onclick="openReklameCetakModal()">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-pink-50 text-pink-500 flex items-center justify-center shrink-0 group-hover:bg-pink-500 group-hover:text-white transition-all"><i class="fa-solid fa-print"></i></div>
                     <div class="flex-1">
-                      <span class="block text-[13px] font-bold text-slate-800 group-hover:text-pink-600 leading-tight">Layanan Cetak</span>
-                      <span class="block text-[10px] text-slate-500 mt-0.5">Lihat Portofolio</span>
+                      <span class="block text-sm sm:text-base md:text-lg font-bold text-slate-800 group-hover:text-pink-600 leading-tight">Layanan Cetak</span>
+                      <span class="block text-xs sm:text-sm text-slate-500 mt-1">Lihat Portofolio</span>
                     </div>
-                    <div class="w-6 h-6 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-pink-100 group-hover:text-pink-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-[10px]"></i></div>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-pink-100 group-hover:text-pink-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-xs sm:text-sm"></i></div>
                   </div>
                 </div>
                 <div class="pt-2">
@@ -1215,14 +1068,14 @@
                   </div>
                 </div>
                 <p class="text-slate-500 text-sm leading-relaxed">{{ $content['layanan_kelistrikan_desc'] ?? 'Perancangan kelistrikan terpusat untuk keamanan operasional server data center, perkantoran, dan gedung.' }}</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 bg-white hover:border-yellow-200 hover:shadow-md cursor-pointer transition group" onclick="openKelistrikanSistemModal()">
-                    <div class="w-10 h-10 rounded-xl bg-yellow-50 text-yellow-500 flex items-center justify-center shrink-0 group-hover:bg-yellow-500 group-hover:text-white transition-all"><i class="fa-solid fa-plug-circle-bolt"></i></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                  <div class="flex items-center gap-4 sm:gap-5 p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl border border-slate-100 bg-white hover:border-yellow-200 hover:shadow-md cursor-pointer transition group" onclick="openKelistrikanSistemModal()">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-yellow-50 text-yellow-500 flex items-center justify-center shrink-0 group-hover:bg-yellow-500 group-hover:text-white transition-all"><i class="fa-solid fa-plug-circle-bolt"></i></div>
                     <div class="flex-1">
-                      <span class="block text-[13px] font-bold text-slate-800 group-hover:text-yellow-600 leading-tight">Sistem Kelistrikan</span>
-                      <span class="block text-[10px] text-slate-500 mt-0.5">Lihat Portofolio</span>
+                      <span class="block text-sm sm:text-base md:text-lg font-bold text-slate-800 group-hover:text-yellow-600 leading-tight">Sistem Kelistrikan</span>
+                      <span class="block text-xs sm:text-sm text-slate-500 mt-1">Lihat Portofolio</span>
                     </div>
-                    <div class="w-6 h-6 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-yellow-100 group-hover:text-yellow-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-[10px]"></i></div>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-yellow-100 group-hover:text-yellow-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-xs sm:text-sm"></i></div>
                   </div>
                 </div>
                 <div class="pt-2">
@@ -1242,22 +1095,22 @@
                   </div>
                 </div>
                 <p class="text-slate-500 text-sm leading-relaxed">{{ $content['layanan_ac_desc'] ?? 'Maintenance pendingin ruangan secara rutin demi menjaga kestabilan suhu ruangan kerja maupun mesin server.' }}</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 bg-white hover:border-cyan-200 hover:shadow-md cursor-pointer transition group" onclick="openAcPemasanganModal()">
-                    <div class="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-500 flex items-center justify-center shrink-0 group-hover:bg-cyan-500 group-hover:text-white transition-all"><i class="fa-solid fa-shower"></i></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                  <div class="flex items-center gap-4 sm:gap-5 p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl border border-slate-100 bg-white hover:border-cyan-200 hover:shadow-md cursor-pointer transition group" onclick="openAcPemasanganModal()">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-cyan-50 text-cyan-500 flex items-center justify-center shrink-0 group-hover:bg-cyan-500 group-hover:text-white transition-all"><i class="fa-solid fa-shower"></i></div>
                     <div class="flex-1">
-                      <span class="block text-[13px] font-bold text-slate-800 group-hover:text-cyan-600 leading-tight">Pemasangan AC</span>
-                      <span class="block text-[10px] text-slate-500 mt-0.5">Lihat Portofolio</span>
+                      <span class="block text-sm sm:text-base md:text-lg font-bold text-slate-800 group-hover:text-cyan-600 leading-tight">Pemasangan AC</span>
+                      <span class="block text-xs sm:text-sm text-slate-500 mt-1">Lihat Portofolio</span>
                     </div>
-                    <div class="w-6 h-6 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-cyan-100 group-hover:text-cyan-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-[10px]"></i></div>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-cyan-100 group-hover:text-cyan-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-xs sm:text-sm"></i></div>
                   </div>
-                  <div class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 bg-white hover:border-cyan-200 hover:shadow-md cursor-pointer transition group" onclick="openAcMaintenanceModal()">
-                    <div class="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-500 flex items-center justify-center shrink-0 group-hover:bg-cyan-500 group-hover:text-white transition-all"><i class="fa-solid fa-wind"></i></div>
+                  <div class="flex items-center gap-4 sm:gap-5 p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl border border-slate-100 bg-white hover:border-cyan-200 hover:shadow-md cursor-pointer transition group" onclick="openAcMaintenanceModal()">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-cyan-50 text-cyan-500 flex items-center justify-center shrink-0 group-hover:bg-cyan-500 group-hover:text-white transition-all"><i class="fa-solid fa-wind"></i></div>
                     <div class="flex-1">
-                      <span class="block text-[13px] font-bold text-slate-800 group-hover:text-cyan-600 leading-tight">Maintenance AC</span>
-                      <span class="block text-[10px] text-slate-500 mt-0.5">Lihat Portofolio</span>
+                      <span class="block text-sm sm:text-base md:text-lg font-bold text-slate-800 group-hover:text-cyan-600 leading-tight">Maintenance AC</span>
+                      <span class="block text-xs sm:text-sm text-slate-500 mt-1">Lihat Portofolio</span>
                     </div>
-                    <div class="w-6 h-6 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-cyan-100 group-hover:text-cyan-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-[10px]"></i></div>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-cyan-100 group-hover:text-cyan-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-xs sm:text-sm"></i></div>
                   </div>
                 </div>
                 <div class="pt-2">
@@ -1277,22 +1130,22 @@
                   </div>
                 </div>
                 <p class="text-slate-500 text-sm leading-relaxed">Penyediaan unit komputer client, laptop, server lokal, serta perbaikan berkala pada unit pencetak printer.</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-md cursor-pointer transition group" onclick="openKomputerPengadaanModal()">
-                    <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0 group-hover:bg-slate-600 group-hover:text-white transition-all"><i class="fa-solid fa-laptop"></i></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                  <div class="flex items-center gap-4 sm:gap-5 p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-md cursor-pointer transition group" onclick="openKomputerPengadaanModal()">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0 group-hover:bg-slate-600 group-hover:text-white transition-all"><i class="fa-solid fa-laptop"></i></div>
                     <div class="flex-1">
-                      <span class="block text-[13px] font-bold text-slate-800 group-hover:text-slate-700 leading-tight">Pengadaan Unit</span>
-                      <span class="block text-[10px] text-slate-500 mt-0.5">Lihat Portofolio</span>
+                      <span class="block text-sm sm:text-base md:text-lg font-bold text-slate-800 group-hover:text-slate-700 leading-tight">Pengadaan Unit</span>
+                      <span class="block text-xs sm:text-sm text-slate-500 mt-1">Lihat Portofolio</span>
                     </div>
-                    <div class="w-6 h-6 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-slate-200 group-hover:text-slate-700 transition shrink-0"><i class="fa-solid fa-arrow-right text-[10px]"></i></div>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-slate-200 group-hover:text-slate-700 transition shrink-0"><i class="fa-solid fa-arrow-right text-xs sm:text-sm"></i></div>
                   </div>
-                  <div class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-md cursor-pointer transition group" onclick="openKomputerPerawatanModal()">
-                    <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0 group-hover:bg-slate-600 group-hover:text-white transition-all"><i class="fa-solid fa-print"></i></div>
+                  <div class="flex items-center gap-4 sm:gap-5 p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-md cursor-pointer transition group" onclick="openKomputerPerawatanModal()">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0 group-hover:bg-slate-600 group-hover:text-white transition-all"><i class="fa-solid fa-print"></i></div>
                     <div class="flex-1">
-                      <span class="block text-[13px] font-bold text-slate-800 group-hover:text-slate-700 leading-tight">Layanan Perawatan</span>
-                      <span class="block text-[10px] text-slate-500 mt-0.5">Lihat Portofolio</span>
+                      <span class="block text-sm sm:text-base md:text-lg font-bold text-slate-800 group-hover:text-slate-700 leading-tight">Layanan Perawatan</span>
+                      <span class="block text-xs sm:text-sm text-slate-500 mt-1">Lihat Portofolio</span>
                     </div>
-                    <div class="w-6 h-6 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-slate-200 group-hover:text-slate-700 transition shrink-0"><i class="fa-solid fa-arrow-right text-[10px]"></i></div>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-slate-200 group-hover:text-slate-700 transition shrink-0"><i class="fa-solid fa-arrow-right text-xs sm:text-sm"></i></div>
                   </div>
                 </div>
                 <div class="pt-2">
@@ -1312,14 +1165,14 @@
                   </div>
                 </div>
                 <p class="text-slate-500 text-sm leading-relaxed">Pengadaan berbagai peralatan elektronik operasional seperti TV display informasi, speaker pro, hingga proyektor.</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 bg-white hover:border-teal-200 hover:shadow-md cursor-pointer transition group" onclick="openElektronikPenyediaanModal()">
-                    <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 group-hover:bg-teal-500 group-hover:text-white transition-all"><i class="fa-solid fa-tv"></i></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                  <div class="flex items-center gap-4 sm:gap-5 p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl border border-slate-100 bg-white hover:border-teal-200 hover:shadow-md cursor-pointer transition group" onclick="openElektronikPenyediaanModal()">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 group-hover:bg-teal-500 group-hover:text-white transition-all"><i class="fa-solid fa-tv"></i></div>
                     <div class="flex-1">
-                      <span class="block text-[13px] font-bold text-slate-800 group-hover:text-teal-600 leading-tight">Penyediaan Elektronik</span>
-                      <span class="block text-[10px] text-slate-500 mt-0.5">Lihat Portofolio</span>
+                      <span class="block text-sm sm:text-base md:text-lg font-bold text-slate-800 group-hover:text-teal-600 leading-tight">Penyediaan Elektronik</span>
+                      <span class="block text-xs sm:text-sm text-slate-500 mt-1">Lihat Portofolio</span>
                     </div>
-                    <div class="w-6 h-6 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-teal-100 group-hover:text-teal-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-[10px]"></i></div>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-teal-100 group-hover:text-teal-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-xs sm:text-sm"></i></div>
                   </div>
                 </div>
                 <div class="pt-2">
@@ -1339,22 +1192,22 @@
                   </div>
                 </div>
                 <p class="text-slate-500 text-sm leading-relaxed">Penyediaan meja kerja, kursi ergonomis, lemari berkas baja, serta furniture custom pendukung kenyamanan kantor.</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 bg-white hover:border-orange-200 hover:shadow-md cursor-pointer transition group" onclick="openKantorPenyediaanModal()">
-                    <div class="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center shrink-0 group-hover:bg-orange-500 group-hover:text-white transition-all"><i class="fa-solid fa-chair"></i></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                  <div class="flex items-center gap-4 sm:gap-5 p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl border border-slate-100 bg-white hover:border-orange-200 hover:shadow-md cursor-pointer transition group" onclick="openKantorPenyediaanModal()">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-orange-50 text-orange-500 flex items-center justify-center shrink-0 group-hover:bg-orange-500 group-hover:text-white transition-all"><i class="fa-solid fa-chair"></i></div>
                     <div class="flex-1">
-                      <span class="block text-[13px] font-bold text-slate-800 group-hover:text-orange-600 leading-tight">Perlengkapan Kantor</span>
-                      <span class="block text-[10px] text-slate-500 mt-0.5">Lihat Portofolio</span>
+                      <span class="block text-sm sm:text-base md:text-lg font-bold text-slate-800 group-hover:text-orange-600 leading-tight">Perlengkapan Kantor</span>
+                      <span class="block text-xs sm:text-sm text-slate-500 mt-1">Lihat Portofolio</span>
                     </div>
-                    <div class="w-6 h-6 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-orange-100 group-hover:text-orange-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-[10px]"></i></div>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-orange-100 group-hover:text-orange-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-xs sm:text-sm"></i></div>
                   </div>
-                  <div class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 bg-white hover:border-orange-200 hover:shadow-md cursor-pointer transition group" onclick="openKantorPerawatanModal()">
-                    <div class="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center shrink-0 group-hover:bg-orange-500 group-hover:text-white transition-all"><i class="fa-solid fa-box-archive"></i></div>
+                  <div class="flex items-center gap-4 sm:gap-5 p-4 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl border border-slate-100 bg-white hover:border-orange-200 hover:shadow-md cursor-pointer transition group" onclick="openKantorPerawatanModal()">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-orange-50 text-orange-500 flex items-center justify-center shrink-0 group-hover:bg-orange-500 group-hover:text-white transition-all"><i class="fa-solid fa-box-archive"></i></div>
                     <div class="flex-1">
-                      <span class="block text-[13px] font-bold text-slate-800 group-hover:text-orange-600 leading-tight">Perawatan Peralatan</span>
-                      <span class="block text-[10px] text-slate-500 mt-0.5">Lihat Portofolio</span>
+                      <span class="block text-sm sm:text-base md:text-lg font-bold text-slate-800 group-hover:text-orange-600 leading-tight">Perawatan Peralatan</span>
+                      <span class="block text-xs sm:text-sm text-slate-500 mt-1">Lihat Portofolio</span>
                     </div>
-                    <div class="w-6 h-6 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-orange-100 group-hover:text-orange-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-[10px]"></i></div>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-orange-100 group-hover:text-orange-600 transition shrink-0"><i class="fa-solid fa-arrow-right text-xs sm:text-sm"></i></div>
                   </div>
                 </div>
                 <div class="pt-2">
@@ -1371,33 +1224,7 @@
           </div>
         </div>
 
-        <!-- Right: Accordion -->
-        <div class="lg:col-span-6 flex flex-col gap-3 justify-center">
-          @php
-            $accordions = [
-              ['icon'=>'fa-wand-magic-sparkles','title'=>'Solusi Terintegrasi','content'=>'Kelola seluruh CCTV, kelistrikan, pendingin, dan jaringan perkantoran Anda di bawah satu koordinasi teknis yang andal dan tepercaya.','open'=>true],
-              ['icon'=>'fa-wifi','title'=>'Konektivitas Handal','content'=>'Kami menjamin kestabilan koneksi internet via satelit VSAT maupun fiber optik, dikerjakan oleh teknisi bersertifikasi.','open'=>false],
-              ['icon'=>'fa-shield-halved','title'=>'Layanan Purna Jual','content'=>'Garansi pekerjaan dan ketersediaan tim tanggap darurat (NOC Team) untuk meminimalkan durasi kendala sistem.','open'=>false],
-              ['icon'=>'fa-clock-rotate-left','title'=>'Pengerjaan Tepat Waktu','content'=>'Setiap proyek dikerjakan sesuai timeline kontrak yang disepakati, dengan manajemen proyek yang terstruktur dan transparan.','open'=>false],
-            ];
-          @endphp
-          @foreach($accordions as $acc)
-          <details class="group text-left cursor-pointer bg-white hover:bg-sky-50/30 border border-slate-100 hover:border-sky-200 rounded-2xl p-5 transition-all shadow-sm hover:shadow-md" {{ $acc['open'] ? 'open' : '' }}>
-            <summary class="flex justify-between items-center font-heading font-bold text-slate-800 text-base list-none">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-100 to-cyan-50 text-sky-600 flex items-center justify-center shrink-0 group-open:from-sky-500 group-open:to-cyan-500 group-open:text-white transition-all duration-300">
-                  <i class="fa-solid {{ $acc['icon'] }}"></i>
-                </div>
-                <span class="group-open:text-sky-700 transition-colors">{{ $acc['title'] }}</span>
-              </div>
-              <i class="fa-solid fa-chevron-down text-sky-400 text-xs acc-arrow shrink-0"></i>
-            </summary>
-            <div class="mt-3 text-xs text-slate-500 leading-relaxed pl-13">
-              {{ $acc['content'] }}
-            </div>
-          </details>
-          @endforeach
-        </div>
+
 
       </div>
     </div>
@@ -1406,11 +1233,11 @@
   <!-- ======================================================
        GALERI / PORTFOLIO SECTION
   ====================================================== -->
-  <section id="gallery" class="py-20 sm:py-28 relative overflow-hidden" style="background: linear-gradient(180deg, #020817 0%, #0a1628 60%, #020817 100%);">
-    <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle, rgba(14,165,233,0.3) 1px, transparent 1px); background-size: 30px 30px;"></div>
-    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-sky-500/40 to-transparent"></div>
+  <section id="gallery" class="py-20 sm:py-28 relative overflow-hidden" style="background: linear-gradient(180deg, #f8faff 0%, #f1f5fb 100%);">
+    <div class="absolute inset-0 opacity-[0.05]" style="background-image: radial-gradient(circle, rgba(14,165,233,0.4) 1px, transparent 1px); background-size: 30px 30px;"></div>
+    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-sky-300/40 to-transparent"></div>
     <div class="absolute top-0 left-0 w-full">
-      <svg viewBox="0 0 1440 80" preserveAspectRatio="none" class="w-full h-12 sm:h-16" style="fill:#f1f5fb;">
+      <svg viewBox="0 0 1440 80" preserveAspectRatio="none" class="w-full h-12 sm:h-16" style="fill:#ffffff;">
         <path d="M0,30 C360,60 720,5 1080,45 C1260,65 1380,25 1440,35 L1440,0 L0,0 Z"/>
       </svg>
     </div>
@@ -1420,18 +1247,18 @@
       <!-- Header -->
       <div class="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 reveal">
         <div>
-          <div class="inline-flex items-center gap-2 bg-sky-500/10 border border-sky-500/20 text-sky-400 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase mb-4">
+          <div class="inline-flex items-center gap-2 bg-sky-50 border border-sky-100 text-sky-600 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase mb-4">
             <i class="fa-solid fa-images text-[10px]"></i> Portofolio
           </div>
-          <h2 class="text-4xl sm:text-5xl font-heading font-black text-white text-glow-soft">Dokumentasi Proyek</h2>
-          <p class="mt-2 text-slate-400 text-sm">Rekam jejak pengerjaan nyata di lapangan.</p>
+          <h2 class="text-4xl sm:text-5xl font-heading font-black text-slate-900">Dokumentasi Proyek</h2>
+          <p class="mt-2 text-slate-500 text-sm">Rekam jejak pengerjaan nyata di lapangan.</p>
         </div>
 
         <div class="flex gap-3 mt-6 md:mt-0 select-none">
-          <button id="portfolio-prev" class="w-12 h-12 rounded-full bg-white/5 hover:bg-sky-500/20 border border-white/10 hover:border-sky-500/40 text-white hover:text-sky-300 flex items-center justify-center shadow transition-all duration-300 hover:-translate-x-0.5 neon-border cursor-pointer">
+          <button id="portfolio-prev" class="w-12 h-12 rounded-full bg-white hover:bg-sky-50 border border-slate-200 hover:border-sky-200 text-slate-600 hover:text-sky-600 flex items-center justify-center shadow-sm transition-all duration-300 hover:-translate-x-0.5 cursor-pointer">
             <i class="fa-solid fa-chevron-left text-sm"></i>
           </button>
-          <button id="portfolio-next" class="w-12 h-12 rounded-full bg-white/5 hover:bg-sky-500/20 border border-white/10 hover:border-sky-500/40 text-white hover:text-sky-300 flex items-center justify-center shadow transition-all duration-300 hover:translate-x-0.5 neon-border cursor-pointer">
+          <button id="portfolio-next" class="w-12 h-12 rounded-full bg-white hover:bg-sky-50 border border-slate-200 hover:border-sky-200 text-slate-600 hover:text-sky-600 flex items-center justify-center shadow-sm transition-all duration-300 hover:translate-x-0.5 cursor-pointer">
             <i class="fa-solid fa-chevron-right text-sm"></i>
           </button>
         </div>
@@ -1445,15 +1272,15 @@
                  data-category="{{ $p->category ?? 'Umum' }}"
                  data-title="{{ $p->title }}"
                  data-desc="{{ $p->description ?? 'Deskripsi pengerjaan proyek.' }}"
-                 class="swiper-slide cursor-pointer group relative rounded-3xl overflow-hidden border border-white/8 hover:border-sky-500/40 transition-all duration-500 hover:shadow-2xl hover:shadow-sky-500/10 select-none">
-              <div class="h-56 relative overflow-hidden bg-slate-900">
-                <img src="{{ asset($p->image_path) }}" alt="{{ $p->title }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent"></div>
-                <span class="absolute top-4 left-4 bg-sky-500/80 backdrop-blur-md text-white text-[9px] font-extrabold uppercase px-3 py-1 rounded-full tracking-wider">{{ $p->category ?? 'Umum' }}</span>
+                 class="swiper-slide cursor-pointer group relative rounded-3xl overflow-hidden border border-slate-200 hover:border-sky-300 transition-all duration-500 hover:shadow-xl hover:shadow-sky-100 select-none bg-white">
+              <div class="h-56 relative overflow-hidden bg-slate-100">
+                <img src="{{ asset($p->image_path) }}" alt="{{ $p->title }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/10 to-transparent opacity-60"></div>
+                <span class="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-sky-700 text-[9px] font-extrabold uppercase px-3 py-1 rounded-full tracking-wider shadow-sm">{{ $p->category ?? 'Umum' }}</span>
               </div>
-              <div class="bg-dark-900/95 backdrop-blur-md p-5 border-t border-white/5">
-                <h4 class="font-heading font-bold text-white text-sm line-clamp-1 mb-1.5">{{ $p->title }}</h4>
-                <p class="text-slate-400 text-xs leading-relaxed line-clamp-2">{{ $p->description ?? 'Deskripsi pengerjaan proyek.' }}</p>
+              <div class="bg-white p-5 border-t border-slate-100">
+                <h4 class="font-heading font-bold text-slate-800 text-sm line-clamp-1 mb-1.5 group-hover:text-sky-600 transition-colors">{{ $p->title }}</h4>
+                <p class="text-slate-500 text-xs leading-relaxed line-clamp-2">{{ $p->description ?? 'Deskripsi pengerjaan proyek.' }}</p>
               </div>
             </div>
           @empty
@@ -1470,15 +1297,15 @@
                  data-category="{{ $sp['cat'] }}"
                  data-title="{{ $sp['title'] }}"
                  data-desc="{{ $sp['desc'] }}"
-                 class="swiper-slide cursor-pointer group relative rounded-3xl overflow-hidden border border-white/8 hover:border-sky-500/40 transition-all duration-500 hover:shadow-2xl hover:shadow-sky-500/10 select-none">
-              <div class="h-56 relative overflow-hidden bg-slate-900">
-                <img src="{{ asset($sp['img']) }}" alt="{{ $sp['title'] }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent"></div>
-                <span class="absolute top-4 left-4 bg-sky-500/80 backdrop-blur-md text-white text-[9px] font-extrabold uppercase px-3 py-1 rounded-full tracking-wider">{{ $sp['cat'] }}</span>
+                 class="swiper-slide cursor-pointer group relative rounded-3xl overflow-hidden border border-slate-200 hover:border-sky-300 transition-all duration-500 hover:shadow-xl hover:shadow-sky-100 select-none bg-white">
+              <div class="h-56 relative overflow-hidden bg-slate-100">
+                <img src="{{ asset($sp['img']) }}" alt="{{ $sp['title'] }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/10 to-transparent opacity-60"></div>
+                <span class="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-sky-700 text-[9px] font-extrabold uppercase px-3 py-1 rounded-full tracking-wider shadow-sm">{{ $sp['cat'] }}</span>
               </div>
-              <div class="bg-dark-900/95 backdrop-blur-md p-5 border-t border-white/5">
-                <h4 class="font-heading font-bold text-white text-sm line-clamp-1 mb-1.5">{{ $sp['title'] }}</h4>
-                <p class="text-slate-400 text-xs leading-relaxed line-clamp-2">{{ $sp['desc'] }}</p>
+              <div class="bg-white p-5 border-t border-slate-100">
+                <h4 class="font-heading font-bold text-slate-800 text-sm line-clamp-1 mb-1.5 group-hover:text-sky-600 transition-colors">{{ $sp['title'] }}</h4>
+                <p class="text-slate-500 text-xs leading-relaxed line-clamp-2">{{ $sp['desc'] }}</p>
               </div>
             </div>
             @endforeach
@@ -1500,200 +1327,64 @@
   <!-- ======================================================
        INSTAGRAM NEWS SECTION
   ====================================================== -->
-  <section id="news" class="py-20 sm:py-28 relative overflow-hidden" style="background: linear-gradient(180deg, #020817 0%, #0a1628 60%, #020817 100%);">
-    <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(circle, rgba(236,72,153,0.3) 1px, transparent 1px); background-size: 30px 30px;"></div>
-    <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-pink-500/10 rounded-full blur-3xl translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
-    <div class="absolute bottom-0 left-0 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl -translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
+  <section id="news" class="py-20 sm:py-28 relative overflow-hidden" style="background: linear-gradient(180deg, #f8faff 0%, #f1f5fb 100%);">
+    <div class="absolute inset-0 opacity-[0.05]" style="background-image: radial-gradient(circle, rgba(236,72,153,0.4) 1px, transparent 1px); background-size: 30px 30px;"></div>
+    <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-pink-200/40 rounded-full blur-3xl translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
+    <div class="absolute bottom-0 left-0 w-96 h-96 bg-orange-200/40 rounded-full blur-3xl -translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
 
     <div class="w-full max-w-[95%] 2xl:max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
       <div class="text-center mb-16 reveal">
-        <div class="inline-flex items-center gap-2 bg-pink-500/10 border border-pink-500/20 text-pink-400 px-5 py-2 rounded-full text-xs font-bold tracking-widest uppercase mb-5">
+        <div class="inline-flex items-center gap-2 bg-pink-50 border border-pink-100 text-pink-600 px-5 py-2 rounded-full text-xs font-bold tracking-widest uppercase mb-5">
           <i class="fa-brands fa-instagram text-sm"></i> Media Informasi
         </div>
-        <h2 class="text-4xl sm:text-5xl font-heading font-black text-white text-glow-soft">Kabar Terbaru <span class="bg-gradient-to-r from-pink-400 to-orange-400 bg-clip-text text-transparent">Perusahaan</span></h2>
-        <p class="mt-4 text-slate-400 text-sm max-w-lg mx-auto">Update aktivitas, proyek, dan perkembangan terkini CV. NUSTECH.</p>
+        <h2 class="text-4xl sm:text-5xl font-heading font-black text-slate-900">Kabar Terbaru</h2>
+        <p class="mt-4 text-slate-500 text-sm max-w-lg mx-auto">Update aktivitas, proyek, dan perkembangan terkini CV. NUSTECH.</p>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <div class="max-w-3xl mx-auto">
         
         <!-- Kolom Kiri: Berita Umum -->
         <div>
           <div class="flex items-center justify-between mb-6">
-            <h3 class="text-xl font-heading font-black text-white flex items-center gap-2">
-              <span class="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center"><i class="fa-regular fa-newspaper"></i></span> Berita Umum
+            <h3 class="text-xl font-heading font-black text-slate-800 flex items-center gap-2">
+              <span class="w-8 h-8 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center"><i class="fa-regular fa-newspaper"></i></span> Berita Umum
             </h3>
-            <div class="flex gap-2">
-              <button id="general-prev" class="w-8 h-8 rounded-full bg-white/5 hover:bg-sky-500/20 border border-white/10 hover:border-sky-500/40 text-white hover:text-sky-300 flex items-center justify-center shadow transition-all duration-300">
-                <i class="fa-solid fa-chevron-left text-xs"></i>
-              </button>
-              <button id="general-next" class="w-8 h-8 rounded-full bg-white/5 hover:bg-sky-500/20 border border-white/10 hover:border-sky-500/40 text-white hover:text-sky-300 flex items-center justify-center shadow transition-all duration-300">
-                <i class="fa-solid fa-chevron-right text-xs"></i>
-              </button>
-            </div>
           </div>
-          <div class="swiper generalNewsSwiper !overflow-visible py-4">
-            <div class="swiper-wrapper">
-              @forelse($generalNews as $item)
-                <div class="swiper-slide w-[90%] sm:w-[400px] h-auto cursor-pointer"
-                     data-image="{{ $item->image_path ? asset($item->image_path) : '' }}"
-                     data-category="Berita Umum"
-                     data-title="{{ $item->title }}"
-                     data-desc="{{ strip_tags($item->caption) }}">
-                  <div class="bg-dark-850/50 backdrop-blur-md rounded-3xl border border-white/10 shadow-lg overflow-hidden flex flex-col h-full hover:border-sky-500/40 hover:shadow-sky-500/10 hover:-translate-y-1 transition-all duration-400 group">
-                    <div class="relative overflow-hidden aspect-video bg-dark-950 flex items-center justify-center shrink-0">
-                      @if($item->image_path)
-                        <img src="{{ asset($item->image_path) }}" alt="{{ $item->title }}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500">
-                      @else
-                        <div class="w-full h-full bg-gradient-to-tr from-sky-950 via-brand-900 to-sky-700 flex flex-col items-center justify-center text-white p-6 text-center opacity-80 group-hover:opacity-100">
-                          <i class="fa-regular fa-newspaper text-5xl opacity-20 mb-2"></i>
-                        </div>
-                      @endif
-                      <div class="absolute inset-0 bg-gradient-to-t from-dark-950/80 to-transparent"></div>
+          
+          <div class="flex flex-col gap-4">
+            @forelse($generalNews->take(4) as $item)
+              <a href="{{ route('news.show', $item->id) }}" class="group block bg-white rounded-2xl border border-slate-200 shadow-sm hover:border-sky-300 hover:shadow-md transition-all duration-300 overflow-hidden flex items-center h-28">
+                <div class="w-28 h-full bg-slate-100 shrink-0 relative overflow-hidden">
+                  @if($item->image_path)
+                    <img src="{{ asset($item->image_path) }}" alt="{{ $item->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                  @else
+                    <div class="w-full h-full bg-gradient-to-tr from-sky-100 to-blue-50 flex items-center justify-center text-sky-800 opacity-50">
+                      <i class="fa-regular fa-newspaper text-3xl"></i>
                     </div>
-                    <div class="px-6 py-5 flex-1 flex flex-col justify-between relative z-10 -mt-8 pointer-events-none">
-                      <div class="bg-dark-900/90 backdrop-blur-xl p-5 rounded-2xl border border-white/5 shadow-xl h-full flex flex-col justify-between pointer-events-auto">
-                        <div>
-                          <h4 class="font-heading font-bold text-white text-sm leading-snug line-clamp-2 mb-2 group-hover:text-sky-300 transition-colors">{{ $item->title }}</h4>
-                          <p class="text-xs text-slate-400 leading-relaxed line-clamp-3">{!! nl2br(e($item->caption)) !!}</p>
-                        </div>
-                        <div class="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
-                          <span class="text-[10px] text-sky-400 font-bold"><i class="fa-regular fa-calendar mr-1"></i> {{ $item->published_at ? $item->published_at->format('d M Y') : '' }}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  @endif
                 </div>
-              @empty
-                <div class="swiper-slide w-full">
-                  <div class="bg-dark-850/30 rounded-2xl border border-white/10 p-8 text-center backdrop-blur-sm">
-                    <i class="fa-regular fa-folder-open text-3xl text-slate-600 mb-3"></i>
-                    <h4 class="text-slate-400 font-bold text-sm">Belum ada berita umum.</h4>
-                  </div>
+                <div class="p-4 flex-1 min-w-0 flex flex-col justify-center">
+                  <h4 class="font-heading font-bold text-slate-800 text-sm leading-snug line-clamp-2 group-hover:text-sky-600 transition-colors mb-1.5">{{ $item->title }}</h4>
+                  <span class="text-[10px] text-slate-500 flex items-center gap-1"><i class="fa-regular fa-calendar text-sky-500"></i> {{ $item->published_at ? $item->published_at->format('d M Y') : '' }}</span>
                 </div>
-              @endforelse
-            </div>
-            <div class="general-news-pagination flex justify-center mt-6"></div>
+              </a>
+            @empty
+              <div class="bg-white rounded-2xl border border-slate-200 p-8 text-center shadow-sm">
+                <i class="fa-regular fa-folder-open text-3xl text-slate-300 mb-3"></i>
+                <h4 class="text-slate-500 font-bold text-sm">Belum ada berita umum.</h4>
+              </div>
+            @endforelse
           </div>
-        </div>
 
-        <!-- Kolom Kanan: Instagram News -->
-        <div>
-          <div class="flex items-center justify-between mb-6">
-            <h3 class="text-xl font-heading font-black text-white flex items-center gap-2">
-              <span class="w-8 h-8 rounded-lg bg-pink-500/20 text-pink-400 flex items-center justify-center"><i class="fa-brands fa-instagram"></i></span> Instagram News
-            </h3>
-            <div class="flex gap-2">
-              <button id="ig-prev" class="w-8 h-8 rounded-full bg-white/5 hover:bg-pink-500/20 border border-white/10 hover:border-pink-500/40 text-white hover:text-pink-300 flex items-center justify-center shadow transition-all duration-300">
-                <i class="fa-solid fa-chevron-left text-xs"></i>
-              </button>
-              <button id="ig-next" class="w-8 h-8 rounded-full bg-white/5 hover:bg-pink-500/20 border border-white/10 hover:border-pink-500/40 text-white hover:text-pink-300 flex items-center justify-center shadow transition-all duration-300">
-                <i class="fa-solid fa-chevron-right text-xs"></i>
-              </button>
-            </div>
-          </div>
-          <div class="swiper instagramNewsSwiper !overflow-visible py-4">
-            <div class="swiper-wrapper">
-              @forelse($instagramNews as $item)
-                <div class="swiper-slide w-[80%] sm:w-[320px] h-auto cursor-pointer"
-                     data-image="{{ $item->image_path ? asset($item->image_path) : '' }}"
-                     data-category="Instagram"
-                     data-title="{{ $item->title }}"
-                     data-desc="{{ strip_tags($item->caption) }}">
-                  <div class="bg-dark-850/50 backdrop-blur-md rounded-3xl border border-white/10 shadow-lg overflow-hidden flex flex-col h-full hover:border-pink-500/40 hover:shadow-pink-500/10 hover:-translate-y-1 transition-all duration-400 group">
-                    @if($item->instagram_url)
-                      <div class="bg-white rounded-3xl overflow-hidden p-1 pointer-events-auto">
-                        <blockquote class="instagram-media w-full m-0 p-0" data-instgrm-permalink="{{ rtrim($item->instagram_url, '/') }}/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14" style="background:#FFF; border:0; margin:0; padding:0; width:100%;">
-                        </blockquote>
-                      </div>
-                    @else
-                      <div class="relative overflow-hidden aspect-square bg-dark-950 flex items-center justify-center shrink-0">
-                        @if($item->image_path)
-                          <img src="{{ asset($item->image_path) }}" alt="{{ $item->title }}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500">
-                        @else
-                          <div class="w-full h-full bg-gradient-to-tr from-pink-950 via-purple-950 to-indigo-950 flex flex-col items-center justify-center text-white p-6 text-center opacity-80 group-hover:opacity-100">
-                            <i class="fa-brands fa-instagram text-5xl opacity-20 mb-2"></i>
-                          </div>
-                        @endif
-                        <div class="absolute inset-0 bg-gradient-to-t from-dark-950/80 to-transparent"></div>
-                      </div>
-                      <div class="px-5 py-4 flex-1 flex flex-col justify-between relative z-10 -mt-6 pointer-events-none">
-                        <div class="bg-dark-900/90 backdrop-blur-xl p-4 rounded-2xl border border-white/5 shadow-xl h-full flex flex-col justify-between pointer-events-auto">
-                          <div>
-                            <h4 class="font-heading font-bold text-white text-xs leading-snug line-clamp-1 mb-1.5 group-hover:text-pink-300 transition-colors">{{ $item->title }}</h4>
-                            <p class="text-[10px] text-slate-400 leading-relaxed line-clamp-2">{!! nl2br(e($item->caption)) !!}</p>
-                          </div>
-                        </div>
-                      </div>
-                    @endif
-                  </div>
-                </div>
-              @empty
-                <!-- Fallback cards -->
-                @php
-                  $instaPosts = [
-                    ['img'=>'assets/img/exp-fiber.jpg','title'=>'Optimasi Jaringan Fiber Optic','caption'=>'Proses instalasi jalur utama koneksi kabel fiber optik berjalan lancar di area NTB.'],
-                    ['img'=>'assets/img/exp-vsat.jpg','title'=>'Pemasangan VSAT di Lokasi 3T','caption'=>'Kami berhasil memasang antena parabola VSAT di kawasan terpencil untuk mendukung program internet desa.'],
-                  ];
-                @endphp
-                @foreach($instaPosts as $post)
-                <div class="swiper-slide w-[80%] sm:w-[320px] h-auto cursor-pointer"
-                     data-image="{{ asset($post['img']) }}"
-                     data-category="Instagram"
-                     data-title="{{ $post['title'] }}"
-                     data-desc="{{ $post['caption'] }}">
-                  <div class="bg-dark-850/50 backdrop-blur-md rounded-3xl border border-white/10 shadow-lg hover:border-pink-500/40 hover:shadow-pink-500/10 hover:-translate-y-1.5 transition-all duration-500 flex flex-col overflow-hidden group h-full">
-                    <!-- Header -->
-                    <div class="px-4 py-3 flex items-center justify-between border-b border-white/5 shrink-0">
-                      <div class="flex items-center gap-2.5">
-                        <img src="{{ asset('assets/img/logonustech.png') }}" alt="Avatar" class="w-7 h-7 rounded-full border border-white/10 shadow-sm">
-                        <div>
-                          <div class="text-[10px] font-bold text-white flex items-center gap-1">nustech.co.id <i class="fa-solid fa-circle-check text-sky-400 text-[8px]"></i></div>
-                          <div class="text-[8px] text-slate-400 font-semibold">Mataram, NTB</div>
-                        </div>
-                      </div>
-                      <a href="https://www.instagram.com/nustech.co.id/" target="_blank" class="text-slate-500 hover:text-pink-400 transition-colors duration-300 pointer-events-auto">
-                        <i class="fa-brands fa-instagram text-lg"></i>
-                      </a>
-                    </div>
-                    <!-- Image -->
-                    <div class="relative overflow-hidden aspect-square shrink-0">
-                      <img src="{{ asset($post['img']) }}" alt="{{ $post['title'] }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100">
-                      <div class="absolute inset-0 bg-gradient-to-t from-dark-950/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                        <div class="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center scale-75 group-hover:scale-100 transition-transform duration-500">
-                          <i class="fa-brands fa-instagram text-white text-xl"></i>
-                        </div>
-                      </div>
-                    </div>
-                    <!-- Content -->
-                    <div class="px-4 py-3 flex-1 flex flex-col justify-between relative z-10 -mt-6 pointer-events-none">
-                      <div class="bg-dark-900/90 backdrop-blur-xl p-3.5 rounded-2xl border border-white/5 shadow-xl h-full flex flex-col justify-between pointer-events-auto">
-                        <div>
-                          <h4 class="font-heading font-bold text-white text-[11px] leading-snug mb-1">{{ $post['title'] }}</h4>
-                          <p class="text-[9px] text-slate-400 leading-relaxed line-clamp-2 mb-2">
-                            <span class="font-bold text-slate-300 mr-1">nustech.co.id</span>{{ $post['caption'] }}
-                          </p>
-                        </div>
-                        <div class="border-t border-white/5 pt-2 flex items-center justify-between">
-                          <span class="text-[8px] text-pink-400 font-bold uppercase tracking-widest">Terbaru</span>
-                          <a href="https://www.instagram.com/nustech.co.id/" target="_blank" class="bg-white/5 hover:bg-pink-500/20 text-slate-300 hover:text-pink-300 px-3 py-1 rounded-lg border border-white/10 text-[9px] font-bold transition-all duration-300 flex items-center gap-1 pointer-events-auto">
-                            Buka <i class="fa-solid fa-arrow-up-right-from-square text-[7px]"></i>
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                @endforeach
-              @endforelse
-            </div>
-            <div class="instagram-news-pagination flex justify-center mt-6"></div>
+          <div class="mt-6 text-center">
+            <a href="https://nustech.co.id/news" class="inline-flex items-center justify-center px-6 py-2.5 rounded-full bg-sky-50 text-sky-600 border border-sky-100 hover:bg-sky-500 hover:text-white font-bold text-xs tracking-wider uppercase transition-all duration-300 shadow-sm hover:shadow-md group">
+              Lihat Berita Lainnya <i class="fa-solid fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+            </a>
           </div>
         </div>
 
       </div>
-
-      <script async src="//www.instagram.com/embed.js"></script>
     </div>
   </section>
 
@@ -1779,7 +1470,7 @@
             <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-sky-50 to-transparent rounded-bl-full pointer-events-none group-hover:scale-125 transition-transform duration-500"></div>
             <div class="relative z-10 space-y-3">
               <div class="flex items-center justify-between gap-2">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-100 to-cyan-100 text-sky-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-gradient-to-br from-sky-100 to-cyan-100 text-sky-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
                   <i class="fa-solid fa-map-location-dot text-sm"></i>
                 </div>
                 @if($item->year)
@@ -1893,7 +1584,7 @@
             <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-sky-50 to-transparent rounded-bl-full pointer-events-none group-hover:scale-125 transition-transform duration-500"></div>
             <div class="relative z-10 space-y-4">
               <div class="flex items-center justify-between gap-2">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-100 to-cyan-100 text-sky-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-gradient-to-br from-sky-100 to-cyan-100 text-sky-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
                   <i class="fa-solid fa-camera-rotate text-sm"></i>
                 </div>
                 @if($item->year)
@@ -1943,7 +1634,7 @@
             <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-indigo-50 to-transparent rounded-bl-full pointer-events-none group-hover:scale-125 transition-transform duration-500"></div>
             <div class="relative z-10 space-y-4">
               <div class="flex items-center justify-between gap-2">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-100 to-blue-100 text-indigo-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-gradient-to-br from-indigo-100 to-blue-100 text-indigo-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
                   <i class="fa-solid fa-code text-sm"></i>
                 </div>
                 @if($item->year)
@@ -1994,7 +1685,7 @@
             <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-indigo-50 to-transparent rounded-bl-full pointer-events-none group-hover:scale-125 transition-transform duration-500"></div>
             <div class="relative z-10 space-y-4">
               <div class="flex items-center justify-between gap-2">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-100 to-blue-100 text-indigo-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-gradient-to-br from-indigo-100 to-blue-100 text-indigo-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
                   <i class="fa-solid fa-laptop-code text-sm"></i>
                 </div>
                 @if($item->year)
@@ -2045,7 +1736,7 @@
             <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-pink-50 to-transparent rounded-bl-full pointer-events-none group-hover:scale-125 transition-transform duration-500"></div>
             <div class="relative z-10 space-y-4">
               <div class="flex items-center justify-between gap-2">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-100 to-rose-100 text-pink-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-gradient-to-br from-pink-100 to-rose-100 text-pink-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
                   <i class="fa-solid fa-palette text-sm"></i>
                 </div>
                 @if($item->year)
@@ -2096,7 +1787,7 @@
             <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-pink-50 to-transparent rounded-bl-full pointer-events-none group-hover:scale-125 transition-transform duration-500"></div>
             <div class="relative z-10 space-y-4">
               <div class="flex items-center justify-between gap-2">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-100 to-rose-100 text-pink-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-gradient-to-br from-pink-100 to-rose-100 text-pink-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
                   <i class="fa-solid fa-paint-roller text-sm"></i>
                 </div>
                 @if($item->year)
@@ -2147,7 +1838,7 @@
             <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-yellow-50 to-transparent rounded-bl-full pointer-events-none group-hover:scale-125 transition-transform duration-500"></div>
             <div class="relative z-10 space-y-4">
               <div class="flex items-center justify-between gap-2">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-100 to-amber-100 text-yellow-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-gradient-to-br from-yellow-100 to-amber-100 text-yellow-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
                   <i class="fa-solid fa-bolt text-sm"></i>
                 </div>
                 @if($item->year)
@@ -2198,7 +1889,7 @@
             <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-cyan-50 to-transparent rounded-bl-full pointer-events-none group-hover:scale-125 transition-transform duration-500"></div>
             <div class="relative z-10 space-y-4">
               <div class="flex items-center justify-between gap-2">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-100 to-sky-100 text-cyan-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-gradient-to-br from-cyan-100 to-sky-100 text-cyan-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
                   <i class="fa-solid fa-snowflake text-sm"></i>
                 </div>
                 @if($item->year)
@@ -2249,7 +1940,7 @@
             <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-cyan-50 to-transparent rounded-bl-full pointer-events-none group-hover:scale-125 transition-transform duration-500"></div>
             <div class="relative z-10 space-y-4">
               <div class="flex items-center justify-between gap-2">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-100 to-sky-100 text-cyan-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-gradient-to-br from-cyan-100 to-sky-100 text-cyan-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
                   <i class="fa-solid fa-fan text-sm"></i>
                 </div>
                 @if($item->year)
@@ -2300,7 +1991,7 @@
             <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-slate-50 to-transparent rounded-bl-full pointer-events-none group-hover:scale-125 transition-transform duration-500"></div>
             <div class="relative z-10 space-y-4">
               <div class="flex items-center justify-between gap-2">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-200 to-slate-300 text-slate-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-gradient-to-br from-slate-200 to-slate-300 text-slate-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
                   <i class="fa-solid fa-desktop text-sm"></i>
                 </div>
                 @if($item->year)
@@ -2351,7 +2042,7 @@
             <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-slate-50 to-transparent rounded-bl-full pointer-events-none group-hover:scale-125 transition-transform duration-500"></div>
             <div class="relative z-10 space-y-4">
               <div class="flex items-center justify-between gap-2">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-200 to-slate-300 text-slate-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-gradient-to-br from-slate-200 to-slate-300 text-slate-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
                   <i class="fa-solid fa-screwdriver-wrench text-sm"></i>
                 </div>
                 @if($item->year)
@@ -2402,7 +2093,7 @@
             <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-teal-50 to-transparent rounded-bl-full pointer-events-none group-hover:scale-125 transition-transform duration-500"></div>
             <div class="relative z-10 space-y-4">
               <div class="flex items-center justify-between gap-2">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-100 to-emerald-100 text-teal-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-gradient-to-br from-teal-100 to-emerald-100 text-teal-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
                   <i class="fa-solid fa-plug text-sm"></i>
                 </div>
                 @if($item->year)
@@ -2453,7 +2144,7 @@
             <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-orange-50 to-transparent rounded-bl-full pointer-events-none group-hover:scale-125 transition-transform duration-500"></div>
             <div class="relative z-10 space-y-4">
               <div class="flex items-center justify-between gap-2">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-100 to-amber-100 text-orange-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-gradient-to-br from-orange-100 to-amber-100 text-orange-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
                   <i class="fa-solid fa-couch text-sm"></i>
                 </div>
                 @if($item->year)
@@ -2504,7 +2195,7 @@
             <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-orange-50 to-transparent rounded-bl-full pointer-events-none group-hover:scale-125 transition-transform duration-500"></div>
             <div class="relative z-10 space-y-4">
               <div class="flex items-center justify-between gap-2">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-100 to-amber-100 text-orange-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl text-lg sm:text-xl bg-gradient-to-br from-orange-100 to-amber-100 text-orange-600 flex items-center justify-center shrink-0 shadow-sm border border-white">
                   <i class="fa-solid fa-broom text-sm"></i>
                 </div>
                 @if($item->year)
@@ -3193,3 +2884,4 @@
 </body>
 
 </html>
+

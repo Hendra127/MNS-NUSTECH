@@ -9,8 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}">
     <script src="{{ asset('js/nav-modal.js') }}"></script>
     <script src="{{ asset('js/profile-dropdown.js') }}"></script>
-    @include('components.nav-modal-structure')
-    <meta charset="UTF-8">
+        <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile | Project Operational</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -668,6 +667,7 @@
             });
         @endif
     </script>
+    @include('components.nav-modal-structure')
 </body>
 
 </html>

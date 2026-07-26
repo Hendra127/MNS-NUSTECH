@@ -22,6 +22,8 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <!-- Styles -->
+    <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}?v=1.1">
+    <script src="{{ asset('js/nav-modal.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('css/mydashboard.css') }}?v={{ time() }}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <!-- Select2 CSS -->
@@ -34,20 +36,24 @@
             border: 1px solid #ddd !important;
             border-radius: 6px !important;
         }
+
         .select2-container--default .select2-selection--single .select2-selection__arrow {
             height: 40px !important;
         }
+
         .select2-container--default .select2-selection--single .select2-selection__rendered {
             line-height: 28px !important;
             font-size: 0.85rem !important;
             color: #444 !important;
         }
+
         .select2-dropdown {
             border: 1px solid #ddd !important;
             border-radius: 6px !important;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
             z-index: 9999 !important;
         }
+
         .select2-search__field {
             border-radius: 4px !important;
             padding: 6px !important;
@@ -56,8 +62,15 @@
     <style>
         /* Modern Chat Enhancements */
         @keyframes chatMessageIn {
-            from { opacity: 0; transform: translateY(15px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+            from {
+                opacity: 0;
+                transform: translateY(15px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .chat-message-in {
@@ -70,7 +83,7 @@
             border-radius: 20px;
             font-size: 13.5px;
             line-height: 1.5;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
             transition: all 0.2s ease;
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
@@ -89,8 +102,8 @@
             background: rgba(255, 255, 255, 0.9);
             color: #1a1a1a;
             border-bottom-left-radius: 4px;
-            border: 1px solid rgba(255,255,255,1);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+            border: 1px solid rgba(255, 255, 255, 1);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
         }
 
         .chat-avatar {
@@ -99,7 +112,7 @@
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid #ffffff;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s ease;
         }
 
@@ -135,7 +148,7 @@
         }
 
         .chat-reply-preview-inner {
-            background: rgba(0,0,0,0.06);
+            background: rgba(0, 0, 0, 0.06);
             padding: 8px 12px;
             border-radius: 10px;
             margin-bottom: 8px;
@@ -159,8 +172,9 @@
         #chatbox::-webkit-scrollbar {
             width: 6px;
         }
+
         #chatbox::-webkit-scrollbar-thumb {
-            background: rgba(0,0,0,0.1);
+            background: rgba(0, 0, 0, 0.1);
             border-radius: 10px;
         }
 
@@ -171,13 +185,13 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
             border: 1px solid #eee;
             transition: all 0.3s ease;
         }
 
         .chat-input-wrapper:focus-within {
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
             border-color: #007bff;
             transform: translateY(-2px);
         }
@@ -201,7 +215,8 @@
                 <div class="logo-text">
                     <h1>
                         <i class="ph-fill ph-broadcast"></i>
-                        <a href="{{ route('landingpage') }}" style="text-decoration: none; color: inherit;"><span class="bold-title">NUSTECH</span></a>
+                        <a href="{{ route('landingpage') }}" style="text-decoration: none; color: inherit;"><span
+                                class="bold-title">NUSTECH</span></a>
                         <span class="regular-title">Monitoring Dashboard</span>
                     </h1>
                     <p>Real-Time Network & Site Operation Center</p>
@@ -274,27 +289,28 @@
                         <span class="menu-title">Piket Schedule</span>
                         <i class="ph-fill ph-caret-right arrow-icon"></i>
                     </div>
-                        <div class="menu-content">
-                            <div class="shift-info-bar">
-                                <div class="shift-status">
-                                    <span>{{ $piketHariIni->isNotEmpty() ? 'Shift On' : 'No Shift' }}</span>
-                                </div>
-                                <div class="shift-time">
-                                    {{ $shiftInfo }}
-                                </div>
+                    <div class="menu-content">
+                        <div class="shift-info-bar">
+                            <div class="shift-status">
+                                <span>{{ $piketHariIni->isNotEmpty() ? 'Shift On' : 'No Shift' }}</span>
                             </div>
-                            <div class="personnel-list">
-                                @forelse($piketHariIni as $piket)
-                                    <div class="personnel-badge">
-                                        {{ $piket->user->name ?? $piket->nama_petugas }}
-                                        <span class="badge bg-light text-dark ms-1" style="font-size: 10px;">{{ $piket->shift->kode }}</span>
-                                    </div>
-                                @empty
-                                    <div class="text-muted small p-2">Semua personil sedang OFF hari ini.</div>
-                                @endforelse
+                            <div class="shift-time">
+                                {{ $shiftInfo }}
                             </div>
                         </div>
+                        <div class="personnel-list">
+                            @forelse($piketHariIni as $piket)
+                                <div class="personnel-badge">
+                                    {{ $piket->user->name ?? $piket->nama_petugas }}
+                                    <span class="badge bg-light text-dark ms-1"
+                                        style="font-size: 10px;">{{ $piket->shift->kode }}</span>
+                                </div>
+                            @empty
+                                <div class="text-muted small p-2">Semua personil sedang OFF hari ini.</div>
+                            @endforelse
+                        </div>
                     </div>
+                </div>
 
                 <!-- Menu Item 2: Open Ticket Problem (Collapsed) -->
                 <div class="card menu-item collapsed">
@@ -309,14 +325,17 @@
                                 <div class="ticket-group">
                                     <div class="ticket-row">
                                         <span>{{ strtoupper($problem ?? 'N/A') }}</span>
-                                        <a href="javascript:void(0)" class="toggle-site">Lihat Site ({{ $items->count() }})</a>
+                                        <a href="javascript:void(0)" class="toggle-site">Lihat Site
+                                            ({{ $items->count() }})</a>
                                     </div>
-                                    
+
                                     {{-- Container Detail Site --}}
-                                    <div class="site-detail-container" style="display: none; padding: 8px 10px; background: rgba(0,0,0,0.03); border-radius: 6px; margin-top: 5px;">
+                                    <div class="site-detail-container"
+                                        style="display: none; padding: 8px 10px; background: rgba(0,0,0,0.03); border-radius: 6px; margin-top: 5px;">
                                         <ul style="list-style: none; padding: 0; margin: 0;">
                                             @foreach($items as $ticket)
-                                                <li style="padding: 4px 0; color: #2c3e50; font-size: 0.8rem; display: flex; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.03);">
+                                                <li
+                                                    style="padding: 4px 0; color: #2c3e50; font-size: 0.8rem; display: flex; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.03);">
                                                     <i class="ph ph-caret-right" style="margin-right: 5px; color: #4facfe;"></i>
                                                     {{ $ticket->nama_site }}
                                                 </li>
@@ -325,7 +344,8 @@
                                     </div>
                                 </div>
                             @empty
-                                <p style="padding: 10px; color: #999; text-align: center; font-size: 0.85rem;">No open problems</p>
+                                <p style="padding: 10px; color: #999; text-align: center; font-size: 0.85rem;">No open
+                                    problems</p>
                             @endforelse
                         </div>
                     </div>
@@ -334,69 +354,90 @@
                 <div class="card menu-item collapsed sparepart-menu">
                     <div class="menu-header d-flex justify-content-between align-items-center w-100">
                         <div class="d-flex align-items-center gap-2">
-                            <span class="menu-title" style="margin-right: auto;">Sparepart Needed ({{ \App\Models\SparepartNeeded::where('status', '!=', 'Completed')->count() }})</span>
+                            <span class="menu-title" style="margin-right: auto;">Sparepart Needed
+                                ({{ \App\Models\SparepartNeeded::where('status', '!=', 'Completed')->count() }})</span>
                         </div>
                         <i class="ph-fill ph-caret-right arrow-icon"></i>
                     </div>
 
                     <div class="menu-content" style="padding: 10px 15px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(0,0,0,0.05);">
                             <span style="font-size: 0.85rem; font-weight: 600; color: #555;">Daftar Kebutuhan</span>
                             @if(auth()->check() && (auth()->user()->hasAdminAccess() || auth()->user()->role === 'user'))
-                            <button class="btn btn-sm" onclick="openSparepartModal('add')" style="background: transparent; border: none; padding: 0; color: #0d6efd; display: flex; align-items: center; justify-content: center;" title="Tambah Kebutuhan">
-                                <i class="ph ph-plus-circle" style="font-size: 1.35rem; transition: color 0.2s;" onmouseover="this.style.color='#0b5ed7'" onmouseout="this.style.color='#0d6efd'"></i>
-                            </button>
+                                <button class="btn btn-sm" onclick="openSparepartModal('add')"
+                                    style="background: transparent; border: none; padding: 0; color: #0d6efd; display: flex; align-items: center; justify-content: center;"
+                                    title="Tambah Kebutuhan">
+                                    <i class="ph ph-plus-circle" style="font-size: 1.35rem; transition: color 0.2s;"
+                                        onmouseover="this.style.color='#0b5ed7'"
+                                        onmouseout="this.style.color='#0d6efd'"></i>
+                                </button>
                             @endif
                         </div>
 
-                        <div class="spareparts-list" style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px;">
+                        <div class="spareparts-list"
+                            style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px;">
                             @forelse($sparepartsNeeded as $sp)
-                            <div class="sparepart-item" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.1); padding: 12px; border-radius: 8px; margin-bottom: 10px; position: relative; transition: all 0.2s;">
-                                
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <div style="font-size: 0.8rem; font-weight: 700; color: #333; display: flex; align-items: center; flex-wrap: wrap; gap: 4px; line-height: 1.4;">
-                                        <i class="ph-fill ph-map-pin" style="color: #e74c3c;"></i>
-                                        <span>{{ $sp->site ? $sp->site->sitename : $sp->site_id }}</span>
-                                        <i class="ph ph-arrow-right" style="color: #888; font-size: 0.75rem;"></i>
-                                        <span style="color: #0d6efd;">{{ $sp->sparepart_name }}</span>
-                                        <span style="background: #f1f3f5; padding: 1px 5px; border-radius: 4px; font-size: 0.7rem; color: #555; border: 1px solid #eaeaea; font-weight: 600;">x{{ $sp->quantity }}</span>
+                                <div class="sparepart-item"
+                                    style="background: #ffffff; border: 1px solid rgba(0,0,0,0.1); padding: 12px; border-radius: 8px; margin-bottom: 10px; position: relative; transition: all 0.2s;">
+
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <div
+                                            style="font-size: 0.8rem; font-weight: 700; color: #333; display: flex; align-items: center; flex-wrap: wrap; gap: 4px; line-height: 1.4;">
+                                            <i class="ph-fill ph-map-pin" style="color: #e74c3c;"></i>
+                                            <span>{{ $sp->site ? $sp->site->sitename : $sp->site_id }}</span>
+                                            <i class="ph ph-arrow-right" style="color: #888; font-size: 0.75rem;"></i>
+                                            <span style="color: #0d6efd;">{{ $sp->sparepart_name }}</span>
+                                            <span
+                                                style="background: #f1f3f5; padding: 1px 5px; border-radius: 4px; font-size: 0.7rem; color: #555; border: 1px solid #eaeaea; font-weight: 600;">x{{ $sp->quantity }}</span>
+                                        </div>
+
+                                        @if(auth()->check() && (auth()->user()->hasAdminAccess() || auth()->user()->role === 'user'))
+                                            <div class="actions d-flex gap-2 flex-shrink-0 ms-2">
+                                                <button class="btn btn-sm p-0"
+                                                    onclick="openSparepartModal('edit', {{ $sp->id }}, '{{ $sp->site_id }}', '{{ htmlspecialchars($sp->sparepart_name) }}', {{ $sp->quantity }}, '{{ htmlspecialchars($sp->description) }}', '{{ $sp->status }}')"
+                                                    style="border: none; background: transparent; color: #6c757d;" title="Edit"
+                                                    onmouseover="this.style.color='#0d6efd'"
+                                                    onmouseout="this.style.color='#6c757d'">
+                                                    <i class="ph ph-pencil-simple" style="font-size: 1rem;"></i>
+                                                </button>
+                                                <form action="{{ route('sparepart.needed.destroy', $sp->id) }}" method="POST"
+                                                    style="display:inline; margin: 0;"
+                                                    onsubmit="return confirm('Apakah Anda yakin ingin menghapus kebutuhan ini?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm p-0"
+                                                        style="border: none; background: transparent; color: #6c757d;"
+                                                        title="Hapus" onmouseover="this.style.color='#e74c3c'"
+                                                        onmouseout="this.style.color='#6c757d'">
+                                                        <i class="ph ph-trash" style="font-size: 1rem;"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        @endif
                                     </div>
-                                    
-                                    @if(auth()->check() && (auth()->user()->hasAdminAccess() || auth()->user()->role === 'user'))
-                                    <div class="actions d-flex gap-2 flex-shrink-0 ms-2">
-                                        <button class="btn btn-sm p-0" onclick="openSparepartModal('edit', {{ $sp->id }}, '{{ $sp->site_id }}', '{{ htmlspecialchars($sp->sparepart_name) }}', {{ $sp->quantity }}, '{{ htmlspecialchars($sp->description) }}', '{{ $sp->status }}')" style="border: none; background: transparent; color: #6c757d;" title="Edit" onmouseover="this.style.color='#0d6efd'" onmouseout="this.style.color='#6c757d'">
-                                            <i class="ph ph-pencil-simple" style="font-size: 1rem;"></i>
-                                        </button>
-                                        <form action="{{ route('sparepart.needed.destroy', $sp->id) }}" method="POST" style="display:inline; margin: 0;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kebutuhan ini?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm p-0" style="border: none; background: transparent; color: #6c757d;" title="Hapus" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='#6c757d'">
-                                                <i class="ph ph-trash" style="font-size: 1rem;"></i>
-                                            </button>
-                                        </form>
+
+                                    <div
+                                        style="font-size: 0.75rem; color: #666; display: flex; align-items: center; gap: 6px; margin-top: 4px;">
+                                        <span style="font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; white-space: nowrap;
+                                            @if($sp->status == 'Pending') background: rgba(243, 156, 18, 0.1); color: #e67e22;
+                                            @elseif($sp->status == 'Completed') background: rgba(46, 204, 113, 0.1); color: #27ae60;
+                                            @else background: rgba(52, 152, 219, 0.1); color: #2980b9; @endif">
+                                            {{ $sp->status }}
+                                        </span>
+                                        @if($sp->description)
+                                            <span
+                                                style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                                                Ket: <span style="font-style: italic;">{{ $sp->description }}</span>
+                                            </span>
+                                        @endif
                                     </div>
-                                    @endif
                                 </div>
-                                
-                                <div style="font-size: 0.75rem; color: #666; display: flex; align-items: center; gap: 6px; margin-top: 4px;">
-                                    <span style="font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; white-space: nowrap;
-                                        @if($sp->status == 'Pending') background: rgba(243, 156, 18, 0.1); color: #e67e22;
-                                        @elseif($sp->status == 'Completed') background: rgba(46, 204, 113, 0.1); color: #27ae60;
-                                        @else background: rgba(52, 152, 219, 0.1); color: #2980b9; @endif">
-                                        {{ $sp->status }}
-                                    </span>
-                                    @if($sp->description)
-                                    <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                                        Ket: <span style="font-style: italic;">{{ $sp->description }}</span>
-                                    </span>
-                                    @endif
-                                </div>
-                            </div>
                             @empty
-                            <div style="text-align: center; padding: 20px 0; color: #aaa;">
-                                <i class="ph ph-package" style="font-size: 2rem; margin-bottom: 5px; opacity: 0.5;"></i>
-                                <p style="margin: 0; font-size: 0.8rem;">Belum ada sparepart yg dibutuhkan</p>
-                            </div>
+                                <div style="text-align: center; padding: 20px 0; color: #aaa;">
+                                    <i class="ph ph-package" style="font-size: 2rem; margin-bottom: 5px; opacity: 0.5;"></i>
+                                    <p style="margin: 0; font-size: 0.8rem;">Belum ada sparepart yg dibutuhkan</p>
+                                </div>
                             @endforelse
                         </div>
                     </div>
@@ -424,37 +465,35 @@
                         </thead>
                         <tbody>
                             @forelse($tickets as $ticket)
-                            <tr>
-                                <td class="text-center">{{ $loop->iteration }}</td>
-                                <td>{{ $ticket->nama_site }}</td>
-                                <td class="text-center">
-                                    <a href="javascript:void(0)" 
-                                    class="site-detail-link" 
-                                    data-id="{{ $ticket->id }}" 
-                                    style="color: #000000; text-decoration: none; font-weight: normal;">
-                                        {{ $ticket->site_code }}
-                                    </a>
-                                </td>
-                                <td class="text-center">
-                                    <span class="badge bg-warning text-dark">OPEN</span>
-                                </td>
-                                <td class="text-center">
-                                    @php
-                                        $tglRekap = \Carbon\Carbon::parse($ticket->tanggal_rekap)->startOfDay();
-                                        if (in_array(strtolower($ticket->status), ['close', 'closed']) && $ticket->tanggal_close) {
-                                            $tglAkhir = \Carbon\Carbon::parse($ticket->tanggal_close)->startOfDay();
-                                        } else {
-                                            $tglAkhir = now()->startOfDay();
-                                        }
-                                        $durasiDashboard = $tglRekap->diffInDays($tglAkhir);
-                                    @endphp
-                                    {{ floor($durasiDashboard) }} Hari
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td class="text-center">{{ $loop->iteration }}</td>
+                                    <td>{{ $ticket->nama_site }}</td>
+                                    <td class="text-center">
+                                        <a href="javascript:void(0)" class="site-detail-link" data-id="{{ $ticket->id }}"
+                                            style="color: #000000; text-decoration: none; font-weight: normal;">
+                                            {{ $ticket->site_code }}
+                                        </a>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-warning text-dark">OPEN</span>
+                                    </td>
+                                    <td class="text-center">
+                                        @php
+                                            $tglRekap = \Carbon\Carbon::parse($ticket->tanggal_rekap)->startOfDay();
+                                            if (in_array(strtolower($ticket->status), ['close', 'closed']) && $ticket->tanggal_close) {
+                                                $tglAkhir = \Carbon\Carbon::parse($ticket->tanggal_close)->startOfDay();
+                                            } else {
+                                                $tglAkhir = now()->startOfDay();
+                                            }
+                                            $durasiDashboard = $tglRekap->diffInDays($tglAkhir);
+                                        @endphp
+                                        {{ floor($durasiDashboard) }} Hari
+                                    </td>
+                                </tr>
                             @empty
-                            <tr>
-                                <td colspan="5" class="text-center">Tidak ada tiket terbuka saat ini.</td>
-                            </tr>
+                                <tr>
+                                    <td colspan="5" class="text-center">Tidak ada tiket terbuka saat ini.</td>
+                                </tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -463,30 +502,39 @@
 
             <!-- Chat Widget -->
             <div class="card chat-card" style="border: none; overflow: hidden;">
-                <div class="chat-header" style="background: rgba(255,255,255,0.5); backdrop-filter: blur(10px); padding: 15px 20px; border-bottom: 1px solid rgba(0,0,0,0.05);">
-                    <h2 class="card-title" style="display: flex; justify-content: space-between; align-items: center; margin: 0; font-size: 1.1rem;">
+                <div class="chat-header"
+                    style="background: rgba(255,255,255,0.5); backdrop-filter: blur(10px); padding: 15px 20px; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                    <h2 class="card-title"
+                        style="display: flex; justify-content: space-between; align-items: center; margin: 0; font-size: 1.1rem;">
                         <span style="display: flex; align-items: center; gap: 8px;">
                             <i class="ph-fill ph-chat-circle-dots" style="color: #007bff;"></i>
                             Live Chat
                         </span>
-                        <span id="last-sync-time" style="font-size: 10px; font-weight: 500; color: #888;">Last Sync: --:--</span>
+                        <span id="last-sync-time" style="font-size: 10px; font-weight: 500; color: #888;">Last Sync:
+                            --:--</span>
                     </h2>
                 </div>
 
-                <div class="chat-area no-scrollbar" id="chatbox" style="height: 400px; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; background: rgba(0,0,0,0.02); gap: 15px;"></div>
+                <div class="chat-area no-scrollbar" id="chatbox"
+                    style="height: 400px; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; background: rgba(0,0,0,0.02); gap: 15px;">
+                </div>
 
                 <div class="chat-footer" style="padding: 15px; background: #ffffff;">
-                    <div id="replyPreview" class="hidden" style="background: rgba(0,123,255,0.05); padding: 10px 15px; border-radius: 12px; margin-bottom: 12px; font-size: 12px; display: none; justify-content: space-between; align-items: center; border-left: 4px solid #007bff;">
+                    <div id="replyPreview" class="hidden"
+                        style="background: rgba(0,123,255,0.05); padding: 10px 15px; border-radius: 12px; margin-bottom: 12px; font-size: 12px; display: none; justify-content: space-between; align-items: center; border-left: 4px solid #007bff;">
                         <div>
-                            <span style="font-weight: 700; color: #007bff;">Membalas:</span> 
+                            <span style="font-weight: 700; color: #007bff;">Membalas:</span>
                             <span id="replyText" style="color: #555; margin-left: 5px;"></span>
                         </div>
-                        <button onclick="cancelReply()" style="color: #888; border: none; background: none; cursor: pointer; font-size: 14px;">&times;</button>
+                        <button onclick="cancelReply()"
+                            style="color: #888; border: none; background: none; cursor: pointer; font-size: 14px;">&times;</button>
                     </div>
 
                     <div class="chat-input-wrapper">
-                        <input type="text" id="chatInput" placeholder="Ketik pesan di sini..." style="flex: 1; border: none; outline: none; background: transparent; font-size: 13.5px; font-family: inherit;">
-                        <button class="send-btn" onclick="sendMessage()" style="background: #007bff; color: white; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: static; transform: none; box-shadow: 0 4px 10px rgba(0,123,255,0.3); transition: all 0.2s;">
+                        <input type="text" id="chatInput" placeholder="Ketik pesan di sini..."
+                            style="flex: 1; border: none; outline: none; background: transparent; font-size: 13.5px; font-family: inherit;">
+                        <button class="send-btn" onclick="sendMessage()"
+                            style="background: #007bff; color: white; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: static; transform: none; box-shadow: 0 4px 10px rgba(0,123,255,0.3); transition: all 0.2s;">
                             <i class="ph-fill ph-paper-plane-right" style="font-size: 1.1rem;"></i>
                         </button>
                     </div>
@@ -496,96 +544,138 @@
         </div>
         <div id="siteModal" class="custom-modal" style="display:none;">
             <div class="modal-content">
-                <div class="modal-header d-flex justify-content-center position-relative" style="background-color: #ffffff; border-bottom: 2px solid #eee;">
-                    <h2 class="modal-title w-100 text-center" id="modalTitle" style="color: #000000; font-weight: 700;">Detail Tiket</h2>
-                    <button type="button" class="btn-close position-absolute end-0 me-3 close-modal" data-bs-dismiss="modal" aria-label="Close" style="background: none; border: none; color: #000000; font-size: 1.5rem; font-weight: 700;">&times;</button>
+                <div class="modal-header d-flex justify-content-center position-relative"
+                    style="background-color: #ffffff; border-bottom: 2px solid #eee;">
+                    <h2 class="modal-title w-100 text-center" id="modalTitle" style="color: #000000; font-weight: 700;">
+                        Detail Tiket</h2>
+                    <button type="button" class="btn-close position-absolute end-0 me-3 close-modal"
+                        data-bs-dismiss="modal" aria-label="Close"
+                        style="background: none; border: none; color: #000000; font-size: 1.5rem; font-weight: 700;">&times;</button>
                 </div>
                 <div class="modal-body">
-            <div class="modal-detail-wrapper">
-                <div class="detail-info-list">
-                    <div class="detail-row"><span>Site ID</span> <span class="detail-colon">:</span> <span id="m-site-id"></span></div>
-                    <div class="detail-row"><span>Kategori</span> <span class="detail-colon">:</span> <span id="m-kategori"></span></div>
-                    <div class="detail-row"><span>Provinsi</span> <span class="detail-colon">:</span> <span id="m-provinsi"></span></div>
-                    <div class="detail-row"><span>Kabupaten</span> <span class="detail-colon">:</span> <span id="m-kabupaten"></span></div>
-                    <div class="detail-row"><span>Sumber Listrik</span> <span class="detail-colon">:</span> <span id="m-listrik"></span></div>
-                    <div class="detail-row"><span>Durasi</span> <span class="detail-colon">:</span> <span id="m-durasi"></span></div>
-                    <div class="detail-row"><span>Detail Problem</span> <span class="detail-colon">:</span> <span id="m-problem"></span></div>
-                    <div class="detail-row"><span>CE</span> <span class="detail-colon">:</span> <span id="m-ce"></span></div>
-                    <div class="detail-row"><span>Evidence</span> <span class="detail-colon">:</span> <span id="m-evidence" class="text-primary fw-bold"></span></div>
-                </div>
+                    <div class="modal-detail-wrapper">
+                        <div class="detail-info-list">
+                            <div class="detail-row"><span>Site ID</span> <span class="detail-colon">:</span> <span
+                                    id="m-site-id"></span></div>
+                            <div class="detail-row"><span>Kategori</span> <span class="detail-colon">:</span> <span
+                                    id="m-kategori"></span></div>
+                            <div class="detail-row"><span>Provinsi</span> <span class="detail-colon">:</span> <span
+                                    id="m-provinsi"></span></div>
+                            <div class="detail-row"><span>Kabupaten</span> <span class="detail-colon">:</span> <span
+                                    id="m-kabupaten"></span></div>
+                            <div class="detail-row"><span>Sumber Listrik</span> <span class="detail-colon">:</span>
+                                <span id="m-listrik"></span></div>
+                            <div class="detail-row"><span>Durasi</span> <span class="detail-colon">:</span> <span
+                                    id="m-durasi"></span></div>
+                            <div class="detail-row"><span>Detail Problem</span> <span class="detail-colon">:</span>
+                                <span id="m-problem"></span></div>
+                            <div class="detail-row"><span>CE</span> <span class="detail-colon">:</span> <span
+                                    id="m-ce"></span></div>
+                            <div class="detail-row"><span>Evidence</span> <span class="detail-colon">:</span> <span
+                                    id="m-evidence" class="text-primary fw-bold"></span></div>
+                        </div>
 
-                <div class="map-container-small" style="position: relative;">
-                    <div id="map"></div>
-                    <div style="position: absolute; bottom: 5px; right: 5px; z-index: 1000; background: rgba(255,255,255,0.8); padding: 2px 8px; border-radius: 4px; font-size: 11px;">
-                        <a id="googleMapsLink" href="#" target="_blank" style="color: #007bff; text-decoration: none; font-weight: bold;">
-                            <i class="ph ph-google-logo"></i> View on Google Maps
-                        </a>
+                        <div class="map-container-small" style="position: relative;">
+                            <div id="map"></div>
+                            <div
+                                style="position: absolute; bottom: 5px; right: 5px; z-index: 1000; background: rgba(255,255,255,0.8); padding: 2px 8px; border-radius: 4px; font-size: 11px;">
+                                <a id="googleMapsLink" href="#" target="_blank"
+                                    style="color: #007bff; text-decoration: none; font-weight: bold;">
+                                    <i class="ph ph-google-logo"></i> View on Google Maps
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-    </div>
-</div>
-
-<!-- Sparepart Modal Form -->
-<div id="sparepartModal" class="custom-modal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1050; background: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
-    <div class="modal-content" style="background: #fff; width: 90%; max-width: 500px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeInUp 0.3s ease;">
-        <div class="modal-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #0d6efd, #0b5ed7); color: white; padding: 15px 20px;">
-            <h5 class="modal-title" id="sparepartModalTitle" style="margin: 0; font-weight: 600; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
-                <i class="ph ph-package"></i> <span>Tambah Kebutuhan Sparepart</span>
-            </h5>
-            <button type="button" class="btn-close" onclick="closeSparepartModal()" style="background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; transition: opacity 0.2s;">
-                <i class="ph ph-x"></i>
-            </button>
         </div>
-        <form id="sparepartForm" method="POST" action="{{ route('sparepart.needed.store') }}" style="padding: 20px;">
-            @csrf
-            <input type="hidden" name="_method" id="sparepartFormMethod" value="POST">
-            
-            <div class="mb-3">
-                <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 5px; display: block;">Site Tujuan <span style="color:red;">*</span></label>
-                <select name="site_id" id="sparepart_site_id" class="select2-site" required style="width: 100%;">
-                    <option value="">-- Cari Nama atau ID Site --</option>
-                    @foreach(\App\Models\Site::orderBy('sitename')->get() as $s)
-                        <option value="{{ $s->site_id }}">{{ $s->site_id }} - {{ $s->sitename }}</option>
-                    @endforeach
-                </select>
-            </div>
-            
-            <div class="row" style="display: flex; gap: 10px; margin-bottom: 15px;">
-                <div class="col" style="flex: 2;">
-                    <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 5px; display: block;">Nama Sparepart <span style="color:red;">*</span></label>
-                    <input type="text" name="sparepart_name" id="sparepart_name" required placeholder="Contoh: Kabel FO / Switch / Modem" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd; font-size: 0.85rem; outline: none; transition: border-color 0.2s;">
-                </div>
-                <div class="col" style="flex: 1;">
-                    <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 5px; display: block;">Quantity <span style="color:red;">*</span></label>
-                    <input type="number" name="quantity" id="sparepart_quantity" required min="1" value="1" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd; font-size: 0.85rem; outline: none; transition: border-color 0.2s;">
-                </div>
-            </div>
-            
-            <div class="mb-3" id="statusGroup" style="margin-bottom: 15px;">
-                <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 5px; display: block;">Status Kebutuhan</label>
-                <input type="text" name="status" id="sparepart_status" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd; font-size: 0.85rem; outline: none;" placeholder="Contoh: Pending" value="Pending">
-            </div>
+        </div>
 
-            <div class="mb-4">
-                <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 5px; display: block;">Keterangan / Deskripsi</label>
-                <textarea name="description" id="sparepart_description" rows="3" placeholder="Alasan membutuhkan sparepart atau catatan tambahan..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd; font-size: 0.85rem; outline: none; transition: border-color 0.2s; resize: vertical;"></textarea>
+        <!-- Sparepart Modal Form -->
+        <div id="sparepartModal" class="custom-modal"
+            style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1050; background: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
+            <div class="modal-content"
+                style="background: #fff; width: 90%; max-width: 500px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeInUp 0.3s ease;">
+                <div class="modal-header d-flex justify-content-between align-items-center"
+                    style="background: linear-gradient(135deg, #0d6efd, #0b5ed7); color: white; padding: 15px 20px;">
+                    <h5 class="modal-title" id="sparepartModalTitle"
+                        style="margin: 0; font-weight: 600; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+                        <i class="ph ph-package"></i> <span>Tambah Kebutuhan Sparepart</span>
+                    </h5>
+                    <button type="button" class="btn-close" onclick="closeSparepartModal()"
+                        style="background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; transition: opacity 0.2s;">
+                        <i class="ph ph-x"></i>
+                    </button>
+                </div>
+                <form id="sparepartForm" method="POST" action="{{ route('sparepart.needed.store') }}"
+                    style="padding: 20px;">
+                    @csrf
+                    <input type="hidden" name="_method" id="sparepartFormMethod" value="POST">
+
+                    <div class="mb-3">
+                        <label class="form-label"
+                            style="font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 5px; display: block;">Site
+                            Tujuan <span style="color:red;">*</span></label>
+                        <select name="site_id" id="sparepart_site_id" class="select2-site" required
+                            style="width: 100%;">
+                            <option value="">-- Cari Nama atau ID Site --</option>
+                            @foreach(\App\Models\Site::orderBy('sitename')->get() as $s)
+                                <option value="{{ $s->site_id }}">{{ $s->site_id }} - {{ $s->sitename }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="row" style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <div class="col" style="flex: 2;">
+                            <label class="form-label"
+                                style="font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 5px; display: block;">Nama
+                                Sparepart <span style="color:red;">*</span></label>
+                            <input type="text" name="sparepart_name" id="sparepart_name" required
+                                placeholder="Contoh: Kabel FO / Switch / Modem"
+                                style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd; font-size: 0.85rem; outline: none; transition: border-color 0.2s;">
+                        </div>
+                        <div class="col" style="flex: 1;">
+                            <label class="form-label"
+                                style="font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 5px; display: block;">Quantity
+                                <span style="color:red;">*</span></label>
+                            <input type="number" name="quantity" id="sparepart_quantity" required min="1" value="1"
+                                style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd; font-size: 0.85rem; outline: none; transition: border-color 0.2s;">
+                        </div>
+                    </div>
+
+                    <div class="mb-3" id="statusGroup" style="margin-bottom: 15px;">
+                        <label class="form-label"
+                            style="font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 5px; display: block;">Status
+                            Kebutuhan</label>
+                        <input type="text" name="status" id="sparepart_status"
+                            style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd; font-size: 0.85rem; outline: none;"
+                            placeholder="Contoh: Pending" value="Pending">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label"
+                            style="font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 5px; display: block;">Keterangan
+                            / Deskripsi</label>
+                        <textarea name="description" id="sparepart_description" rows="3"
+                            placeholder="Alasan membutuhkan sparepart atau catatan tambahan..."
+                            style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd; font-size: 0.85rem; outline: none; transition: border-color 0.2s; resize: vertical;"></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2"
+                        style="display: flex; gap: 10px; border-top: 1px solid #eee; padding-top: 15px;">
+                        <button type="button" class="btn btn-light" onclick="closeSparepartModal()"
+                            style="padding: 8px 16px; border-radius: 6px; background: #f8f9fa; border: 1px solid #ddd; font-weight: 600; font-size: 0.85rem; color: #444; cursor: pointer;">
+                            Batal
+                        </button>
+                        <button type="submit" class="btn btn-primary"
+                            style="padding: 8px 16px; border-radius: 6px; background: linear-gradient(135deg, #0d6efd, #0b5ed7); border: none; font-weight: 600; font-size: 0.85rem; color: #fff; cursor: pointer; box-shadow: 0 4px 10px rgba(13,110,253,0.3);">
+                            Simpan Data
+                        </button>
+                    </div>
+                </form>
             </div>
-            
-            <div class="d-flex justify-content-end gap-2" style="display: flex; gap: 10px; border-top: 1px solid #eee; padding-top: 15px;">
-                <button type="button" class="btn btn-light" onclick="closeSparepartModal()" style="padding: 8px 16px; border-radius: 6px; background: #f8f9fa; border: 1px solid #ddd; font-weight: 600; font-size: 0.85rem; color: #444; cursor: pointer;">
-                    Batal
-                </button>
-                <button type="submit" class="btn btn-primary" style="padding: 8px 16px; border-radius: 6px; background: linear-gradient(135deg, #0d6efd, #0b5ed7); border: none; font-weight: 600; font-size: 0.85rem; color: #fff; cursor: pointer; box-shadow: 0 4px 10px rgba(13,110,253,0.3);">
-                    Simpan Data
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
+        </div>
 
     </main>
 
@@ -598,183 +688,183 @@
         </div>
     </footer>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-    // Initialize Select2 when document is ready
-    $(document).ready(function() {
-        $('.select2-site').select2({
-            dropdownParent: $('#sparepartModal'),
-            placeholder: "-- Cari Nama atau ID Site --",
-            allowClear: true,
-            width: '100%'
-        });
-    });
-
-    function getGuestName() {
-        // Jika sudah login, tidak perlu nama guest
-        if (@json(auth()->check())) return null;
-
-        let name = localStorage.getItem('chat_guest_name');
-        
-        while (!name || name.trim() === "") {
-            name = prompt("Silakan masukkan nama Anda untuk memulai chat:");
-            if (name) {
-                name = name.trim();
-                localStorage.setItem('chat_guest_name', name);
-            }
-        }
-        return name;
-    }
-// Pelacakan pesan terakhir untuk notifikasi
-let lastMessageId = null;
-let isFirstLoad = true;
-
-// Minta izin notifikasi browser & Fitur Enter-to-Send
-document.addEventListener('DOMContentLoaded', function() {
-    if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
-        Notification.requestPermission();
-    }
-
-    // Tambahkan event listener Enter pada input chat
-    const chatInput = document.getElementById('chatInput');
-    if (chatInput) {
-        chatInput.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault(); // Hindari newline karea input bertipe text
-                sendMessage();
-            }
-        });
-    }
-});
-
-// Fungsi untuk menampilkan notifikasi browser
-function showBrowserNotification(msg) {
-    console.log("Mencoba menampilkan notifikasi. Status Izin:", Notification.permission); 
-    if (Notification.permission === 'granted') {
-        const isAdmin = (msg.user && (msg.user.is_admin == 1 || msg.user.is_admin === true)) || (msg.is_admin == 1);
-        const name = msg.user ? msg.user.name : (msg.guest_name || 'Guest');
-        // Format Baru: Nama (Admin)
-        const senderName = isAdmin ? `${name} (Admin)` : name;
-        
-        try {
-            const notification = new Notification(`Chat Baru dari ${senderName}`, {
-                body: msg.message,
-                icon: 'https://cdn-icons-png.flaticon.com/512/733/733585.png'
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Initialize Select2 when document is ready
+        $(document).ready(function () {
+            $('.select2-site').select2({
+                dropdownParent: $('#sparepartModal'),
+                placeholder: "-- Cari Nama atau ID Site --",
+                allowClear: true,
+                width: '100%'
             });
+        });
 
-            notification.onclick = function() {
-                window.focus();
-                notification.close();
-            };
-        } catch (e) {
-            console.error("Gagal membuat objek Notifikasi:", e);
+        function getGuestName() {
+            // Jika sudah login, tidak perlu nama guest
+            if (@json(auth()->check())) return null;
+
+            let name = localStorage.getItem('chat_guest_name');
+
+            while (!name || name.trim() === "") {
+                name = prompt("Silakan masukkan nama Anda untuk memulai chat:");
+                if (name) {
+                    name = name.trim();
+                    localStorage.setItem('chat_guest_name', name);
+                }
+            }
+            return name;
         }
-    } else {
-        console.warn("Izin notifikasi tidak diberikan (Status: " + Notification.permission + ")");
-    }
-}
+        // Pelacakan pesan terakhir untuk notifikasi
+        let lastMessageId = null;
+        let isFirstLoad = true;
 
-let selectedReplyId = null;
-function setReply(id, text, name, isAdmin = false) { 
-    selectedReplyId = id;
-    const preview = document.getElementById('replyPreview');
-    const replyText = document.getElementById('replyText');
-    
-    // Gunakan nama yang sudah diformat dari parameter
-    replyText.innerText = `${name}: ${text.substring(0, 35)}${text.length > 35 ? '...' : ''}`;
-    
-    preview.style.display = 'flex';
-    document.getElementById('chatInput').focus();
-}
-// 2. Fungsi membatalkan balasan
-function cancelReply() {
-    selectedReplyId = null;
-    document.getElementById('replyPreview').style.display = 'none';
-}
+        // Minta izin notifikasi browser & Fitur Enter-to-Send
+        document.addEventListener('DOMContentLoaded', function () {
+            if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+                Notification.requestPermission();
+            }
 
-function formatAdminName(name, isAdmin) {
-    return isAdmin ? `${name} (Admin)` : name;
-}
-
-/// 3. Fungsi Ambil Pesan (Load)
-function loadMessages() {
-    const guestName = localStorage.getItem('chat_guest_name') || '';
-    fetch(`{{ route('chat.fetch') }}?guest_name=${encodeURIComponent(guestName)}`)
-        .then(res => res.json())
-        .then(data => {
-            const chatbox = document.getElementById('chatbox');
-            
-            // Cek pesan baru untuk notifikasi
-            if (!isFirstLoad) {
-                data.forEach(msg => {
-                    const isMsgNew = lastMessageId && msg.id > lastMessageId;
-                    if (isMsgNew && !msg.is_me) {
-                        showBrowserNotification(msg);
+            // Tambahkan event listener Enter pada input chat
+            const chatInput = document.getElementById('chatInput');
+            if (chatInput) {
+                chatInput.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault(); // Hindari newline karea input bertipe text
+                        sendMessage();
                     }
                 });
             }
+        });
 
-            // Update lastMessageId ke pesan paling baru di data
-            if (data.length > 0) {
-                lastMessageId = Math.max(...data.map(m => m.id));
+        // Fungsi untuk menampilkan notifikasi browser
+        function showBrowserNotification(msg) {
+            console.log("Mencoba menampilkan notifikasi. Status Izin:", Notification.permission);
+            if (Notification.permission === 'granted') {
+                const isAdmin = (msg.user && (msg.user.is_admin == 1 || msg.user.is_admin === true)) || (msg.is_admin == 1);
+                const name = msg.user ? msg.user.name : (msg.guest_name || 'Guest');
+                // Format Baru: Nama (Admin)
+                const senderName = isAdmin ? `${name} (Admin)` : name;
+
+                try {
+                    const notification = new Notification(`Chat Baru dari ${senderName}`, {
+                        body: msg.message,
+                        icon: 'https://cdn-icons-png.flaticon.com/512/733/733585.png'
+                    });
+
+                    notification.onclick = function () {
+                        window.focus();
+                        notification.close();
+                    };
+                } catch (e) {
+                    console.error("Gagal membuat objek Notifikasi:", e);
+                }
+            } else {
+                console.warn("Izin notifikasi tidak diberikan (Status: " + Notification.permission + ")");
             }
-            isFirstLoad = false;
+        }
 
-            chatbox.innerHTML = "";
-            let lastDate = null;
+        let selectedReplyId = null;
+        function setReply(id, text, name, isAdmin = false) {
+            selectedReplyId = id;
+            const preview = document.getElementById('replyPreview');
+            const replyText = document.getElementById('replyText');
 
-            data.forEach(msg => {
-                // --- 1. LOGIKA PEMISAH TANGGAL ---
-                const dateObj = new Date(msg.created_at);
-                const msgDate = dateObj.toLocaleDateString('id-ID', {
-                    day: 'numeric', month: 'long', year: 'numeric'
-                });
-                
-                const today = new Date().toLocaleDateString('id-ID', {
-                    day: 'numeric', month: 'long', year: 'numeric'
-                });
+            // Gunakan nama yang sudah diformat dari parameter
+            replyText.innerText = `${name}: ${text.substring(0, 35)}${text.length > 35 ? '...' : ''}`;
 
-                const yesterday = new Date();
-                yesterday.setDate(yesterday.getDate() - 1);
-                const yesterdayStr = yesterday.toLocaleDateString('id-ID', {
-                    day: 'numeric', month: 'long', year: 'numeric'
-                });
+            preview.style.display = 'flex';
+            document.getElementById('chatInput').focus();
+        }
+        // 2. Fungsi membatalkan balasan
+        function cancelReply() {
+            selectedReplyId = null;
+            document.getElementById('replyPreview').style.display = 'none';
+        }
 
-                if (msgDate !== lastDate) {
-                    let label = msgDate;
-                    if (msgDate === today) label = "Hari Ini";
-                    else if (msgDate === yesterdayStr) label = "Kemarin";
+        function formatAdminName(name, isAdmin) {
+            return isAdmin ? `${name} (Admin)` : name;
+        }
 
-                    chatbox.innerHTML += `
+        /// 3. Fungsi Ambil Pesan (Load)
+        function loadMessages() {
+            const guestName = localStorage.getItem('chat_guest_name') || '';
+            fetch(`{{ route('chat.fetch') }}?guest_name=${encodeURIComponent(guestName)}`)
+                .then(res => res.json())
+                .then(data => {
+                    const chatbox = document.getElementById('chatbox');
+
+                    // Cek pesan baru untuk notifikasi
+                    if (!isFirstLoad) {
+                        data.forEach(msg => {
+                            const isMsgNew = lastMessageId && msg.id > lastMessageId;
+                            if (isMsgNew && !msg.is_me) {
+                                showBrowserNotification(msg);
+                            }
+                        });
+                    }
+
+                    // Update lastMessageId ke pesan paling baru di data
+                    if (data.length > 0) {
+                        lastMessageId = Math.max(...data.map(m => m.id));
+                    }
+                    isFirstLoad = false;
+
+                    chatbox.innerHTML = "";
+                    let lastDate = null;
+
+                    data.forEach(msg => {
+                        // --- 1. LOGIKA PEMISAH TANGGAL ---
+                        const dateObj = new Date(msg.created_at);
+                        const msgDate = dateObj.toLocaleDateString('id-ID', {
+                            day: 'numeric', month: 'long', year: 'numeric'
+                        });
+
+                        const today = new Date().toLocaleDateString('id-ID', {
+                            day: 'numeric', month: 'long', year: 'numeric'
+                        });
+
+                        const yesterday = new Date();
+                        yesterday.setDate(yesterday.getDate() - 1);
+                        const yesterdayStr = yesterday.toLocaleDateString('id-ID', {
+                            day: 'numeric', month: 'long', year: 'numeric'
+                        });
+
+                        if (msgDate !== lastDate) {
+                            let label = msgDate;
+                            if (msgDate === today) label = "Hari Ini";
+                            else if (msgDate === yesterdayStr) label = "Kemarin";
+
+                            chatbox.innerHTML += `
                         <div style="display: flex; align-items: center; margin: 20px 0; opacity: 0.8;">
                             <div style="flex: 1; height: 1px; background: linear-gradient(to right, transparent, #ddd);"></div>
                             <div style="padding: 0 15px; font-size: 11px; font-weight: bold; color: #888; text-transform: uppercase; letter-spacing: 1px;">${label}</div>
                             <div style="flex: 1; height: 1px; background: linear-gradient(to left, transparent, #ddd);"></div>
                         </div>
                     `;
-                    lastDate = msgDate;
-                }
+                            lastDate = msgDate;
+                        }
 
-                // --- 2. LOGIKA BUBBLE CHAT ---
-                const isMe = msg.is_me;
-                const isAdmin = msg.is_sender_admin;
-                const displayName = msg.user ? msg.user.name : (msg.guest_name || 'Guest');
-                const userPhoto = msg.user && msg.user.photo 
-                    ? `{{ asset('storage_public') }}/${msg.user.photo}` 
-                    : `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random`;
+                        // --- 2. LOGIKA BUBBLE CHAT ---
+                        const isMe = msg.is_me;
+                        const isAdmin = msg.is_sender_admin;
+                        const displayName = msg.user ? msg.user.name : (msg.guest_name || 'Guest');
+                        const userPhoto = msg.user && msg.user.photo
+                            ? `{{ asset('storage_public') }}/${msg.user.photo}`
+                            : `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random`;
 
-                const avatarHtml = `<img src="${userPhoto}" class="chat-avatar" style="margin-${isMe ? 'left' : 'right'}: 8px;" alt="Avatar">`;
+                        const avatarHtml = `<img src="${userPhoto}" class="chat-avatar" style="margin-${isMe ? 'left' : 'right'}: 8px;" alt="Avatar">`;
 
-                const replyTemplate = msg.parent ? `
+                        const replyTemplate = msg.parent ? `
                     <div class="chat-reply-preview-inner">
                         <strong>${(msg.parent.user ? msg.parent.user.name : (msg.parent.guest_name || 'Guest')) + (msg.parent.is_admin == 1 ? ' (Admin)' : '')}</strong>
                         <div style="opacity: 0.8;">${msg.parent.message.substring(0, 40)}...</div>
                     </div>
                 ` : '';
 
-                const msgHtml = `
+                        const msgHtml = `
                     <div class="chat-message-in" style="display: flex; justify-content: ${isMe ? 'flex-end' : 'flex-start'}; align-items: flex-end; margin-bottom: 15px;">
                         ${!isMe ? avatarHtml : ''}
                         <div style="max-width: 75%; position: relative;">
@@ -794,80 +884,80 @@ function loadMessages() {
                                 <div style="font-size: 13.5px; line-height: 1.4;">${msg.message}</div>
                                 
                                 <div class="chat-timestamp">
-                                    ${dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                    ${dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                 </div>
                             </div>
                         </div>
                         ${isMe ? avatarHtml : ""}
                     </div>
                 `;
-                chatbox.innerHTML += msgHtml;
-            });
-            
-            chatbox.scrollTop = chatbox.scrollHeight; 
-        })
-        .catch(err => console.error("Gagal memuat pesan:", err));
-}
-// 4. Fungsi Kirim Pesan
-function sendMessage() {
-    const input = document.getElementById('chatInput');
-    const message = input.value;
-    if (message.trim() == "") return;
+                        chatbox.innerHTML += msgHtml;
+                    });
 
-    // AMBIL NAMA GUEST DISINI
-    const guestName = getGuestName(); 
-
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-    fetch("{{ route('chat.send') }}", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "X-CSRF-TOKEN": csrfToken
-        },
-        body: JSON.stringify({ 
-            message: message,
-            guest_name: guestName, // KIRIM NAMA KE SERVER
-            parent_id: selectedReplyId 
-        })
-    })
-    .then(async res => {
-        const data = await res.json();
-        if (!res.ok) {
-            // Ini akan memberitahu kita ALASAN spesifik gagalnya
-            console.error("Error Server:", data);
-            throw new Error(data.message || "Gagal mengirim");
+                    chatbox.scrollTop = chatbox.scrollHeight;
+                })
+                .catch(err => console.error("Gagal memuat pesan:", err));
         }
-        return data;
-    })
-    .then(() => {
-        input.value = "";
-        cancelReply();
-        loadMessages(); 
-    })
-    .catch(err => {
-        console.error(err);
-        alert("Pesan Gagal: " + err.message);
-    });
-}
+        // 4. Fungsi Kirim Pesan
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value;
+            if (message.trim() == "") return;
 
-// Jalankan load pesan setiap 3 detik
-setInterval(loadMessages, 15000);
-loadMessages();
-</script>
-{{-- Script untuk Detail Site Modal & Peta --}}
+            // AMBIL NAMA GUEST DISINI
+            const guestName = getGuestName();
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            fetch("{{ route('chat.send') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "X-CSRF-TOKEN": csrfToken
+                },
+                body: JSON.stringify({
+                    message: message,
+                    guest_name: guestName, // KIRIM NAMA KE SERVER
+                    parent_id: selectedReplyId
+                })
+            })
+                .then(async res => {
+                    const data = await res.json();
+                    if (!res.ok) {
+                        // Ini akan memberitahu kita ALASAN spesifik gagalnya
+                        console.error("Error Server:", data);
+                        throw new Error(data.message || "Gagal mengirim");
+                    }
+                    return data;
+                })
+                .then(() => {
+                    input.value = "";
+                    cancelReply();
+                    loadMessages();
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Pesan Gagal: " + err.message);
+                });
+        }
+
+        // Jalankan load pesan setiap 3 detik
+        setInterval(loadMessages, 15000);
+        loadMessages();
+    </script>
+    {{-- Script untuk Detail Site Modal & Peta --}}
     <script>
         // 1. Inisialisasi Peta & Jam Global
-        let map; 
+        let map;
 
         function updateClock() {
             const now = new Date();
-            const timeString = now.toLocaleTimeString('en-GB', { 
-                hour: '2-digit', minute: '2-digit', second: '2-digit' 
+            const timeString = now.toLocaleTimeString('en-GB', {
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
             });
             const clockEl = document.getElementById('clock');
-            if(clockEl) clockEl.innerText = timeString;
+            if (clockEl) clockEl.innerText = timeString;
         }
         setInterval(updateClock, 1000);
         updateClock();
@@ -876,7 +966,7 @@ loadMessages();
         const menuItems = document.querySelectorAll(".menu-item");
         menuItems.forEach(item => {
             const header = item.querySelector(".menu-header");
-            header.addEventListener("click", function(e) {
+            header.addEventListener("click", function (e) {
                 // JANGAN jalankan collapse jika yang diklik adalah tombol "Lihat Site"
                 if (e.target.classList.contains('toggle-site')) return;
 
@@ -897,7 +987,7 @@ loadMessages();
         });
 
         // 3. Logic for "Lihat Site" (Dropdown in sidebar)
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             const toggleBtn = e.target.closest('.toggle-site');
             if (toggleBtn) {
                 e.preventDefault();
@@ -906,7 +996,7 @@ loadMessages();
                 const group = toggleBtn.closest('.ticket-group');
                 const container = group.querySelector('.site-detail-container');
                 if (!container) return;
-                
+
                 const count = container.querySelectorAll('li').length;
                 const isHidden = container.style.display === "none" || container.style.display === "";
 
@@ -961,7 +1051,7 @@ loadMessages();
                     // Update Evidence Row
                     const evidenceEl = document.getElementById('m-evidence');
                     evidenceEl.innerHTML = '';
-                    
+
                     const baseUrl = "{{ asset('storage_public') }}";
                     let evidenceHtml = '';
 
@@ -973,7 +1063,7 @@ loadMessages();
                                     <i class="ph ph-eye"></i> Bukti #${idx + 1}
                                 </a>`;
                         });
-                    } 
+                    }
                     // 2. Fallback ke evidence utama (kolom lama)
                     else if (data.evidence && data.evidence.includes('.')) {
                         evidenceHtml = `<a href="javascript:void(0)" onclick="viewEvidence('${baseUrl}/${data.evidence}')" class="text-primary fw-bold" style="text-decoration: none; font-size: 0.85rem;"><i class="ph ph-eye"></i> ADA (Klik untuk lihat)</a>`;
@@ -1007,7 +1097,7 @@ loadMessages();
         }
 
         // Listener untuk link di tabel (Event Delegation untuk element dinamis)
-        document.body.addEventListener('click', function(e) {
+        document.body.addEventListener('click', function (e) {
             let target = e.target.closest('.site-detail-link');
             if (target) {
                 e.preventDefault();
@@ -1018,55 +1108,55 @@ loadMessages();
         // 5. Logika Penutup Modal
         const closeModal = () => { document.getElementById('siteModal').style.display = 'none'; };
         const closeBtn = document.querySelector('.close-modal');
-        if(closeBtn) closeBtn.onclick = closeModal;
-        
+        if (closeBtn) closeBtn.onclick = closeModal;
+
         window.onclick = (event) => {
             const modal = document.getElementById('siteModal');
             if (event.target == modal) closeModal();
         };
     </script>
-<script>
-let currentTableFilter = 'all_open'; // Default Filter
+    <script>
+        let currentTableFilter = 'all_open'; // Default Filter
 
-document.addEventListener('DOMContentLoaded', function() {
-    const cards = document.querySelectorAll('.clickable-card');
-    
-    cards.forEach(card => {
-        card.addEventListener('click', function() {
-            const type = this.getAttribute('data-type');
-            currentTableFilter = type; // Simpan filter yang aktif
-            const tableBody = document.querySelector('table tbody');
-            const tableTitle = document.querySelector('.table-card .card-title');
-            const tableHeaderLast = document.querySelector('table thead th:last-child'); // Target kolom Duration/Date
+        document.addEventListener('DOMContentLoaded', function () {
+            const cards = document.querySelectorAll('.clickable-card');
 
-            // Feedback visual
-            tableBody.innerHTML = '<tr><td colspan="5" class="text-center">Sedang mengambil data...</td></tr>';
+            cards.forEach(card => {
+                card.addEventListener('click', function () {
+                    const type = this.getAttribute('data-type');
+                    currentTableFilter = type; // Simpan filter yang aktif
+                    const tableBody = document.querySelector('table tbody');
+                    const tableTitle = document.querySelector('.table-card .card-title');
+                    const tableHeaderLast = document.querySelector('table thead th:last-child'); // Target kolom Duration/Date
 
-            fetch(`/tickets/filter?type=${type}`)
-                .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        if (tableTitle) tableTitle.innerText = data.type_label;
-                        
-                        // FIX: Merubah Header secara dinamis
-                        if (type === 'pm_bmn' || type === 'pm_sl') {
-                            if (tableHeaderLast) tableHeaderLast.innerText = 'Date';
-                        } else {
-                            if (tableHeaderLast) tableHeaderLast.innerText = 'Duration';
-                        }
+                    // Feedback visual
+                    tableBody.innerHTML = '<tr><td colspan="5" class="text-center">Sedang mengambil data...</td></tr>';
 
-                        tableBody.innerHTML = '';
+                    fetch(`/tickets/filter?type=${type}`)
+                        .then(response => {
+                            if (!response.ok) throw new Error('Network response was not ok');
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                if (tableTitle) tableTitle.innerText = data.type_label;
 
-                        if (data.tickets.length === 0) {
-                            tableBody.innerHTML = '<tr><td colspan="5" class="text-center">Data tidak ditemukan</td></tr>';
-                            return;
-                        }
+                                // FIX: Merubah Header secara dinamis
+                                if (type === 'pm_bmn' || type === 'pm_sl') {
+                                    if (tableHeaderLast) tableHeaderLast.innerText = 'Date';
+                                } else {
+                                    if (tableHeaderLast) tableHeaderLast.innerText = 'Duration';
+                                }
 
-                        data.tickets.forEach((t, index) => {
-                            tableBody.innerHTML += `
+                                tableBody.innerHTML = '';
+
+                                if (data.tickets.length === 0) {
+                                    tableBody.innerHTML = '<tr><td colspan="5" class="text-center">Data tidak ditemukan</td></tr>';
+                                    return;
+                                }
+
+                                data.tickets.forEach((t, index) => {
+                                    tableBody.innerHTML += `
                                 <tr>
                                     <td class="text-center">${index + 1}</td>
                                     <td>${t.nama_site}</td>
@@ -1086,62 +1176,62 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <td class="text-center">${t.display_date}</td>
                                 </tr>
                             `;
+                                });
+                            } else {
+                                throw new Error(data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Gagal memuat data.</td></tr>';
                         });
-                    } else {
-                        throw new Error(data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Gagal memuat data.</td></tr>';
                 });
+            });
         });
-    });
-});
-</script>
+    </script>
 
-<!-- Auto Logout Script -->
-<script>
-    (function() {
-        let timeout;
-        const maxIdleTime = 3600000; // 1 jam (3.600.000 ms)
+    <!-- Auto Logout Script -->
+    <script>
+        (function () {
+            let timeout;
+            const maxIdleTime = 3600000; // 1 jam (3.600.000 ms)
 
-        function resetTimer() {
-            clearTimeout(timeout);
-            timeout = setTimeout(logoutUser, maxIdleTime);
-        }
+            function resetTimer() {
+                clearTimeout(timeout);
+                timeout = setTimeout(logoutUser, maxIdleTime);
+            }
 
-        function logoutUser() {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = "{{ route('logout') }}";
-            
-            const csrfToken = document.createElement('input');
-            csrfToken.type = 'hidden';
-            csrfToken.name = '_token';
-            csrfToken.value = "{{ csrf_token() }}";
-            
-            form.appendChild(csrfToken);
-            document.body.appendChild(form);
-            form.submit();
-        }
+            function logoutUser() {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = "{{ route('logout') }}";
 
-        window.onload = resetTimer;
-        window.onmousemove = resetTimer;
-        window.onmousedown = resetTimer; 
-        window.ontouchstart = resetTimer;
-        window.onclick = resetTimer;     
-        window.onkeydown = resetTimer;   
-        window.addEventListener('scroll', resetTimer, true);
-    })();
-</script>
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = "{{ csrf_token() }}";
 
-<!-- Script Auto-Refresh Menyeluruh (V5 - Stabil) -->
-<script>
-(function() {
-    // CSS Efek Pulse
-    const style = document.createElement('style');
-    style.textContent = `
+                form.appendChild(csrfToken);
+                document.body.appendChild(form);
+                form.submit();
+            }
+
+            window.onload = resetTimer;
+            window.onmousemove = resetTimer;
+            window.onmousedown = resetTimer;
+            window.ontouchstart = resetTimer;
+            window.onclick = resetTimer;
+            window.onkeydown = resetTimer;
+            window.addEventListener('scroll', resetTimer, true);
+        })();
+    </script>
+
+    <!-- Script Auto-Refresh Menyeluruh (V5 - Stabil) -->
+    <script>
+        (function () {
+            // CSS Efek Pulse
+            const style = document.createElement('style');
+            style.textContent = `
         @keyframes pulse-update {
             0% { transform: scale(1); color: #28a745; font-weight: bold; }
             50% { transform: scale(1.1); color: #28a745; font-weight: bold; }
@@ -1149,76 +1239,76 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         .update-pulse { animation: pulse-update 0.8s ease-out; }
     `;
-    document.head.append(style);
+            document.head.append(style);
 
-    function applyPulse(elementId, newValue) {
-        const el = document.getElementById(elementId);
-        if (el && el.innerText != newValue) {
-            el.innerText = newValue;
-            el.classList.remove('update-pulse');
-            void el.offsetWidth; 
-            el.classList.add('update-pulse');
-        } else if (el) {
-            el.innerText = newValue;
-        }
-    }
+            function applyPulse(elementId, newValue) {
+                const el = document.getElementById(elementId);
+                if (el && el.innerText != newValue) {
+                    el.innerText = newValue;
+                    el.classList.remove('update-pulse');
+                    void el.offsetWidth;
+                    el.classList.add('update-pulse');
+                } else if (el) {
+                    el.innerText = newValue;
+                }
+            }
 
-    function safeUpdateInnerText(id, text) {
-        const el = document.getElementById(id);
-        if (el) el.innerText = text;
-    }
+            function safeUpdateInnerText(id, text) {
+                const el = document.getElementById(id);
+                if (el) el.innerText = text;
+            }
 
 
-    function updateStats() {
-        console.log("Sinkronisasi Dashboard Dimulai...");
-        const syncLabel = document.getElementById('last-sync-time');
-        
-        // Visual indicator: Sedang Sinkron
-        if (syncLabel) syncLabel.style.color = '#4facfe';
+            function updateStats() {
+                console.log("Sinkronisasi Dashboard Dimulai...");
+                const syncLabel = document.getElementById('last-sync-time');
 
-        fetch(`{{ route('dashboard.stats') }}?type=${currentTableFilter}&_t=` + new Date().getTime())
-            .then(res => res.json())
-            .then(data => {
-                if (!data.success) throw new Error(data.message || "Gagal mengambil data");
+                // Visual indicator: Sedang Sinkron
+                if (syncLabel) syncLabel.style.color = '#4facfe';
 
-                const s = data.stats;
-                
-                // 1. Update Statistik Utama
-                try {
-                    applyPulse('stat-today', s.todayCount);
-                    applyPulse('stat-all-open', s.totalOpen);
-                    applyPulse('stat-pm-bmn-done', s.pmBmnDone);
-                    applyPulse('stat-pm-sl-done', s.pmSlDone);
-                    safeUpdateInnerText('stat-pm-bmn-total', `/ ${s.pmBmnTotal}`);
-                    safeUpdateInnerText('stat-pm-sl-total', `/ ${s.pmSlTotal}`);
-                } catch (e) { console.warn("Error update stats:", e); }
+                fetch(`{{ route('dashboard.stats') }}?type=${currentTableFilter}&_t=` + new Date().getTime())
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!data.success) throw new Error(data.message || "Gagal mengambil data");
 
-                // 2. Update Jadwal Piket
-                try {
-                    const statusEl = document.querySelector('.shift-status span');
-                    const timeEl = document.querySelector('.shift-time');
-                    const listEl = document.querySelector('.personnel-list');
-                    
-                    if (statusEl) statusEl.innerText = data.piket.status;
-                    if (timeEl) timeEl.innerText = data.piket.info;
-                    if (listEl) {
-                        listEl.innerHTML = data.piket.list.length > 0 
-                            ? data.piket.list.map(p => `
+                        const s = data.stats;
+
+                        // 1. Update Statistik Utama
+                        try {
+                            applyPulse('stat-today', s.todayCount);
+                            applyPulse('stat-all-open', s.totalOpen);
+                            applyPulse('stat-pm-bmn-done', s.pmBmnDone);
+                            applyPulse('stat-pm-sl-done', s.pmSlDone);
+                            safeUpdateInnerText('stat-pm-bmn-total', `/ ${s.pmBmnTotal}`);
+                            safeUpdateInnerText('stat-pm-sl-total', `/ ${s.pmSlTotal}`);
+                        } catch (e) { console.warn("Error update stats:", e); }
+
+                        // 2. Update Jadwal Piket
+                        try {
+                            const statusEl = document.querySelector('.shift-status span');
+                            const timeEl = document.querySelector('.shift-time');
+                            const listEl = document.querySelector('.personnel-list');
+
+                            if (statusEl) statusEl.innerText = data.piket.status;
+                            if (timeEl) timeEl.innerText = data.piket.info;
+                            if (listEl) {
+                                listEl.innerHTML = data.piket.list.length > 0
+                                    ? data.piket.list.map(p => `
                                 <div class="personnel-badge">
                                     ${p.name}
                                     <span class="badge bg-light text-dark ms-1" style="font-size: 10px;">${p.shift_kode}</span>
                                 </div>`).join('')
-                            : '<div class="text-muted small p-2">Semua personil sedang OFF hari ini.</div>';
-                    }
-                } catch (e) { console.warn("Error update piket:", e); }
+                                    : '<div class="text-muted small p-2">Semua personil sedang OFF hari ini.</div>';
+                            }
+                        } catch (e) { console.warn("Error update piket:", e); }
 
-                // 3. Update Sidebar (Open Ticket Problem)
-                try {
-                    const sidebarContainer = document.querySelector('.ticket-list');
-                    if (sidebarContainer) {
-                        let html = '';
-                        for (const [prob, items] of Object.entries(data.sidebar)) {
-                            html += `
+                        // 3. Update Sidebar (Open Ticket Problem)
+                        try {
+                            const sidebarContainer = document.querySelector('.ticket-list');
+                            if (sidebarContainer) {
+                                let html = '';
+                                for (const [prob, items] of Object.entries(data.sidebar)) {
+                                    html += `
                                 <div class="ticket-group">
                                     <div class="ticket-row">
                                         <span>${prob.toUpperCase()}</span>
@@ -1230,29 +1320,29 @@ document.addEventListener('DOMContentLoaded', function() {
                                         </ul>
                                     </div>
                                 </div>`;
-                        }
-                        sidebarContainer.innerHTML = html || '<p class="text-center small text-muted">No open problems</p>';
-                    }
-                } catch (e) { console.warn("Error update sidebar:", e); }
+                                }
+                                sidebarContainer.innerHTML = html || '<p class="text-center small text-muted">No open problems</p>';
+                            }
+                        } catch (e) { console.warn("Error update sidebar:", e); }
 
-                // 4. Update Tabel Utama
-                try {
-                    const tbody = document.querySelector('.table-card tbody');
-                    const tableTitle = document.querySelector('.table-card .card-title');
-                    const tableHeaderLast = document.querySelector('table thead th:last-child');
+                        // 4. Update Tabel Utama
+                        try {
+                            const tbody = document.querySelector('.table-card tbody');
+                            const tableTitle = document.querySelector('.table-card .card-title');
+                            const tableHeaderLast = document.querySelector('table thead th:last-child');
 
-                    if (tableTitle) tableTitle.innerText = data.type_label;
-                    
-                    // Update Header Tabel Kolom Terakhir
-                    if (data.type === 'pm_bmn' || data.type === 'pm_sl') {
-                        if (tableHeaderLast) tableHeaderLast.innerText = 'Date';
-                    } else {
-                        if (tableHeaderLast) tableHeaderLast.innerText = 'Duration';
-                    }
+                            if (tableTitle) tableTitle.innerText = data.type_label;
 
-                    if (tbody) {
-                        tbody.innerHTML = data.table.length > 0
-                            ? data.table.map((t, idx) => `
+                            // Update Header Tabel Kolom Terakhir
+                            if (data.type === 'pm_bmn' || data.type === 'pm_sl') {
+                                if (tableHeaderLast) tableHeaderLast.innerText = 'Date';
+                            } else {
+                                if (tableHeaderLast) tableHeaderLast.innerText = 'Duration';
+                            }
+
+                            if (tbody) {
+                                tbody.innerHTML = data.table.length > 0
+                                    ? data.table.map((t, idx) => `
                                 <tr>
                                     <td class="text-center">${idx + 1}</td>
                                     <td>${t.nama_site}</td>
@@ -1264,133 +1354,136 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </td>
                                     <td class="text-center">${t.durasi}</td>
                                 </tr>`).join('')
-                            : `<tr><td colspan="5" class="text-center">Tidak ada data untuk ${data.type_label}.</td></tr>`;
-                    }
-                } catch (e) { console.warn("Error update table:", e); }
+                                    : `<tr><td colspan="5" class="text-center">Tidak ada data untuk ${data.type_label}.</td></tr>`;
+                            }
+                        } catch (e) { console.warn("Error update table:", e); }
 
-                // Success Visual
-                if (syncLabel) {
-                    const now = new Date();
-                    syncLabel.innerText = "Last Sync: " + now.toLocaleTimeString();
-                    syncLabel.style.color = '#28a745';
-                }
-            })
-            .catch(err => {
-                console.error("Gagal sinkronisasi:", err);
-                if (syncLabel) {
-                    syncLabel.innerText = "Sync Failed: " + new Date().toLocaleTimeString();
-                    syncLabel.style.color = '#dc3545';
-                }
-            });
-    }
+                        // Success Visual
+                        if (syncLabel) {
+                            const now = new Date();
+                            syncLabel.innerText = "Last Sync: " + now.toLocaleTimeString();
+                            syncLabel.style.color = '#28a745';
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Gagal sinkronisasi:", err);
+                        if (syncLabel) {
+                            syncLabel.innerText = "Sync Failed: " + new Date().toLocaleTimeString();
+                            syncLabel.style.color = '#dc3545';
+                        }
+                    });
+            }
 
-    // Jalankan
-    setInterval(updateStats, 30000); // 30 Detik
-    window.addEventListener('load', updateStats);
-})();
-</script>
+            // Jalankan
+            setInterval(updateStats, 30000); // 30 Detik
+            window.addEventListener('load', updateStats);
+        })();
+    </script>
 
-<!-- Modal Viewer Evidence -->
-<div id="modalViewerEvidence" class="custom-modal" style="display: none;">
-    <div class="modal-content bg-transparent border-0 shadow-none" style="background: transparent; box-shadow: none;">
-        <span class="close-modal-evidence" style="position: absolute; top: -40px; right: 0; font-size: 40px; color: white; cursor: pointer;">&times;</span>
-        <div id="evidenceContainer" style="display: flex; justify-content: center; align-items: center; min-height: 200px;">
-            <!-- Content will be injected here -->
+    <!-- Modal Viewer Evidence -->
+    <div id="modalViewerEvidence" class="custom-modal" style="display: none;">
+        <div class="modal-content bg-transparent border-0 shadow-none"
+            style="background: transparent; box-shadow: none;">
+            <span class="close-modal-evidence"
+                style="position: absolute; top: -40px; right: 0; font-size: 40px; color: white; cursor: pointer;">&times;</span>
+            <div id="evidenceContainer"
+                style="display: flex; justify-content: center; align-items: center; min-height: 200px;">
+                <!-- Content will be injected here -->
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    function viewEvidence(url) {
-        const modal = document.getElementById('modalViewerEvidence');
-        const container = document.getElementById('evidenceContainer');
-        if (!modal || !container) return;
-        
-        const ext = url.split('.').pop().toLowerCase();
-        const videoExts = ['mp4', 'mov', 'avi', 'webm'];
-        
-        container.innerHTML = 'Loading...';
-        
-        if (videoExts.includes(ext)) {
-            container.innerHTML = `<video src="${url}" controls autoplay class="img-fluid rounded shadow-lg" style="max-height: 85vh; width: auto; max-width: 95vw;"></video>`;
-        } else {
-            container.innerHTML = `<img src="${url}" class="img-fluid rounded shadow-lg" style="max-height: 85vh; width: auto; max-width: 95vw; object-fit: contain;">`;
-        }
-        
-        modal.style.display = 'flex';
-    }
-
-    // Close function for the manual modal
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('close-modal-evidence') || e.target.id === 'modalViewerEvidence') {
+    <script>
+        function viewEvidence(url) {
             const modal = document.getElementById('modalViewerEvidence');
-            if (modal) {
-                modal.style.display = 'none';
-                document.getElementById('evidenceContainer').innerHTML = ''; // reset content
+            const container = document.getElementById('evidenceContainer');
+            if (!modal || !container) return;
+
+            const ext = url.split('.').pop().toLowerCase();
+            const videoExts = ['mp4', 'mov', 'avi', 'webm'];
+
+            container.innerHTML = 'Loading...';
+
+            if (videoExts.includes(ext)) {
+                container.innerHTML = `<video src="${url}" controls autoplay class="img-fluid rounded shadow-lg" style="max-height: 85vh; width: auto; max-width: 95vw;"></video>`;
+            } else {
+                container.innerHTML = `<img src="${url}" class="img-fluid rounded shadow-lg" style="max-height: 85vh; width: auto; max-width: 95vw; object-fit: contain;">`;
             }
+
+            modal.style.display = 'flex';
         }
-    });
 
-    // Handle close button click specifically
-    const closeEvBtn = document.querySelector('.close-modal-evidence');
-    if(closeEvBtn) {
-        closeEvBtn.onclick = function() {
-            document.getElementById('modalViewerEvidence').style.display = 'none';
-        };
-    }
+        // Close function for the manual modal
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('close-modal-evidence') || e.target.id === 'modalViewerEvidence') {
+                const modal = document.getElementById('modalViewerEvidence');
+                if (modal) {
+                    modal.style.display = 'none';
+                    document.getElementById('evidenceContainer').innerHTML = ''; // reset content
+                }
+            }
+        });
 
-    function openSparepartModal(mode, id = null, site_id = '', name = '', qty = 1, desc = '', status = 'Pending') {
-        const modal = document.getElementById('sparepartModal');
-        const form = document.getElementById('sparepartForm');
-        const titleSpan = document.getElementById('sparepartModalTitle').querySelector('span');
-        const methodInput = document.getElementById('sparepartFormMethod');
-        const statusGroup = document.getElementById('statusGroup');
-        
-        form.querySelectorAll('input, select, textarea').forEach(el => el.style.borderColor = '#ddd');
-
-        if(mode === 'add') {
-            titleSpan.innerText = 'Tambah Kebutuhan Sparepart';
-            form.action = "{{ route('sparepart.needed.store') }}";
-            methodInput.value = 'POST';
-            
-            // Trigger Select2 update
-            $('#sparepart_site_id').val('').trigger('change');
-            document.getElementById('sparepart_name').value = '';
-            document.getElementById('sparepart_quantity').value = '1';
-            document.getElementById('sparepart_description').value = '';
-            
-            statusGroup.style.display = 'none';
-            
-        } else if(mode === 'edit') {
-            titleSpan.innerText = 'Edit Kebutuhan Sparepart';
-            form.action = `/sparepart-needed/update/${id}`;
-            methodInput.value = 'PUT';
-            
-            // Trigger Select2 update
-            $('#sparepart_site_id').val(site_id).trigger('change');
-            document.getElementById('sparepart_name').value = name;
-            document.getElementById('sparepart_quantity').value = qty;
-            document.getElementById('sparepart_description').value = desc;
-            document.getElementById('sparepart_status').value = status;
-            
-            statusGroup.style.display = 'block';
+        // Handle close button click specifically
+        const closeEvBtn = document.querySelector('.close-modal-evidence');
+        if (closeEvBtn) {
+            closeEvBtn.onclick = function () {
+                document.getElementById('modalViewerEvidence').style.display = 'none';
+            };
         }
-        
-        modal.style.display = 'flex';
-        // Give time for Select2 to initialize before focusing
-        setTimeout(() => $('.select2-site').select2('open'), 200);
-    }
-    
-    function closeSparepartModal() {
-        document.getElementById('sparepartModal').style.display = 'none';
-    }
-    
-    document.getElementById('sparepartModal').addEventListener('click', function(e) {
-        if(e.target === this) closeSparepartModal();
-    });
-    
-    const styleSheet = document.createElement("style");
-    styleSheet.innerText = `
+
+        function openSparepartModal(mode, id = null, site_id = '', name = '', qty = 1, desc = '', status = 'Pending') {
+            const modal = document.getElementById('sparepartModal');
+            const form = document.getElementById('sparepartForm');
+            const titleSpan = document.getElementById('sparepartModalTitle').querySelector('span');
+            const methodInput = document.getElementById('sparepartFormMethod');
+            const statusGroup = document.getElementById('statusGroup');
+
+            form.querySelectorAll('input, select, textarea').forEach(el => el.style.borderColor = '#ddd');
+
+            if (mode === 'add') {
+                titleSpan.innerText = 'Tambah Kebutuhan Sparepart';
+                form.action = "{{ route('sparepart.needed.store') }}";
+                methodInput.value = 'POST';
+
+                // Trigger Select2 update
+                $('#sparepart_site_id').val('').trigger('change');
+                document.getElementById('sparepart_name').value = '';
+                document.getElementById('sparepart_quantity').value = '1';
+                document.getElementById('sparepart_description').value = '';
+
+                statusGroup.style.display = 'none';
+
+            } else if (mode === 'edit') {
+                titleSpan.innerText = 'Edit Kebutuhan Sparepart';
+                form.action = `/sparepart-needed/update/${id}`;
+                methodInput.value = 'PUT';
+
+                // Trigger Select2 update
+                $('#sparepart_site_id').val(site_id).trigger('change');
+                document.getElementById('sparepart_name').value = name;
+                document.getElementById('sparepart_quantity').value = qty;
+                document.getElementById('sparepart_description').value = desc;
+                document.getElementById('sparepart_status').value = status;
+
+                statusGroup.style.display = 'block';
+            }
+
+            modal.style.display = 'flex';
+            // Give time for Select2 to initialize before focusing
+            setTimeout(() => $('.select2-site').select2('open'), 200);
+        }
+
+        function closeSparepartModal() {
+            document.getElementById('sparepartModal').style.display = 'none';
+        }
+
+        document.getElementById('sparepartModal').addEventListener('click', function (e) {
+            if (e.target === this) closeSparepartModal();
+        });
+
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -1417,37 +1510,41 @@ document.addEventListener('DOMContentLoaded', function() {
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
     `;
-    document.head.appendChild(styleSheet);
+        document.head.appendChild(styleSheet);
 
-    function viewEvidence(url) {
-        const modal = document.getElementById('viewerEvidenceModal');
-        const container = document.getElementById('viewerEvidenceContainer');
-        const ext = url.split('.').pop().toLowerCase();
-        const videoExts = ['mp4', 'mov', 'avi', 'webm'];
+        function viewEvidence(url) {
+            const modal = document.getElementById('viewerEvidenceModal');
+            const container = document.getElementById('viewerEvidenceContainer');
+            const ext = url.split('.').pop().toLowerCase();
+            const videoExts = ['mp4', 'mov', 'avi', 'webm'];
 
-        container.innerHTML = '';
-        if (videoExts.includes(ext)) {
-            container.innerHTML = `<video src="${url}" controls autoplay></video>`;
-        } else {
-            container.innerHTML = `<img src="${url}" alt="Evidence">`;
+            container.innerHTML = '';
+            if (videoExts.includes(ext)) {
+                container.innerHTML = `<video src="${url}" controls autoplay></video>`;
+            } else {
+                container.innerHTML = `<img src="${url}" alt="Evidence">`;
+            }
+
+            modal.style.display = 'flex';
         }
 
-        modal.style.display = 'flex';
-    }
+        function closeViewerModal() {
+            document.getElementById('viewerEvidenceModal').style.display = 'none';
+            document.getElementById('viewerEvidenceContainer').innerHTML = '';
+        }
+    </script>
 
-    function closeViewerModal() {
-        document.getElementById('viewerEvidenceModal').style.display = 'none';
-        document.getElementById('viewerEvidenceContainer').innerHTML = '';
-    }
-</script>
-
-<!-- Modal Viewer Evidence Custom -->
-<div id="viewerEvidenceModal" class="custom-modal" onclick="closeViewerModal()" style="display:none; z-index: 10001;">
-    <span class="close-modal" onclick="closeViewerModal()" style="color: #fff; top: 20px; right: 30px; font-size: 40px;">&times;</span>
-    <div class="modal-content viewer-modal-content" onclick="event.stopPropagation()">
-        <div id="viewerEvidenceContainer"></div>
+    <!-- Modal Viewer Evidence Custom -->
+    <div id="viewerEvidenceModal" class="custom-modal" onclick="closeViewerModal()"
+        style="display:none; z-index: 10001;">
+        <span class="close-modal" onclick="closeViewerModal()"
+            style="color: #fff; top: 20px; right: 30px; font-size: 40px;">&times;</span>
+        <div class="modal-content viewer-modal-content" onclick="event.stopPropagation()">
+            <div id="viewerEvidenceContainer"></div>
+        </div>
     </div>
-</div>
 
+    @include('components.nav-modal-structure')
 </body>
+
 </html>

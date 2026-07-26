@@ -9,8 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}?v=1.1">
     <script src="{{ asset('js/nav-modal.js') }}"></script>
     <script src="{{ asset('js/profile-dropdown.js') }}"></script>
-    @include('components.nav-modal-structure')
-    <title>Corrective Maintenance | Project Operational</title>
+        <title>Corrective Maintenance | Project Operational</title>
     <style>
         /* Modern Table Sticky Header */
         .table-responsive-custom table thead th {
@@ -694,6 +693,7 @@
         @endif
     </script>
     <!-- SCRIPT UNTUK SEARCH OTOMATIS -->
+    @include('components.nav-modal-structure')
 </body>
 
 </html>

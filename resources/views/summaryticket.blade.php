@@ -9,8 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}?v=1.1">
     <script src="{{ asset('js/nav-modal.js') }}"></script>
     <script src="{{ asset('js/profile-dropdown.js') }}"></script>
-    @include('components.nav-modal-structure')
-    <meta charset="UTF-8">
+        <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Summary Tiket</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -318,6 +317,7 @@
                 options: chartOptions
             });
         </script>
+    @include('components.nav-modal-structure')
 </body>
 
 </html>

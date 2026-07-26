@@ -9,8 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}?v=1.1">
     <script src="{{ asset('js/nav-modal.js') }}"></script>
     <script src="{{ asset('js/profile-dropdown.js') }}"></script>
-    @include('components.nav-modal-structure')
-    <meta charset="UTF-8">
+        <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spare Tracker | Project Operational</title>
     <style>
@@ -187,6 +186,7 @@
         <a href="{{ route('pergantianperangkat') }}" class="tab {{ request()->is('pergantianperangkat*') ? 'active' : '' }}" style="text-decoration: none; color: Black;">Pergantian Perangkat</a>
         <a href="{{ url('/logpergantian') }}" class="tab {{ request()->is('logpergantian*') ? 'active' : '' }}" style="text-decoration: none; color: Black;">Log Perangkat</a>
         <a href="{{ url('/sparetracker') }}" class="tab {{ request()->is('sparetracker*') ? 'active' : '' }}" style="text-decoration: none; color: White;">Spare Tracker</a>
+        <a href="{{ url('/pengiriman') }}" class="tab {{ request()->is('pengiriman*') ? 'active' : '' }}" style="text-decoration: none; color: Black;">Pengiriman</a>
         <a href="{{ url('/pm-summary') }}" class="tab {{ request()->is('pm-summary*') ? 'active' : '' }}" style="text-decoration: none; color: Black;">Summary</a>
         <div class="ms-auto d-flex align-items-center">
             <span class="summary-badge text-black">Total Spare: <b>{{ $totalSpare }}</b></span>
@@ -417,6 +417,15 @@
                     @if(auth()->check() && auth()->user()->hasAdminAccess())
                     <td class="text-center sticky-col-right">
                         <div class="d-flex gap-2 justify-content-center align-items-center">
+                            @if($item->status_penggunaan_sparepart === 'Proses Repair')
+                                <button class="btn btn-sm btn-outline-primary p-0 border-0 shadow-none" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modalRepairStatus{{ $item->id }}"
+                                        title="Update Status Repair"
+                                        style="font-size: 1rem;">
+                                    <i class="bi bi-wrench-adjustable"></i>
+                                </button>
+                            @endif
                             <button class="btn btn-sm bi bi-pencil text-dark p-0 border-0 shadow-none" 
                                     data-bs-toggle="modal" 
                                     data-bs-target="#modalEditSpare{{ $item->id }}"
@@ -432,6 +441,51 @@
                     </td>
                     @endif
                 </tr>
+
+                {{-- Modal Update Repair Status --}}
+                @if($item->status_penggunaan_sparepart === 'Proses Repair')
+                <div class="modal fade" id="modalRepairStatus{{ $item->id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content rounded-4 border-0 shadow-lg text-start">
+                            <div class="modal-header text-white d-flex justify-content-center position-relative" style="background-color: #198754; border-radius: 15px 15px 0 0;">
+                                <h5 class="modal-title w-100 text-center fw-bold"><i class="bi bi-wrench-adjustable"></i> Update Hasil Repair</h5>
+                                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body pt-4">
+                                <div class="mb-3">
+                                    <p class="text-muted mb-1" style="font-size: 0.85rem;">Perangkat:</p>
+                                    <h6 class="fw-bold">{{ $item->nama_perangkat }} <span class="text-muted fw-normal">(SN: {{ $item->sn }})</span></h6>
+                                </div>
+                                <form action="{{ route('inventory.tracker.update-repair', $item->id) }}" method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Hasil Repair <span class="text-danger">*</span></label>
+                                        <div class="d-flex gap-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="hasil_repair" value="Kondisi Baik" id="repair_baik_{{ $item->id }}" required>
+                                                <label class="form-check-label text-success fw-bold" for="repair_baik_{{ $item->id }}">
+                                                    <i class="bi bi-check-circle-fill"></i> Kondisi Baik
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="hasil_repair" value="Kondisi Buruk" id="repair_buruk_{{ $item->id }}">
+                                                <label class="form-check-label text-danger fw-bold" for="repair_buruk_{{ $item->id }}">
+                                                    <i class="bi bi-x-circle-fill"></i> Kondisi Buruk
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-end gap-2 mt-4">
+                                        <button type="button" class="btn btn-light px-4 rounded-3 border" data-bs-dismiss="modal">Batal</button>
+                                        <button type="submit" class="btn btn-success px-4 rounded-3">Update Status</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
                         <!-- Modal Edit Spare -->
                         <div class="modal fade" id="modalEditSpare{{ $item->id }}" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog modal-xl modal-dialog-scrollable">
@@ -558,6 +612,7 @@
         </div>
     </div>
 </div>
+    @include('components.nav-modal-structure')
 </body>
 </html>
 
