@@ -10,10 +10,26 @@
     <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}?v=1.1">
     <script src="{{ asset('js/nav-modal.js') }}"></script>
     <script src="{{ asset('js/profile-dropdown.js') }}"></script>
-        <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sparepart Needed | Project Operational</title>
     <style>
+        /* Custom Select2 Dropdown for SN */
+        .select2-sn-dropdown .select2-results__options {
+            max-height: 130px !important;
+            overflow-y: auto !important;
+        }
+        /* Each result item smaller */
+        .select2-sn-dropdown .select2-results__option {
+            padding: 4px 8px !important;
+            font-size: 0.8rem !important;
+        }
+        .select2-sn-dropdown .select2-search--dropdown {
+            padding: 5px 8px !important;
+        }
+        .select2-sn-dropdown .select2-search__field {
+            font-size: 0.82rem !important;
+        }
         /* Modern Table Sticky Header */
         .table-responsive-custom table thead th {
             position: sticky;
@@ -142,8 +158,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <style>
         .tabs-section {
             flex-wrap: wrap;
@@ -230,6 +250,15 @@
             background: linear-gradient(135deg, #1a6fc4, #0d5dbc);
         }
 
+        [data-bs-theme="dark"] .search-box {
+            background: #2b3035 !important;
+            border-color: #495057 !important;
+        }
+
+        [data-bs-theme="dark"] .search-box input {
+            color: #f8f9fa !important;
+        }
+
         /* Sweet Alert Blur Backdrop */
         .swal2-backdrop-blur {
             backdrop-filter: blur(6px) !important;
@@ -242,6 +271,190 @@
             object-fit: contain !important;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* ================================================
+           Select2 Custom Styling — SN Perangkat Search
+           ================================================ */
+
+        /* Kotak pemilih utama (trigger) */
+        .select2-container--bootstrap-5 .select2-selection {
+            border-radius: 10px !important;
+            min-height: 44px !important;
+            height: auto !important;
+            display: flex !important;
+            align-items: center !important;
+            border: 1.5px solid #c8d6e5 !important;
+            font-size: 0.875rem !important;
+            background: #fff !important;
+            transition: border-color 0.2s, box-shadow 0.2s !important;
+        }
+        .select2-container--bootstrap-5 .select2-selection:focus,
+        .select2-container--bootstrap-5.select2-container--focus .select2-selection {
+            border-color: #4a9eff !important;
+            box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.18) !important;
+            outline: none !important;
+        }
+        .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+            padding-left: 12px !important;
+            padding-right: 36px !important;
+            color: #333 !important;
+            font-size: 0.875rem !important;
+            line-height: 42px !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+        .select2-container--bootstrap-5 .select2-selection--single .select2-selection__placeholder {
+            color: #9aa5b4 !important;
+        }
+        .select2-container--bootstrap-5 .select2-selection__arrow {
+            height: 44px !important;
+            right: 10px !important;
+        }
+        /* Dropdown container */
+        .select2-container--bootstrap-5 .select2-dropdown {
+            border-radius: 12px !important;
+            border: 1.5px solid #c8d6e5 !important;
+            box-shadow: 0 8px 32px rgba(30, 60, 120, 0.13) !important;
+            overflow: hidden !important;
+            background: #fff !important;
+            margin-top: 4px !important;
+            min-width: 420px !important;
+        }
+        /* Kotak pencarian di dalam dropdown */
+        .select2-container--bootstrap-5 .select2-search--dropdown {
+            padding: 10px 12px 8px 12px !important;
+            background: #f7f9fc !important;
+            border-bottom: 1px solid #e8eef5 !important;
+        }
+        .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+            border-radius: 8px !important;
+            border: 1.5px solid #4a9eff !important;
+            padding: 8px 14px !important;
+            font-size: 0.875rem !important;
+            width: 100% !important;
+            margin: 0 !important;
+            background: #fff !important;
+            color: #333 !important;
+            box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1) !important;
+            outline: none !important;
+            transition: border-color 0.2s, box-shadow 0.2s !important;
+        }
+        .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field:focus {
+            border-color: #1a7bff !important;
+            box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.22) !important;
+        }
+        /* Daftar opsi */
+        .select2-container--bootstrap-5 .select2-results__options {
+            max-height: 230px !important;
+            overflow-y: auto !important;
+            padding: 4px 0 !important;
+        }
+        .select2-container--bootstrap-5 .select2-results__options::-webkit-scrollbar {
+            width: 6px;
+        }
+        .select2-container--bootstrap-5 .select2-results__options::-webkit-scrollbar-thumb {
+            background: #c8d6e5;
+            border-radius: 4px;
+        }
+        .select2-results__option {
+            padding: 9px 16px !important;
+            font-size: 0.825rem !important;
+            border-bottom: 1px solid #f0f4f8 !important;
+            color: #3a4a5a !important;
+            cursor: pointer !important;
+            transition: background 0.15s !important;
+        }
+        .select2-results__option:last-child {
+            border-bottom: none !important;
+        }
+        .select2-results__option--highlighted {
+            background-color: #e8f1fd !important;
+            color: #1a5bbf !important;
+            font-weight: 500 !important;
+        }
+        /* Optgroup label */
+        .select2-results__group {
+            padding: 6px 14px 4px 14px !important;
+            font-size: 0.72rem !important;
+            font-weight: 700 !important;
+            color: #7a8fa6 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.04em !important;
+            background: #f7f9fc !important;
+            border-bottom: 1px solid #e8eef5 !important;
+        }
+        /* Item yang sudah dipilih — sembunyikan dari dropdown */
+        .select2-container--bootstrap-5 .select2-results__option[aria-selected="true"] {
+            display: none !important;
+        }
+        /* Tag terpilih (multiple) */
+        .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice {
+            font-size: 0.8rem;
+            padding: 2px 10px;
+            margin-top: 5px;
+            border-radius: 6px;
+            background: #e8f1fd;
+            border: 1px solid #aac8f5;
+            color: #1a5bbf;
+        }
+        /* Pastikan dropdown muncul di atas modal */
+        .select2-container--open {
+            z-index: 9999 !important;
+        }
+        /* Dropdown above fix */
+        .select2-dropdown--above {
+            border-top: 1.5px solid #c8d6e5 !important;
+            border-bottom: none !important;
+            border-radius: 12px !important;
+            margin-bottom: 4px !important;
+            margin-top: 0 !important;
+        }
+        /* Pesan tidak ada hasil */
+        .select2-results__message {
+            padding: 12px 16px !important;
+            font-size: 0.825rem !important;
+            color: #9aa5b4 !important;
+            text-align: center !important;
+        }
+
+        /* ---- Dua-baris item SN di dropdown ---- */
+        .s2-item-sn {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            padding: 1px 0;
+            max-width: 100%;
+            overflow: hidden;
+        }
+        .s2-item-sn__code {
+            font-weight: 600;
+            font-size: 0.82rem;
+            color: #1a3a5c;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.3;
+        }
+        .s2-item-sn__info {
+            font-size: 0.72rem;
+            color: #6b7e96;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.2;
+        }
+        /* Saat di-hover: ubah warna teks info */
+        .select2-results__option--highlighted .s2-item-sn__code {
+            color: #1a5bbf;
+        }
+        .select2-results__option--highlighted .s2-item-sn__info {
+            color: #5a8fd8;
+        }
+        /* Padding lebih besar untuk item dua baris */
+        .select2-results__option:has(.s2-item-sn) {
+            padding: 7px 14px !important;
         }
     </style>
     <style>
@@ -575,36 +788,77 @@
     <div class="content-container mt-4">
         <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3"
             style="margin-bottom: 20px;">
-            <h5 class="m-0 fw-bold"><i class="bi bi-file-earmark-text"></i> Data Formulir Pengajuan</h5>
-            <div class="d-flex align-items-center gap-2 ms-auto">
-                <form method="GET" action="{{ route('sparepart_needed') }}" class="m-0 d-flex gap-2"
-                    id="filterPengajuanForm">
-                    @if(request('search')) <input type="hidden" name="search" value="{{ request('search') }}"> @endif
-                    @if(request('status')) <input type="hidden" name="status" value="{{ request('status') }}"> @endif
-                    @if(request('sparepart_page')) <input type="hidden" name="sparepart_page"
-                    value="{{ request('sparepart_page') }}"> @endif
-
-                    <select name="tipe_pengajuan" class="form-select form-select-sm">
-                        <option value="">Klasifikasi</option>
-                        <option value="Pembelian Baru" {{ request('tipe_pengajuan') === 'Pembelian Baru' ? 'selected' : '' }}>Pembelian Baru</option>
-                        <option value="Repair Perangkat" {{ request('tipe_pengajuan') === 'Repair Perangkat' ? 'selected' : '' }}>Repair Perangkat</option>
-                    </select>
-
-                    <select name="status_pembayaran" class="form-select form-select-sm">
-                        <option value="">Pembayaran</option>
-                        <option value="belum_dibayar" {{ request('status_pembayaran') === 'belum_dibayar' ? 'selected' : '' }}>Belum Dibayar</option>
-                        <option value="dp_50" {{ request('status_pembayaran') === 'dp_50' ? 'selected' : '' }}>Sudah di DP
-                            50%</option>
-                        <option value="lunas" {{ request('status_pembayaran') === 'lunas' ? 'selected' : '' }}>Sudah Lunas
-                        </option>
-                    </select>
-                </form>
+            <div class="actions flex-shrink-0">
                 @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin', 'user', 'noc_leader']))
-                    <button type="button" class="btn-buat-pengajuan" data-bs-toggle="modal"
-                        data-bs-target="#modalPrintPengajuan" title="Buat Pengajuan Baru">
-                        <i class="bi bi-plus-circle-fill"></i> Buat Pengajuan
+                    <button type="button" class="btn btn-primary rounded-pill d-flex align-items-center gap-2 px-4 shadow-sm" data-bs-toggle="modal"
+                        data-bs-target="#modalPrintPengajuan" title="Buat Pengajuan Baru" style="height: 40px;">
+                        <i class="bi bi-plus-lg"></i> Buat Pengajuan
                     </button>
                 @endif
+            </div>
+            <div class="w-100 mt-2 mt-lg-0">
+                <form method="GET" action="{{ route('sparepart_needed') }}"
+                    class="search-form row g-2 align-items-center w-100 m-0 justify-content-lg-end"
+                    id="filterPengajuanForm">
+
+                    <div class="col-12 col-md-auto">
+                        <select name="tipe_pengajuan" class="form-select form-select-sm w-100"
+                            style="border-radius: 50px;">
+                            <option value="">Semua Klasifikasi</option>
+                            <option value="Pembelian Baru" {{ request('tipe_pengajuan') === 'Pembelian Baru' ? 'selected' : '' }}>Pembelian Baru</option>
+                            <option value="Repair Perangkat" {{ request('tipe_pengajuan') === 'Repair Perangkat' ? 'selected' : '' }}>Repair Perangkat</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12 col-md-auto">
+                        <select name="status_pembayaran" class="form-select form-select-sm w-100"
+                            style="border-radius: 50px;">
+                            <option value="">Semua Status Bayar</option>
+                            <option value="belum_dibayar" {{ request('status_pembayaran') === 'belum_dibayar' ? 'selected' : '' }}>Belum Dibayar</option>
+                            <option value="dp_50" {{ request('status_pembayaran') === 'dp_50' ? 'selected' : '' }}>Sudah
+                                di DP 50%</option>
+                            <option value="lunas" {{ request('status_pembayaran') === 'lunas' ? 'selected' : '' }}>Sudah
+                                Lunas</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12 col-md-auto">
+                        <select name="approval_status" class="form-select form-select-sm w-100"
+                            style="border-radius: 50px;">
+                            <option value="">Semua Status</option>
+                            <option value="pending_noc" {{ request('approval_status') == 'pending_noc' ? 'selected' : '' }}>Pending NOC Leader</option>
+                            <option value="pending" {{ request('approval_status') == 'pending' ? 'selected' : '' }}>
+                                Pending Manager</option>
+                            <option value="approved_manager" {{ request('approval_status') == 'approved_manager' ? 'selected' : '' }}>Pending Accounting</option>
+                            <option value="approved_accounting" {{ request('approval_status') == 'approved_accounting' ? 'selected' : '' }}>Pending Direktur</option>
+                            <option value="approved_direktur" {{ request('approval_status') == 'approved_direktur' ? 'selected' : '' }}>Pending Penasihat</option>
+                            <option value="approved_penasihat" {{ request('approval_status') == 'approved_penasihat' ? 'selected' : '' }}>Selesai (Approved)</option>
+                            <option value="rejected" {{ request('approval_status') == 'rejected' ? 'selected' : '' }}>
+                                Ditolak</option>
+                        </select>
+                    </div>
+
+                    <div class="col-auto">
+                        <button type="submit" class="btn-filter-pill w-100 justify-content-center">
+                            <i class="bi bi-funnel"></i> Filter
+                        </button>
+                    </div>
+                    <div class="col-auto">
+                        <a href="{{ route('sparepart_needed') }}"
+                            class="btn btn-light btn-sm rounded-pill border d-flex align-items-center justify-content-center h-100"
+                            style="padding: 8px 12px;" title="Reset Filter"><i class="bi bi-arrow-repeat"></i></a>
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <div class="search-box d-flex align-items-center w-100"
+                            style="font-size: 13px; padding: 5px 15px; border-radius: 50px; background: #f8f9fa; border: 1px solid #dee2e6;">
+                            <input type="text" name="search_pengajuan" id="searchPengajuanInput"
+                                placeholder="Cari No / Divisi / Perangkat" value="{{ request('search_pengajuan') }}"
+                                style="flex-grow: 1; border: none; outline: none; padding-left: 10px; background: transparent; font-size: 13px;">
+                            <button type="submit" style="border: none; background: transparent;"><i
+                                    class="bi bi-search"></i></button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -614,8 +868,8 @@
                     <tr>
                         <th class="text-center" style="width: 50px;">NO</th>
                         <th style="min-width: 150px;">TANGGAL & NOMOR</th>
-                        <th style="min-width: 200px;">DIVISI</th>
                         <th style="min-width: 300px;">DETAIL PERANGKAT</th>
+                        <th style="min-width: 200px;">SN PERANGKAT</th>
                         <th class="text-end" style="min-width: 130px;">TOTAL DANA</th>
                         <th class="text-center" style="min-width: 150px;">STATUS PEMBAYARAN</th>
                         <th class="text-center" style="min-width: 150px;">PROGRESS APPROVAL</th>
@@ -637,9 +891,6 @@
                                             class="bi bi-cart-plus me-1"></i>Pembelian</span>
                                 @endif
                             </td>
-                            <td>
-                                <div class="small text-dark">{{ $p->divisi }}</div>
-                            </td>
                             <td style="max-width: 300px;">
                                 <div class="small text-dark text-truncate">
                                     @if(is_array($p->items))
@@ -649,6 +900,20 @@
                                             }, $p->items);
                                         @endphp
                                         {{ implode(', ', $perangkatList) }}
+                                    @else
+                                        -
+                                    @endif
+                                </div>
+                            </td>
+                            <td style="max-width: 200px;">
+                                <div class="small text-dark text-truncate">
+                                    @if(is_array($p->items))
+                                        @php
+                                            $snList = array_map(function ($i) {
+                                                return !empty($i['sn_perangkat']) ? $i['sn_perangkat'] : '-';
+                                            }, $p->items);
+                                        @endphp
+                                        {{ implode(', ', $snList) }}
                                     @else
                                         -
                                     @endif
@@ -1412,19 +1677,69 @@
                                         <input type="text" name="keterangan[]" class="form-control" value="-">
                                     </div>
                                 </div>
-                                <div class="row mt-2 repair-fields"
-                                    style="display: none; background-color: #f8d7da; padding: 10px; border-radius: 5px;">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold text-danger" style="font-size: 0.85rem;">SN
-                                            Perangkat (Wajib)</label>
-                                        <input type="text" name="sn_perangkat[]" class="form-control input-sn"
-                                            placeholder="Contoh: SN-12345">
+                                <div class="row mt-3 repair-fields"
+                                    style="display: none; background: linear-gradient(135deg, #fff5f5 0%, #fff0f0 100%); padding: 16px; border-radius: 10px; border: 1.5px solid #f5c6c6; gap: 0;">
+                                    <div class="col-12 mb-2">
+                                        <div class="d-flex align-items-center gap-2 mb-2" style="border-bottom: 1px solid #f5c6c6; padding-bottom: 8px;">
+                                            <span style="background:#dc3545;border-radius:6px;padding:4px 8px;display:inline-flex;align-items:center;">
+                                                <i class="bi bi-cpu-fill text-white" style="font-size:0.85rem;"></i>
+                                            </span>
+                                            <span class="fw-bold text-danger" style="font-size:0.82rem;">Informasi Perangkat yang di-Repair</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 mb-2">
+                                        <label class="form-label fw-semibold text-danger mb-1" style="font-size: 0.82rem;">
+                                            <i class="bi bi-upc-scan me-1"></i>SN Perangkat yang akan direpair <span class="badge bg-danger" style="font-size:0.65rem;">Wajib</span>
+                                        </label>
+                                        <input type="hidden" class="hidden-sn">
+                                        <div class="sn-custom-dropdown" style="position:relative;">
+                                            {{-- Trigger button --}}
+                                            <div class="sn-trigger form-control d-flex align-items-center justify-content-between"
+                                                style="cursor:pointer; font-size:0.85rem; border:1.5px solid #dee2e6; border-radius:6px; background:#fff; user-select:none;">
+                                                <span class="sn-trigger-text text-muted">-- Pilih SN --</span>
+                                                <i class="bi bi-chevron-down text-muted" style="font-size:0.75rem;"></i>
+                                            </div>
+                                            {{-- Dropdown panel (hidden by default) --}}
+                                            <div class="sn-dropdown-panel" style="display:none; position:absolute; top:100%; left:0; right:0; z-index:9999; background:#fff; border:1.5px solid #4f8ef7; border-radius:6px; box-shadow:0 4px 15px rgba(0,0,0,0.12); margin-top:2px;">
+                                                <div style="padding:6px 8px; border-bottom:1px solid #e3ecfc; background:#f0f5ff;">
+                                                    <input type="text" class="form-control form-control-sm sn-search-input"
+                                                        placeholder="🔍 Ketik SN atau nama perangkat..."
+                                                        autocomplete="off"
+                                                        style="border:1.5px solid #4f8ef7; border-radius:5px; font-size:0.82rem;">
+                                                </div>
+                                                <select name="sn_perangkat[]" class="form-select input-sn sn-list-select"
+                                                    size="6"
+                                                    style="border:none; border-radius:0 0 6px 6px; font-size:0.8rem; height:140px; overflow-y:auto;">
+                                                    <option value="">-- Pilih SN --</option>
+                                                    @foreach($allSNs['sparetracker'] as $sn)
+                                                        @if(!empty(trim($sn->sn)) && trim($sn->sn) !== '-' && strtolower(trim($sn->sn)) !== 'unreadable')
+                                                        @php
+                                                            $info = collect([$sn->nama_perangkat, $sn->jenis, $sn->kondisi, $sn->lokasi])
+                                                                ->filter()->implode(' | ');
+                                                        @endphp
+                                                        <option value="{{ $sn->sn }}">{{ $sn->sn }}{{ $info ? ' — '.$info : '' }}</option>
+                                                        @endif
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="mt-1" style="font-size:0.75rem; color:#888;">
+                                            <i class="bi bi-info-circle me-1"></i>Ketik SN atau nama perangkat untuk mencari
+                                        </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold text-danger" style="font-size: 0.85rem;"><i
-                                                class="bi bi-image me-1"></i>Foto SN</label>
-                                        <input type="file" name="foto_sn[]" class="form-control input-foto-sn"
-                                            accept="image/*">
+                                        <label class="form-label fw-semibold text-danger mb-1" style="font-size: 0.82rem;"><i class="bi bi-image me-1"></i>Foto SN Perangkat <span class="badge bg-danger" style="font-size:0.65rem;">Wajib</span></label>
+                                        <input type="file" name="foto_sn[]" class="form-control form-control-sm input-foto-sn" accept="image/*" style="border-radius:8px;">
+                                    </div>
+                                    {{-- Auto-fill foto perangkat dari Spare Tracker --}}
+                                    <div class="col-md-6 mt-0 sn-foto-preview-create" style="display:none;">
+                                        <label class="form-label fw-semibold text-danger mb-1" style="font-size: 0.82rem;"><i class="bi bi-camera-fill me-1"></i>Foto Perangkat (Spare Tracker)</label>
+                                        <div class="d-flex align-items-center gap-3 p-2 bg-white rounded border">
+                                            <a class="sn-foto-link" href="#" target="_blank">
+                                                <img class="sn-foto-img" src="" alt="foto perangkat" style="max-height:80px;max-width:120px;border-radius:6px;border:1px solid #ddd;object-fit:cover;cursor:pointer;">
+                                            </a>
+                                            <p class="mb-0 text-muted" style="font-size:0.75rem;">Klik gambar untuk melihat penuh</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1647,22 +1962,76 @@
                                                     </div>
                                                 </div>
                                                 {{-- Repair Fields (shown/hidden dynamically) --}}
-                                                <div class="row mt-2 edit-repair-fields-{{ $p->id }} {{ $p->tipe_pengajuan === 'Repair Perangkat' ? '' : 'd-none' }}"
-                                                    style="background-color: #f8d7da; padding: 10px; border-radius: 5px;">
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-bold text-danger" style="font-size: 0.85rem;">SN
-                                                            Perangkat</label>
-                                                        <input type="text" name="sn_perangkat[]" class="form-control"
-                                                            value="{{ $item['sn_perangkat'] ?? '' }}" placeholder="Contoh: SN-12345">
+                                                <div class="row mt-3 edit-repair-fields-{{ $p->id }} {{ $p->tipe_pengajuan === 'Repair Perangkat' ? '' : 'd-none' }}"
+                                                    style="background: linear-gradient(135deg, #fff5f5 0%, #fff0f0 100%); padding: 16px; border-radius: 10px; border: 1.5px solid #f5c6c6; gap: 0;">
+                                                    <div class="col-12 mb-2">
+                                                        <div class="d-flex align-items-center gap-2 mb-2" style="border-bottom: 1px solid #f5c6c6; padding-bottom: 8px;">
+                                                            <span style="background:#dc3545;border-radius:6px;padding:4px 8px;display:inline-flex;align-items:center;">
+                                                                <i class="bi bi-cpu-fill text-white" style="font-size:0.85rem;"></i>
+                                                            </span>
+                                                            <span class="fw-bold text-danger" style="font-size:0.82rem;">Informasi Perangkat yang di-Repair</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12 mb-2">
+                                                        <label class="form-label fw-semibold text-danger mb-1" style="font-size: 0.82rem;">
+                                                            <i class="bi bi-upc-scan me-1"></i>SN Perangkat yang direpair <span class="badge bg-danger" style="font-size:0.65rem;">Wajib</span>
+                                                        </label>
+                                                        <input type="hidden" class="hidden-sn" value="{{ $item['sn_perangkat'] ?? '' }}">
+                                                        <div class="sn-custom-dropdown" style="position:relative;">
+                                                            {{-- Trigger button --}}
+                                                            <div class="sn-trigger form-control d-flex align-items-center justify-content-between"
+                                                                style="cursor:pointer; font-size:0.85rem; border:1.5px solid #dee2e6; border-radius:6px; background:#fff; user-select:none;">
+                                                                <span class="sn-trigger-text {{ empty($item['sn_perangkat']) ? 'text-muted' : 'fw-semibold text-dark' }}">
+                                                                    {{ !empty($item['sn_perangkat']) ? $item['sn_perangkat'] : '-- Pilih SN --' }}
+                                                                </span>
+                                                                <i class="bi bi-chevron-down text-muted" style="font-size:0.75rem;"></i>
+                                                            </div>
+                                                            {{-- Dropdown panel (hidden by default) --}}
+                                                            <div class="sn-dropdown-panel" style="display:none; position:absolute; top:100%; left:0; right:0; z-index:9999; background:#fff; border:1.5px solid #4f8ef7; border-radius:6px; box-shadow:0 4px 15px rgba(0,0,0,0.12); margin-top:2px;">
+                                                                <div style="padding:6px 8px; border-bottom:1px solid #e3ecfc; background:#f0f5ff;">
+                                                                    <input type="text" class="form-control form-control-sm sn-search-input"
+                                                                        placeholder="🔍 Ketik SN atau nama perangkat..."
+                                                                        autocomplete="off"
+                                                                        style="border:1.5px solid #4f8ef7; border-radius:5px; font-size:0.82rem;">
+                                                                </div>
+                                                                <select name="sn_perangkat[]" class="form-select sn-list-select"
+                                                                    size="6"
+                                                                    style="border:none; border-radius:0 0 6px 6px; font-size:0.8rem; height:140px; overflow-y:auto;">
+                                                                    <option value="">-- Pilih SN --</option>
+                                                                    @foreach($allSNs['sparetracker'] as $sn)
+                                                                        @if(!empty(trim($sn->sn)) && trim($sn->sn) !== '-' && strtolower(trim($sn->sn)) !== 'unreadable')
+                                                                        @php
+                                                                            $info = collect([$sn->nama_perangkat, $sn->jenis, $sn->kondisi, $sn->lokasi])
+                                                                                ->filter()->implode(' | ');
+                                                                        @endphp
+                                                                        <option value="{{ $sn->sn }}" {{ ($item['sn_perangkat'] ?? '') === $sn->sn ? 'selected' : '' }}>{{ $sn->sn }}{{ $info ? ' — '.$info : '' }}</option>
+                                                                        @endif
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mt-1" style="font-size:0.75rem; color:#888;">
+                                                            <i class="bi bi-info-circle me-1"></i>Ketik SN atau nama perangkat untuk mencari
+                                                        </div>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <label class="form-label fw-bold text-danger" style="font-size: 0.85rem;"><i
-                                                                class="bi bi-image me-1"></i>Foto SN</label>
+                                                        <label class="form-label fw-semibold text-danger mb-1" style="font-size: 0.82rem;"><i
+                                                                class="bi bi-image me-1"></i>Foto SN <span class="badge bg-danger" style="font-size:0.65rem;">Wajib</span></label>
                                                         @if(!empty($item['foto_sn']))
                                                             <div class="mb-1"><small class="text-success"><i class="bi bi-check-circle"></i>
                                                                     Sudah ada foto</small></div>
                                                         @endif
-                                                        <input type="file" name="foto_sn[]" class="form-control" accept="image/*">
+                                                        <input type="file" name="foto_sn[]" class="form-control form-control-sm input-foto-sn" accept="image/*" style="border-radius:8px;">
+                                                    </div>
+                                                    {{-- Auto-fill foto perangkat dari Spare Tracker (Edit Modal) --}}
+                                                    <div class="col-md-6 mt-2 sn-foto-preview-edit" style="display:none;">
+                                                        <label class="form-label fw-semibold text-danger mb-1" style="font-size: 0.82rem;"><i class="bi bi-camera-fill me-1"></i>Foto Perangkat (Spare Tracker)</label>
+                                                        <div class="d-flex align-items-center gap-3 p-2 bg-white rounded border">
+                                                            <a class="sn-foto-link" href="#" target="_blank">
+                                                                <img class="sn-foto-img" src="" alt="foto perangkat" style="max-height:80px;max-width:120px;border-radius:6px;border:1px solid #ddd;object-fit:cover;cursor:pointer;">
+                                                            </a>
+                                                            <p class="mb-0 text-muted" style="font-size:0.75rem;">Klik gambar untuk melihat penuh</p>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1804,7 +2173,21 @@
                 const btnAddItem = modalElement.querySelector('.btn-add-item-trigger');
                 if (btnAddItem) {
                     btnAddItem.addEventListener('click', function () {
-                        const firstRow = itemsContainer.querySelector('.item-row').cloneNode(true);
+                        // Destroy Select2 temporarily on the first row to clean up cloning
+                        const firstRowSource = itemsContainer.querySelector('.item-row');
+                        const selectElement = firstRowSource.querySelector('.select2-sn-create');
+                        if (selectElement && $(selectElement).hasClass('select2-hidden-accessible')) {
+                            $(selectElement).select2('destroy');
+                        }
+
+                        const firstRow = firstRowSource.cloneNode(true);
+
+                        // Re-init Select2 on the source row
+                        if (selectElement && typeof initCreateSN === 'function') {
+                            initCreateSN();
+                        } else if (selectElement) {
+                            $(selectElement).select2({ theme: 'bootstrap-5', tags: true, width: '100%', dropdownParent: $('#modalPrintPengajuan') });
+                        }
 
                         // Clear values in cloned row
                         firstRow.querySelectorAll('input').forEach(input => {
@@ -1816,6 +2199,13 @@
                             else if (input.classList.contains('input-subtotal')) input.value = '0';
                             else input.value = '';
                         });
+
+                        // Clear selected options in cloned select
+                        const clonedSelect = firstRow.querySelector('.select2-sn-create');
+                        if (clonedSelect) {
+                            clonedSelect.innerHTML = clonedSelect.innerHTML; // clear state if needed
+                            Array.from(clonedSelect.options).forEach(opt => opt.selected = false);
+                        }
 
                         // Make sure there is a remove button
                         let btnRemove = firstRow.querySelector('.btn-remove-item');
@@ -1833,6 +2223,13 @@
 
                         itemsContainer.appendChild(firstRow);
                         calculateTotal();
+
+                        // Re-init Select2 on the new row
+                        if (typeof initCreateSN === 'function') {
+                            initCreateSN();
+                        } else if (clonedSelect) {
+                            $(clonedSelect).select2({ theme: 'bootstrap-5', tags: true, width: '100%', dropdownParent: $('#modalPrintPengajuan') });
+                        }
                     });
                 }
 
@@ -2328,6 +2725,297 @@
             }
         });
     </script>
+
+    {{-- SN Custom Dropdown Script (vanilla JS) --}}
+    <script>
+    document.addEventListener('click', function(e) {
+        // Handle trigger click
+        var trigger = e.target.closest('.sn-trigger');
+        if (trigger) {
+            var wrapper = trigger.closest('.sn-custom-dropdown');
+            var panel = wrapper.querySelector('.sn-dropdown-panel');
+            var input = wrapper.querySelector('.sn-search-input');
+            
+            // Toggle panel
+            var isHidden = panel.style.display === 'none';
+            // Close all other panels first
+            document.querySelectorAll('.sn-dropdown-panel').forEach(p => p.style.display = 'none');
+            
+            if (isHidden) {
+                panel.style.display = 'block';
+                input.focus();
+            }
+            return;
+        }
+
+        // Close panel if clicked outside
+        if (!e.target.closest('.sn-custom-dropdown')) {
+            document.querySelectorAll('.sn-dropdown-panel').forEach(p => p.style.display = 'none');
+        }
+    });
+
+    // Filter opsi di sn-list-select saat mengetik di sn-search-input
+    document.addEventListener('input', function(e) {
+        if (!e.target.classList.contains('sn-search-input')) return;
+        var keyword = e.target.value.toLowerCase().trim();
+        var select = e.target.closest('.sn-custom-dropdown').querySelector('.sn-list-select');
+        if (!select) return;
+        Array.from(select.options).forEach(function(opt) {
+            if(opt.value === '') return; // Skip placeholder
+            var text = (opt.text + ' ' + opt.value).toLowerCase();
+            opt.hidden = keyword !== '' && text.indexOf(keyword) === -1;
+        });
+    });
+
+    // Saat user klik option di sn-list-select
+    document.addEventListener('change', function(e) {
+        if (!e.target.classList.contains('sn-list-select')) return;
+        var select = e.target;
+        var selectedOpt = select.options[select.selectedIndex];
+        var wrapper = select.closest('.sn-custom-dropdown');
+        if (!wrapper) return;
+        
+        var triggerText = wrapper.querySelector('.sn-trigger-text');
+        var panel = wrapper.querySelector('.sn-dropdown-panel');
+        var hiddenInput = wrapper.closest('.repair-fields, [class*="edit-repair-fields-"]').querySelector('.hidden-sn');
+        
+        if (selectedOpt && selectedOpt.value !== '') {
+            triggerText.textContent = selectedOpt.value;
+            triggerText.classList.remove('text-muted');
+            triggerText.classList.add('fw-semibold', 'text-dark');
+            if(hiddenInput) hiddenInput.value = selectedOpt.value;
+        } else {
+            triggerText.textContent = '-- Pilih SN --';
+            triggerText.classList.add('text-muted');
+            triggerText.classList.remove('fw-semibold', 'text-dark');
+            if(hiddenInput) hiddenInput.value = '';
+        }
+        
+        // Trigger change event manual untuk sync foto (di script bawah)
+        var event = new Event('change', { bubbles: true });
+        hiddenInput.dispatchEvent(event);
+
+        // Tutup panel
+        panel.style.display = 'none';
+    });
+    </script>
+
+    {{-- Select2 initialization for SN fields --}}
+    <script>
+    $(document).ready(function() {
+
+        /**
+         * Custom Select2 Matcher:
+         * - Strips zero-width characters (from copy-paste) and normalizes whitespace
+         * - Searches against both option text and option value (id)
+         * - Correctly handles optgroup by filtering children
+         */
+        function customSelect2Matcher(params, data) {
+            // Helper: clean and lowercase a string
+            function cleanStr(str) {
+                if (str === null || str === undefined) return '';
+                return String(str)
+                    .replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '') // zero-width + non-breaking space
+                    .replace(/\s+/g, ' ')
+                    .trim()
+                    .toLowerCase();
+            }
+
+            // If no search term, show everything
+            if (!params.term || params.term.trim() === '') return data;
+
+            var term = cleanStr(params.term);
+
+            // Handle optgroup (has children)
+            if (data.children && data.children.length > 0) {
+                var filteredChildren = [];
+                $.each(data.children, function(_, child) {
+                    var childText = cleanStr(child.text);
+                    var childId   = cleanStr(child.id);
+                    if (childText.indexOf(term) !== -1 || childId.indexOf(term) !== -1) {
+                        filteredChildren.push(child);
+                    }
+                });
+                if (filteredChildren.length > 0) {
+                    // Shallow clone to avoid mutating Select2 internals
+                    var modifiedData = $.extend({}, data);
+                    modifiedData.children = filteredChildren;
+                    return modifiedData;
+                }
+                return null;
+            }
+
+            // Handle regular option
+            var text = cleanStr(data.text);
+            var id   = cleanStr(data.id);
+            if (text.indexOf(term) !== -1 || id.indexOf(term) !== -1) {
+                return data;
+            }
+            return null;
+        }
+
+        var select2BaseConfig = {
+            theme: 'bootstrap-5',
+            placeholder: '-- Cari SN atau nama perangkat --',
+            allowClear: true,
+            width: '100%',
+            dropdownCssClass: 'select2-sn-dropdown',
+            tags: true,
+            createTag: function(params) {
+                var term = $.trim(params.term);
+                if (!term) return null;
+                return { id: term, text: '✏️ Manual: ' + term, newTag: true };
+            },
+            matcher: customSelect2Matcher,
+            templateResult: function(data) {
+                if (!data.id || data.id === '') return data.text;
+                // Parse: "SN — Nama Perangkat @ Lokasi (Site)" or "SN | Nama"
+                var raw = data.text || '';
+                var sep = raw.indexOf(' — ') !== -1 ? ' — ' : (raw.indexOf(' | ') !== -1 ? ' | ' : null);
+                var sn = raw, info = '';
+                if (sep) {
+                    var parts = raw.split(sep);
+                    sn   = (parts[0] || '').trim();
+                    info = (parts.slice(1).join(sep) || '').trim();
+                }
+                var $el = $('<div class="s2-item-sn"></div>');
+                $('<div class="s2-item-sn__code"></div>').text(sn).appendTo($el);
+                if (info) $('<div class="s2-item-sn__info"></div>').text(info).appendTo($el);
+                return $el;
+            },
+            templateSelection: function(data) {
+                if (!data.id) { return data.text; }
+                // Hanya tampilkan SN (teks sebelum karakter | atau —) agar tag lebih rapi
+                return data.text.split(' | ')[0].split('—')[0].trim();
+            }
+        };
+
+        // --- Init for CREATE modal (#modalPrintPengajuan) ---
+        function initCreateSN() {
+            $('.select2-sn-create').each(function() {
+                if ($(this).hasClass('select2-hidden-accessible')) {
+                    $(this).select2('destroy');
+                }
+                $(this).select2($.extend({}, select2BaseConfig, {
+                    dropdownParent: $('#modalPrintPengajuan'),
+                    width: '100%'
+                }));
+            });
+        }
+
+        // Init EDIT modal SN selects (each has unique class)
+        function initEditSN($modal) {
+            $modal.find('[class*="select2-sn-edit-"]').each(function() {
+                if ($(this).hasClass('select2-hidden-accessible')) {
+                    $(this).select2('destroy');
+                }
+                $(this).select2($.extend({}, select2BaseConfig, {
+                    dropdownParent: $modal,
+                    width: '100%'
+                }));
+            });
+        }
+
+        // When the create modal opens
+        $('#modalPrintPengajuan').on('shown.bs.modal', function() {
+            initCreateSN();
+        });
+
+        // When any edit modal opens
+        $(document).on('shown.bs.modal', '[id^="modalEditPengajuan"]', function() {
+            initEditSN($(this));
+        });
+
+        // -------------------------------------------------------
+        // Build foto lookup map from Blade data (reliable, no DOM issues)
+        // -------------------------------------------------------
+        var snFotoMap = {};
+        @foreach($allSNs['sparetracker'] as $sn)
+            @if($sn->foto)
+            snFotoMap[{{ json_encode($sn->sn) }}] = {{ json_encode(asset('storage/' . $sn->foto)) }};
+            @endif
+        @endforeach
+
+        // Sync hidden input + auto-fill foto for EDIT modals
+        $(document).on('change', '[class*="select2-sn-edit-"]', function() {
+            var selected = $(this).val();
+            var valStr = Array.isArray(selected) ? selected.join(', ') : (selected || '');
+            var $repairRow  = $(this).closest('[class*="edit-repair-fields-"]');
+            $repairRow.find('.hidden-sn').val(valStr);
+
+            var $previewDiv = $repairRow.find('.sn-foto-preview-edit');
+            var snVal = Array.isArray(selected) ? selected[0] : selected;
+
+            if (!snVal) {
+                $previewDiv.hide();
+                return;
+            }
+
+            if (snFotoMap[snVal]) {
+                $previewDiv.find('.sn-foto-img').attr('src', snFotoMap[snVal]);
+                $previewDiv.find('.sn-foto-link').attr('href', snFotoMap[snVal]);
+                $previewDiv.show();
+            } else {
+                $.ajax({
+                    url: '/api/sparetracker/sn/' + encodeURIComponent(snVal),
+                    type: 'GET',
+                    success: function(data) {
+                        if (data.found && data.foto_url) {
+                            snFotoMap[snVal] = data.foto_url;
+                            $previewDiv.find('.sn-foto-img').attr('src', data.foto_url);
+                            $previewDiv.find('.sn-foto-link').attr('href', data.foto_url);
+                            $previewDiv.show();
+                        } else {
+                            $previewDiv.hide();
+                        }
+                    },
+                    error: function() { $previewDiv.hide(); }
+                });
+            }
+        });
+
+        // CREATE repair: sync hidden input + auto-fill foto preview
+        $(document).on('change', '.select2-sn-create', function() {
+            var snVal = $(this).val(); // single select, returns a string
+            var $repairRow = $(this).closest('.repair-fields');
+            var $hiddenSn = $repairRow.find('.hidden-sn');
+            var $previewDiv = $repairRow.find('.sn-foto-preview-create');
+
+            // Sync ke hidden input
+            $hiddenSn.val(snVal || '');
+
+            if (!snVal) {
+                $previewDiv.hide();
+                return;
+            }
+
+            // Cek di map dulu (sudah di-build dari server-side)
+            if (snFotoMap[snVal]) {
+                $previewDiv.find('.sn-foto-img').attr('src', snFotoMap[snVal]);
+                $previewDiv.find('.sn-foto-link').attr('href', snFotoMap[snVal]);
+                $previewDiv.show();
+            } else {
+                // Fallback: fetch via AJAX API
+                $.ajax({
+                    url: '/api/sparetracker/sn/' + encodeURIComponent(snVal),
+                    type: 'GET',
+                    success: function(data) {
+                        if (data.found && data.foto_url) {
+                            snFotoMap[snVal] = data.foto_url; // cache
+                            $previewDiv.find('.sn-foto-img').attr('src', data.foto_url);
+                            $previewDiv.find('.sn-foto-link').attr('href', data.foto_url);
+                            $previewDiv.show();
+                        } else {
+                            $previewDiv.hide();
+                        }
+                    },
+                    error: function() { $previewDiv.hide(); }
+                });
+            }
+        });
+    });
+    </script>
+
     @include('components.nav-modal-structure')
 </body>
 

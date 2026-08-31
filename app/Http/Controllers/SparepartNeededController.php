@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\SparepartNeeded;
 use App\Models\PengajuanSparepart;
 use App\Models\Sparetracker;
+use App\Models\Site;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -71,13 +72,40 @@ class SparepartNeededController extends Controller
         if ($request->tipe_pengajuan) {
             $pengajuansQuery->where('tipe_pengajuan', $request->tipe_pengajuan);
         }
+        if ($request->approval_status) {
+            $pengajuansQuery->where('approval_status', $request->approval_status);
+        }
+        if ($request->search_pengajuan) {
+            $pengajuansQuery->where(function ($q) use ($request) {
+                $q->where('nomor', 'like', "%{$request->search_pengajuan}%")
+                  ->orWhere('divisi', 'like', "%{$request->search_pengajuan}%")
+                  ->orWhere('items', 'like', "%{$request->search_pengajuan}%");
+            });
+        }
         $pengajuans = $pengajuansQuery->paginate(20, ['*'], 'pengajuan_page')->withQueryString();
 
         foreach($pengajuans as $p) {
             $p->can_approve = $this->canAct($p);
         }
 
-        return view('sparepart_needed', compact('sparepartsNeeded', 'statuses', 'pengajuans'));
+        // Build list of all SNs for the searchable dropdown (only from Spare Tracker)
+        $snFromTracker = Sparetracker::whereNotNull('sn')
+            ->where('sn', '!=', '')
+            ->orderBy('sn')
+            ->get(['id', 'sn', 'nama_perangkat', 'jenis', 'kondisi', 'lokasi', 'status_penggunaan_sparepart', 'foto']);
+
+        // Clean SNs from invisible characters/newlines that might break Select2 DOM
+        foreach ($snFromTracker as $item) {
+            foreach (['sn', 'nama_perangkat', 'jenis', 'kondisi', 'lokasi'] as $col) {
+                if ($item->$col) {
+                    $item->$col = trim(preg_replace('/[\x00-\x1F\x7F\xA0]/u', '', $item->$col));
+                }
+            }
+        }
+
+        $allSNs = ['sparetracker' => $snFromTracker];
+
+        return view('sparepart_needed', compact('sparepartsNeeded', 'statuses', 'pengajuans', 'allSNs'));
     }
 
     public function store(Request $request)
@@ -128,29 +156,47 @@ class SparepartNeededController extends Controller
             'price' => $request->tipe_pengajuan === 'repair_perangkat' ? null : $request->price
         ]);
 
-        // Insert ke sparetracker
-        $status_penggunaan = $request->tipe_pengajuan === 'repair_perangkat' ? 'Proses Repair' : 'Tahap Pengadaan';
-        $kondisi           = $request->tipe_pengajuan === 'repair_perangkat' ? null : 'BAIK';
+        // Insert/Update ke sparetracker
+        if ($request->tipe_pengajuan === 'repair_perangkat') {
+            // Untuk REPAIR: cari record yang sudah ada berdasarkan SN, update statusnya
+            $snPerangkat = trim($request->sn_perangkat);
+            $existingTracker = Sparetracker::whereRaw('TRIM(LOWER(sn)) = LOWER(?)', [$snPerangkat])->first();
 
-        // Untuk repair: SN wajib ada (1 pengajuan = 1 unit, SN sudah diketahui)
-        // Untuk pembelian baru: SN bisa diisi nanti di halaman Sparetracker
-        $snPerangkat = $request->sn_perangkat ?? null;
-
-        for ($i = 0; $i < $request->quantity; $i++) {
-            // Jika qty > 1 dan repair, SN tetap sama (satu perangkat)
-            // Jika qty > 1 dan pembelian, SN dibiarkan null dan diisi manual nanti
-            Sparetracker::create([
-                'sn'                          => ($i === 0) ? $snPerangkat : null, // SN hanya untuk unit pertama (repair)
-                'nama_perangkat'              => $request->sparepart_name,
-                'status_penggunaan_sparepart' => $status_penggunaan,
-                'kondisi'                     => $kondisi,
-                'pengadaan_by'                => $request->tipe_pengajuan === 'repair_perangkat' ? null : 'NUSTECH',
-                'lokasi_asal'                 => $request->tipe_pengajuan === 'repair_perangkat' ? null : 'NUSTECH',
-                'lokasi'                      => $request->tipe_pengajuan === 'repair_perangkat' ? $request->site_id : null,
-                'lokasi_realtime'             => 'Gudang NOC',
-                'tanggal_masuk'               => null, // Diisi manual nanti
-                'sparepart_needed_id'         => $sparepart->id, // traceability: asal dari pengajuan mana
-            ]);
+            if ($existingTracker) {
+                // Update record yang sudah ada
+                $existingTracker->update([
+                    'status_penggunaan_sparepart' => 'Proses Repair',
+                    'sparepart_needed_id'         => $sparepart->id,
+                ]);
+            } else {
+                // Jika SN tidak ditemukan, buat record baru
+                Sparetracker::create([
+                    'sn'                          => $snPerangkat ?: null,
+                    'nama_perangkat'              => $request->sparepart_name,
+                    'status_penggunaan_sparepart' => 'Proses Repair',
+                    'kondisi'                     => null,
+                    'pengadaan_by'                => null,
+                    'lokasi'                      => $request->site_id,
+                    'lokasi_realtime'             => 'Gudang NOC',
+                    'tanggal_masuk'               => null,
+                    'sparepart_needed_id'         => $sparepart->id,
+                ]);
+            }
+        } else {
+            // Untuk PEMBELIAN BARU: buat record baru sejumlah quantity
+            for ($i = 0; $i < $request->quantity; $i++) {
+                Sparetracker::create([
+                    'sn'                          => null, // SN diisi manual nanti
+                    'nama_perangkat'              => $request->sparepart_name,
+                    'status_penggunaan_sparepart' => 'Tahap Pengadaan',
+                    'kondisi'                     => 'BAIK',
+                    'pengadaan_by'                => 'NUSTECH',
+                    'lokasi_asal'                 => 'NUSTECH',
+                    'lokasi_realtime'             => 'Gudang NOC',
+                    'tanggal_masuk'               => null,
+                    'sparepart_needed_id'         => $sparepart->id,
+                ]);
+            }
         }
 
         return redirect()->back()->with('success', 'Sparepart needed added successfully.');

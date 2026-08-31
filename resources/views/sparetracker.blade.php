@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     @include('partials.pwa-head')
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logonustech.png') }}?v=1.0">
@@ -9,7 +10,7 @@
     <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}?v=1.1">
     <script src="{{ asset('js/nav-modal.js') }}"></script>
     <script src="{{ asset('js/profile-dropdown.js') }}"></script>
-        <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spare Tracker | Project Operational</title>
     <style>
@@ -26,29 +27,42 @@
             padding: 12px 15px !important;
             border-bottom: 2px solid #e0e0e0 !important;
             box-shadow: 0 1px 0 #e0e0e0;
+            white-space: nowrap;
+            vertical-align: middle;
         }
-        
+
         .sticky-col {
             position: sticky !important;
             background-color: #fff !important;
             z-index: 5 !important;
             background-clip: padding-box;
         }
-        
+
         thead th.sticky-col {
             z-index: 20 !important;
             background-color: #f5f6fa !important;
         }
 
-        .col-no { left: 0; min-width: 50px; }
-        .col-sn { left: 50px; min-width: 150px; }
-        .col-nama-perangkat { left: 200px; min-width: 250px; }
-        
+        .col-no {
+            left: 0;
+            min-width: 50px;
+        }
+
+        .col-tanggal {
+            left: 50px;
+            min-width: 280px;
+        }
+
+        .col-sn {
+            left: 330px;
+            min-width: 150px;
+        }
+
         /* Striped background for sticky columns */
         tbody tr:nth-child(even) .sticky-col {
             background-color: #fafbfc !important;
         }
-        
+
         /* Hover effect */
         tbody tr:hover td {
             background-color: #f0f5fb !important;
@@ -63,6 +77,7 @@
             flex-wrap: wrap;
             gap: 10px;
         }
+
         .summary-badge {
             font-size: 12px;
             padding: 5px 15px;
@@ -71,16 +86,19 @@
             border: 1px solid #dee2e6;
             margin-right: 10px;
         }
+
         .search-box {
             display: flex;
             align-items: center;
         }
+
         .search-box input {
             border: none;
             outline: none;
             padding: 20px;
             background: transparent;
         }
+
         @media (max-width: 768px) {
             .tabs-section .ms-auto {
                 width: 100%;
@@ -88,34 +106,52 @@
                 justify-content: flex-start;
                 margin-top: 10px;
             }
+
             .card-header {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 15px;
             }
+
             .search-form {
                 width: 100%;
             }
+
             .search-box {
                 width: 100%;
             }
+
             .search-box input {
                 width: 100%;
             }
         }
-        /* Sticky col shadow untuk kolom NAMA PERANGKAT */
-        th.col-nama-perangkat, td.col-nama-perangkat {
+
+        /* Sticky col shadow untuk kolom SN karena nama perangkat di hide */
+        th.col-sn,
+        td.col-sn {
             border-right: 2px solid #e8ecf0 !important;
-            box-shadow: 2px 0 8px rgba(0,0,0,0.06) !important;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06) !important;
         }
-        .col-sn {
+
+        th.col-sn {
+            border-right: 2px solid #1f5037 !important;
+        }
+
+        .col-no {
+            left: 0;
+            min-width: 50px;
+        }
+
+        .col-tanggal {
             left: 50px;
-            min-width: 130px;
+            min-width: 280px;
         }
-        .col-nama-perangkat {
-            left: 180px;
-            min-width: 160px;
+
+        .col-sn {
+            left: 330px;
+            min-width: 150px;
         }
+
         .btn-filter-pill {
             display: inline-flex;
             align-items: center;
@@ -130,22 +166,29 @@
             cursor: pointer;
             white-space: nowrap;
             transition: all 0.2s;
-            box-shadow: 0 2px 8px rgba(13,110,253,0.3);
+            box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
         }
+
         .btn-filter-pill:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(13,110,253,0.4);
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
         }
+
         [data-bs-theme="dark"] .btn-filter-pill {
             background: linear-gradient(135deg, #1a6fc4, #0d5dbc);
         }
     </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body>
-<header class="main-header">
+    <header class="main-header">
         <div class="header-logo-container">
-            <a href="javascript:void(0)" class="header-brand-link" onclick="openNavModal()" style="text-decoration: none !important; color: white !important;">
+            <a href="javascript:void(0)" class="header-brand-link" onclick="openNavModal()"
+                style="text-decoration: none !important; color: white !important;">
                 <div class="header-brand" style="display: flex; align-items: center; gap: 8px; font-weight: bold;">
                     Project <span style="opacity: 0.5;">|</span> Operational
                 </div>
@@ -159,22 +202,29 @@
             @endif
             <div class="user-profile-wrapper" style="position: relative;">
                 <div class="user-profile-icon" id="profileDropdownTrigger" style="cursor: pointer;">
-                        @if(auth()->check() && auth()->user()->photo)
-                            <img src="{{ asset('storage/' . auth()->user()->photo) }}" alt="Profile" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
-                        @else
-                            <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
-                        @endif
-                    </div>
-                <div id="profileDropdownMenu" class="hidden" style="position: absolute; right: 0; top: 100%; mt: 10px; width: 150px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; display: none; flex-direction: column; overflow: hidden;">
-                    <div style="padding: 10px 15px; border-bottom: 1px solid #eee; font-size: 14px; font-weight: bold; color: #333;">
+                    @if(auth()->check() && auth()->user()->photo)
+                        <img src="{{ asset('storage/' . auth()->user()->photo) }}" alt="Profile"
+                            style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                    @else
+                        <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
+                    @endif
+                </div>
+                <div id="profileDropdownMenu" class="hidden"
+                    style="position: absolute; right: 0; top: 100%; mt: 10px; width: 150px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; display: none; flex-direction: column; overflow: hidden;">
+                    <div
+                        style="padding: 10px 15px; border-bottom: 1px solid #eee; font-size: 14px; font-weight: bold; color: #333;">
                         {{ auth()->user()->name ?? 'User' }}
                     </div>
-                    <a href="{{ route('profile.edit') }}" style="padding: 10px 15px; text-decoration: none; color: #333; font-size: 14px; display: flex; align-items: center; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#f5f5f5'" onmouseout="this.style.backgroundColor='transparent'">
+                    <a href="{{ route('profile.edit') }}"
+                        style="padding: 10px 15px; text-decoration: none; color: #333; font-size: 14px; display: flex; align-items: center; transition: background 0.2s;"
+                        onmouseover="this.style.backgroundColor='#f5f5f5'"
+                        onmouseout="this.style.backgroundColor='transparent'">
                         <i class="bi bi-person me-2"></i> Profile
                     </a>
                     <form action="{{ route('logout') }}" method="POST" id="logout-form">
                         @csrf
-                        <button type="submit" style="width: 100%; text-align: left; padding: 10px 15px; background: none; border: none; font-size: 14px; color: #dc3545; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                        <button type="submit"
+                            style="width: 100%; text-align: left; padding: 10px 15px; background: none; border: none; font-size: 14px; color: #dc3545; cursor: pointer; display: flex; align-items: center; gap: 8px;">
                             <i class="bi bi-box-arrow-right"></i> Logout
                         </button>
                     </form>
@@ -183,11 +233,17 @@
         </div>
     </header>
     <div class="tabs-section d-flex align-items-center">
-        <a href="{{ route('pergantianperangkat') }}" class="tab {{ request()->is('pergantianperangkat*') ? 'active' : '' }}" style="text-decoration: none; color: Black;">Pergantian Perangkat</a>
-        <a href="{{ url('/logpergantian') }}" class="tab {{ request()->is('logpergantian*') ? 'active' : '' }}" style="text-decoration: none; color: Black;">Log Perangkat</a>
-        <a href="{{ url('/sparetracker') }}" class="tab {{ request()->is('sparetracker*') ? 'active' : '' }}" style="text-decoration: none; color: White;">Spare Tracker</a>
-        <a href="{{ url('/pengiriman') }}" class="tab {{ request()->is('pengiriman*') ? 'active' : '' }}" style="text-decoration: none; color: Black;">Pengiriman</a>
-        <a href="{{ url('/pm-summary') }}" class="tab {{ request()->is('pm-summary*') ? 'active' : '' }}" style="text-decoration: none; color: Black;">Summary</a>
+        <a href="{{ route('pergantianperangkat') }}"
+            class="tab {{ request()->is('pergantianperangkat*') ? 'active' : '' }}"
+            style="text-decoration: none; color: Black;">Pergantian Perangkat</a>
+        <a href="{{ url('/logpergantian') }}" class="tab {{ request()->is('logpergantian*') ? 'active' : '' }}"
+            style="text-decoration: none; color: Black;">Log Perangkat</a>
+        <a href="{{ url('/sparetracker') }}" class="tab {{ request()->is('sparetracker*') ? 'active' : '' }}"
+            style="text-decoration: none; color: White;">Spare Tracker</a>
+        <a href="{{ url('/pengiriman') }}" class="tab {{ request()->is('pengiriman*') ? 'active' : '' }}"
+            style="text-decoration: none; color: Black;">Pengiriman</a>
+        <a href="{{ url('/pm-summary') }}" class="tab {{ request()->is('pm-summary*') ? 'active' : '' }}"
+            style="text-decoration: none; color: Black;">Summary</a>
         <div class="ms-auto d-flex align-items-center">
             <span class="summary-badge text-black">Total Spare: <b>{{ $totalSpare }}</b></span>
             <span class="summary-badge text-success">Baik: <b>{{ $countBaik }}</b></span>
@@ -197,25 +253,32 @@
     </div>
     <!-- CONTENT -->
     <div class="content-container">
-        <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3" style="margin-bottom: 20px;">
+        <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3"
+            style="margin-bottom: 20px;">
             <div class="actions flex-shrink-0">
                 @if(auth()->check() && auth()->user()->hasAdminAccess())
-                    <button type="button" class="btn-action bi bi-plus" title="Tambah Data" data-bs-toggle="modal" data-bs-target="#modalTambahSpare"></button>
+                    <button type="button" class="btn-action bi bi-plus" title="Tambah Data" data-bs-toggle="modal"
+                        data-bs-target="#modalTambahSpare"></button>
                     <!-- Form Import -->
-                    <form action="{{ route('sparetracker.import') }}" method="POST" enctype="multipart/form-data" id="importForm" class="m-0">
+                    <form action="{{ route('sparetracker.import') }}" method="POST" enctype="multipart/form-data"
+                        id="importForm" class="m-0">
                         @csrf
-                        <input type="file" name="file" id="fileInput" style="display: none;" onchange="document.getElementById('importForm').submit();">
-                        <button type="button" class="btn-action bi bi-upload" title="Upload" onclick="document.getElementById('fileInput').click();"></button>
+                        <input type="file" name="file" id="fileInput" style="display: none;"
+                            onchange="document.getElementById('importForm').submit();">
+                        <button type="button" class="btn-action bi bi-upload" title="Upload"
+                            onclick="document.getElementById('fileInput').click();"></button>
                     </form>
                 @endif
                 <!-- Button Export -->
-                <a href="{{ route('sparetracker.export') }}" class="btn-action bi bi-download" title="Download" style="text-decoration: none;"></a>
+                <a href="{{ route('sparetracker.export') }}" class="btn-action bi bi-download" title="Download"
+                    style="text-decoration: none;"></a>
             </div>
             <div class="w-100 mt-2 mt-lg-0">
-                <form method="GET" action="{{ route('sparetracker') }}" class="search-form row g-2 align-items-center w-100 m-0 justify-content-lg-end" id="filterForm">
+                <form method="GET" action="{{ route('sparetracker') }}"
+                    class="search-form row g-2 align-items-center w-100 m-0 justify-content-lg-end" id="filterForm">
                     <div class="col-12 col-md-auto">
                         <select name="kondisi" class="form-select form-select-sm w-100">
-                            <option value="">Semua Kondisi</option>
+                            <option value="">Kondisi</option>
                             <option value="BAIK" {{ request('kondisi') == 'BAIK' ? 'selected' : '' }}>BAIK</option>
                             <option value="RUSAK" {{ request('kondisi') == 'RUSAK' ? 'selected' : '' }}>RUSAK</option>
                             <option value="BARU" {{ request('kondisi') == 'BARU' ? 'selected' : '' }}>BARU</option>
@@ -224,15 +287,19 @@
 
                     <div class="col-12 col-md-auto">
                         <div class="d-flex align-items-center gap-1 w-100">
-                            <input type="date" name="tgl_masuk_mulai" class="form-control form-control-sm w-100" value="{{ request('tgl_masuk_mulai') }}" title="Tgl Masuk Dari">
-                            <input type="date" name="tgl_masuk_selesai" class="form-control form-control-sm w-100" value="{{ request('tgl_masuk_selesai') }}" title="Tgl Masuk Sampai">
+                            <input type="date" name="tgl_masuk_mulai" class="form-control form-control-sm w-100"
+                                value="{{ request('tgl_masuk_mulai') }}" title="Tgl Masuk Dari">
+                            <input type="date" name="tgl_masuk_selesai" class="form-control form-control-sm w-100"
+                                value="{{ request('tgl_masuk_selesai') }}" title="Tgl Masuk Sampai">
                         </div>
                     </div>
 
                     <div class="col-12 col-md-auto">
                         <div class="d-flex align-items-center gap-1 w-100">
-                            <input type="date" name="tgl_keluar_mulai" class="form-control form-control-sm w-100" value="{{ request('tgl_keluar_mulai') }}" title="Tgl Keluar Dari">
-                            <input type="date" name="tgl_keluar_selesai" class="form-control form-control-sm w-100" value="{{ request('tgl_keluar_selesai') }}" title="Tgl Keluar Sampai">
+                            <input type="date" name="tgl_keluar_mulai" class="form-control form-control-sm w-100"
+                                value="{{ request('tgl_keluar_mulai') }}" title="Tgl Keluar Dari">
+                            <input type="date" name="tgl_keluar_selesai" class="form-control form-control-sm w-100"
+                                value="{{ request('tgl_keluar_selesai') }}" title="Tgl Keluar Sampai">
                         </div>
                     </div>
 
@@ -242,11 +309,15 @@
                         </button>
                     </div>
                     <div class="col-auto">
-                        <a href="{{ route('sparetracker') }}" class="btn btn-light btn-sm rounded-pill border d-flex align-items-center justify-content-center h-100" title="Reset Filter"><i class="bi bi-arrow-repeat"></i></a>
+                        <a href="{{ route('sparetracker') }}"
+                            class="btn btn-light btn-sm rounded-pill border d-flex align-items-center justify-content-center h-100"
+                            title="Reset Filter"><i class="bi bi-arrow-repeat"></i></a>
                     </div>
                     <div class="col-12 col-md-auto">
                         <div class="search-box d-flex align-items-center w-100">
-                            <input type="text" name="search" id="searchInput" placeholder="Search Data" value="{{ request('search') }}" style="flex-grow: 1; border: none; outline: none; padding-left: 15px;">
+                            <input type="text" name="search" id="searchInput" placeholder="Search Data"
+                                value="{{ request('search') }}"
+                                style="flex-grow: 1; border: none; outline: none; padding-left: 15px;">
                             <button type="submit" class="search-btn">🔍</button>
                         </div>
                     </div>
@@ -254,366 +325,406 @@
             </div>
 
             <div class="modal fade" id="modalTambahSpare" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content rounded-4 border-0 shadow-lg">
-            <div class="modal-header text-white d-flex justify-content-center position-relative" style="background-color: #071152; border-radius: 15px 15px 0 0;">
-                <h4 class="modal-title w-100 text-center fw-bold">Tambah Data Spare Tracker</h4>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body pt-3">
-                <form action="{{ route('sparetracker.store') }}" method="POST">
-                    @csrf
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <label class="form-label label-blue">SN</label>
-                            <input type="text" name="sn" class="form-control input-custom" required>
+                <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                    <div class="modal-content rounded-4 border-0 shadow-lg">
+                        <div class="modal-header text-white d-flex justify-content-center position-relative"
+                            style="background-color: #071152; border-radius: 15px 15px 0 0;">
+                            <h4 class="modal-title w-100 text-center fw-bold">Tambah Data Spare Tracker</h4>
+                            <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
+                                data-bs-dismiss="modal"></button>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label label-blue">Nama Perangkat</label>
-                            <input type="text" name="nama_perangkat" class="form-control input-custom">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label label-blue">Jenis</label>
-                            <select name="jenis" class="form-select input-custom">
-                                <option value="">-- Pilih --</option>
-                                <option value="MODEM">MODEM</option>
-                                <option value="ROUTER">ROUTER</option>
-                                <option value="SWITCH">SWITCH</option>
-                                <option value="AP1">AP1</option>
-                                <option value="AP2">AP2</option>
-                                <option value="STAVOL">STAVOL</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label label-blue">Type</label>
-                            <input type="text" name="type" class="form-control input-custom">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label label-blue">Kondisi</label>
-                            <select name="kondisi" class="form-select input-custom">
-                                <option value="">-- Pilih --</option>
-                                <option value="BAIK">BAIK</option>
-                                <option value="RUSAK">RUSAK</option>
-                                <option value="BARU">BARU</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label label-blue">Pengadaan By</label>
-                            <input type="text" name="pengadaan_by" class="form-control input-custom">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label label-blue">Lokasi Asal</label>
-                            <input type="text" name="lokasi_asal" class="form-control input-custom">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label label-blue">Lokasi</label>
-                            <input type="text" name="lokasi" class="form-control input-custom">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label label-blue">Bulan Masuk</label>
-                            <input type="text" name="bulan_masuk" class="form-control input-custom">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label label-blue">Tanggal Masuk</label>
-                            <input type="date" name="tanggal_masuk" class="form-control input-custom">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label label-blue">Status Penggunaan</label>
-                            <input type="text" name="status_penggunaan_sparepart" class="form-control input-custom">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label label-blue">Lokasi Realtime</label>
-                            <input type="text" name="lokasi_realtime" class="form-control input-custom">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label label-blue">Kabupaten</label>
-                            <input type="text" name="kabupaten" class="form-control input-custom">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label label-blue">Bulan Keluar</label>
-                            <input type="text" name="bulan_keluar" class="form-control input-custom">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label label-blue">Tanggal Keluar</label>
-                            <input type="date" name="tanggal_keluar" class="form-control input-custom">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label label-blue">Layanan AI</label>
-                            <input type="text" name="layanan_ai" class="form-control input-custom">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label label-blue">Keterangan</label>
-                            <textarea name="keterangan" rows="2" class="form-control input-custom"></textarea>
+                        <div class="modal-body pt-3">
+                            <form action="{{ route('sparetracker.store') }}" method="POST">
+                                @csrf
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label label-blue">SN</label>
+                                        <input type="text" name="sn" class="form-control input-custom" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label label-blue">Nama Perangkat</label>
+                                        <input type="text" name="nama_perangkat" class="form-control input-custom">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label label-blue">Jenis</label>
+                                        <select name="jenis" class="form-select input-custom">
+                                            <option value="">-- Pilih --</option>
+                                            <option value="MODEM">MODEM</option>
+                                            <option value="ROUTER">ROUTER</option>
+                                            <option value="SWITCH">SWITCH</option>
+                                            <option value="AP1">AP1</option>
+                                            <option value="AP2">AP2</option>
+                                            <option value="STAVOL">STAVOL</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label label-blue">Kondisi</label>
+                                        <select name="kondisi" class="form-select input-custom">
+                                            <option value="">-- Pilih --</option>
+                                            <option value="BAIK">BAIK</option>
+                                            <option value="RUSAK">RUSAK</option>
+                                            <option value="BARU">BARU</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label label-blue">Pengadaan</label>
+                                        <input type="text" name="pengadaan_by" class="form-control input-custom">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label label-blue">Lokasi Asal</label>
+                                        <input type="text" name="lokasi_asal" class="form-control input-custom">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label label-blue">Tanggal Masuk</label>
+                                        <input type="date" name="tanggal_masuk" class="form-control input-custom">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label label-blue">Status Perangkat</label>
+                                        <input type="text" name="status_penggunaan_sparepart"
+                                            class="form-control input-custom">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label label-blue">Lokasi Realtime</label>
+                                        <input type="text" name="lokasi_realtime" class="form-control input-custom">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label label-blue">Kabupaten</label>
+                                        <input type="text" name="kabupaten" class="form-control input-custom">
+                                    </div>
+                                    <div class="col-md-3 d-none">
+                                        <label class="form-label label-blue">Bulan Keluar</label>
+                                        <input type="text" name="bulan_keluar" class="form-control input-custom">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label label-blue">Tanggal Keluar</label>
+                                        <input type="date" name="tanggal_keluar" class="form-control input-custom">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label label-blue">Layanan AI</label>
+                                        <input type="text" name="layanan_ai" class="form-control input-custom">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label label-blue">Keterangan</label>
+                                        <textarea name="keterangan" rows="2"
+                                            class="form-control input-custom"></textarea>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-end gap-2 mt-4">
+                                    <button type="button" class="btn btn-light px-4 rounded-3" data-bs-dismiss="modal">
+                                        Batal
+                                    </button>
+                                    <button type="submit" class="btn btn-primary px-4 rounded-3">
+                                        Simpan
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
-                    <div class="d-flex justify-content-end gap-2 mt-4">
-                        <button type="button" class="btn btn-light px-4 rounded-3" data-bs-dismiss="modal">
-                            Batal
-                        </button>
-                        <button type="submit" class="btn btn-primary px-4 rounded-3">
-                            Simpan
-                        </button>
-                    </div>
-                </form>
+                </div>
             </div>
-        </div>
-    </div>
-</div>
         </div>
         <div class="table-responsive-custom">
-        <table>
-            <thead>
-                <tr class="thead-dark">
-                    <th class="text-center sticky-col col-no">NO</th>
-                    <th class="sticky-col col-sn">SN</th>
-                    <th class="sticky-col col-nama-perangkat">NAMA PERANGKAT</th>
-                    <th>JENIS</th>
-                    <th>TYPE</th>
-                    <th>KONDISI</th>
-                    <th>PENGADAAN BY</th>
-                    <th>LOKASI ASAL</th>
-                    <th>LOKASI</th>
-                    <th>TANGGAL MASUK</th>
-                    <th>TANGGAL KELUAR</th>
-                    <th>STATUS PENGGUNAAN</th>
-                    <th>LOKASI REALTIME</th>
-                    <th>KABUPATEN</th>
-                    <th>LAYANAN AI</th>
-                    <th>KETERANGAN</th>
-                    @if(auth()->check() && auth()->user()->hasAdminAccess())
-                        <th class="sticky-col-right">AKSI</th>
-                    @endif
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($spare_data as $item)
-                <tr>
-                    <td class="text-center sticky-col col-no">{{ $loop->iteration }}</td>
-                    <td class="sticky-col col-sn">{{ $item->sn }}</td>
-                    <td class="sticky-col col-nama-perangkat">{{ $item->nama_perangkat }}</td>
-                    <td>{{ $item->jenis }}</td>
-                    <td>{{ $item->type }}</td>
-                    <td class="text-center">
-                        @if($item->kondisi == 'BAIK')
-                            <span class="badge bg-success">BAIK</span>
-                        @elseif($item->kondisi == 'RUSAK')
-                            <span class="badge bg-danger">RUSAK</span>
-                        @elseif($item->kondisi == 'BARU')
-                            <span class="badge bg-primary">BARU</span>
-                        @else
-                            {{ $item->kondisi }}
+            <table>
+                <thead>
+                    <tr>
+                        <th class="text-center sticky-col col-no">NO</th>
+                        <th class="sticky-col col-tanggal">TANGGAL PENGADAAN / BARANG DITERIMA</th>
+                        <th class="sticky-col col-sn">SERIAL NUMBER /SN</th>
+                        <th>JENIS BARANG</th>
+                        <th>LAYANAN</th>
+                        <th>LOKASI PERANGKAT</th>
+                        <th>STATUS PERANGKAT</th>
+                        <th>TANGGAL KELUAR</th>
+                        <th>KONDISI</th>
+                        <th>LOKASI ASAL</th>
+                        <th>KABUPATEN</th>
+                        <th>CATATAN</th>
+                        <th>FOTO</th>
+                        
+                        @if(auth()->check() && auth()->user()->hasAdminAccess())
+                            <th class="sticky-col-right">AKSI</th>
                         @endif
-                    </td>
-                    <td>{{ $item->pengadaan_by }}</td>
-                    <td>{{ $item->lokasi_asal }}</td>
-                    <td>{{ $item->lokasi }}</td>
-                    <td>{{ $item->tanggal_masuk }}</td>
-                    <td>{{ $item->tanggal_keluar }}</td>
-                    <td>{{ $item->status_penggunaan_sparepart }}</td>
-                    <td>{{ $item->lokasi_realtime }}</td>
-                    <td>{{ $item->kabupaten }}</td>
-                    <td>{{ $item->layanan_ai }}</td>
-                    <td>{{ $item->keterangan }}</td>
-                    @if(auth()->check() && auth()->user()->hasAdminAccess())
-                    <td class="text-center sticky-col-right">
-                        <div class="d-flex gap-2 justify-content-center align-items-center">
-                            @if($item->status_penggunaan_sparepart === 'Proses Repair')
-                                <button class="btn btn-sm btn-outline-primary p-0 border-0 shadow-none" 
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#modalRepairStatus{{ $item->id }}"
-                                        title="Update Status Repair"
-                                        style="font-size: 1rem;">
-                                    <i class="bi bi-wrench-adjustable"></i>
-                                </button>
-                            @endif
-                            <button class="btn btn-sm bi bi-pencil text-dark p-0 border-0 shadow-none" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#modalEditSpare{{ $item->id }}"
-                                    title="Edit"
-                                    style="font-size: 1rem;">
-                            </button>
-                            <button class="btn btn-sm bi bi-trash text-dark p-0 border-0 shadow-none" 
-                                    onclick="confirmDelete('{{ $item->id }}')"
-                                    title="Hapus"
-                                    style="font-size: 1rem;">
-                            </button>
-                        </div>
-                    </td>
-                    @endif
-                </tr>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($spare_data as $item)
+                                        <tr>
+                                            <td class="text-center sticky-col col-no">{{ $loop->iteration }}</td>
+                                            <td class="sticky-col col-tanggal">{{ $item->tanggal_masuk }}</td>
+                                            <td class="sticky-col col-sn">{{ $item->sn }}</td>
+                                            <td>{{ $item->jenis }}</td>
+                                            
+                                            <!-- NAMA PERANGKAT, PENGADAAN hidden -->
+                                            
+                                            <td>{{ $item->layanan_ai }}</td>
+                                            <td>{{ $item->lokasi_realtime }}</td>
+                                            <td>
+                                                @if(str_contains(strtolower($item->status_penggunaan_sparepart), 'rusak'))
+                                                    <span class="badge" style="background-color: #a40000; color: white;">{{ strtoupper($item->status_penggunaan_sparepart) }}</span>
+                                                @elseif(str_contains(strtolower($item->status_penggunaan_sparepart), 'terpasang'))
+                                                    <span class="badge" style="background-color: #ff99cc; color: #a40000;">{{ strtoupper($item->status_penggunaan_sparepart) }}</span>
+                                                @elseif(str_contains(strtolower($item->status_penggunaan_sparepart), 'repair'))
+                                                    <span class="badge" style="background-color: #ffdb99; color: #8a6d3b;">{{ strtoupper($item->status_penggunaan_sparepart) }}</span>
+                                                @else
+                                                    {{ $item->status_penggunaan_sparepart }}
+                                                @endif
+                                            </td>
+                                            <td>{{ $item->tanggal_keluar }}</td>
+                                            
+                                            <td class="text-center">
+                                                @if($item->kondisi == 'BAIK')
+                                                    <span class="badge bg-success">BAIK</span>
+                                                @elseif($item->kondisi == 'RUSAK')
+                                                    <span class="badge bg-danger">RUSAK</span>
+                                                @elseif($item->kondisi == 'BARU')
+                                                    <span class="badge bg-primary">BARU</span>
+                                                @else
+                                                    {{ $item->kondisi }}
+                                                @endif
+                                            </td>
+                                            <td>{{ $item->lokasi_asal }}</td>
+                                            <td>{{ $item->kabupaten }}</td>
+                                            
+                                            <td>{{ $item->keterangan }}</td>
+                                            <td class="text-center">
+                                                @if($item->foto)
+                                                    <a href="{{ asset('storage/' . $item->foto) }}" target="_blank">
+                                                        <img src="{{ asset('storage/' . $item->foto) }}" alt="foto" style="width:50px;height:40px;object-fit:cover;border-radius:5px;border:1px solid #ddd;">
+                                                    </a>
+                                                @else
+                                                    <span class="text-muted" style="font-size:11px;">-</span>
+                                                @endif
+                                            </td>
+                                            
+                                            @if(auth()->check() && auth()->user()->hasAdminAccess())
+                                                <td class="text-center sticky-col-right">
+                                                    <div class="d-flex gap-2 justify-content-center align-items-center">
+                                                        @if($item->status_penggunaan_sparepart === 'Proses Repair')
+                                                            <button class="btn btn-sm btn-outline-primary p-0 border-0 shadow-none"
+                                                                data-bs-toggle="modal" data-bs-target="#modalRepairStatus{{ $item->id }}"
+                                                                title="Update Status Repair" style="font-size: 1rem;">
+                                                                <i class="bi bi-wrench-adjustable"></i>
+                                                            </button>
+                                                        @endif
+                                                        <button class="btn btn-sm bi bi-pencil text-dark p-0 border-0 shadow-none"
+                                                            data-bs-toggle="modal" data-bs-target="#modalEditSpare{{ $item->id }}" title="Edit"
+                                                            style="font-size: 1rem;">
+                                                        </button>
+                                                        <button class="btn btn-sm bi bi-trash text-dark p-0 border-0 shadow-none"
+                                                            onclick="confirmDelete('{{ $item->id }}')" title="Hapus" style="font-size: 1rem;">
+                                                        </button>
+                                                        <button class="btn btn-sm p-0 border-0 shadow-none text-info" onclick="showHistory('{{ $item->sn }}')" title="Lihat History" style="font-size: 1rem;">
+                                                            <i class="bi bi-info-circle-fill"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            @endif
+                                        </tr>
 
-                {{-- Modal Update Repair Status --}}
-                @if($item->status_penggunaan_sparepart === 'Proses Repair')
-                <div class="modal fade" id="modalRepairStatus{{ $item->id }}" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content rounded-4 border-0 shadow-lg text-start">
-                            <div class="modal-header text-white d-flex justify-content-center position-relative" style="background-color: #198754; border-radius: 15px 15px 0 0;">
-                                <h5 class="modal-title w-100 text-center fw-bold"><i class="bi bi-wrench-adjustable"></i> Update Hasil Repair</h5>
-                                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body pt-4">
-                                <div class="mb-3">
-                                    <p class="text-muted mb-1" style="font-size: 0.85rem;">Perangkat:</p>
-                                    <h6 class="fw-bold">{{ $item->nama_perangkat }} <span class="text-muted fw-normal">(SN: {{ $item->sn }})</span></h6>
-                                </div>
-                                <form action="{{ route('inventory.tracker.update-repair', $item->id) }}" method="POST">
-                                    @csrf
-                                    @method('PUT')
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold" style="font-size: 0.85rem;">Hasil Repair <span class="text-danger">*</span></label>
-                                        <div class="d-flex gap-3">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="hasil_repair" value="Kondisi Baik" id="repair_baik_{{ $item->id }}" required>
-                                                <label class="form-check-label text-success fw-bold" for="repair_baik_{{ $item->id }}">
-                                                    <i class="bi bi-check-circle-fill"></i> Kondisi Baik
-                                                </label>
+                                        {{-- Modal Update Repair Status --}}
+                                        @if($item->status_penggunaan_sparepart === 'Proses Repair')
+                                            <div class="modal fade" id="modalRepairStatus{{ $item->id }}" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content rounded-4 border-0 shadow-lg text-start">
+                                                        <div class="modal-header text-white d-flex justify-content-center position-relative"
+                                                            style="background-color: #198754; border-radius: 15px 15px 0 0;">
+                                                            <h5 class="modal-title w-100 text-center fw-bold"><i
+                                                                    class="bi bi-wrench-adjustable"></i> Update Hasil Repair</h5>
+                                                            <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
+                                                                data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <div class="modal-body pt-4">
+                                                            <div class="mb-3">
+                                                                <p class="text-muted mb-1" style="font-size: 0.85rem;">Perangkat:</p>
+                                                                <h6 class="fw-bold">{{ $item->nama_perangkat }} <span
+                                                                        class="text-muted fw-normal">(SN: {{ $item->sn }})</span></h6>
+                                                            </div>
+                                                            <form action="{{ route('inventory.tracker.update-repair', $item->id) }}"
+                                                                method="POST">
+                                                                @csrf
+                                                                <div class="mb-3">
+                                                                    <label class="form-label fw-bold" style="font-size: 0.85rem;">Hasil Repair
+                                                                        <span class="text-danger">*</span></label>
+                                                                    <div class="d-flex gap-3">
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input" type="radio" name="kondisi_akhir"
+                                                                                value="Kondisi Baik" id="repair_baik_{{ $item->id }}" required>
+                                                                            <label class="form-check-label text-success fw-bold"
+                                                                                for="repair_baik_{{ $item->id }}">
+                                                                                <i class="bi bi-check-circle-fill"></i> Kondisi Baik
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input" type="radio" name="kondisi_akhir"
+                                                                                value="Kondisi Buruk" id="repair_buruk_{{ $item->id }}">
+                                                                            <label class="form-check-label text-danger fw-bold"
+                                                                                for="repair_buruk_{{ $item->id }}">
+                                                                                <i class="bi bi-x-circle-fill"></i> Kondisi Buruk
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="d-flex justify-content-end gap-2 mt-4">
+                                                                    <button type="button" class="btn btn-light px-4 rounded-3 border"
+                                                                        data-bs-dismiss="modal">Batal</button>
+                                                                    <button type="submit" class="btn btn-success px-4 rounded-3">Update
+                                                                        Status</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="hasil_repair" value="Kondisi Buruk" id="repair_buruk_{{ $item->id }}">
-                                                <label class="form-check-label text-danger fw-bold" for="repair_buruk_{{ $item->id }}">
-                                                    <i class="bi bi-x-circle-fill"></i> Kondisi Buruk
-                                                </label>
+                                        @endif
+                                        <!-- Modal Edit Spare -->
+                                        <div class="modal fade" id="modalEditSpare{{ $item->id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                                                <div class="modal-content rounded-4 border-0 shadow-lg text-start">
+                                                    <div class="modal-header text-white d-flex justify-content-center position-relative"
+                                                        style="background-color: #071152; border-radius: 15px 15px 0 0;">
+                                                        <h4 class="modal-title w-100 text-center fw-bold">Edit Data Spare Tracker</h4>
+                                                        <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
+                                                            data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body pt-3">
+                                                        <form action="{{ route('sparetracker.update') }}" method="POST" enctype="multipart/form-data">
+                                                            @csrf
+                                                            <input type="hidden" name="id" value="{{ $item->id }}">
+                                                            <div class="row g-4">
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label label-blue">SN</label>
+                                                                    <input type="text" name="sn" class="form-control input-custom"
+                                                                        value="{{ $item->sn }}" required>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label label-blue">Nama Perangkat</label>
+                                                                    <input type="text" name="nama_perangkat"
+                                                                        class="form-control input-custom"
+                                                                        value="{{ $item->nama_perangkat }}">
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label label-blue">Jenis</label>
+                                                                    <select name="jenis" class="form-select input-custom">
+                                                                        <option value="">-- Pilih --</option>
+                                                                        @foreach(['MODEM', 'ROUTER', 'SWITCH', 'AP1', 'AP2', 'STAVOL'] as $j)
+                                                                            <option value="{{ $j }}" {{ $item->jenis == $j ? 'selected' : '' }}>
+                                                                                {{ $j }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label label-blue">Kondisi</label>
+                                                                    <select name="kondisi" class="form-select input-custom">
+                                                                        <option value="">-- Pilih --</option>
+                                                                        @foreach(['BAIK', 'RUSAK', 'BARU'] as $k)
+                                                                            <option value="{{ $k }}" {{ $item->kondisi == $k ? 'selected' : '' }}>
+                                                                                {{ $k }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label label-blue">Pengadaan</label>
+                                                                    <input type="text" name="pengadaan_by" class="form-control input-custom"
+                                                                        value="{{ $item->pengadaan_by }}">
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label label-blue">Lokasi Asal</label>
+                                                                    <input type="text" name="lokasi_asal" class="form-control input-custom"
+                                                                        value="{{ $item->lokasi_asal }}">
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <label class="form-label label-blue">Tanggal Masuk</label>
+                                                                    <input type="date" name="tanggal_masuk"
+                                                                        class="form-control input-custom"
+                                                                        value="{{ $item->tanggal_masuk }}">
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label label-blue">Status Perangkat</label>
+                                                                    <input type="text" name="status_penggunaan_sparepart"
+                                                                        class="form-control input-custom"
+                                                                        value="{{ $item->status_penggunaan_sparepart }}">
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label label-blue">Lokasi Realtime</label>
+                                                                    <input type="text" name="lokasi_realtime"
+                                                                        class="form-control input-custom"
+                                                                        value="{{ $item->lokasi_realtime }}">
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label label-blue">Kabupaten</label>
+                                                                    <input type="text" name="kabupaten" class="form-control input-custom"
+                                                                        value="{{ $item->kabupaten }}">
+                                                                </div>
+                                                                <div class="col-md-3 d-none">
+                                                                    <label class="form-label label-blue">Bulan Keluar</label>
+                                                                    <input type="text" name="bulan_keluar" class="form-control input-custom"
+                                                                        value="{{ $item->bulan_keluar }}">
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <label class="form-label label-blue">Tanggal Keluar</label>
+                                                                    <input type="date" name="tanggal_keluar"
+                                                                        class="form-control input-custom"
+                                                                        value="{{ $item->tanggal_keluar }}">
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label label-blue">Layanan AI</label>
+                                                                    <input type="text" name="layanan_ai" class="form-control input-custom"
+                                                                        value="{{ $item->layanan_ai }}">
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label label-blue">Keterangan</label>
+                                                                    <textarea name="keterangan" rows="2"
+                                                                        class="form-control input-custom">{{ $item->keterangan }}</textarea>
+                                                                </div>
+                                                                <div class="col-md-12">
+                                                                    <label class="form-label label-blue"><i class="bi bi-image me-1"></i>Foto Perangkat</label>
+                                                                    @if($item->foto)
+                                                                        <div class="mb-2">
+                                                                            <img src="{{ asset('storage/' . $item->foto) }}" alt="foto" style="max-height:120px;border-radius:8px;border:1px solid #ddd;">
+                                                                            <p class="text-muted mt-1" style="font-size:11px;">Foto saat ini. Upload foto baru untuk menggantinya.</p>
+                                                                        </div>
+                                                                    @endif
+                                                                    <input type="file" name="foto" class="form-control input-custom" accept="image/*">
+                                                                </div>
+                                                            </div>
+                                                            <div class="d-flex justify-content-end gap-2 mt-4">
+                                                                <button type="button" class="btn btn-light px-4 rounded-3"
+                                                                    data-bs-dismiss="modal">Batal</button>
+                                                                <button type="submit" class="btn btn-primary px-4 rounded-3">Update</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="d-flex justify-content-end gap-2 mt-4">
-                                        <button type="button" class="btn btn-light px-4 rounded-3 border" data-bs-dismiss="modal">Batal</button>
-                                        <button type="submit" class="btn btn-success px-4 rounded-3">Update Status</button>
-                                    </div>
-                                </form>
                             </div>
                         </div>
-                    </div>
-                </div>
-                @endif
-                        <!-- Modal Edit Spare -->
-                        <div class="modal fade" id="modalEditSpare{{ $item->id }}" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                                <div class="modal-content rounded-4 border-0 shadow-lg text-start">
-                                    <div class="modal-header text-white d-flex justify-content-center position-relative" style="background-color: #071152; border-radius: 15px 15px 0 0;">
-                                        <h4 class="modal-title w-100 text-center fw-bold">Edit Data Spare Tracker</h4>
-                                        <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
-                                    </div>
-                                    <div class="modal-body pt-3">
-                                        <form action="{{ route('sparetracker.update') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="id" value="{{ $item->id }}">
-                                            <div class="row g-4">
-                                                <div class="col-md-6">
-                                                    <label class="form-label label-blue">SN</label>
-                                                    <input type="text" name="sn" class="form-control input-custom" value="{{ $item->sn }}" required>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label label-blue">Nama Perangkat</label>
-                                                    <input type="text" name="nama_perangkat" class="form-control input-custom" value="{{ $item->nama_perangkat }}">
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label class="form-label label-blue">Jenis</label>
-                                                    <select name="jenis" class="form-select input-custom">
-                                                        <option value="">-- Pilih --</option>
-                                                        @foreach(['MODEM', 'ROUTER', 'SWITCH', 'AP1', 'AP2', 'STAVOL'] as $j)
-                                                            <option value="{{ $j }}" {{ $item->jenis == $j ? 'selected' : '' }}>{{ $j }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label class="form-label label-blue">Type</label>
-                                                    <input type="text" name="type" class="form-control input-custom" value="{{ $item->type }}">
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label class="form-label label-blue">Kondisi</label>
-                                                    <select name="kondisi" class="form-select input-custom">
-                                                        <option value="">-- Pilih --</option>
-                                                        @foreach(['BAIK', 'RUSAK', 'BARU'] as $k)
-                                                            <option value="{{ $k }}" {{ $item->kondisi == $k ? 'selected' : '' }}>{{ $k }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label label-blue">Pengadaan By</label>
-                                                    <input type="text" name="pengadaan_by" class="form-control input-custom" value="{{ $item->pengadaan_by }}">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label label-blue">Lokasi Asal</label>
-                                                    <input type="text" name="lokasi_asal" class="form-control input-custom" value="{{ $item->lokasi_asal }}">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label label-blue">Lokasi</label>
-                                                    <input type="text" name="lokasi" class="form-control input-custom" value="{{ $item->lokasi }}">
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label label-blue">Bulan Masuk</label>
-                                                    <input type="text" name="bulan_masuk" class="form-control input-custom" value="{{ $item->bulan_masuk }}">
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label label-blue">Tanggal Masuk</label>
-                                                    <input type="date" name="tanggal_masuk" class="form-control input-custom" value="{{ $item->tanggal_masuk }}">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label label-blue">Status Penggunaan</label>
-                                                    <input type="text" name="status_penggunaan_sparepart" class="form-control input-custom" value="{{ $item->status_penggunaan_sparepart }}">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label label-blue">Lokasi Realtime</label>
-                                                    <input type="text" name="lokasi_realtime" class="form-control input-custom" value="{{ $item->lokasi_realtime }}">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label label-blue">Kabupaten</label>
-                                                    <input type="text" name="kabupaten" class="form-control input-custom" value="{{ $item->kabupaten }}">
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label label-blue">Bulan Keluar</label>
-                                                    <input type="text" name="bulan_keluar" class="form-control input-custom" value="{{ $item->bulan_keluar }}">
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label label-blue">Tanggal Keluar</label>
-                                                    <input type="date" name="tanggal_keluar" class="form-control input-custom" value="{{ $item->tanggal_keluar }}">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label label-blue">Layanan AI</label>
-                                                    <input type="text" name="layanan_ai" class="form-control input-custom" value="{{ $item->layanan_ai }}">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label label-blue">Keterangan</label>
-                                                    <textarea name="keterangan" rows="2" class="form-control input-custom">{{ $item->keterangan }}</textarea>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex justify-content-end gap-2 mt-4">
-                                                <button type="button" class="btn btn-light px-4 rounded-3" data-bs-dismiss="modal">Batal</button>
-                                                <button type="submit" class="btn btn-primary px-4 rounded-3">Update</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-                <form id="delete-form-{{ $item->id }}" action="{{ route('sparetracker.destroy', $item->id) }}" method="POST" style="display: none;">
-                    @csrf
-                    @method('DELETE')
-                </form>
-                @endforeach
-                <tr class="row-grand-total">
-                    <td colspan="17" class="text-center">GRAND TOTAL: {{ $totalSpare }} Unit</td>
-                </tr>
-            </tbody>
-        </table>
-        </div>
-        <div class="pagination-wrapper">
-            <span class="pagination-info">
-                Showing {{ $spare_data->firstItem() ?? 0 }} to {{ $spare_data->lastItem() ?? 0 }} 
-                of&nbsp;<strong>{{ $spare_data->total() }}</strong>&nbsp;results
-            </span>
-            <nav>
-                {{ $spare_data->appends(request()->query())->links("pagination::bootstrap-5") }}
-            </nav>
-        </div>
+                        <form id="delete-form-{{ $item->id }}" action="{{ route('sparetracker.destroy', $item->id) }}" method="POST"
+                            style="display: none;">
+                            @csrf
+                            @method('DELETE')
+                        </form>
+                    @endforeach
+    <tr class="row-grand-total">
+        <td colspan="18" class="text-center">GRAND TOTAL: {{ $totalSpare }} Unit</td>
+    </tr>
+    </tbody>
+    </table>
     </div>
-</div>
+    <div class="pagination-wrapper">
+        <span class="pagination-info">
+            Showing {{ $spare_data->firstItem() ?? 0 }} to {{ $spare_data->lastItem() ?? 0 }}
+            of&nbsp;<strong>{{ $spare_data->total() }}</strong>&nbsp;results
+        </span>
+        <nav>
+            {{ $spare_data->appends(request()->query())->links("pagination::bootstrap-5") }}
+        </nav>
+    </div>
+    </div>
+    </div>
     @include('components.nav-modal-structure')
+    @include('components.history-modal')
 </body>
+
 </html>
-
-

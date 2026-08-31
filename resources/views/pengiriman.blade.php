@@ -16,6 +16,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .tabs-section {
@@ -143,17 +147,17 @@
                                 <div class="col-md-6">
                                     <label class="form-label" style="font-size: 0.85rem; font-weight: 600;">SN Perangkat
                                         <span class="text-danger">*</span></label>
-                                    <input type="text" name="sn_perangkat" required class="form-control" list="sn-list" placeholder="Ketik manual atau pilih SN yang ada...">
-                                    <datalist id="sn-list">
+                                    <select name="sn_perangkat" id="sn_perangkat" required class="form-select select2-with-tags" style="width: 100%;">
+                                        <option value="">Ketik manual atau pilih SN yang ada...</option>
                                         @foreach($sparetrackers as $st)
                                             <option value="{{ $st->sn }}">{{ $st->sn }} - {{ $st->nama_perangkat }}</option>
                                         @endforeach
-                                    </datalist>
+                                    </select>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label" style="font-size: 0.85rem; font-weight: 600;">Site Tujuan
                                         <span class="text-danger">*</span></label>
-                                    <select name="site_id" required class="form-select">
+                                    <select name="site_id" required class="form-select select2-site" style="width: 100%;">
                                         <option value="">-- Pilih Site Tujuan --</option>
                                         @foreach($sites as $s)
                                             <option value="{{ $s->site_id }}">{{ $s->site_id }} - {{ $s->sitename }}</option>
@@ -316,6 +320,35 @@
     </div>
 
     <script>
+        $(document).ready(function() {
+            // Site Tujuan: searchable + allow typing custom/manual site
+            $('.select2-site').select2({
+                theme: 'bootstrap-5',
+                dropdownParent: $('#modalTambahPengiriman'),
+                placeholder: "-- Cari atau ketik site tujuan --",
+                tags: true,
+                createTag: function(params) {
+                    var term = $.trim(params.term);
+                    if (!term) return null;
+                    return { id: term, text: '📍 Manual: ' + term, newTag: true };
+                },
+                width: '100%'
+            });
+            // SN Perangkat: searchable + allow typing manual SN
+            $('.select2-with-tags').select2({
+                theme: 'bootstrap-5',
+                dropdownParent: $('#modalTambahPengiriman'),
+                tags: true,
+                createTag: function(params) {
+                    var term = $.trim(params.term);
+                    if (!term) return null;
+                    return { id: term, text: '✏️ Manual: ' + term, newTag: true };
+                },
+                placeholder: "Ketik manual atau pilih SN...",
+                width: '100%'
+            });
+        });
+
         document.querySelectorAll('.form-terima').forEach(form => {
             form.addEventListener('submit', function(e) {
                 e.preventDefault();

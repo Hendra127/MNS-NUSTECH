@@ -335,6 +335,9 @@
     <a href="{{ url('/sparetracker') }}"
         class="tab {{ request()->is('sparetracker*') ? 'active' : '' }}"
         style="text-decoration: none; color: Black;">Spare Tracker</a>
+    <a href="{{ route('pengiriman.index') }}"
+        class="tab {{ request()->is('pengiriman*') ? 'active' : '' }}"
+        style="text-decoration: none; color: Black;">Pengiriman</a>
     <a href="{{ url('/pm-summary') }}"
         class="tab {{ request()->is('pm-summary*') ? 'active' : '' }}"
         style="text-decoration: none; color: Black;">Summary</a>
@@ -524,10 +527,24 @@
                         </td>
 
                         {{-- SN LAMA --}}
-                        <td class="sn-cell">{{ $item->sn_lama ?? '-' }}</td>
+                        <td class="sn-cell">
+                            {{ $item->sn_lama ?? '-' }}
+                            @if(!empty($item->sn_lama) && $item->sn_lama !== '-')
+                            <button class="btn btn-sm p-0 ms-1 text-info" onclick="showHistory('{{ $item->sn_lama }}')" title="Lihat History">
+                                <i class="bi bi-info-circle"></i>
+                            </button>
+                            @endif
+                        </td>
 
                         {{-- SN BARU --}}
-                        <td class="sn-cell">{{ $item->sn_baru ?? '-' }}</td>
+                        <td class="sn-cell">
+                            {{ $item->sn_baru ?? '-' }}
+                            @if(!empty($item->sn_baru) && $item->sn_baru !== '-')
+                            <button class="btn btn-sm p-0 ms-1 text-info" onclick="showHistory('{{ $item->sn_baru }}')" title="Lihat History">
+                                <i class="bi bi-info-circle"></i>
+                            </button>
+                            @endif
+                        </td>
 
                         {{-- TANGGAL --}}
                         <td style="font-size:12px; white-space:nowrap;">
@@ -1062,5 +1079,6 @@
     });
 </script>
     @include('components.nav-modal-structure')
+    @include('components.history-modal')
 </body>
 </html>

@@ -156,7 +156,12 @@ class SparetrackerController extends Controller
             'tanggal_keluar' => 'nullable|date',
             'layanan_ai' => 'nullable|string|max:255',
             'keterangan' => 'nullable|string',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
         ]);
+
+        if ($request->hasFile('foto')) {
+            $validated['foto'] = $request->file('foto')->store('sparetracker_foto', 'public');
+        }
 
         $spare = Sparetracker::create($validated);
 
@@ -190,7 +195,15 @@ class SparetrackerController extends Controller
             'tanggal_keluar' => 'nullable|date',
             'layanan_ai' => 'nullable|string|max:255',
             'keterangan' => 'nullable|string',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
         ]);
+
+        if ($request->hasFile('foto')) {
+            if ($data->foto && \Illuminate\Support\Facades\Storage::disk('public')->exists($data->foto)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($data->foto);
+            }
+            $validated['foto'] = $request->file('foto')->store('sparetracker_foto', 'public');
+        }
 
         // Auto-update status jika dari 'Tahap Pengadaan' dan SN baru dimasukkan
         $isRandomSN = str_starts_with($snLama, 'SN-');
@@ -222,12 +235,44 @@ class SparetrackerController extends Controller
         return redirect()->back()->with('success', 'Data berhasil diperbarui.');
     }
 
+
+
     public function destroy($id)
     {
         $data = Sparetracker::findOrFail($id);
         $data->delete();
 
         return redirect()->back()->with('success', 'Data berhasil dihapus.');
+    }
+
+    public function history($sn)
+    {
+        $logs = \App\Models\LogPergantian::with('user')
+            ->where('sn_perangkat', $sn)
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        return response()->json($logs);
+    }
+
+    /**
+     * API: Ambil data sparetracker berdasarkan SN (untuk auto-fill foto di form repair)
+     */
+    public function getBySnApi($sn)
+    {
+        $tracker = Sparetracker::whereRaw('TRIM(LOWER(sn)) = LOWER(?)', [trim($sn)])->first();
+
+        if (!$tracker) {
+            return response()->json(['found' => false]);
+        }
+
+        return response()->json([
+            'found'      => true,
+            'foto_url'   => $tracker->foto ? asset('storage/' . $tracker->foto) : null,
+            'nama'       => $tracker->nama_perangkat,
+            'status'     => $tracker->status_penggunaan_sparepart,
+            'lokasi'     => $tracker->lokasi_realtime,
+        ]);
     }
 
     /**

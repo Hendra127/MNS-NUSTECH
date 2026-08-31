@@ -61,6 +61,7 @@
                                     Perangkat</a></li>
                             <li><a href="{{ route('logpergantian') }}"><i class="bi bi-journal-text me-2"></i> Log
                                     Pergantian</a></li>
+                            <li><a href="{{ route('pengiriman.index') }}"><i class="bi bi-truck me-2"></i> Pengiriman</a></li>
                             <li><a href="{{ route('sparetracker') }}"><i class="bi bi-box-seam me-2"></i> Spare Tracker</a></li>
                             <li><a href="{{ route('summaryperangkat') }}"><i class="bi bi-bar-chart-steps me-2"></i> Summary
                                     Perangkat</a></li>

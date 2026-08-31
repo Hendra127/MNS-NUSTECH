@@ -117,24 +117,37 @@ Route::post('/notifications/mark-read', function () {
 Route::get('/assets/{path}', function ($path) {
     // Membaca file dari folder assets di LUAR public (yaitu di root project)
     $filePath = base_path('assets/' . $path);
-    
+
     if (file_exists($filePath)) {
         $extension = pathinfo($filePath, PATHINFO_EXTENSION);
         $mime = @mime_content_type($filePath);
-        
+
         // Perbaikan MIME type manual jika fungsi mime_content_type tidak akurat
         switch (strtolower($extension)) {
-            case 'css': $mime = 'text/css'; break;
-            case 'js': $mime = 'application/javascript'; break;
-            case 'mp4': $mime = 'video/mp4'; break;
-            case 'svg': $mime = 'image/svg+xml'; break;
-            case 'png': $mime = 'image/png'; break;
+            case 'css':
+                $mime = 'text/css';
+                break;
+            case 'js':
+                $mime = 'application/javascript';
+                break;
+            case 'mp4':
+                $mime = 'video/mp4';
+                break;
+            case 'svg':
+                $mime = 'image/svg+xml';
+                break;
+            case 'png':
+                $mime = 'image/png';
+                break;
             case 'jpg':
-            case 'jpeg': $mime = 'image/jpeg'; break;
+            case 'jpeg':
+                $mime = 'image/jpeg';
+                break;
         }
-        
-        if (!$mime) $mime = 'application/octet-stream';
-        
+
+        if (!$mime)
+            $mime = 'application/octet-stream';
+
         return response()->file($filePath, ['Content-Type' => $mime]);
     }
 
@@ -236,6 +249,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/sparetracker/store', [SparetrackerController::class, 'store'])->name('sparetracker.store');
         Route::post('/sparetracker/update', [SparetrackerController::class, 'update'])->name('sparetracker.update');
         Route::delete('/sparetracker/delete/{id}', [SparetrackerController::class, 'destroy'])->name('sparetracker.destroy');
+        Route::get('/api/sparetracker/sn/{sn}', [SparetrackerController::class, 'getBySnApi'])->where('sn', '.*')->name('sparetracker.api.sn');
         Route::get('/pm-summary', [SummaryController::class, 'index'])->name('summaryperangkat');
 
         // --- LANDING PAGE ADMIN ROUTES ---
@@ -454,3 +468,6 @@ Route::prefix('inventory')->group(function () {
 Route::get('/pengiriman', [PengirimanController::class, 'index'])->name('pengiriman.index');
 Route::post('/pengiriman', [PengirimanController::class, 'store'])->name('pengiriman.store');
 Route::post('/pengiriman/terima/{id}', [PengirimanController::class, 'terima'])->name('pengiriman.terima');
+
+// --- SPARETRACKER HISTORY ROUTE ---
+Route::get('/sparetracker/history/{sn}', [\App\Http\Controllers\SparetrackerController::class, 'history'])->name('sparetracker.history');

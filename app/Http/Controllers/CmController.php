@@ -155,11 +155,13 @@ class CmController extends Controller
         // Notification logic
         if ($data['approval_status'] === CmPengajuan::STATUS_PENDING_NOC) {
             $nocLeader = User::where('name', 'Rossie Maulana Septian, S.Kom')->orWhere('role', 'noc_leader')->get();
-            Notification::send($nocLeader, new CsrApprovalNotification($cm, "Pengajuan CM baru ({$cm->nomor}) dari " . Auth::user()->name . " menunggu persetujuan NOC Leader.", "CM"));
+            $nomorText = $cm->nomor ? " ({$cm->nomor})" : "";
+            Notification::send($nocLeader, new CsrApprovalNotification($cm, "Pengajuan CM baru{$nomorText} dari " . Auth::user()->name . " menunggu persetujuan NOC Leader.", "CM"));
             $msg = 'Formulir CM berhasil disimpan. Menunggu persetujuan NOC Leader.';
         } else {
             $notifiableUsers = User::whereIn('role', ['manager', 'superadmin'])->get();
-            Notification::send($notifiableUsers, new CsrApprovalNotification($cm, "Pengajuan CM baru ({$cm->nomor}) telah dibuat oleh " . Auth::user()->name . ". Menunggu persetujuan Anda.", "CM"));
+            $nomorText = $cm->nomor ? " ({$cm->nomor})" : "";
+            Notification::send($notifiableUsers, new CsrApprovalNotification($cm, "Pengajuan CM baru{$nomorText} telah dibuat oleh " . Auth::user()->name . ". Menunggu persetujuan Anda.", "CM"));
             $msg = 'Formulir CM berhasil disimpan. Menunggu persetujuan Manager.';
 
             // Send WhatsApp notification to manager
@@ -236,7 +238,8 @@ class CmController extends Controller
         $who = $approvedByLabels[$cm->approval_status] ?? 'Pejabat';
 
         if ($pemohon) {
-            $pemohon->notify(new CsrApprovalNotification($cm, "Pengajuan CM Anda ({$cm->nomor}) telah disetujui oleh {$who}.", "CM"));
+            $nomorText = $cm->nomor ? " ({$cm->nomor})" : "";
+            $pemohon->notify(new CsrApprovalNotification($cm, "Pengajuan CM Anda{$nomorText} telah disetujui oleh {$who}.", "CM"));
         }
 
         $nextRole = null;
@@ -247,7 +250,8 @@ class CmController extends Controller
 
         if ($nextRole) {
             $nextUsers = User::whereIn('role', [$nextRole, 'superadmin'])->get();
-            Notification::send($nextUsers, new CsrApprovalNotification($cm, "Pengajuan CM ({$cm->nomor}) telah disetujui oleh {$who} dan menunggu persetujuan Anda.", "CM"));
+            $nomorText = $cm->nomor ? " ({$cm->nomor})" : "";
+            Notification::send($nextUsers, new CsrApprovalNotification($cm, "Pengajuan CM{$nomorText} telah disetujui oleh {$who} dan menunggu persetujuan Anda.", "CM"));
 
             // Send WhatsApp notification
             $roleLabels = [
@@ -319,7 +323,8 @@ class CmController extends Controller
 
         $pemohon = $cm->user ?: User::find($cm->user_id);
         if ($pemohon) {
-            $pemohon->notify(new CsrApprovalNotification($cm, "❌ Pengajuan CM Anda ({$cm->nomor}) DITOLAK oleh {$rejectorLabel}.", "CM"));
+            $nomorText = $cm->nomor ? " ({$cm->nomor})" : "";
+            $pemohon->notify(new CsrApprovalNotification($cm, "❌ Pengajuan CM Anda{$nomorText} DITOLAK oleh {$rejectorLabel}.", "CM"));
         }
 
         return redirect()->back()->with('success', "❌ CM ditolak oleh {$rejectorLabel}.");

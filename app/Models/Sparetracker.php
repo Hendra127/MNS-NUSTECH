@@ -13,7 +13,7 @@ class Sparetracker extends Model
         'lokasi_asal', 'lokasi', 'bulan_masuk', 'tanggal_masuk',
         'status_penggunaan_sparepart', 'lokasi_realtime', 'kabupaten',
         'bulan_keluar', 'tanggal_keluar', 'layanan_ai', 'keterangan',
-        'sparepart_needed_id',
+        'foto', 'sparepart_needed_id',
     ];
 
     /**

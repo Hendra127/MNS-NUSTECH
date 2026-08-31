@@ -413,9 +413,17 @@
                                 </td>
                             @elseif(auth()->check() && auth()->user()->role === 'user')
                                 <td class="col-sticky-right col-aksi text-center">
-                                    <button type="button" class="btn btn-sm bi bi-info-circle"
-                                        onclick="viewSiteInfo({{ $site->toJson() }})" title="Info Site">
-                                    </button>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-sm bi bi-info-circle"
+                                            onclick="viewSiteInfo({{ $site->toJson() }})" title="Info Site">
+                                        </button>
+                                        @if($site->ip_router)
+                                            <button type="button" class="btn btn-sm btn-remote-action" title="Remote Mikrotik"
+                                                onclick="remoteMikrotik('{{ $site->ip_router }}', '{{ $site->tipe }}', '{{ $site->sitename }}', '{{ $site->site_id }}')">
+                                                <i class="bi bi-broadcast"></i>
+                                            </button>
+                                        @endif
+                                    </div>
                                 </td>
                             @endif
                         </tr>

@@ -476,9 +476,7 @@
             document.addEventListener('DOMContentLoaded', () => {
                 showInstallButton();
                 initDarkMode();
-                @if(auth()->user()->hasAdminAccess())
                 initNotificationBell();
-                @endif
                 initNavLogo();
                 initSessionPulse();
                 initIdleLogout();
@@ -487,9 +485,7 @@
         } else {
             showInstallButton();
             initDarkMode();
-            @if(auth()->user()->hasAdminAccess())
             initNotificationBell();
-            @endif
             initNavLogo();
             initSessionPulse();
             initIdleLogout();

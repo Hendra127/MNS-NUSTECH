@@ -20,76 +20,78 @@ class PengirimanController extends Controller
     {
         $sites = Site::orderBy('sitename')->get();
         $pengirimans = Pengiriman::with('site')->latest()->paginate(20);
-        $sparetrackers = Sparetracker::where('status_penggunaan_sparepart', 'Stok')->get();
+        // Show all sparetrackers with SN for dropdown (not just Stok, in case SN needs to be tracked)
+        $sparetrackers = Sparetracker::whereNotNull('sn')->orderBy('sn')->get();
         return view('pengiriman', compact('sites', 'pengirimans', 'sparetrackers'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'ekspedisi' => 'required|string|max:255',
-            'no_resi' => 'required|string|max:255',
-            'sn_perangkat' => 'required|string|max:255',
-            'site_id' => 'required|exists:sites,site_id',
-            'keterangan' => 'nullable|string',
+            'ekspedisi'          => 'required|string|max:255',
+            'no_resi'            => 'required|string|max:255',
+            'sn_perangkat'       => 'required|string|max:255',
+            'site_id'            => 'required|string|max:255',
+            'keterangan'         => 'nullable|string',
             'tanggal_pengiriman' => 'nullable|date',
-            'nama_pengirim' => 'nullable|string|max:255',
-            'nama_penerima' => 'nullable|string|max:255',
-            'kabkota_pengirim' => 'nullable|string|max:255',
-            'kabkota_penerima' => 'nullable|string|max:255',
-            'biaya_pengiriman' => 'nullable|numeric',
-            'klasifikasi' => 'nullable|string|in:BMN,SL',
+            'nama_pengirim'      => 'nullable|string|max:255',
+            'nama_penerima'      => 'nullable|string|max:255',
+            'kabkota_pengirim'   => 'nullable|string|max:255',
+            'kabkota_penerima'   => 'nullable|string|max:255',
+            'biaya_pengiriman'   => 'nullable|numeric',
+            'klasifikasi'        => 'nullable|string|in:BMN,SL',
         ]);
 
         $snInput = trim($request->sn_perangkat);
 
-        $pengiriman = Pengiriman::create([
-            'ekspedisi' => $request->ekspedisi,
-            'no_resi' => $request->no_resi,
-            'sn_perangkat' => $snInput,
-            'site_id' => $request->site_id,
-            'status' => 'Dalam Pengiriman',
-            'keterangan' => $request->keterangan,
+        // Store pengiriman record first (always)
+        Pengiriman::create([
+            'ekspedisi'          => $request->ekspedisi,
+            'no_resi'            => $request->no_resi,
+            'sn_perangkat'       => $snInput,
+            'site_id'            => $request->site_id,
+            'status'             => 'Dalam Pengiriman',
+            'keterangan'         => $request->keterangan,
             'tanggal_pengiriman' => $request->tanggal_pengiriman,
-            'nama_pengirim' => $request->nama_pengirim,
-            'nama_penerima' => $request->nama_penerima,
-            'kabkota_pengirim' => $request->kabkota_pengirim,
-            'kabkota_penerima' => $request->kabkota_penerima,
-            'biaya_pengiriman' => $request->biaya_pengiriman,
-            'klasifikasi' => $request->klasifikasi ?? 'BMN',
+            'nama_pengirim'      => $request->nama_pengirim,
+            'nama_penerima'      => $request->nama_penerima,
+            'kabkota_pengirim'   => $request->kabkota_pengirim,
+            'kabkota_penerima'   => $request->kabkota_penerima,
+            'biaya_pengiriman'   => $request->biaya_pengiriman,
+            'klasifikasi'        => $request->klasifikasi ?? 'BMN',
         ]);
 
-        // Logic update Sparetracker — cari dengan trim dan case insensitive
+        // Try to find matching site (may be manual input, not in DB)
         $site = Site::where('site_id', $request->site_id)->first();
-        $tracker = Sparetracker::whereRaw('TRIM(LOWER(sn)) = ?', [strtolower($snInput)])->first();
+        $siteName = $site ? $site->sitename : $request->site_id;
 
-        if ($tracker && $site) {
-            $statusLama = $tracker->status_penggunaan_sparepart;
+        // Try to find sparetracker by SN (case-insensitive, trimmed)
+        $tracker = Sparetracker::whereRaw('TRIM(LOWER(sn)) = LOWER(TRIM(?))', [$snInput])->first();
+
+        if ($tracker) {
+            $statusLama  = $tracker->status_penggunaan_sparepart;
             $kondisiLama = $tracker->kondisi;
 
             $tracker->update([
+                'lokasi_asal'                 => $tracker->lokasi_realtime,
                 'status_penggunaan_sparepart' => 'Dikirim ke Site',
-                'tanggal_keluar' => now(),
+                'tanggal_keluar'              => now(),
+                'keterangan'                  => 'TELAH DIKIRIM KE LOKASI ' . strtoupper($siteName) . ', MENUNGGU PEMASANGAN',
             ]);
 
             LogPergantian::create([
                 'sn_perangkat' => $snInput,
-                'aksi' => 'dikirim',
-                'keterangan' => 'Perangkat dikirim ke site ' . ($site->sitename ?? '-') . ' via ' . $request->ekspedisi . ' (Resi: ' . $request->no_resi . ')',
-                'status_lama' => $statusLama,
-                'status_baru' => 'Dikirim ke Site',
+                'aksi'         => 'dikirim',
+                'keterangan'   => 'Perangkat dikirim ke ' . $siteName . ' via ' . $request->ekspedisi . ' (Resi: ' . $request->no_resi . ')',
+                'status_lama'  => $statusLama,
+                'status_baru'  => 'Dikirim ke Site',
                 'kondisi_lama' => $kondisiLama,
                 'kondisi_baru' => $kondisiLama,
-                'user_id' => Auth::id() ?? 1,
+                'user_id'      => Auth::id() ?? 1,
             ]);
-
-            return redirect()->back()->with('success', 'Data pengiriman berhasil disimpan! Sparetracker (SN: ' . $snInput . ') diupdate ke status "Dikirim ke Site".');
-        } elseif (!$tracker) {
-            // SN tidak ditemukan di Sparetracker — data pengiriman tetap tersimpan
-            return redirect()->back()->with('error', 'Data pengiriman tersimpan, tapi SN "' . $snInput . '" tidak ditemukan di Sparetracker. Pastikan SN sudah terdaftar di halaman Spare Tracker.');
-        } else {
-            return redirect()->back()->with('success', 'Data pengiriman berhasil disimpan.');
         }
+
+        return redirect()->back()->with('success', 'Data pengiriman berhasil disimpan!' . ($tracker ? ' Spare Tracker SN ' . $snInput . ' diupdate.' : ''));
     }
 
     public function terima($id)
@@ -102,37 +104,45 @@ class PengirimanController extends Controller
 
         $pengiriman->update(['status' => 'Diterima']);
 
-        $snInput = trim($pengiriman->sn_perangkat);
-        $site = Site::where('site_id', $pengiriman->site_id)->first();
-        $tracker = Sparetracker::whereRaw('TRIM(LOWER(sn)) = ?', [strtolower($snInput)])->first();
+        $snInput  = trim($pengiriman->sn_perangkat);
+        $site     = Site::where('site_id', $pengiriman->site_id)->first();
+        $siteName = $site ? $site->sitename : $pengiriman->site_id;
 
-        if ($tracker && $site) {
-            $statusLama = $tracker->status_penggunaan_sparepart;
+        // Find sparetracker - case insensitive, trimmed
+        $tracker = Sparetracker::whereRaw('TRIM(LOWER(sn)) = LOWER(TRIM(?))', [$snInput])->first();
+
+        if ($tracker) {
+            $statusLama  = $tracker->status_penggunaan_sparepart;
             $kondisiLama = $tracker->kondisi;
 
+            $isManualSite = !$site;
+            $statusBaru = $isManualSite ? 'Spare' : 'Terpasang';
+            $keteranganBaru = $isManualSite ? 'TERSEDIA SEBAGAI SPARE DI ' . strtoupper($siteName) : 'Terpasang di ' . strtoupper($siteName);
+
             $tracker->update([
-                'status_penggunaan_sparepart' => 'Terpasang',
-                'lokasi_realtime' => $site->sitename,
-                'lokasi' => $site->site_id,
-                'kabupaten' => $site->kab,
+                'status_penggunaan_sparepart' => $statusBaru,
+                'lokasi_realtime'             => $siteName,
+                'lokasi'                      => $site ? $site->site_id : $pengiriman->site_id,
+                'kabupaten'                   => $site ? $site->kab : null,
+                'keterangan'                  => $keteranganBaru,
+                'tanggal_keluar'              => $tracker->tanggal_keluar ?? now(),
             ]);
 
             LogPergantian::create([
                 'sn_perangkat' => $snInput,
-                'aksi' => 'diterima',
-                'keterangan' => 'Perangkat telah diterima di site ' . ($site->sitename ?? '-'),
-                'status_lama' => $statusLama,
-                'status_baru' => 'Terpasang',
+                'aksi'         => 'diterima',
+                'keterangan'   => 'Perangkat diterima ' . ($isManualSite ? 'sebagai Spare di ' : 'dan terpasang di site ') . $siteName,
+                'status_lama'  => $statusLama,
+                'status_baru'  => $statusBaru,
                 'kondisi_lama' => $kondisiLama,
                 'kondisi_baru' => $kondisiLama,
-                'user_id' => Auth::id() ?? 1,
+                'user_id'      => Auth::id() ?? 1,
             ]);
 
-            return redirect()->back()->with('success', 'Pengiriman Diterima! Sparetracker (SN: ' . $snInput . ') lokasi diperbarui ke ' . ($site->sitename ?? '-') . '.');
-        } elseif (!$tracker) {
-            return redirect()->back()->with('error', 'Status pengiriman berhasil diubah ke Diterima, tapi SN "' . $snInput . '" tidak ditemukan di Sparetracker. Update lokasi gagal dilakukan.');
-        } else {
-            return redirect()->back()->with('success', 'Pengiriman telah Diterima.');
+            return redirect()->back()->with('success', 'Pengiriman Diterima! Spare Tracker SN ' . $snInput . ' lokasi diperbarui ke ' . $siteName . '.');
         }
+
+        return redirect()->back()->with('success', 'Pengiriman berhasil ditandai Diterima. (SN "' . $snInput . '" tidak ditemukan di Spare Tracker, update lokasi dilewati.)');
     }
 }
+
