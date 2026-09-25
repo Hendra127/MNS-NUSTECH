@@ -8,6 +8,8 @@ use App\Notifications\CsrApprovalNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
+use App\Exports\CmExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CmController extends Controller
 {
@@ -92,6 +94,10 @@ class CmController extends Controller
             $query->where('status_pembayaran', $request->status_pembayaran);
         }
 
+        if ($request->kategori) {
+            $query->where('kategori', $request->kategori);
+        }
+
         $cmList = $query->get();
         $sites   = \App\Models\Site::orderBy('sitename')->get(['site_id', 'sitename']);
         $userRole = Auth::user()->role;
@@ -106,6 +112,7 @@ class CmController extends Controller
         $data = $request->validate([
             'tempat_tanggal'        => 'nullable|string',
             'divisi'                => 'nullable|string',
+            'kategori'              => 'nullable|in:BMN,SL',
             'nomor'                 => 'nullable|string',
             'nama_site'             => 'required|array',
             'tanggal_kunjungan'     => 'nullable|string',
@@ -353,6 +360,7 @@ class CmController extends Controller
         $data = $request->validate([
             'tempat_tanggal'        => 'nullable|string',
             'divisi'                => 'nullable|string',
+            'kategori'              => 'nullable|in:BMN,SL',
             'nomor'                 => 'nullable|string',
             'nama_site'             => 'required|array',
             'tanggal_kunjungan'     => 'nullable|string',
@@ -419,8 +427,8 @@ class CmController extends Controller
 
     public function updateAccountingNotes(Request $request, $id)
     {
-        if (Auth::user()->role !== 'accounting') {
-            return redirect()->back()->with('error', 'Hanya Accounting yang dapat mengisi catatan dan nomor surat.');
+        if (!in_array(Auth::user()->role, ['accounting', 'direktur'])) {
+            return redirect()->back()->with('error', 'Hanya Accounting atau Direktur yang dapat mengisi catatan dan nomor surat.');
         }
 
         $cm = CmPengajuan::findOrFail($id);
@@ -483,5 +491,29 @@ class CmController extends Controller
         \App\Services\WhatsAppService::sendToRole('accounting', $waMessage);
 
         return redirect()->back()->with('success', '✅ Site dinyatakan DONE.');
+    }
+
+    // -------------------------------------------------------------------------
+
+    public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'bulan' => 'required|integer|min:1|max:12',
+            'tahun' => 'required|integer|min:2020|max:2099',
+        ]);
+
+        $month = (int) $request->bulan;
+        $year  = (int) $request->tahun;
+
+        $bulanIndo = [
+            1  => 'Januari', 2  => 'Februari', 3  => 'Maret',
+            4  => 'April',   5  => 'Mei',       6  => 'Juni',
+            7  => 'Juli',    8  => 'Agustus',   9  => 'September',
+            10 => 'Oktober', 11 => 'November',  12 => 'Desember',
+        ];
+
+        $filename = 'CM_' . ($bulanIndo[$month] ?? $month) . '_' . $year . '.xlsx';
+
+        return Excel::download(new CmExport($month, $year), $filename);
     }
 }

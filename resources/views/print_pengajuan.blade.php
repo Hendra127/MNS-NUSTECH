@@ -154,18 +154,20 @@
             height: 160px;
             max-width: 250px;
             object-fit: contain;
-            filter: contrast(4) brightness(0.4);
+            filter: grayscale(1) contrast(4); mix-blend-mode: multiply;
             z-index: 10;
         }
 
         .sign-accounting img {
-            bottom: -80px !important;
+            bottom: -30px !important;
+            height: 90px !important;
+            max-width: 130px !important;
         }
 
         .sign-direktur img {
             bottom: -50px !important;
             height: 120px !important;
-            filter: contrast(3.5) brightness(0.5) !important;
+            filter: grayscale(1) contrast(3.5) !important; mix-blend-mode: multiply !important;
             opacity: 0.95;
         }
 
@@ -346,7 +348,7 @@
                 <div class="sign-title">Pemohon,</div>
                 <div class="sign-img">
                     @if(isset($pengajuan) && $withTtd)
-                        <img src="{{ asset('assets/img/ttd/pemohon.png') }}" alt="TTD Pemohon">
+                        <img src="{{ asset('assets/img/ttd/pemohon.png') }}?v={{ time() }}" alt="TTD Pemohon">
                     @else
                         <div style="height: 60px;"></div>
                     @endif
@@ -358,7 +360,7 @@
                 <div class="sign-title">Diverifikasi,</div>
                 <div class="sign-img">
                     @if(isset($pengajuan) && $pengajuan->approved_manager_at && $withTtd)
-                        <img src="{{ asset('assets/img/ttd/manager.png') }}" alt="TTD Manager">
+                        <img src="{{ asset('assets/img/ttd/manager.png') }}?v={{ time() }}" alt="TTD Manager">
                     @else
                         <div style="height: 60px;"></div>
                     @endif
@@ -374,7 +376,7 @@
                 <div class="sign-title">Diverifikasi,</div>
                 <div class="sign-img sign-accounting">
                     @if(isset($pengajuan) && $pengajuan->approved_accounting_at && $withTtd)
-                        <img src="{{ asset('assets/img/ttd/accounting.png') }}" alt="TTD Accounting">
+                        <img src="{{ asset('assets/img/ttd/accounting.png') }}?v={{ time() }}" alt="TTD Accounting">
                     @else
                         <div style="height: 60px;"></div>
                     @endif
@@ -386,7 +388,7 @@
                 <div class="sign-title">Disetujui,</div>
                 <div class="sign-img sign-direktur">
                     @if(isset($pengajuan) && $pengajuan->approved_direktur_at && $withTtd)
-                        <img src="{{ asset('assets/img/ttd/direktur.png') }}" alt="TTD Direktur">
+                        <img src="{{ asset('assets/img/ttd/direktur.png') }}?v={{ time() }}" alt="TTD Direktur">
                     @else
                         <div style="height: 60px;"></div>
                     @endif
@@ -402,7 +404,7 @@
                 <div class="sign-title">Mengetahui,</div>
                 <div class="sign-img">
                     @if(isset($pengajuan) && $pengajuan->approved_penasihat_at && $withTtd)
-                        <img src="{{ asset('assets/img/ttd/penasihat.png') }}" alt="TTD Penasihat">
+                        <img src="{{ asset('assets/img/ttd/penasihat.png') }}?v={{ time() }}" alt="TTD Penasihat">
                     @else
                         <div style="height: 60px;"></div>
                     @endif

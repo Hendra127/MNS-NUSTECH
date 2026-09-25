@@ -721,7 +721,7 @@
             height: 80px;
             max-width: 150px;
             object-fit: contain;
-            filter: contrast(3) brightness(0.5);
+            filter: grayscale(1) contrast(3); mix-blend-mode: multiply;
         }
 
         .preview-sign-name {
@@ -788,13 +788,17 @@
     <div class="content-container mt-4">
         <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3"
             style="margin-bottom: 20px;">
-            <div class="actions flex-shrink-0">
-                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin', 'user', 'noc_leader']))
+            <div class="actions flex-shrink-0 d-flex gap-2">
+                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin', 'user', 'noc_leader', 'accounting', 'direktur']))
                     <button type="button" class="btn btn-primary rounded-pill d-flex align-items-center gap-2 px-4 shadow-sm" data-bs-toggle="modal"
-                        data-bs-target="#modalPrintPengajuan" title="Buat Pengajuan Baru" style="height: 40px;">
+                        data-bs-target="#modalPrintPengajuan" title="Buat Pengajuan Baru" style="height: 40px; background: linear-gradient(135deg, #0d6efd, #0b5ed7); border: none; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                         <i class="bi bi-plus-lg"></i> Buat Pengajuan
                     </button>
                 @endif
+                <button type="button" class="btn btn-success text-white fw-bold d-flex align-items-center gap-2 rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalExportExcelSP"
+                    title="Export ke Excel" style="height: 40px; background: linear-gradient(135deg, #16a34a, #15803d); border: none; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <i class="bi bi-file-earmark-excel-fill"></i> Export Excel
+                </button>
             </div>
             <div class="w-100 mt-2 mt-lg-0">
                 <form method="GET" action="{{ route('sparepart_needed') }}"
@@ -969,7 +973,7 @@
                             <td class="text-center">
                                 <div class="d-flex gap-2 justify-content-center align-items-center">
                                     @if($p->can_approve)
-                                        @if($p->approval_status === 'approved_manager' && auth()->user()->role === 'accounting')
+                                        @if(in_array($p->approval_status, ['approved_manager', 'approved_accounting']) && in_array(auth()->user()->role, ['accounting', 'direktur']))
                                             {{-- Accounting: buka modal isi no_surat + catatan dulu --}}
                                             <button type="button" class="btn btn-sm btn-success shadow-sm" data-bs-toggle="modal"
                                                 data-bs-target="#modalApproveAccSP{{ $p->id }}" title="Setujui &amp; Isi Catatan">
@@ -1035,7 +1039,7 @@
                                     @endif
 
                                     {{-- Tombol Edit Catatan/No Surat khusus Accounting --}}
-                                    @if(auth()->check() && auth()->user()->role === 'accounting')
+                                    @if(auth()->check() && in_array(auth()->user()->role, ['accounting', 'direktur']))
                                         <button type="button" class="btn btn-sm btn-outline-dark"
                                             style="border-radius:8px;padding:6px 10px;" data-bs-toggle="modal"
                                             data-bs-target="#modalNotesSP{{ $p->id }}" title="Isi / Edit Catatan & No Surat">
@@ -1349,15 +1353,14 @@
                                                             <p class="mb-1">Diverifikasi,</p>
                                                             <div class="preview-sign-img" style="height: 70px;">
                                                                 @if($p->approved_accounting_at)
-                                                                    <img src="{{ asset('assets/img/ttd/accounting.png') }}"
-                                                                        style="bottom: -20px; position: relative;">
+                                                                    <img src="{{ asset('assets/img/ttd/accounting_ttd.png') }}">
                                                                 @endif
                                                             </div>
                                                             <p class="preview-sign-name">
-                                                                {{ $dataJson['diverifikasi2_nama'] ?? 'Baiq Nana Erlina, A.Md' }}
+                                                                {{ $dataJson['diverifikasi2_nama'] ?? 'Desi Halisna Ariani' }}
                                                             </p>
                                                             <p class="preview-sign-jabatan">
-                                                                {{ $dataJson['diverifikasi2_jabatan'] ?? 'Accounting' }}
+                                                                {{ $dataJson['diverifikasi2_jabatan'] ?? 'Head of Accounting' }}
                                                             </p>
                                                         </div>
                                                         <div>
@@ -1368,10 +1371,10 @@
                                                                 @endif
                                                             </div>
                                                             <p class="preview-sign-name">
-                                                                {{ $dataJson['disetujui_nama'] ?? 'Galuh Zakiyatun, S.Kom' }}
+                                                                {{ $dataJson['disetujui_nama'] ?? 'Baiq Nana Erlina, A.Md' }}
                                                             </p>
                                                             <p class="preview-sign-jabatan">
-                                                                {{ $dataJson['disetujui_jabatan'] ?? 'Direktur' }}
+                                                                {{ $dataJson['disetujui_jabatan'] ?? 'Plt. Direktur' }}
                                                             </p>
                                                         </div>
                                                     </div>
@@ -1420,7 +1423,7 @@
     </div>
 
     {{-- ===== MODALS APPROVE ACCOUNTING + NOTES SPAREPART ===== --}}
-    @if(auth()->check() && auth()->user()->role === 'accounting')
+    @if(auth()->check() && in_array(auth()->user()->role, ['accounting', 'direktur']))
         @foreach($pengajuans as $p)
             {{-- MODAL APPROVE ACCOUNTING SPAREPART --}}
             <div class="modal fade" id="modalApproveAccSP{{ $p->id }}" tabindex="-1">
@@ -1484,7 +1487,7 @@
                             <div class="modal-body p-4">
                                 <div class="alert alert-warning border-0 small mb-3" style="background:#fffbeb;">
                                     <i class="bi bi-lock me-1"></i>
-                                    Hanya <strong>Accounting</strong> yang dapat mengisi/mengubah data ini. Semua field bersifat
+                                    Hanya <strong>Accounting</strong> dan <strong>Direktur</strong> yang dapat mengisi/mengubah data ini. Semua field bersifat
                                     opsional.
                                 </div>
                                 <div class="mb-3">
@@ -1786,14 +1789,14 @@
                             <div class="col-4">
                                 <label class="form-label fw-bold" style="font-size: 0.85rem;">Diverifikasi 2</label>
                                 <input type="text" name="diverifikasi2_nama" class="form-control mb-1"
-                                    value="Baiq Nana Erlina, A.Md">
-                                <input type="text" name="diverifikasi2_jabatan" class="form-control" value="Accounting">
+                                    value="Desi Halisna Ariani">
+                                <input type="text" name="diverifikasi2_jabatan" class="form-control" value="Head of Accounting">
                             </div>
                             <div class="col-4">
                                 <label class="form-label fw-bold" style="font-size: 0.85rem;">Disetujui</label>
                                 <input type="text" name="disetujui_nama" class="form-control mb-1"
-                                    value="Galuh Zakiyatun, S.Kom">
-                                <input type="text" name="disetujui_jabatan" class="form-control" value="Direktur">
+                                    value="Baiq Nana Erlina, A.Md">
+                                <input type="text" name="disetujui_jabatan" class="form-control" value="Plt. Direktur">
                             </div>
                             <div class="col-4">
                                 <label class="form-label fw-bold" style="font-size: 0.85rem;">Mengetahui</label>
@@ -2790,10 +2793,60 @@
             triggerText.classList.remove('fw-semibold', 'text-dark');
             if(hiddenInput) hiddenInput.value = '';
         }
+        // --- AUTO-FILL FOTO PREVIEW LOGIC ---
+        var repairRow = wrapper.closest('.repair-fields') || wrapper.closest('[class*="edit-repair-fields-"]');
+        var snVal = selectedOpt ? selectedOpt.value : '';
         
+        if (repairRow) {
+            var $repairRow = $(repairRow);
+            var $previewDiv = $repairRow.find('.sn-foto-preview-create, .sn-foto-preview-edit');
+            var $fileInput = $repairRow.find('.input-foto-sn, input[type="file"]');
+            var $badge = $repairRow.find('label:contains("Foto SN Perangkat") .badge');
+            
+            var handleFoundFoto = function(fotoUrl) {
+                if ($previewDiv.length) {
+                    $previewDiv.find('.sn-foto-img').attr('src', fotoUrl);
+                    $previewDiv.find('.sn-foto-link').attr('href', fotoUrl);
+                    $previewDiv.show();
+                }
+                if ($fileInput.length) $fileInput.prop('required', false);
+                if ($badge.length) $badge.text('Opsional').removeClass('bg-danger').addClass('bg-secondary');
+            };
+
+            var handleNoFoto = function() {
+                if ($previewDiv.length) $previewDiv.hide();
+                if ($fileInput.length) $fileInput.prop('required', true);
+                if ($badge.length) $badge.text('Wajib').removeClass('bg-secondary').addClass('bg-danger');
+            };
+
+            if (!snVal) {
+                handleNoFoto();
+            } else {
+                if (typeof window.snFotoMap !== 'undefined' && window.snFotoMap[snVal]) {
+                    handleFoundFoto(window.snFotoMap[snVal]);
+                } else {
+                    $.ajax({
+                        url: '/api/sparetracker/sn/' + encodeURIComponent(snVal),
+                        type: 'GET',
+                        success: function(data) {
+                            if (data.found && data.foto_url) {
+                                if (typeof window.snFotoMap !== 'undefined') window.snFotoMap[snVal] = data.foto_url;
+                                handleFoundFoto(data.foto_url);
+                            } else {
+                                handleNoFoto();
+                            }
+                        },
+                        error: function() { handleNoFoto(); }
+                    });
+                }
+            }
+        }
+        // --- END AUTO-FILL ---
+
         // Trigger change event manual untuk sync foto (di script bawah)
-        var event = new Event('change', { bubbles: true });
-        hiddenInput.dispatchEvent(event);
+        if (hiddenInput) {
+            $(hiddenInput).trigger('change');
+        }
 
         // Tutup panel
         panel.style.display = 'none';
@@ -2973,50 +3026,133 @@
                 });
             }
         });
-
-        // CREATE repair: sync hidden input + auto-fill foto preview
-        $(document).on('change', '.select2-sn-create', function() {
-            var snVal = $(this).val(); // single select, returns a string
-            var $repairRow = $(this).closest('.repair-fields');
-            var $hiddenSn = $repairRow.find('.hidden-sn');
-            var $previewDiv = $repairRow.find('.sn-foto-preview-create');
-
-            // Sync ke hidden input
-            $hiddenSn.val(snVal || '');
-
-            if (!snVal) {
-                $previewDiv.hide();
-                return;
-            }
-
-            // Cek di map dulu (sudah di-build dari server-side)
-            if (snFotoMap[snVal]) {
-                $previewDiv.find('.sn-foto-img').attr('src', snFotoMap[snVal]);
-                $previewDiv.find('.sn-foto-link').attr('href', snFotoMap[snVal]);
-                $previewDiv.show();
-            } else {
-                // Fallback: fetch via AJAX API
-                $.ajax({
-                    url: '/api/sparetracker/sn/' + encodeURIComponent(snVal),
-                    type: 'GET',
-                    success: function(data) {
-                        if (data.found && data.foto_url) {
-                            snFotoMap[snVal] = data.foto_url; // cache
-                            $previewDiv.find('.sn-foto-img').attr('src', data.foto_url);
-                            $previewDiv.find('.sn-foto-link').attr('href', data.foto_url);
-                            $previewDiv.show();
-                        } else {
-                            $previewDiv.hide();
-                        }
-                    },
-                    error: function() { $previewDiv.hide(); }
-                });
-            }
-        });
     });
     </script>
 
     @include('components.nav-modal-structure')
+
+    {{-- ===================== MODAL EXPORT EXCEL PENGAJUAN SPAREPART ===================== --}}
+    <div class="modal fade" id="modalExportExcelSP" tabindex="-1" aria-labelledby="modalExportExcelSPLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 18px; overflow: hidden;">
+                {{-- Header --}}
+                <div class="modal-header border-0 text-white py-4 px-4"
+                    style="background: linear-gradient(135deg, #16a34a, #15803d);">
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="width: 44px; height: 44px; background: rgba(255,255,255,0.2);
+                            border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-file-earmark-excel-fill" style="font-size: 1.4rem;"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title mb-0 fw-bold" id="modalExportExcelSPLabel">Export Pengajuan Perangkat</h5>
+                            <small style="opacity: 0.85; font-size: 12px;">Pilih tipe, bulan, dan tahun</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                {{-- Body --}}
+                <div class="modal-body px-4 py-4" style="background: #f9fafb;">
+                    <form action="{{ route('sparepart.needed.pengajuan.export.excel') }}" method="GET" id="formExportSP">
+                        @csrf
+
+                        <div class="row g-3">
+                            {{-- Tipe Pengajuan --}}
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-dark" style="font-size: 13px;">
+                                    <i class="bi bi-gear-fill me-1 text-success"></i> Tipe Pengajuan
+                                </label>
+                                <select name="tipe_pengajuan" class="form-select shadow-sm" required
+                                    style="border-radius: 10px; border: 1.5px solid #d1fae5; font-size: 14px; padding: 10px 14px;">
+                                    <option value="Pembelian Baru">Pembelian Baru</option>
+                                    <option value="Repair Perangkat">Repair Perangkat</option>
+                                </select>
+                            </div>
+
+                            {{-- Bulan --}}
+                            <div class="col-7">
+                                <label class="form-label fw-semibold text-dark" style="font-size: 13px;">
+                                    <i class="bi bi-calendar-month me-1 text-success"></i> Bulan
+                                </label>
+                                <select name="bulan" id="exportBulanSP" class="form-select shadow-sm" required
+                                    style="border-radius: 10px; border: 1.5px solid #d1fae5; font-size: 14px; padding: 10px 14px;">
+                                    <option value="1">Januari</option>
+                                    <option value="2">Februari</option>
+                                    <option value="3">Maret</option>
+                                    <option value="4">April</option>
+                                    <option value="5">Mei</option>
+                                    <option value="6">Juni</option>
+                                    <option value="7">Juli</option>
+                                    <option value="8">Agustus</option>
+                                    <option value="9">September</option>
+                                    <option value="10">Oktober</option>
+                                    <option value="11">November</option>
+                                    <option value="12">Desember</option>
+                                </select>
+                            </div>
+
+                            {{-- Tahun --}}
+                            <div class="col-5">
+                                <label class="form-label fw-semibold text-dark" style="font-size: 13px;">
+                                    <i class="bi bi-calendar3 me-1 text-success"></i> Tahun
+                                </label>
+                                <select name="tahun" id="exportTahunSP" class="form-select shadow-sm" required
+                                    style="border-radius: 10px; border: 1.5px solid #d1fae5; font-size: 14px; padding: 10px 14px;">
+                                    @for($y = date('Y'); $y >= 2020; $y--)
+                                        <option value="{{ $y }}" {{ $y == date('Y') ? 'selected' : '' }}>{{ $y }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                        </div>
+
+                        {{-- Info box --}}
+                        <div class="mt-3 p-3 rounded-3 d-flex align-items-start gap-2"
+                            style="background: #ecfdf5; border: 1px solid #a7f3d0; font-size: 12.5px; color: #065f46;">
+                            <i class="bi bi-info-circle-fill mt-1 flex-shrink-0" style="color: #059669;"></i>
+                            <span>File Excel akan diunduh secara otomatis berisi data pengajuan sesuai filter yang dipilih.</span>
+                        </div>
+
+                        {{-- Actions --}}
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="button" class="btn btn-light flex-fill rounded-3 fw-semibold"
+                                data-bs-dismiss="modal" style="font-size: 14px;">
+                                <i class="bi bi-x-lg me-1"></i> Batal
+                            </button>
+                            <button type="submit" class="btn text-white flex-fill rounded-3 fw-bold shadow-sm"
+                                id="btnDownloadExcelSP"
+                                style="background: linear-gradient(135deg, #16a34a, #15803d); font-size: 14px; transition: all 0.2s;">
+                                <i class="bi bi-download me-1"></i> Download Excel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- =================== END MODAL EXPORT EXCEL PENGAJUAN SPAREPART =================== --}}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Set default bulan to current month
+            const currentMonth = new Date().getMonth() + 1;
+            const bulanSelect  = document.getElementById('exportBulanSP');
+            if (bulanSelect) bulanSelect.value = currentMonth;
+
+            // Loading state on submit
+            const form = document.getElementById('formExportSP');
+            const btn  = document.getElementById('btnDownloadExcelSP');
+            if (form && btn) {
+                form.addEventListener('submit', function () {
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Mengunduh...';
+                    btn.disabled  = true;
+                    setTimeout(function () {
+                        btn.innerHTML = '<i class="bi bi-download me-1"></i> Download Excel';
+                        btn.disabled  = false;
+                    }, 4000);
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

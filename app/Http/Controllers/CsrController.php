@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Notifications\CsrApprovalNotification;
 use Illuminate\Support\Facades\Notification;
+use App\Exports\CsrExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CsrController extends Controller
 {
@@ -463,8 +465,8 @@ class CsrController extends Controller
 
     public function updateAccountingNotes(Request $request, $id)
     {
-        if (Auth::user()->role !== 'accounting') {
-            return redirect()->back()->with('error', 'Hanya Accounting yang dapat mengisi catatan dan nomor surat.');
+        if (!in_array(Auth::user()->role, ['accounting', 'direktur'])) {
+            return redirect()->back()->with('error', 'Hanya Accounting atau Direktur yang dapat mengisi catatan dan nomor surat.');
         }
 
         $csr = CsrPengajuan::findOrFail($id);
@@ -496,5 +498,29 @@ class CsrController extends Controller
         $csr->update($updateData);
 
         return redirect()->back()->with('success', '✅ Catatan, Nomor Surat, dan Pembayaran berhasil disimpan.');
+    }
+
+    // -------------------------------------------------------------------------
+
+    public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'bulan' => 'required|integer|min:1|max:12',
+            'tahun' => 'required|integer|min:2020|max:2099',
+        ]);
+
+        $month = (int) $request->bulan;
+        $year  = (int) $request->tahun;
+
+        $bulanIndo = [
+            1  => 'Januari', 2  => 'Februari', 3  => 'Maret',
+            4  => 'April',   5  => 'Mei',       6  => 'Juni',
+            7  => 'Juli',    8  => 'Agustus',   9  => 'September',
+            10 => 'Oktober', 11 => 'November',  12 => 'Desember',
+        ];
+
+        $filename = 'CSR_' . ($bulanIndo[$month] ?? $month) . '_' . $year . '.xlsx';
+
+        return Excel::download(new CsrExport($month, $year), $filename);
     }
 }

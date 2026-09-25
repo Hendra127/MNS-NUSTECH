@@ -134,18 +134,20 @@
             height: 160px;
             max-width: 250px;
             object-fit: contain;
-            filter: contrast(4) brightness(0.4);
+            filter: grayscale(1) contrast(4); mix-blend-mode: multiply;
             z-index: 10;
         }
 
         .sign-accounting img {
-            bottom: -80px !important;
+            bottom: -30px !important;
+            height: 90px !important;
+            max-width: 130px !important;
         }
 
         .sign-direktur img {
             bottom: -50px !important; /* Dinaikkan sedikit */
             height: 120px !important; /* Dikecilkan */
-            filter: contrast(3.5) brightness(0.5) !important;
+            filter: grayscale(1) contrast(3.5) !important; mix-blend-mode: multiply !important;
             opacity: 0.95;
         }
 
@@ -363,14 +365,13 @@
                             @endif
                             <div class="signature-grid">
                                 <div class="sign-box">
-
                                     <div class="sign-title">Pemohon,</div>
                                     <div class="sign-img">
                                         @if($csr->ttd_pemohon && $withTtd)
                                             @php
                                                 $ttdUrl = str_replace('storage/', 'storage/', $csr->ttd_pemohon);
                                             @endphp
-                                            <img src="{{ asset($ttdUrl) }}" alt="TTD Pemohon">
+                                            <img src="{{ asset($ttdUrl) }}?v={{ time() }}" alt="TTD Pemohon">
                                         @endif
                                     </div>
                                     <div class="sign-name">Rossie Maulana Septian, S.Kom</div>
@@ -384,7 +385,7 @@
                                             @php
                                                 $ttdUrl = str_replace('storage/', 'storage/', $csr->ttd_manager);
                                             @endphp
-                                            <img src="{{ asset($ttdUrl) }}" alt="TTD Manager">
+                                            <img src="{{ asset($ttdUrl) }}?v={{ time() }}" alt="TTD Manager">
                                         @endif
                                     </div>
                                     <div class="sign-name">{{ $csr->diverifikasi2_nama }}</div>
@@ -398,7 +399,7 @@
                                             @php
                                                 $ttdUrl = str_replace('storage/', 'storage/', $csr->ttd_accounting);
                                             @endphp
-                                            <img src="{{ asset($ttdUrl) }}" alt="TTD Accounting">
+                                            <img src="{{ asset($ttdUrl) }}?v={{ time() }}" alt="TTD Accounting">
                                         @endif
                                     </div>
                                     <div class="sign-name">{{ $csr->diverifikasi3_nama }}</div>
@@ -412,7 +413,7 @@
                                             @php
                                                 $ttdUrl = str_replace('storage/', 'storage/', $csr->ttd_direktur);
                                             @endphp
-                                            <img src="{{ asset($ttdUrl) }}" alt="TTD Direktur">
+                                            <img src="{{ asset($ttdUrl) }}?v={{ time() }}" alt="TTD Direktur">
                                         @endif
                                     </div>
                                     <div class="sign-name">{{ $csr->disetujui_nama }}</div>
@@ -429,7 +430,7 @@
                                             @php
                                                 $ttdUrl = str_replace('storage/', 'storage/', $csr->ttd_penasihat);
                                             @endphp
-                                            <img src="{{ asset($ttdUrl) }}" alt="TTD Penasihat">
+                                            <img src="{{ asset($ttdUrl) }}?v={{ time() }}" alt="TTD Penasihat">
                                         @endif
                                     </div>
                                     <div class="sign-name">{{ $csr->mengetahui_nama }}</div>

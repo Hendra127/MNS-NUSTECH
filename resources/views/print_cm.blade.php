@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulir Pengajuan CM - {{ $cm->nama_site }}</title>
     <style>
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             font-family: Tahoma, Geneva, Verdana, sans-serif;
@@ -23,7 +25,8 @@
         }
 
         .page-content {
-            padding: 2mm 20mm; /* Reduced from 15mm */
+            padding: 2mm 20mm;
+            /* Reduced from 15mm */
         }
 
         .header-container {
@@ -32,13 +35,19 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid #3b82f6;
-            padding: 10mm 20mm 10px 20mm; /* Reduced from 15mm */
+            padding: 10mm 20mm 10px 20mm;
+            /* Reduced from 15mm */
             background: white;
         }
 
-        .logo { width: 220px; height: auto; }
+        .logo {
+            width: 220px;
+            height: auto;
+        }
 
-        .header-text-right { text-align: right; }
+        .header-text-right {
+            text-align: right;
+        }
 
         .header-text-right h2 {
             margin: 0;
@@ -58,16 +67,29 @@
             font-family: Arial, Helvetica, sans-serif;
         }
 
-        .info-section { margin-bottom: 12px; }
+        .info-section {
+            margin-bottom: 12px;
+        }
 
         .info-row {
             display: flex;
             margin-bottom: 3px;
         }
 
-        .info-label   { width: 135px; flex-shrink: 0; }
-        .info-separator { width: 18px; text-align: center; flex-shrink: 0; }
-        .info-value   { flex: 1; }
+        .info-label {
+            width: 135px;
+            flex-shrink: 0;
+        }
+
+        .info-separator {
+            width: 18px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .info-value {
+            flex: 1;
+        }
 
         .pembuka {
             margin-bottom: 10px;
@@ -82,32 +104,52 @@
 
         .main-table td {
             border: 1px solid #000;
-            padding: 1px 8px; /* Reduced padding for compact layout */
-            vertical-align: middle; /* Changed to middle for better consistency */
-            line-height: 1.15; /* Compact line-height */
+            padding: 1px 8px;
+            /* Reduced padding for compact layout */
+            vertical-align: middle;
+            /* Changed to middle for better consistency */
+            line-height: 1.15;
+            /* Compact line-height */
         }
 
-        .label-cell     { width: 170px; }
-        .total-cell     { font-weight: bold; }
-        .terbilang-cell { font-style: italic; }
+        .label-cell {
+            width: 170px;
+        }
 
-        .footer-text { margin-bottom: 16px; }
+        .total-cell {
+            font-weight: bold;
+        }
+
+        .terbilang-cell {
+            font-style: italic;
+        }
+
+        .footer-text {
+            margin-bottom: 16px;
+        }
 
         .signature-block {
-            margin-top: 10px; /* Reduced from 25px */
+            margin-top: 10px;
+            /* Reduced from 25px */
         }
 
         .signature-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            row-gap: 15px; /* Further reduced from 30px */
+            row-gap: 15px;
+            /* Further reduced from 30px */
             column-gap: 16px;
-            margin-bottom: 5px; /* Further reduced from 10px */
+            margin-bottom: 5px;
+            /* Further reduced from 10px */
         }
 
-        .sign-box { text-align: center; }
+        .sign-box {
+            text-align: center;
+        }
 
-        .sign-title { margin-bottom: 5px; }
+        .sign-title {
+            margin-bottom: 5px;
+        }
 
 
 
@@ -128,18 +170,22 @@
             height: 160px;
             max-width: 250px;
             object-fit: contain;
-            filter: contrast(4) brightness(0.4);
+            filter: grayscale(1) contrast(4);
+            mix-blend-mode: multiply;
             z-index: 10;
         }
 
         .sign-accounting img {
-            bottom: -80px !important;
+            bottom: -30px !important;
+            height: 90px !important;
+            max-width: 130px !important;
         }
 
         .sign-direktur img {
             bottom: -50px !important;
             height: 120px !important;
-            filter: contrast(3.5) brightness(0.5) !important;
+            filter: grayscale(1) contrast(3.5) !important;
+            mix-blend-mode: multiply !important;
             opacity: 0.95;
         }
 
@@ -151,12 +197,15 @@
             z-index: 5;
         }
 
-        .sign-jabatan { font-weight: bold; }
+        .sign-jabatan {
+            font-weight: bold;
+        }
 
         .penasihat-row {
             display: flex;
             justify-content: center;
-            margin-top: 15px; /* Reduced from 40px */
+            margin-top: 15px;
+            /* Reduced from 40px */
             page-break-inside: avoid;
         }
 
@@ -165,9 +214,19 @@
                 size: A4;
                 margin: 0;
             }
-            body { background: none; margin: 0; }
-            thead { display: table-header-group; }
-            .no-print { display: none; }
+
+            body {
+                background: none;
+                margin: 0;
+            }
+
+            thead {
+                display: table-header-group;
+            }
+
+            .no-print {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -183,7 +242,7 @@
             $_SERVER['DOCUMENT_ROOT'] . '/mns/assets/img/logo2.jpg',
             base_path('../public_html/assets/img/logo2.jpg'),
             base_path('../public_html/mns/assets/img/logo2.jpg'),
-            
+
             // Fallback ke logonustech.png
             public_path('assets/img/logonustech.png'),
             public_path('mns/assets/img/logonustech.png'),
@@ -245,7 +304,8 @@
                         </div>
 
                         <div class="pembuka">
-                            Dengan ini saya mengajukan kunjungan teknisi untuk maintenance site open tiket atau sudah terpantau offline selama durasi lebih dari 3 hari dengan perincian sebagai berikut:
+                            Dengan ini saya mengajukan kunjungan teknisi untuk maintenance site open tiket atau sudah
+                            terpantau offline selama durasi lebih dari 3 hari dengan perincian sebagai berikut:
                         </div>
 
                         <table class="main-table">
@@ -257,15 +317,16 @@
                                     </div>
                                 </td>
                                 <td class="value-cell" style="line-height: 1.2; vertical-align: top;">@php
-                                        $rawSites = str_replace(["\r", "\n"], ',', $cm->nama_site);
-                                        $siteArray = array_values(array_filter(array_map('trim', explode(',', $rawSites))));
-                                    @endphp @if(count($siteArray) > 1)
+                                    $rawSites = str_replace(["\r", "\n"], ',', $cm->nama_site);
+                                    $siteArray = array_values(array_filter(array_map('trim', explode(',', $rawSites))));
+                                @endphp @if(count($siteArray) > 1)
                                         @foreach($siteArray as $index => $s)
                                             {{ $index + 1 }}. {{ preg_replace('/^[0-9]+\.\s*/', '', $s) }}<br>
                                         @endforeach
                                     @else
                                         {{ $cm->nama_site }}
-                                    @endif</td>
+                                    @endif
+                                </td>
                             </tr>
                             <tr>
                                 <td class="label-cell">
@@ -310,7 +371,8 @@
                                         <span>:</span>
                                     </div>
                                 </td>
-                                <td class="value-cell" style="vertical-align: top;">{!! nl2br(e($cm->rincian_kebutuhan)) !!}</td>
+                                <td class="value-cell" style="vertical-align: top;">
+                                    {!! nl2br(e($cm->rincian_kebutuhan)) !!}</td>
                             </tr>
                             <tr>
                                 <td class="label-cell">
@@ -355,13 +417,13 @@
                             <div class="signature-grid">
                                 <div class="sign-box">
 
-                                    <div class="sign-title">Pemohon,</div>
+                                     <div class="sign-title">Pemohon,</div>
                                     <div class="sign-img">
                                         @if($cm->ttd_pemohon && $withTtd)
                                             @php
                                                 $ttdUrl = str_replace('storage/', 'storage/', $cm->ttd_pemohon);
                                             @endphp
-                                            <img src="{{ asset($ttdUrl) }}" alt="TTD Pemohon">
+                                            <img src="{{ asset($ttdUrl) }}?v={{ time() }}" alt="TTD Pemohon">
                                         @endif
                                     </div>
                                     <div class="sign-name">Rossie Maulana Septian, S.Kom</div>
@@ -375,7 +437,7 @@
                                             @php
                                                 $ttdUrl = str_replace('storage/', 'storage/', $cm->ttd_manager);
                                             @endphp
-                                            <img src="{{ asset($ttdUrl) }}" alt="TTD Manager">
+                                            <img src="{{ asset($ttdUrl) }}?v={{ time() }}" alt="TTD Manager">
                                         @endif
                                     </div>
                                     <div class="sign-name">{{ $cm->diverifikasi1_nama }}</div>
@@ -389,7 +451,7 @@
                                             @php
                                                 $ttdUrl = str_replace('storage/', 'storage/', $cm->ttd_accounting);
                                             @endphp
-                                            <img src="{{ asset($ttdUrl) }}" alt="TTD Accounting">
+                                            <img src="{{ asset($ttdUrl) }}?v={{ time() }}" alt="TTD Accounting">
                                         @endif
                                     </div>
                                     <div class="sign-name">{{ $cm->diverifikasi2_nama }}</div>
@@ -403,7 +465,7 @@
                                             @php
                                                 $ttdUrl = str_replace('storage/', 'storage/', $cm->ttd_direktur);
                                             @endphp
-                                            <img src="{{ asset($ttdUrl) }}" alt="TTD Direktur">
+                                            <img src="{{ asset($ttdUrl) }}?v={{ time() }}" alt="TTD Direktur">
                                         @endif
                                     </div>
                                     <div class="sign-name">{{ $cm->disetujui_nama }}</div>
@@ -420,7 +482,7 @@
                                             @php
                                                 $ttdUrl = str_replace('storage/', 'storage/', $cm->ttd_penasihat);
                                             @endphp
-                                            <img src="{{ asset($ttdUrl) }}" alt="TTD Penasihat">
+                                            <img src="{{ asset($ttdUrl) }}?v={{ time() }}" alt="TTD Penasihat">
                                         @endif
                                     </div>
                                     <div class="sign-name">{{ $cm->mengetahui_nama }}</div>

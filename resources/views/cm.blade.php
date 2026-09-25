@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/nav-modal.css') }}?v=1.1">
     <script src="{{ asset('js/nav-modal.js') }}"></script>
     <script src="{{ asset('js/profile-dropdown.js') }}"></script>
-        <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CM Pengajuan | Project Operational</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -230,11 +230,12 @@
         [data-bs-theme="dark"] .btn-filter-pill {
             background: linear-gradient(135deg, #1a6fc4, #0d5dbc);
         }
-        
+
         [data-bs-theme="dark"] .search-box {
             background: #2b3035;
             border-color: #495057;
         }
+
         [data-bs-theme="dark"] .search-box input {
             color: #f8f9fa;
         }
@@ -244,13 +245,13 @@
         body {
             overflow-x: hidden;
         }
-        
+
         .content-container {
             max-width: 100vw;
             box-sizing: border-box;
             overflow-x: hidden;
         }
-        
+
         .table-responsive-custom {
             width: 100%;
             max-width: 100%;
@@ -258,7 +259,7 @@
             -webkit-overflow-scrolling: touch;
             display: block;
         }
-        
+
         .tabs-section {
             display: flex;
             flex-wrap: nowrap;
@@ -267,17 +268,18 @@
             scrollbar-width: none;
             max-width: 100vw;
         }
-        
+
         .tabs-section::-webkit-scrollbar {
             display: none;
         }
-        
+
         .tabs-section .tab {
             white-space: nowrap;
             flex-shrink: 0;
         }
-        
+
         @media (max-width: 768px) {
+
             .table-custom th,
             .table-custom td {
                 padding: 10px;
@@ -289,12 +291,13 @@
             color: #f8f9fa;
             border-color: #f8f9fa;
         }
+
         [data-bs-theme="dark"] .btn-outline-dark:hover {
             color: #212529;
             background-color: #f8f9fa;
             border-color: #f8f9fa;
         }
-        
+
         @media (max-width: 768px) {
             .content-container {
                 padding: 15px !important;
@@ -302,27 +305,35 @@
                 border-radius: 12px;
                 width: calc(100vw - 20px);
             }
+
             .card-header {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 15px;
             }
+
             .search-form {
                 width: 100%;
             }
+
             .search-box {
                 width: 100%;
                 margin-right: 0;
             }
+
             .search-box input {
                 width: 100%;
             }
-            .btn-premium, .btn-action-premium {
+
+            .btn-premium,
+            .btn-action-premium {
                 width: 100%;
                 border-radius: 8px;
                 height: 45px;
             }
-            .btn-premium::after, .btn-action-premium::after {
+
+            .btn-premium::after,
+            .btn-action-premium::after {
                 display: none !important;
             }
         }
@@ -427,38 +438,65 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
-        <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3" style="margin-bottom: 20px;">
-            <div class="actions flex-shrink-0">
-                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin', 'user', 'noc_leader']))
-                    <button class="btn btn-primary text-white fw-bold d-flex align-items-center gap-2 rounded-pill px-4 py-2 mt-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambahCm"
-                        title="Buat Pengajuan Baru" style="background: linear-gradient(135deg, #0d6efd, #0b5ed7); border: none; transition: transform 0.2s; color: white !important;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3"
+            style="margin-bottom: 20px;">
+            <div class="actions flex-shrink-0 d-flex gap-2">
+                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin', 'user', 'noc_leader', 'accounting', 'direktur']))
+                    <button
+                        class="btn btn-primary text-white fw-bold d-flex align-items-center gap-2 rounded-pill px-4 py-2 mt-2 shadow-sm"
+                        data-bs-toggle="modal" data-bs-target="#modalTambahCm" title="Buat Pengajuan Baru"
+                        style="background: linear-gradient(135deg, #0d6efd, #0b5ed7); border: none; transition: transform 0.2s; color: white !important;"
+                        onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                         <i class="bi bi-plus-lg"></i> Buat Pengajuan
                     </button>
                 @endif
+                <button
+                    class="btn btn-success text-white fw-bold d-flex align-items-center gap-2 rounded-pill px-4 py-2 mt-2 shadow-sm"
+                    data-bs-toggle="modal" data-bs-target="#modalExportExcelCm" title="Export ke Excel"
+                    style="background: linear-gradient(135deg, #16a34a, #15803d); border: none; transition: transform 0.2s;"
+                    onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <i class="bi bi-file-earmark-excel-fill"></i> Export Excel
+                </button>
             </div>
             <div class="w-100 mt-2 mt-lg-0">
                 <form method="GET" action="{{ route('cm.index') }}"
                     class="search-form row g-2 align-items-center w-100 m-0 justify-content-lg-end" id="filterForm">
 
                     <div class="col-12 col-md-auto">
-                        <select name="status_pembayaran" class="form-select form-select-sm w-100" style="border-radius: 50px;">
+                        <select name="status_pembayaran" class="form-select form-select-sm w-100"
+                            style="border-radius: 50px;">
                             <option value="">Semua Status Bayar</option>
                             <option value="belum_dibayar" {{ request('status_pembayaran') === 'belum_dibayar' ? 'selected' : '' }}>Belum Dibayar</option>
-                            <option value="dp_50" {{ request('status_pembayaran') === 'dp_50' ? 'selected' : '' }}>Sudah di DP 50%</option>
-                            <option value="lunas" {{ request('status_pembayaran') === 'lunas' ? 'selected' : '' }}>Sudah Lunas</option>
+                            <option value="dp_50" {{ request('status_pembayaran') === 'dp_50' ? 'selected' : '' }}>Sudah
+                                di DP 50%</option>
+                            <option value="lunas" {{ request('status_pembayaran') === 'lunas' ? 'selected' : '' }}>Sudah
+                                Lunas</option>
                         </select>
                     </div>
-                    
+
+                    <div class="col-12 col-md-auto">
+                        <select name="kategori" class="form-select form-select-sm w-100" style="border-radius: 50px;">
+                            <option value="">Semua Kategori</option>
+                            <option value="BMN" {{ request('kategori') === 'BMN' ? 'selected' : '' }}>🏛️ BMN (Barang
+                                Milik Negara)</option>
+                            <option value="SL" {{ request('kategori') === 'SL' ? 'selected' : '' }}>📋 SL (Sewa Layanan)
+                            </option>
+                        </select>
+                    </div>
+
                     <div class="col-12 col-md-auto">
                         <select name="status" class="form-select form-select-sm w-100" style="border-radius: 50px;">
                             <option value="">Semua Status</option>
-                            <option value="pending_noc" {{ request('status') == 'pending_noc' ? 'selected' : '' }}>Pending NOC Leader</option>
-                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending Manager</option>
+                            <option value="pending_noc" {{ request('status') == 'pending_noc' ? 'selected' : '' }}>Pending
+                                NOC Leader</option>
+                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending Manager
+                            </option>
                             <option value="approved_manager" {{ request('status') == 'approved_manager' ? 'selected' : '' }}>Pending Accounting</option>
                             <option value="approved_accounting" {{ request('status') == 'approved_accounting' ? 'selected' : '' }}>Pending Direktur</option>
                             <option value="approved_direktur" {{ request('status') == 'approved_direktur' ? 'selected' : '' }}>Pending Penasihat</option>
                             <option value="approved_penasihat" {{ request('status') == 'approved_penasihat' ? 'selected' : '' }}>Selesai (Approved)</option>
-                            <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Ditolak</option>
+                            <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Ditolak
+                            </option>
                         </select>
                     </div>
 
@@ -470,13 +508,12 @@
                     <div class="col-auto">
                         <a href="{{ route('cm.index') }}"
                             class="btn btn-light btn-sm rounded-pill border d-flex align-items-center justify-content-center h-100"
-                            style="padding: 8px 12px;"
-                            title="Reset Filter"><i class="bi bi-arrow-repeat"></i></a>
+                            style="padding: 8px 12px;" title="Reset Filter"><i class="bi bi-arrow-repeat"></i></a>
                     </div>
                     <div class="col-12 col-md-auto">
                         <div class="search-box d-flex align-items-center w-100">
-                            <input type="text" name="search" id="searchInput" placeholder="Cari No / Divisi / Site / Teknisi"
-                                value="{{ request('search') }}"
+                            <input type="text" name="search" id="searchInput"
+                                placeholder="Cari No / Divisi / Site / Teknisi" value="{{ request('search') }}"
                                 style="flex-grow: 1; border: none; outline: none; padding-left: 10px;">
                             <button type="submit" class="search-btn" style="border: none; background: transparent;"><i
                                     class="bi bi-search"></i></button>
@@ -488,401 +525,452 @@
 
         <div id="tableCmContainer">
             <div class="table-responsive-custom">
-            <table class="table-custom">
-                <thead>
-                    <tr>
-                        <th class="text-center" style="width: 50px;">No</th>
-                        <th style="min-width: 150px;">Tanggal & Nomor</th>
-                        <th style="min-width: 200px;">Site</th>
-                        <th style="min-width: 180px;">Teknisi & Bank</th>
-                        <th>Rincian Kebutuhan</th>
-                        <th class="text-end" style="min-width: 130px;">Total Dana</th>
-                        <th class="text-center" style="min-width: 150px;">Status Pembayaran</th>
-                        <th class="text-center" style="min-width: 150px;">Progress Approval</th>
-                        <th class="text-center">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($cmList as $cm)
-                        @php
-                            $statusColor = 'warning';
-                            $statusLabel = 'Pending Manager';
-                            $step = 0;
-
-                            if ($cm->approval_status == 'approved_manager') {
-                                $statusColor = 'info';
-                                $statusLabel = 'Pending Accounting';
-                                $step = 1;
-                            } elseif ($cm->approval_status == 'approved_accounting') {
-                                $statusColor = 'primary';
-                                $statusLabel = 'Pending Direktur';
-                                $step = 2;
-                            } elseif ($cm->approval_status == 'approved_direktur') {
-                                $statusColor = 'indigo';
-                                $statusLabel = 'Pending Penasihat';
-                                $step = 3;
-                            } elseif ($cm->approval_status == 'approved_penasihat') {
-                                $statusColor = 'success';
-                                $statusLabel = 'Selesai (Approved)';
-                                $step = 4;
-                            } elseif ($cm->approval_status == 'rejected') {
-                                $statusColor = 'danger';
-                                $statusLabel = 'Ditolak';
-                                $step = 0;
-                            }
-                        @endphp
+                <table class="table-custom">
+                    <thead>
                         <tr>
-                            <td class="text-center">
-                                {{ $loop->iteration }}
-                            </td>
-                            <td>
-                                <div class="fw-bold text-dark">{{ $cm->tempat_tanggal }}</div>
-                                <div class="small text-muted">{{ $cm->nomor }}</div>
-                            </td>
-                            <td>
-                                <div class="site-list-compact fw-bold text-dark">
-                                    @php
-                                        $rawSites = str_replace(["\r", "\n"], ',', $cm->nama_site);
-                                        $siteArray = array_values(array_filter(array_map('trim', explode(',', $rawSites))));
-                                    @endphp
-                                    @if(count($siteArray) > 1)
-                                        @foreach($siteArray as $index => $s)
-                                            <div class="site-item">{{ $index + 1 }}. {{ preg_replace('/^[0-9]+\.\s*/', '', $s) }}
+                            <th class="text-center" style="width: 50px;">No</th>
+                            <th style="min-width: 150px;">Tanggal & Nomor</th>
+                            <th style="min-width: 200px;">Site</th>
+                            <th style="min-width: 180px;">Teknisi & Bank</th>
+                            <th>Rincian Kebutuhan</th>
+                            <th class="text-center" style="min-width: 100px;">Kategori</th>
+                            <th class="text-end" style="min-width: 130px;">Total Dana</th>
+                            <th class="text-center" style="min-width: 150px;">Status Pembayaran</th>
+                            <th class="text-center" style="min-width: 150px;">Progress Approval</th>
+                            <th class="text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($cmList as $cm)
+                            @php
+                                $statusColor = 'warning';
+                                $statusLabel = 'Pending Manager';
+                                $step = 0;
+
+                                if ($cm->approval_status == 'approved_manager') {
+                                    $statusColor = 'info';
+                                    $statusLabel = 'Pending Accounting';
+                                    $step = 1;
+                                } elseif ($cm->approval_status == 'approved_accounting') {
+                                    $statusColor = 'primary';
+                                    $statusLabel = 'Pending Direktur';
+                                    $step = 2;
+                                } elseif ($cm->approval_status == 'approved_direktur') {
+                                    $statusColor = 'indigo';
+                                    $statusLabel = 'Pending Penasihat';
+                                    $step = 3;
+                                } elseif ($cm->approval_status == 'approved_penasihat') {
+                                    $statusColor = 'success';
+                                    $statusLabel = 'Selesai (Approved)';
+                                    $step = 4;
+                                } elseif ($cm->approval_status == 'rejected') {
+                                    $statusColor = 'danger';
+                                    $statusLabel = 'Ditolak';
+                                    $step = 0;
+                                }
+                            @endphp
+                            <tr>
+                                <td class="text-center">
+                                    {{ $loop->iteration }}
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark">{{ $cm->tempat_tanggal }}</div>
+                                    <div class="small text-muted">{{ $cm->nomor }}</div>
+                                </td>
+                                <td>
+                                    <div class="site-list-compact fw-bold text-dark">
+                                        @php
+                                            $rawSites = str_replace(["\r", "\n"], ',', $cm->nama_site);
+                                            $siteArray = array_values(array_filter(array_map('trim', explode(',', $rawSites))));
+                                        @endphp
+                                        @if(count($siteArray) > 1)
+                                            @foreach($siteArray as $index => $s)
+                                                <div class="site-item">{{ $index + 1 }}.
+                                                    {{ preg_replace('/^[0-9]+\.\s*/', '', $s) }}
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            {{ $cm->nama_site }}
+                                        @endif
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="teknisi-info">
+                                        <div class="fw-bold text-dark" style="font-size: 13px;"><i class="bi bi-tools"></i>
+                                            {{ $cm->nama_teknisi }}
+                                        </div>
+                                        @if($cm->bank)
+                                            <div class="small text-primary mt-1" style="font-size: 11px;"><i
+                                                    class="bi bi-bank"></i>
+                                                {{ $cm->bank }}
+                                            </div>
+                                            <div class="small text-muted" style="font-size: 11px;">{{ $cm->nomor_rekening }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td style="max-width: 300px;">
+                                    <div class="small text-dark text-truncate">{{ $cm->rincian_kebutuhan }}</div>
+                                </td>
+                                <td class="text-center">
+                                    @if($cm->kategori === 'BMN')
+                                        <span class="badge"
+                                            style="background:#1e40af;color:#fff;font-size:0.75rem;padding:5px 8px;border-radius:6px;"
+                                            title="Barang Milik Negara">
+                                            🏛️ BMN
+                                        </span>
+                                    @elseif($cm->kategori === 'SL')
+                                        <span class="badge"
+                                            style="background:#065f46;color:#fff;font-size:0.75rem;padding:5px 8px;border-radius:6px;"
+                                            title="Sewa Layanan">
+                                            📋 SL
+                                        </span>
+                                    @else
+                                        <span class="badge bg-secondary"
+                                            style="font-size:0.75rem;padding:5px 8px;border-radius:6px;">—</span>
+                                    @endif
+                                </td>
+                                <td class="text-end">
+                                    <div class="fw-bold text-success">Rp {{ number_format($cm->total, 0, ',', '.') }}</div>
+                                </td>
+                                <td class="text-center">
+                                    @if($cm->status_pembayaran === 'lunas')
+                                        <span class="badge bg-success" style="min-width: 85px; padding: 5px;">Lunas</span>
+                                    @elseif($cm->status_pembayaran === 'dp_50')
+                                        <span class="badge bg-warning text-dark" style="min-width: 85px; padding: 5px;">DP
+                                            50%</span>
+                                    @else
+                                        <span class="badge bg-danger" style="min-width: 85px; padding: 5px;">Belum
+                                            Dibayar</span>
+                                    @endif
+
+                                    @if(in_array($cm->status_pembayaran, ['lunas', 'dp_50']))
+                                        <div class="mt-1">
+                                            <button type="button"
+                                                class="btn btn-sm btn-info text-white shadow-sm d-inline-flex align-items-center justify-content-center gap-1"
+                                                style="font-size: 0.72rem; padding: 4px; border-radius: 6px; min-width: 85px;"
+                                                title="Lihat Bukti Pembayaran" data-bs-toggle="modal"
+                                                data-bs-target="#modalBuktiCm{{ $cm->id }}">
+                                                <i class="bi bi-info-circle-fill"></i> Info
+                                            </button>
+                                        </div>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge-status bg-{{ $statusColor }}-subtle text-{{ $statusColor }}">
+                                        @if($cm->approval_status == 'approved_penasihat')
+                                            <i class="bi bi-check-circle-fill"></i>
+                                        @elseif($cm->approval_status == 'rejected')
+                                            <i class="bi bi-x-circle-fill"></i>
+                                        @else
+                                            <i class="bi bi-clock-history"></i>
+                                        @endif
+                                        {{ $statusLabel }}
+                                    </span>
+                                    <div class="workflow-step">
+                                        @foreach(['NOC Leader', 'Manager', 'Accounting', 'Direktur', 'Penasihat'] as $idx => $label)
+                                            <div class="step-item" title="{{ $label }}">
+                                                <div
+                                                    class="step-dot 
+                                                                        {{ $cm->step > ($idx + 1) ? 'completed' : ($cm->approval_status == 'rejected' && $cm->rejected_by == $label ? 'rejected' : ($cm->step == ($idx + 1) ? 'active' : '')) }}">
+                                                </div>
                                             </div>
                                         @endforeach
-                                    @else
-                                        {{ $cm->nama_site }}
-                                    @endif
-                                </div>
-                            </td>
-                            <td>
-                                <div class="teknisi-info">
-                                    <div class="fw-bold text-dark" style="font-size: 13px;"><i class="bi bi-tools"></i>
-                                        {{ $cm->nama_teknisi }}</div>
-                                    @if($cm->bank)
-                                        <div class="small text-primary mt-1" style="font-size: 11px;"><i class="bi bi-bank"></i>
-                                            {{ $cm->bank }}</div>
-                                        <div class="small text-muted" style="font-size: 11px;">{{ $cm->nomor_rekening }}</div>
-                                    @endif
-                                </div>
-                            </td>
-                            <td style="max-width: 300px;">
-                                <div class="small text-dark text-truncate">{{ $cm->rincian_kebutuhan }}</div>
-                            </td>
-                            <td class="text-end">
-                                <div class="fw-bold text-success">Rp {{ number_format($cm->total, 0, ',', '.') }}</div>
-                            </td>
-                            <td class="text-center">
-                                @if($cm->status_pembayaran === 'lunas')
-                                    <span class="badge bg-success" style="min-width: 85px; padding: 5px;">Lunas</span>
-                                @elseif($cm->status_pembayaran === 'dp_50')
-                                    <span class="badge bg-warning text-dark" style="min-width: 85px; padding: 5px;">DP 50%</span>
-                                @else
-                                    <span class="badge bg-danger" style="min-width: 85px; padding: 5px;">Belum Dibayar</span>
-                                @endif
-
-                                @if(in_array($cm->status_pembayaran, ['lunas', 'dp_50']) && ($cm->bukti_transfer || $cm->bukti_dp))
-                                    <div class="mt-1">
-                                        <button type="button"
-                                            class="btn btn-sm btn-info text-white shadow-sm d-inline-flex align-items-center justify-content-center gap-1"
-                                            style="font-size: 0.72rem; padding: 4px; border-radius: 6px; min-width: 85px;"
-                                            title="Lihat Bukti Pembayaran"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#modalBuktiCm{{ $cm->id }}">
-                                            <i class="bi bi-info-circle-fill"></i> Info
-                                        </button>
                                     </div>
-                                @endif
-                            </td>
-                            <td class="text-center">
-                                <span class="badge-status bg-{{ $statusColor }}-subtle text-{{ $statusColor }}">
-                                    @if($cm->approval_status == 'approved_penasihat')
-                                        <i class="bi bi-check-circle-fill"></i>
-                                    @elseif($cm->approval_status == 'rejected')
-                                        <i class="bi bi-x-circle-fill"></i>
-                                    @else
-                                        <i class="bi bi-clock-history"></i>
-                                    @endif
-                                    {{ $statusLabel }}
-                                </span>
-                                <div class="workflow-step">
-                                    @foreach(['NOC Leader', 'Manager', 'Accounting', 'Direktur', 'Penasihat'] as $idx => $label)
-                                        <div class="step-item" title="{{ $label }}">
-                                            <div
-                                                class="step-dot 
-                                                                {{ $cm->step > ($idx + 1) ? 'completed' : ($cm->approval_status == 'rejected' && $cm->rejected_by == $label ? 'rejected' : ($cm->step == ($idx + 1) ? 'active' : '')) }}">
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="d-flex justify-content-center gap-2">
-                                    @if($cm->approval_status != 'approved_penasihat' && $cm->approval_status != 'rejected')
-                                        @php
-                                            $roleGate = [
-                                                'pending_noc' => ['noc_leader'],
-                                                'pending' => ['manager'],
-                                                'approved_manager' => ['accounting'],
-                                                'approved_accounting' => ['direktur'],
-                                                'approved_direktur' => ['penasihat'],
-                                            ];
-                                            $allowedRoles = $roleGate[$cm->approval_status] ?? [];
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        @if($cm->approval_status != 'approved_penasihat' && $cm->approval_status != 'rejected')
+                                            @php
+                                                $roleGate = [
+                                                    'pending_noc' => ['noc_leader'],
+                                                    'pending' => ['manager'],
+                                                    'approved_manager' => ['accounting'],
+                                                    'approved_accounting' => ['direktur'],
+                                                    'approved_direktur' => ['penasihat'],
+                                                ];
+                                                $allowedRoles = $roleGate[$cm->approval_status] ?? [];
 
-                                            // Special check for Rossie Maulana Septian
-                                            $isRossie = (auth()->user()->name === 'Rossie Maulana Septian, S.Kom');
-                                            $canApprove = ($cm->user_id != auth()->id()) &&
-                                                (in_array(auth()->user()->role, $allowedRoles) || ($cm->approval_status === 'pending_noc' && $isRossie));
-                                        @endphp
+                                                // Special check for Rossie Maulana Septian
+                                                $isRossie = (auth()->user()->name === 'Rossie Maulana Septian, S.Kom');
+                                                $canApprove = ($cm->user_id != auth()->id()) &&
+                                                    (in_array(auth()->user()->role, $allowedRoles) || ($cm->approval_status === 'pending_noc' && $isRossie));
+                                            @endphp
 
-                                        @if($canApprove)
-                                            @if($cm->approval_status === 'approved_manager')
-                                                {{-- Accounting: buka modal isi no_surat + catatan dulu --}}
-                                                <button type="button" class="btn-approve"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#modalApproveAccCm{{ $cm->id }}"
-                                                    title="Setujui &amp; Isi Catatan">
-                                                    <i class="bi bi-check-lg"></i>
-                                                </button>
-                                            @else
-                                                <form action="{{ route('cm.approve', $cm->id) }}" method="POST">
-                                                    @csrf
-                                                    <button type="submit" class="btn-approve">
+                                            @if($canApprove)
+                                                @if(in_array($cm->approval_status, ['approved_manager', 'approved_accounting']))
+                                                    {{-- Accounting: buka modal isi no_surat + catatan dulu --}}
+                                                    <button type="button" class="btn-approve" data-bs-toggle="modal"
+                                                        data-bs-target="#modalApproveAccCm{{ $cm->id }}"
+                                                        title="Setujui &amp; Isi Catatan">
                                                         <i class="bi bi-check-lg"></i>
                                                     </button>
-                                                </form>
+                                                @else
+                                                    <form action="{{ route('cm.approve', $cm->id) }}" method="POST">
+                                                        @csrf
+                                                        <button type="submit" class="btn-approve">
+                                                            <i class="bi bi-check-lg"></i>
+                                                        </button>
+                                                    </form>
+                                                @endif
+                                                <button type="button" class="btn-reject" data-bs-toggle="modal"
+                                                    data-bs-target="#modalReject{{ $cm->id }}">
+                                                    <i class="bi bi-x-lg"></i>
+                                                </button>
                                             @endif
-                                            <button type="button" class="btn-reject" data-bs-toggle="modal"
-                                                data-bs-target="#modalReject{{ $cm->id }}">
-                                                <i class="bi bi-x-lg"></i>
-                                            </button>
                                         @endif
-                                    @endif
 
-                                    <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
-                                        data-bs-target="#modalInfoCm{{ $cm->id }}">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-
-                                    @php
-                                        $isApprover = in_array(auth()->user()->role, ['manager', 'accounting', 'direktur', 'penasihat']);
-                                        $canEdit = ($cm->approval_status == 'pending_noc' || $cm->approval_status == 'pending' || $cm->approval_status == 'rejected') && !$isApprover;
-                                        $isAdmin = in_array(auth()->user()->role, ['noc_leader']);
-                                    @endphp
-
-                                    @if($canEdit || $isAdmin)
-                                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
-                                            data-bs-target="#modalEditCm{{ $cm->id }}">
-                                            <i class="bi bi-pencil-square"></i>
+                                        <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
+                                            data-bs-target="#modalInfoCm{{ $cm->id }}">
+                                            <i class="bi bi-eye"></i>
                                         </button>
-                                    @endif
 
-                                    <div class="dropdown d-inline-block">
-                                        <button class="btn btn-sm btn-outline-dark dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Cetak">
-                                            <i class="bi bi-printer"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                            <li><a class="dropdown-item" href="{{ route('cm.print', ['id' => $cm->id, 'with_ttd' => 1]) }}" target="_blank"><i class="bi bi-file-earmark-pdf text-danger me-2"></i>Cetak Full TTD</a></li>
-                                            <li><a class="dropdown-item" href="{{ route('cm.print', ['id' => $cm->id, 'with_ttd' => 0]) }}" target="_blank"><i class="bi bi-file-earmark-pdf me-2"></i>Cetak Tanpa TTD</a></li>
-                                        </ul>
-                                    </div>
-
-                                    @if(auth()->user()->role === 'noc_leader')
-                                        <form id="delete-form-cm-{{ $cm->id }}" action="{{ route('cm.destroy', $cm->id) }}"
-                                            method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button" class="btn btn-sm btn-outline-danger"
-                                                onclick="confirmDelete('delete-form-cm-{{ $cm->id }}')" title="Hapus">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
-                                    @endif
-
-                                    {{-- Tombol Edit Catatan/Status khusus Accounting --}}
-                                    @if(auth()->user()->role === 'accounting')
-                                        <button type="button" class="btn btn-sm btn-outline-dark"
-                                            data-bs-toggle="modal" data-bs-target="#modalNotesCm{{ $cm->id }}"
-                                            title="Isi / Edit Catatan & Status">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </button>
-                                    @endif
-                                    {{-- Tombol Mark as Done (Direct Button) --}}
-                                    @if((auth()->user()->role === 'noc_leader' || $cm->approval_status == 'approved_penasihat') && !$cm->is_clear)
-                                        <form action="{{ url('/cm/mark-done/' . $cm->id) }}" method="POST" class="d-inline" id="formMarkDone{{ $cm->id }}">
-                                            @csrf
-                                            <button type="button" onclick="confirmMarkDone({{ $cm->id }})" class="btn btn-sm btn-outline-success d-inline-flex align-items-center" title="Tandai Selesai (DONE)">
-                                                <i class="bi bi-check-circle-fill me-1"></i> DONE
-                                            </button>
-                                        </form>
-                                    @elseif($cm->is_clear)
-                                        <span class="badge border border-success text-success bg-transparent d-inline-flex align-items-center" style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
-                                            <i class="bi bi-check-all me-1" style="font-size: 1rem;"></i> DONE
-                                        </span>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Modal Reject -->
-                        <div class="modal fade" id="modalReject{{ $cm->id }}" tabindex="-1">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content border-0 shadow-lg rounded-4">
-                                    <form action="{{ route('cm.reject', $cm->id) }}" method="POST">
-                                        @csrf
-                                        <div class="modal-header bg-danger text-white">
-                                            <h5 class="modal-title fw-bold">Konfirmasi Penolakan</h5>
-                                            <button type="button" class="btn-close btn-close-white"
-                                                data-bs-dismiss="modal"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <label class="form-label fw-bold">Alasan Penolakan</label>
-                                            <textarea name="rejection_reason" class="form-control" rows="3"
-                                                required></textarea>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-light"
-                                                data-bs-dismiss="modal">Batal</button>
-                                            <button type="submit" class="btn btn-danger">Tolak Pengajuan</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Modal Bukti Pembayaran CM (Dual Tab: DP & Lunas) --}}
-                        @if(in_array($cm->status_pembayaran, ['lunas', 'dp_50']) && ($cm->bukti_transfer || $cm->bukti_dp))
-                        <div class="modal fade" id="modalBuktiCm{{ $cm->id }}" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
-                                <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
-                                    <div class="modal-header text-white border-0 py-3"
-                                        style="background: linear-gradient(135deg, #0ea5e9, #0284c7);">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <i class="bi bi-cash-coin fs-5"></i>
-                                            <div>
-                                                <h6 class="modal-title fw-bold mb-0">Bukti Pembayaran</h6>
-                                                <div style="font-size: 0.72rem; opacity: 0.85;">
-                                                    CM #{{ $cm->nomor }} &bull;
-                                                    @if($cm->status_pembayaran === 'lunas')
-                                                        <span class="badge bg-success">Lunas</span>
-                                                    @else
-                                                        <span class="badge bg-warning text-dark">DP 50%</span>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal"></button>
-                                    </div>
-                                    <div class="modal-body p-0" style="background: #f1f5f9;">
-                                        {{-- Tab Navigation --}}
                                         @php
-                                            $hasDp = !empty($cm->bukti_dp);
-                                            $hasLunas = !empty($cm->bukti_transfer);
-                                            $showTabs = $hasDp && $hasLunas;
+                                            $isApprover = in_array(auth()->user()->role, ['manager', 'accounting', 'direktur', 'penasihat']);
+                                            $canEdit = ($cm->approval_status == 'pending_noc' || $cm->approval_status == 'pending' || $cm->approval_status == 'rejected') && !$isApprover;
+                                            $isAdmin = in_array(auth()->user()->role, ['noc_leader']);
                                         @endphp
 
-                                        @if($showTabs)
-                                        <ul class="nav nav-tabs nav-fill px-3 pt-3 border-0 gap-2" id="tabBuktiCm{{ $cm->id }}" role="tablist">
-                                            <li class="nav-item" role="presentation">
-                                                <button class="nav-link active fw-semibold d-flex align-items-center justify-content-center gap-1"
-                                                    id="tab-dp-{{ $cm->id }}-tab"
-                                                    data-bs-toggle="tab"
-                                                    data-bs-target="#tab-dp-{{ $cm->id }}"
-                                                    type="button" role="tab"
-                                                    style="border-radius: 10px; border: 2px solid #f59e0b; color:#d97706; font-size:0.82rem;">
-                                                    <i class="bi bi-percent"></i> DP 50%
-                                                </button>
-                                            </li>
-                                            <li class="nav-item" role="presentation">
-                                                <button class="nav-link fw-semibold d-flex align-items-center justify-content-center gap-1"
-                                                    id="tab-lunas-{{ $cm->id }}-tab"
-                                                    data-bs-toggle="tab"
-                                                    data-bs-target="#tab-lunas-{{ $cm->id }}"
-                                                    type="button" role="tab"
-                                                    style="border-radius: 10px; border: 2px solid #10b981; color:#059669; font-size:0.82rem;">
-                                                    <i class="bi bi-check-circle-fill"></i> Lunas
-                                                </button>
-                                            </li>
-                                        </ul>
+                                        @if($canEdit || $isAdmin)
+                                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                                data-bs-target="#modalEditCm{{ $cm->id }}">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </button>
                                         @endif
 
-                                        <div class="tab-content p-3" id="tabContentBuktiCm{{ $cm->id }}">
-                                            {{-- Tab DP 50% --}}
-                                            @if($hasDp)
-                                            <div class="tab-pane fade {{ !$showTabs || $hasDp ? 'show active' : '' }}" id="tab-dp-{{ $cm->id }}" role="tabpanel">
-                                                <div class="text-center mb-2">
-                                                    <span class="badge bg-warning text-dark px-3 py-1" style="font-size:0.78rem;">
-                                                        <i class="bi bi-percent me-1"></i>Bukti DP 50%
-                                                    </span>
-                                                </div>
-                                                <div class="rounded-3 overflow-hidden shadow-sm border" style="background: white;">
-                                                    <img src="{{ asset('storage_public/' . $cm->bukti_dp) }}"
-                                                        alt="Bukti DP 50%"
-                                                        class="w-100"
-                                                        style="max-height: 400px; object-fit: contain; display: block;"
-                                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                                    <div class="align-items-center justify-content-center p-4 text-muted" style="display:none;">
-                                                        <i class="bi bi-image-alt me-2 fs-4"></i> Gambar tidak ditemukan
-                                                    </div>
-                                                </div>
-                                                <div class="mt-2 d-flex justify-content-end">
-                                                    <a href="{{ asset('storage_public/' . $cm->bukti_dp) }}" target="_blank"
-                                                        class="btn btn-sm btn-outline-warning d-inline-flex align-items-center gap-1"
-                                                        style="font-size: 0.75rem; border-radius: 8px;">
-                                                        <i class="bi bi-box-arrow-up-right"></i> Buka
-                                                    </a>
-                                                </div>
-                                            </div>
-                                            @endif
-
-                                            {{-- Tab Lunas --}}
-                                            @if($hasLunas)
-                                            <div class="tab-pane fade {{ $showTabs ? '' : 'show active' }}" id="tab-lunas-{{ $cm->id }}" role="tabpanel">
-                                                <div class="text-center mb-2">
-                                                    <span class="badge bg-success px-3 py-1" style="font-size:0.78rem;">
-                                                        <i class="bi bi-check-circle-fill me-1"></i>Bukti Lunas
-                                                    </span>
-                                                </div>
-                                                <div class="rounded-3 overflow-hidden shadow-sm border" style="background: white;">
-                                                    <img src="{{ asset('storage_public/' . $cm->bukti_transfer) }}"
-                                                        alt="Bukti Lunas"
-                                                        class="w-100"
-                                                        style="max-height: 400px; object-fit: contain; display: block;"
-                                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                                    <div class="align-items-center justify-content-center p-4 text-muted" style="display:none;">
-                                                        <i class="bi bi-image-alt me-2 fs-4"></i> Gambar tidak ditemukan
-                                                    </div>
-                                                </div>
-                                                <div class="mt-2 d-flex justify-content-end">
-                                                    <a href="{{ asset('storage_public/' . $cm->bukti_transfer) }}" target="_blank"
-                                                        class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1"
-                                                        style="font-size: 0.75rem; border-radius: 8px;">
-                                                        <i class="bi bi-box-arrow-up-right"></i> Buka
-                                                    </a>
-                                                </div>
-                                            </div>
-                                            @endif
+                                        <div class="dropdown d-inline-block">
+                                            <button class="btn btn-sm btn-outline-dark dropdown-toggle" type="button"
+                                                data-bs-toggle="dropdown" aria-expanded="false" title="Cetak">
+                                                <i class="bi bi-printer"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                                <li><a class="dropdown-item"
+                                                        href="{{ route('cm.print', ['id' => $cm->id, 'with_ttd' => 1]) }}"
+                                                        target="_blank"><i
+                                                            class="bi bi-file-earmark-pdf text-danger me-2"></i>Cetak Full
+                                                        TTD</a></li>
+                                                <li><a class="dropdown-item"
+                                                        href="{{ route('cm.print', ['id' => $cm->id, 'with_ttd' => 0]) }}"
+                                                        target="_blank"><i class="bi bi-file-earmark-pdf me-2"></i>Cetak
+                                                        Tanpa TTD</a></li>
+                                            </ul>
                                         </div>
 
-                                        <div class="px-3 pb-3">
-                                            <div class="small text-muted">
-                                                <i class="bi bi-building me-1"></i> {{ Str::limit($cm->nama_site, 40) }}
+                                        @if(auth()->user()->role === 'noc_leader')
+                                            <form id="delete-form-cm-{{ $cm->id }}" action="{{ route('cm.destroy', $cm->id) }}"
+                                                method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                                    onclick="confirmDelete('delete-form-cm-{{ $cm->id }}')" title="Hapus">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+
+                                        {{-- Tombol Edit Catatan/Status khusus Accounting --}}
+                                        @if(in_array(auth()->user()->role, ['accounting', 'direktur']))
+                                            <button type="button" class="btn btn-sm btn-outline-dark" data-bs-toggle="modal"
+                                                data-bs-target="#modalNotesCm{{ $cm->id }}" title="Isi / Edit Catatan & Status">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </button>
+                                        @endif
+                                        {{-- Tombol Mark as Done (Direct Button) --}}
+                                        @if((auth()->user()->role === 'noc_leader' || $cm->approval_status == 'approved_penasihat') && !$cm->is_clear)
+                                            <form action="{{ url('/cm/mark-done/' . $cm->id) }}" method="POST" class="d-inline"
+                                                id="formMarkDone{{ $cm->id }}">
+                                                @csrf
+                                                <button type="button" onclick="confirmMarkDone({{ $cm->id }})"
+                                                    class="btn btn-sm btn-outline-success d-inline-flex align-items-center"
+                                                    title="Tandai Selesai (DONE)">
+                                                    <i class="bi bi-check-circle-fill me-1"></i> DONE
+                                                </button>
+                                            </form>
+                                        @elseif($cm->is_clear)
+                                            <span
+                                                class="badge border border-success text-success bg-transparent d-inline-flex align-items-center"
+                                                style="font-size: 0.85rem; padding: 0.35rem 0.5rem;">
+                                                <i class="bi bi-check-all me-1" style="font-size: 1rem;"></i> DONE
+                                            </span>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Modal Reject -->
+                            <div class="modal fade" id="modalReject{{ $cm->id }}" tabindex="-1">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 shadow-lg rounded-4">
+                                        <form action="{{ route('cm.reject', $cm->id) }}" method="POST">
+                                            @csrf
+                                            <div class="modal-header bg-danger text-white">
+                                                <h5 class="modal-title fw-bold">Konfirmasi Penolakan</h5>
+                                                <button type="button" class="btn-close btn-close-white"
+                                                    data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <label class="form-label fw-bold">Alasan Penolakan</label>
+                                                <textarea name="rejection_reason" class="form-control" rows="3"
+                                                    required></textarea>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-light"
+                                                    data-bs-dismiss="modal">Batal</button>
+                                                <button type="submit" class="btn btn-danger">Tolak Pengajuan</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Modal Bukti Pembayaran CM (Dual Tab: DP & Lunas) --}}
+                            @if(in_array($cm->status_pembayaran, ['lunas', 'dp_50']))
+                                <div class="modal fade" id="modalBuktiCm{{ $cm->id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
+                                        <div class="modal-content border-0 shadow-lg"
+                                            style="border-radius: 16px; overflow: hidden;">
+                                            <div class="modal-header text-white border-0 py-3"
+                                                style="background: linear-gradient(135deg, #0ea5e9, #0284c7);">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <i class="bi bi-cash-coin fs-5"></i>
+                                                    <div>
+                                                        <h6 class="modal-title fw-bold mb-0">Bukti Pembayaran</h6>
+                                                        <div style="font-size: 0.72rem; opacity: 0.85;">
+                                                            CM #{{ $cm->nomor }} &bull;
+                                                            @if($cm->status_pembayaran === 'lunas')
+                                                                <span class="badge bg-success">Lunas</span>
+                                                            @else
+                                                                <span class="badge bg-warning text-dark">DP 50%</span>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button type="button" class="btn-close btn-close-white ms-auto"
+                                                    data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body p-0" style="background: #f1f5f9;">
+                                                {{-- Tab Navigation --}}
+                                                @php
+                                                    $hasDp = !empty($cm->bukti_dp);
+                                                    $hasLunas = !empty($cm->bukti_transfer);
+                                                    $showTabs = $hasDp && $hasLunas;
+                                                @endphp
+
+                                                @if($showTabs)
+                                                    <ul class="nav nav-tabs nav-fill px-3 pt-3 border-0 gap-2"
+                                                        id="tabBuktiCm{{ $cm->id }}" role="tablist">
+                                                        <li class="nav-item" role="presentation">
+                                                            <button
+                                                                class="nav-link active fw-semibold d-flex align-items-center justify-content-center gap-1"
+                                                                id="tab-dp-{{ $cm->id }}-tab" data-bs-toggle="tab"
+                                                                data-bs-target="#tab-dp-{{ $cm->id }}" type="button" role="tab"
+                                                                style="border-radius: 10px; border: 2px solid #f59e0b; color:#d97706; font-size:0.82rem;">
+                                                                <i class="bi bi-percent"></i> DP 50%
+                                                            </button>
+                                                        </li>
+                                                        <li class="nav-item" role="presentation">
+                                                            <button
+                                                                class="nav-link fw-semibold d-flex align-items-center justify-content-center gap-1"
+                                                                id="tab-lunas-{{ $cm->id }}-tab" data-bs-toggle="tab"
+                                                                data-bs-target="#tab-lunas-{{ $cm->id }}" type="button" role="tab"
+                                                                style="border-radius: 10px; border: 2px solid #10b981; color:#059669; font-size:0.82rem;">
+                                                                <i class="bi bi-check-circle-fill"></i> Lunas
+                                                            </button>
+                                                        </li>
+                                                    </ul>
+                                                @endif
+
+                                                <div class="tab-content p-3" id="tabContentBuktiCm{{ $cm->id }}">
+                                                    {{-- Tab DP 50% --}}
+                                                    @if($hasDp)
+                                                        <div class="tab-pane fade {{ !$showTabs || $hasDp ? 'show active' : '' }}"
+                                                            id="tab-dp-{{ $cm->id }}" role="tabpanel">
+                                                            <div class="text-center mb-2">
+                                                                <span class="badge bg-warning text-dark px-3 py-1"
+                                                                    style="font-size:0.78rem;">
+                                                                    <i class="bi bi-percent me-1"></i>Bukti DP 50%
+                                                                </span>
+                                                            </div>
+                                                            <div class="rounded-3 overflow-hidden shadow-sm border"
+                                                                style="background: white;">
+                                                                <img src="{{ asset('storage_public/' . $cm->bukti_dp) }}"
+                                                                    alt="Bukti DP 50%" class="w-100"
+                                                                    style="max-height: 400px; object-fit: contain; display: block;"
+                                                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                                                <div class="align-items-center justify-content-center p-4 text-muted"
+                                                                    style="display:none;">
+                                                                    <i class="bi bi-image-alt me-2 fs-4"></i> Gambar tidak ditemukan
+                                                                </div>
+                                                            </div>
+                                                            <div class="mt-2 d-flex justify-content-end">
+                                                                <a href="{{ asset('storage_public/' . $cm->bukti_dp) }}"
+                                                                    target="_blank"
+                                                                    class="btn btn-sm btn-outline-warning d-inline-flex align-items-center gap-1"
+                                                                    style="font-size: 0.75rem; border-radius: 8px;">
+                                                                    <i class="bi bi-box-arrow-up-right"></i> Buka
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+
+                                                    {{-- Tab Lunas --}}
+                                                    @if($hasLunas)
+                                                        <div class="tab-pane fade {{ $showTabs ? '' : 'show active' }}"
+                                                            id="tab-lunas-{{ $cm->id }}" role="tabpanel">
+                                                            <div class="text-center mb-2">
+                                                                <span class="badge bg-success px-3 py-1" style="font-size:0.78rem;">
+                                                                    <i class="bi bi-check-circle-fill me-1"></i>Bukti Lunas
+                                                                </span>
+                                                            </div>
+                                                            <div class="rounded-3 overflow-hidden shadow-sm border"
+                                                                style="background: white;">
+                                                                <img src="{{ asset('storage_public/' . $cm->bukti_transfer) }}"
+                                                                    alt="Bukti Lunas" class="w-100"
+                                                                    style="max-height: 400px; object-fit: contain; display: block;"
+                                                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                                                <div class="align-items-center justify-content-center p-4 text-muted"
+                                                                    style="display:none;">
+                                                                    <i class="bi bi-image-alt me-2 fs-4"></i> Gambar tidak ditemukan
+                                                                </div>
+                                                            </div>
+                                                            <div class="mt-2 d-flex justify-content-end">
+                                                                <a href="{{ asset('storage_public/' . $cm->bukti_transfer) }}"
+                                                                    target="_blank"
+                                                                    class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1"
+                                                                    style="font-size: 0.75rem; border-radius: 8px;">
+                                                                    <i class="bi bi-box-arrow-up-right"></i> Buka
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+
+                                                    @if(!$hasDp && !$hasLunas)
+                                                        <div class="text-center p-4 text-muted">
+                                                            <i class="bi bi-image-alt fs-1 d-block mb-2"></i>
+                                                            <span>Bukti pembayaran belum diunggah.</span>
+                                                        </div>
+                                                    @endif
+                                                </div>
+
+                                                <div class="px-3 pb-3">
+                                                    <div class="small text-muted">
+                                                        <i class="bi bi-building me-1"></i> {{ Str::limit($cm->nama_site, 40) }}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        @endif
+                            @endif
 
-                    @empty
-                        <tr>
-                            <td colspan="7" class="text-center py-5 text-muted">Belum ada pengajuan CM.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">Belum ada pengajuan CM.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
 
     </div>
@@ -908,13 +996,35 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold small">Divisi / Bagian</label>
-                                <input type="text" name="divisi" class="form-control"
-                                    value="Manage Service AI BAKTI" required>
+                                <input type="text" name="divisi" class="form-control" value="Manage Service AI BAKTI"
+                                    required>
                             </div>
                             <div class="col-md-12">
                                 <label class="form-label fw-bold small">Nomor Pengajuan</label>
                                 <input type="text" name="nomor" class="form-control"
                                     placeholder="Contoh: 001/CM/V/2026">
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold small">Kategori</label>
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="kategori" id="kategori_bmn"
+                                            value="BMN" required>
+                                        <label class="form-check-label fw-semibold" for="kategori_bmn">
+                                            🏛️ <span class="badge" style="background:#1e40af;color:#fff;">BMN</span>
+                                            Barang Milik Negara
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="kategori" id="kategori_sl"
+                                            value="SL">
+                                        <label class="form-check-label fw-semibold" for="kategori_sl">
+                                            📋 <span class="badge" style="background:#065f46;color:#fff;">SL</span> Sewa
+                                            Layanan
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="col-md-12">
@@ -1017,23 +1127,23 @@
                             <div class="col-md-6">
                                 <label class="form-label small">Diverifikasi 2 (Accounting) - Nama</label>
                                 <input type="text" name="diverifikasi2_nama" class="form-control form-control-sm"
-                                    value="Baiq Nana Erlina, A.Md">
+                                    value="Desi Halisna Ariani">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small">Diverifikasi 2 (Accounting) - Jabatan</label>
                                 <input type="text" name="diverifikasi2_jabatan" class="form-control form-control-sm"
-                                    value="Accounting">
+                                    value="Head of Accounting">
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label small">Disetujui (Direktur) - Nama</label>
                                 <input type="text" name="disetujui_nama" class="form-control form-control-sm"
-                                    value="Galuh Zakiyatun, S.Kom">
+                                    value="Baiq Nana Erlina, A.Md">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small">Disetujui (Direktur) - Jabatan</label>
                                 <input type="text" name="disetujui_jabatan" class="form-control form-control-sm"
-                                    value="Direktur">
+                                    value="Plt. Direktur">
                             </div>
 
                             <div class="col-md-6">
@@ -1183,7 +1293,8 @@
                                 height: 80px;
                                 max-width: 150px;
                                 object-fit: contain;
-                                filter: contrast(3) brightness(0.5);
+                                filter: grayscale(1) contrast(3);
+                                mix-blend-mode: multiply;
                             }
 
                             .preview-sign-name {
@@ -1291,7 +1402,7 @@
                                         <div class="d-flex justify-content-between"><span>Catatan</span><span>:</span></div>
                                     </td>
                                     <td>
-                                        @if(auth()->user()->role === 'accounting')
+                                        @if(in_array(auth()->user()->role, ['accounting', 'direktur']))
                                             {{ $cm->catatan ?? '-' }}
                                         @else
                                             {{ $cm->catatan ?? '-' }}
@@ -1301,7 +1412,8 @@
 
                                 <tr>
                                     <td class="preview-label-cell">
-                                        <div class="d-flex justify-content-between"><span>Keterangan</span><span>:</span></div>
+                                        <div class="d-flex justify-content-between"><span>Keterangan</span><span>:</span>
+                                        </div>
                                     </td>
                                     <td>{{ $cm->keterangan ?? '-' }}</td>
                                 </tr>
@@ -1341,7 +1453,7 @@
                                     <p class="mb-1">Diverifikasi,</p>
                                     <div class="preview-sign-img" style="height: 70px;">
                                         @if($cm->ttd_accounting)
-                                            <img src="{{ asset('assets/img/ttd/accounting.png') }}" style="bottom: -20px; position: relative;">
+                                            <img src="{{ asset('assets/img/ttd/accounting_ttd.png') }}">
                                         @endif
                                     </div>
                                     <p class="preview-sign-name">{{ $cm->diverifikasi2_nama }}</p>
@@ -1402,130 +1514,140 @@
         </div>
 
         {{-- MODAL APPROVE ACCOUNTING CM (isi no_surat + catatan + keterangan) --}}
-        @if(auth()->user()->role === 'accounting')
-        <div class="modal fade" id="modalApproveAccCm{{ $cm->id }}" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg" style="border-radius:15px;">
-                    <div class="modal-header text-white"
-                        style="background:linear-gradient(135deg,#10b981,#059669);border-radius:15px 15px 0 0;">
-                        <h5 class="modal-title fw-bold mb-0">
-                            <i class="bi bi-check-circle me-2"></i>Setujui & Isi Data Accounting
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <form action="{{ route('cm.approve', $cm->id) }}" method="POST">
-                        @csrf
-                        <div class="modal-body p-4">
-                            <div class="alert alert-info border-0 small mb-3" style="background:#eff6ff;">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Isi data berikut sebelum menyetujui pengajuan CM ini.
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold small">Nomor Surat <span class="text-muted">(opsional)</span></label>
-                                <input type="text" name="no_surat" class="form-control"
-                                    value="{{ $cm->no_surat }}"
-                                    placeholder="Contoh: 001/ACC/CM/V/2026">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold small">Catatan <span class="text-muted">(opsional)</span></label>
-                                <textarea name="catatan" class="form-control" rows="3"
-                                    placeholder="Catatan dari Accounting...">{{ $cm->catatan }}</textarea>
-                            </div>
+        @if(in_array(auth()->user()->role, ['accounting', 'direktur']))
+            <div class="modal fade" id="modalApproveAccCm{{ $cm->id }}" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg" style="border-radius:15px;">
+                        <div class="modal-header text-white"
+                            style="background:linear-gradient(135deg,#10b981,#059669);border-radius:15px 15px 0 0;">
+                            <h5 class="modal-title fw-bold mb-0">
+                                <i class="bi bi-check-circle me-2"></i>Setujui & Isi Data Accounting
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form action="{{ route('cm.approve', $cm->id) }}" method="POST">
+                            @csrf
+                            <div class="modal-body p-4">
+                                <div class="alert alert-info border-0 small mb-3" style="background:#eff6ff;">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Isi data berikut sebelum menyetujui pengajuan CM ini.
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small">Nomor Surat <span
+                                            class="text-muted">(opsional)</span></label>
+                                    <input type="text" name="no_surat" class="form-control" value="{{ $cm->no_surat }}"
+                                        placeholder="Contoh: 001/ACC/CM/V/2026">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small">Catatan <span
+                                            class="text-muted">(opsional)</span></label>
+                                    <textarea name="catatan" class="form-control" rows="3"
+                                        placeholder="Catatan dari Accounting...">{{ $cm->catatan }}</textarea>
+                                </div>
 
-                        </div>
-                        <div class="modal-footer border-0">
-                            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn rounded-pill px-5 fw-bold text-white"
-                                style="background:linear-gradient(135deg,#10b981,#059669);border:none;">
-                                <i class="bi bi-check-lg me-1"></i>Setujui Pengajuan
-                            </button>
-                        </div>
-                    </form>
+                            </div>
+                            <div class="modal-footer border-0">
+                                <button type="button" class="btn btn-light rounded-pill px-4"
+                                    data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn rounded-pill px-5 fw-bold text-white"
+                                    style="background:linear-gradient(135deg,#10b981,#059669);border:none;">
+                                    <i class="bi bi-check-lg me-1"></i>Setujui Pengajuan
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        {{-- MODAL EDIT CATATAN / NO SURAT (Accounting saja) --}}
-        <div class="modal fade" id="modalNotesCm{{ $cm->id }}" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg" style="border-radius:15px;">
-                    <div class="modal-header text-white"
-                        style="background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:15px 15px 0 0;">
-                        <h5 class="modal-title fw-bold mb-0">
-                            <i class="bi bi-journal-text me-2"></i>Isi / Edit Catatan & Status
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            {{-- MODAL EDIT CATATAN / NO SURAT (Accounting saja) --}}
+            <div class="modal fade" id="modalNotesCm{{ $cm->id }}" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg" style="border-radius:15px;">
+                        <div class="modal-header text-white"
+                            style="background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:15px 15px 0 0;">
+                            <h5 class="modal-title fw-bold mb-0">
+                                <i class="bi bi-journal-text me-2"></i>Isi / Edit Catatan & Status
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form action="{{ route('cm.accounting.notes', $cm->id) }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="modal-body p-4">
+                                <div class="alert alert-warning border-0 small mb-3" style="background:#fffbeb;">
+                                    <i class="bi bi-lock me-1"></i>
+                                    Hanya <strong>Accounting</strong> dan <strong>Direktur</strong> yang dapat mengisi/mengubah
+                                    data ini.
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small">Status Pembayaran</label>
+                                    <select name="status_pembayaran" class="form-select" id="status_pembayaran_{{ $cm->id }}"
+                                        onchange="toggleBuktiTransfer({{ $cm->id }})">
+                                        <option value="belum_dibayar" {{ $cm->status_pembayaran === 'belum_dibayar' ? 'selected' : '' }}>Belum Dibayar</option>
+                                        <option value="dp_50" {{ $cm->status_pembayaran === 'dp_50' ? 'selected' : '' }}>Sudah di
+                                            DP 50%</option>
+                                        <option value="lunas" {{ $cm->status_pembayaran === 'lunas' ? 'selected' : '' }}>Sudah
+                                            Lunas</option>
+                                    </select>
+                                </div>
+
+                                {{-- Bukti DP 50% (muncul saat dp_50 atau lunas) --}}
+                                <div class="mb-3" id="bukti_dp_container_{{ $cm->id }}"
+                                    style="display: {{ in_array($cm->status_pembayaran, ['dp_50', 'lunas']) ? 'block' : 'none' }};">
+                                    <label class="form-label fw-bold small text-warning">
+                                        <i class="bi bi-image me-1"></i>Foto Bukti DP 50%
+                                        <span class="text-muted fw-normal">(Opsional)</span>
+                                    </label>
+                                    <input type="file" name="bukti_dp" class="form-control" accept="image/*">
+                                    @if($cm->bukti_dp)
+                                        <div class="mt-2 d-flex align-items-center gap-2">
+                                            <img src="{{ asset('storage_public/' . $cm->bukti_dp) }}" class="rounded border"
+                                                style="height:50px;object-fit:cover;">
+                                            <a href="{{ asset('storage_public/' . $cm->bukti_dp) }}" target="_blank"
+                                                class="small text-primary">Lihat Bukti DP</a>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                {{-- Bukti Lunas (muncul hanya saat lunas) --}}
+                                <div class="mb-3" id="bukti_transfer_container_{{ $cm->id }}"
+                                    style="display: {{ $cm->status_pembayaran === 'lunas' ? 'block' : 'none' }};">
+                                    <label class="form-label fw-bold small text-success">
+                                        <i class="bi bi-image me-1"></i>Foto Bukti Lunas
+                                        <span class="text-muted fw-normal">(Opsional)</span>
+                                    </label>
+                                    <input type="file" name="bukti_transfer" class="form-control" accept="image/*">
+                                    @if($cm->bukti_transfer)
+                                        <div class="mt-2 d-flex align-items-center gap-2">
+                                            <img src="{{ asset('storage_public/' . $cm->bukti_transfer) }}" class="rounded border"
+                                                style="height:50px;object-fit:cover;">
+                                            <a href="{{ asset('storage_public/' . $cm->bukti_transfer) }}" target="_blank"
+                                                class="small text-primary">Lihat Bukti Lunas</a>
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small">Nomor Surat</label>
+                                    <input type="text" name="no_surat" class="form-control" value="{{ $cm->no_surat }}"
+                                        placeholder="Contoh: 001/ACC/CM/V/2026">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small">Catatan</label>
+                                    <textarea name="catatan" class="form-control" rows="3"
+                                        placeholder="Catatan dari Accounting...">{{ $cm->catatan }}</textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer border-0">
+                                <button type="button" class="btn btn-light rounded-pill px-4"
+                                    data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn rounded-pill px-5 fw-bold text-white"
+                                    style="background:linear-gradient(135deg,#f59e0b,#d97706);border:none;">
+                                    <i class="bi bi-save me-1"></i>Simpan
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                    <form action="{{ route('cm.accounting.notes', $cm->id) }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div class="modal-body p-4">
-                            <div class="alert alert-warning border-0 small mb-3" style="background:#fffbeb;">
-                                <i class="bi bi-lock me-1"></i>
-                                Hanya <strong>Accounting</strong> yang dapat mengisi/mengubah data ini.
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold small">Status Pembayaran</label>
-                                <select name="status_pembayaran" class="form-select" id="status_pembayaran_{{ $cm->id }}" onchange="toggleBuktiTransfer({{ $cm->id }})">
-                                    <option value="belum_dibayar" {{ $cm->status_pembayaran === 'belum_dibayar' ? 'selected' : '' }}>Belum Dibayar</option>
-                                    <option value="dp_50" {{ $cm->status_pembayaran === 'dp_50' ? 'selected' : '' }}>Sudah di DP 50%</option>
-                                    <option value="lunas" {{ $cm->status_pembayaran === 'lunas' ? 'selected' : '' }}>Sudah Lunas</option>
-                                </select>
-                            </div>
-
-                            {{-- Bukti DP 50% (muncul saat dp_50 atau lunas) --}}
-                            <div class="mb-3" id="bukti_dp_container_{{ $cm->id }}"
-                                style="display: {{ in_array($cm->status_pembayaran, ['dp_50', 'lunas']) ? 'block' : 'none' }};">
-                                <label class="form-label fw-bold small text-warning">
-                                    <i class="bi bi-image me-1"></i>Foto Bukti DP 50%
-                                    <span class="text-muted fw-normal">(Opsional)</span>
-                                </label>
-                                <input type="file" name="bukti_dp" class="form-control" accept="image/*">
-                                @if($cm->bukti_dp)
-                                    <div class="mt-2 d-flex align-items-center gap-2">
-                                        <img src="{{ asset('storage_public/' . $cm->bukti_dp) }}" class="rounded border" style="height:50px;object-fit:cover;">
-                                        <a href="{{ asset('storage_public/' . $cm->bukti_dp) }}" target="_blank" class="small text-primary">Lihat Bukti DP</a>
-                                    </div>
-                                @endif
-                            </div>
-
-                            {{-- Bukti Lunas (muncul hanya saat lunas) --}}
-                            <div class="mb-3" id="bukti_transfer_container_{{ $cm->id }}"
-                                style="display: {{ $cm->status_pembayaran === 'lunas' ? 'block' : 'none' }};">
-                                <label class="form-label fw-bold small text-success">
-                                    <i class="bi bi-image me-1"></i>Foto Bukti Lunas
-                                    <span class="text-muted fw-normal">(Opsional)</span>
-                                </label>
-                                <input type="file" name="bukti_transfer" class="form-control" accept="image/*">
-                                @if($cm->bukti_transfer)
-                                    <div class="mt-2 d-flex align-items-center gap-2">
-                                        <img src="{{ asset('storage_public/' . $cm->bukti_transfer) }}" class="rounded border" style="height:50px;object-fit:cover;">
-                                        <a href="{{ asset('storage_public/' . $cm->bukti_transfer) }}" target="_blank" class="small text-primary">Lihat Bukti Lunas</a>
-                                    </div>
-                                @endif
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold small">Nomor Surat</label>
-                                <input type="text" name="no_surat" class="form-control"
-                                    value="{{ $cm->no_surat }}"
-                                    placeholder="Contoh: 001/ACC/CM/V/2026">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold small">Catatan</label>
-                                <textarea name="catatan" class="form-control" rows="3"
-                                    placeholder="Catatan dari Accounting...">{{ $cm->catatan }}</textarea>
-                            </div>
-                        </div>
-                        <div class="modal-footer border-0">
-                            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn rounded-pill px-5 fw-bold text-white"
-                                style="background:linear-gradient(135deg,#f59e0b,#d97706);border:none;">
-                                <i class="bi bi-save me-1"></i>Simpan
-                            </button>
-                        </div>
-                    </form>
                 </div>
             </div>
-        </div>
         @endif
 
         {{-- MODAL EDIT CM --}}
@@ -1555,6 +1677,30 @@
                                 <div class="col-md-12">
                                     <label class="form-label fw-bold small">Nomor Pengajuan</label>
                                     <input type="text" name="nomor" class="form-control" value="{{ $cm->nomor }}">
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label fw-bold small">Kategori</label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="kategori"
+                                                id="edit_kategori_bmn_{{ $cm->id }}" value="BMN" {{ $cm->kategori === 'BMN' ? 'checked' : '' }}>
+                                            <label class="form-check-label fw-semibold"
+                                                for="edit_kategori_bmn_{{ $cm->id }}">
+                                                🏛️ <span class="badge" style="background:#1e40af;color:#fff;">BMN</span>
+                                                Barang Milik Negara
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="kategori"
+                                                id="edit_kategori_sl_{{ $cm->id }}" value="SL" {{ $cm->kategori === 'SL' ? 'checked' : '' }}>
+                                            <label class="form-check-label fw-semibold"
+                                                for="edit_kategori_sl_{{ $cm->id }}">
+                                                📋 <span class="badge" style="background:#065f46;color:#fff;">SL</span> Sewa
+                                                Layanan
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="col-md-12">
@@ -1660,7 +1806,6 @@
                                     <label class="form-label small">Diverifikasi 1 (Manager) - Nama</label>
 
                                     <input type="text" name="diverifikasi1_nama" class="form-control form-control-sm"
-
                                         value="{{ $cm->diverifikasi1_nama }}">
 
                                 </div>
@@ -1670,7 +1815,6 @@
                                     <label class="form-label small">Diverifikasi 1 (Manager) - Jabatan</label>
 
                                     <input type="text" name="diverifikasi1_jabatan" class="form-control form-control-sm"
-
                                         value="{{ $cm->diverifikasi1_jabatan ?: 'Manager' }}">
 
                                 </div>
@@ -1681,7 +1825,6 @@
                                     <label class="form-label small">Diverifikasi 2 (Accounting) - Nama</label>
 
                                     <input type="text" name="diverifikasi2_nama" class="form-control form-control-sm"
-
                                         value="{{ $cm->diverifikasi2_nama }}">
 
                                 </div>
@@ -1691,7 +1834,6 @@
                                     <label class="form-label small">Diverifikasi 2 (Accounting) - Jabatan</label>
 
                                     <input type="text" name="diverifikasi2_jabatan" class="form-control form-control-sm"
-
                                         value="{{ $cm->diverifikasi2_jabatan ?: 'Accounting' }}">
 
                                 </div>
@@ -1702,7 +1844,6 @@
                                     <label class="form-label small">Disetujui (Direktur) - Nama</label>
 
                                     <input type="text" name="disetujui_nama" class="form-control form-control-sm"
-
                                         value="{{ $cm->disetujui_nama }}">
 
                                 </div>
@@ -1712,7 +1853,6 @@
                                     <label class="form-label small">Disetujui (Direktur) - Jabatan</label>
 
                                     <input type="text" name="disetujui_jabatan" class="form-control form-control-sm"
-
                                         value="{{ $cm->disetujui_jabatan ?: 'Direktur' }}">
 
                                 </div>
@@ -1723,7 +1863,6 @@
                                     <label class="form-label small">Mengetahui (Penasihat) - Nama</label>
 
                                     <input type="text" name="mengetahui_nama" class="form-control form-control-sm"
-
                                         value="{{ $cm->mengetahui_nama }}">
 
                                 </div>
@@ -1733,7 +1872,6 @@
                                     <label class="form-label small">Mengetahui (Penasihat) - Jabatan</label>
 
                                     <input type="text" name="mengetahui_jabatan" class="form-control form-control-sm"
-
                                         value="{{ $cm->mengetahui_jabatan ?: 'Penasihat' }}">
 
                                 </div>
@@ -1858,7 +1996,7 @@
             });
         @endif
 
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             flatpickr(".date-range-picker", {
                 mode: "range",
                 dateFormat: "d/m/Y",
@@ -1903,17 +2041,17 @@
         }
     </script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const filterForm = document.getElementById('filterForm');
             if (filterForm) {
-                filterForm.addEventListener('change', function(e) {
+                filterForm.addEventListener('change', function (e) {
                     if (e.target.tagName === 'SELECT') {
                         e.preventDefault();
                         fetchTableData();
                     }
                 });
-                
-                filterForm.addEventListener('submit', function(e) {
+
+                filterForm.addEventListener('submit', function (e) {
                     e.preventDefault();
                     fetchTableData();
                 });
@@ -1933,26 +2071,141 @@
                             'X-Requested-With': 'XMLHttpRequest'
                         }
                     })
-                    .then(res => res.text())
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        const newTable = doc.getElementById('tableCmContainer');
-                        if (newTable && container) {
-                            container.innerHTML = newTable.innerHTML;
-                            container.style.opacity = '1';
-                            window.history.pushState({}, '', url);
-                        }
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        if (container) container.style.opacity = '1';
-                    });
+                        .then(res => res.text())
+                        .then(html => {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+                            const newTable = doc.getElementById('tableCmContainer');
+                            if (newTable && container) {
+                                container.innerHTML = newTable.innerHTML;
+                                container.style.opacity = '1';
+                                window.history.pushState({}, '', url);
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            if (container) container.style.opacity = '1';
+                        });
                 }
             }
         });
     </script>
     @include('components.nav-modal-structure')
+
+    {{-- ===================== MODAL EXPORT EXCEL CM ===================== --}}
+    <div class="modal fade" id="modalExportExcelCm" tabindex="-1" aria-labelledby="modalExportExcelCmLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 18px; overflow: hidden;">
+                {{-- Header --}}
+                <div class="modal-header border-0 text-white py-4 px-4"
+                    style="background: linear-gradient(135deg, #16a34a, #15803d);">
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="width: 44px; height: 44px; background: rgba(255,255,255,0.2);
+                            border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-file-earmark-excel-fill" style="font-size: 1.4rem;"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title mb-0 fw-bold" id="modalExportExcelCmLabel">Export Data CM</h5>
+                            <small style="opacity: 0.85; font-size: 12px;">Pilih bulan dan tahun yang ingin
+                                di-export</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+
+                {{-- Body --}}
+                <div class="modal-body px-4 py-4" style="background: #f9fafb;">
+                    <form action="{{ route('cm.export.excel') }}" method="GET" id="formExportCm">
+                        @csrf
+
+                        <div class="row g-3">
+                            {{-- Bulan --}}
+                            <div class="col-7">
+                                <label class="form-label fw-semibold text-dark" style="font-size: 13px;">
+                                    <i class="bi bi-calendar-month me-1 text-success"></i> Bulan
+                                </label>
+                                <select name="bulan" id="exportBulanCm" class="form-select shadow-sm"
+                                    style="border-radius: 10px; border: 1.5px solid #d1fae5; font-size: 14px; padding: 10px 14px;">
+                                    <option value="1">Januari</option>
+                                    <option value="2">Februari</option>
+                                    <option value="3">Maret</option>
+                                    <option value="4">April</option>
+                                    <option value="5">Mei</option>
+                                    <option value="6">Juni</option>
+                                    <option value="7">Juli</option>
+                                    <option value="8">Agustus</option>
+                                    <option value="9">September</option>
+                                    <option value="10">Oktober</option>
+                                    <option value="11">November</option>
+                                    <option value="12">Desember</option>
+                                </select>
+                            </div>
+
+                            {{-- Tahun --}}
+                            <div class="col-5">
+                                <label class="form-label fw-semibold text-dark" style="font-size: 13px;">
+                                    <i class="bi bi-calendar3 me-1 text-success"></i> Tahun
+                                </label>
+                                <select name="tahun" id="exportTahunCm" class="form-select shadow-sm"
+                                    style="border-radius: 10px; border: 1.5px solid #d1fae5; font-size: 14px; padding: 10px 14px;">
+                                    @for($y = date('Y'); $y >= 2020; $y--)
+                                        <option value="{{ $y }}" {{ $y == date('Y') ? 'selected' : '' }}>{{ $y }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                        </div>
+
+                        {{-- Info box --}}
+                        <div class="mt-3 p-3 rounded-3 d-flex align-items-start gap-2"
+                            style="background: #ecfdf5; border: 1px solid #a7f3d0; font-size: 12.5px; color: #065f46;">
+                            <i class="bi bi-info-circle-fill mt-1 flex-shrink-0" style="color: #059669;"></i>
+                            <span>File Excel akan diunduh secara otomatis berisi seluruh data pengajuan CM pada bulan
+                                yang dipilih.</span>
+                        </div>
+
+                        {{-- Actions --}}
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="button" class="btn btn-light flex-fill rounded-3 fw-semibold"
+                                data-bs-dismiss="modal" style="font-size: 14px;">
+                                <i class="bi bi-x-lg me-1"></i> Batal
+                            </button>
+                            <button type="submit" class="btn text-white flex-fill rounded-3 fw-bold shadow-sm"
+                                id="btnDownloadExcelCm"
+                                style="background: linear-gradient(135deg, #16a34a, #15803d); font-size: 14px; transition: all 0.2s;">
+                                <i class="bi bi-download me-1"></i> Download Excel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- =================== END MODAL EXPORT EXCEL CM =================== --}}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Set default bulan to current month
+            const currentMonth = new Date().getMonth() + 1;
+            const bulanSelect = document.getElementById('exportBulanCm');
+            if (bulanSelect) bulanSelect.value = currentMonth;
+
+            // Loading state on submit
+            const form = document.getElementById('formExportCm');
+            const btn = document.getElementById('btnDownloadExcelCm');
+            if (form && btn) {
+                form.addEventListener('submit', function () {
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Mengunduh...';
+                    btn.disabled = true;
+                    setTimeout(function () {
+                        btn.innerHTML = '<i class="bi bi-download me-1"></i> Download Excel';
+                        btn.disabled = false;
+                    }, 4000);
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

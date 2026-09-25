@@ -390,13 +390,17 @@
 
     <div class="content-container">
         <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3" style="margin-bottom: 20px;">
-            <div class="actions flex-shrink-0">
-                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin', 'user', 'noc_leader']))
+            <div class="actions flex-shrink-0 d-flex gap-2">
+                @if(auth()->check() && in_array(auth()->user()->role, ['admin', 'superadmin', 'user', 'noc_leader', 'accounting', 'direktur']))
                     <button class="btn btn-primary text-white fw-bold d-flex align-items-center gap-2 rounded-pill px-4 py-2 mt-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambahCsr"
                         title="Buat Pengajuan Baru" style="background: linear-gradient(135deg, #0d6efd, #0b5ed7); border: none; transition: transform 0.2s; color: white !important;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                         <i class="bi bi-plus-lg"></i> Buat Pengajuan
                     </button>
                 @endif
+                <button class="btn btn-success text-white fw-bold d-flex align-items-center gap-2 rounded-pill px-4 py-2 mt-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalExportExcel"
+                    title="Export ke Excel" style="background: linear-gradient(135deg, #16a34a, #15803d); border: none; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <i class="bi bi-file-earmark-excel-fill"></i> Export Excel
+                </button>
             </div>
             <div class="w-100 mt-2 mt-lg-0">
                 <form method="GET" action="{{ route('csr.index') }}"
@@ -585,7 +589,7 @@
                                         @endphp
 
                                         @if($canApprove)
-                                            @if($csr->approval_status === 'approved_manager')
+                                            @if(in_array($csr->approval_status, ['approved_manager', 'approved_accounting']))
                                                 {{-- Accounting: buka modal isi no_surat + catatan dulu --}}
                                                 <button type="button" class="btn-approve"
                                                     data-bs-toggle="modal"
@@ -650,7 +654,7 @@
                                     @endif
 
                                     {{-- Tombol Edit Catatan/No Surat khusus Accounting --}}
-                                    @if(auth()->user()->role === 'accounting')
+                                    @if(in_array(auth()->user()->role, ['accounting', 'direktur']))
                                         <button type="button" class="btn btn-sm btn-outline-dark"
                                             data-bs-toggle="modal" data-bs-target="#modalNotesCsr{{ $csr->id }}"
                                             title="Isi / Edit Catatan & No Surat">
@@ -942,7 +946,7 @@
                                 height: 80px;
                                 max-width: 150px;
                                 object-fit: contain;
-                                filter: contrast(3) brightness(0.5);
+                                filter: grayscale(1) contrast(3); mix-blend-mode: multiply;
                             }
 
                             .preview-sign-name {
@@ -1087,7 +1091,7 @@
                                     <p class="mb-1">Diverifikasi,</p>
                                     <div class="preview-sign-img" style="height: 70px;">
                                         @if($csr->ttd_accounting)
-                                            <img src="{{ asset('assets/img/ttd/accounting.png') }}" style="bottom: -20px; position: relative;">
+                                            <img src="{{ asset('assets/img/ttd/accounting_ttd.png') }}">
                                         @endif
                                     </div>
                                     <p class="preview-sign-name">{{ $csr->diverifikasi3_nama }}</p>
@@ -1126,7 +1130,7 @@
     {{-- ===== /MODALS INFO CSR ===== --}}
 
     {{-- ===== MODALS APPROVE ACCOUNTING + NOTES CSR ===== --}}
-    @if(auth()->user()->role === 'accounting')
+    @if(in_array(auth()->user()->role, ['accounting', 'direktur']))
     @foreach($csrList as $csr)
         {{-- MODAL APPROVE ACCOUNTING CSR --}}
         <div class="modal fade" id="modalApproveAccCsr{{ $csr->id }}" tabindex="-1">
@@ -1187,7 +1191,7 @@
                         <div class="modal-body p-4">
                             <div class="alert alert-warning border-0 small mb-3" style="background:#fffbeb;">
                                 <i class="bi bi-lock me-1"></i>
-                                Hanya <strong>Accounting</strong> yang dapat mengisi/mengubah data ini.
+                                Hanya <strong>Accounting</strong> dan <strong>Direktur</strong> yang dapat mengisi/mengubah data ini.
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold small">Status Pembayaran</label>
@@ -1609,15 +1613,15 @@
                             <div class="col-md-4">
                                 <label class="form-label fw-bold small">Accounting</label>
                                 <input type="text" name="diverifikasi3_nama" class="form-control mb-1"
-                                    value="Baiq Nana Erlina, A.Md">
+                                    value="Desi Halisna Ariani">
                                 <input type="text" name="diverifikasi3_jabatan" class="form-control small"
-                                    value="Accounting">
+                                    value="Head of Accounting">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-bold small">Direktur</label>
                                 <input type="text" name="disetujui_nama" class="form-control mb-1"
-                                    value="Galuh Zakiyatun, S.Kom">
-                                <input type="text" name="disetujui_jabatan" class="form-control small" value="Direktur">
+                                    value="Baiq Nana Erlina, A.Md">
+                                <input type="text" name="disetujui_jabatan" class="form-control small" value="Plt. Direktur">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-bold small">Penasihat</label>
@@ -1863,6 +1867,120 @@
         });
     </script>
     @include('components.nav-modal-structure')
+
+    {{-- ===================== MODAL EXPORT EXCEL CSR ===================== --}}
+    <div class="modal fade" id="modalExportExcel" tabindex="-1" aria-labelledby="modalExportExcelLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 18px; overflow: hidden;">
+                {{-- Header --}}
+                <div class="modal-header border-0 text-white py-4 px-4"
+                    style="background: linear-gradient(135deg, #16a34a, #15803d);">
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="width: 44px; height: 44px; background: rgba(255,255,255,0.2);
+                            border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-file-earmark-excel-fill" style="font-size: 1.4rem;"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title mb-0 fw-bold" id="modalExportExcelLabel">Export Data CSR</h5>
+                            <small style="opacity: 0.85; font-size: 12px;">Pilih bulan dan tahun yang ingin di-export</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                {{-- Body --}}
+                <div class="modal-body px-4 py-4" style="background: #f9fafb;">
+                    <form action="{{ route('csr.export.excel') }}" method="GET" id="formExportCsr">
+                        @csrf
+
+                        <div class="row g-3">
+                            {{-- Bulan --}}
+                            <div class="col-7">
+                                <label class="form-label fw-semibold text-dark" style="font-size: 13px;">
+                                    <i class="bi bi-calendar-month me-1 text-success"></i> Bulan
+                                </label>
+                                <select name="bulan" id="exportBulan" class="form-select shadow-sm"
+                                    style="border-radius: 10px; border: 1.5px solid #d1fae5; font-size: 14px; padding: 10px 14px;">
+                                    <option value="1">Januari</option>
+                                    <option value="2">Februari</option>
+                                    <option value="3">Maret</option>
+                                    <option value="4">April</option>
+                                    <option value="5">Mei</option>
+                                    <option value="6">Juni</option>
+                                    <option value="7">Juli</option>
+                                    <option value="8">Agustus</option>
+                                    <option value="9">September</option>
+                                    <option value="10">Oktober</option>
+                                    <option value="11">November</option>
+                                    <option value="12">Desember</option>
+                                </select>
+                            </div>
+
+                            {{-- Tahun --}}
+                            <div class="col-5">
+                                <label class="form-label fw-semibold text-dark" style="font-size: 13px;">
+                                    <i class="bi bi-calendar3 me-1 text-success"></i> Tahun
+                                </label>
+                                <select name="tahun" id="exportTahun" class="form-select shadow-sm"
+                                    style="border-radius: 10px; border: 1.5px solid #d1fae5; font-size: 14px; padding: 10px 14px;">
+                                    @for($y = date('Y'); $y >= 2020; $y--)
+                                        <option value="{{ $y }}" {{ $y == date('Y') ? 'selected' : '' }}>{{ $y }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                        </div>
+
+                        {{-- Info box --}}
+                        <div class="mt-3 p-3 rounded-3 d-flex align-items-start gap-2"
+                            style="background: #ecfdf5; border: 1px solid #a7f3d0; font-size: 12.5px; color: #065f46;">
+                            <i class="bi bi-info-circle-fill mt-1 flex-shrink-0" style="color: #059669;"></i>
+                            <span>File Excel akan diunduh secara otomatis berisi seluruh data pengajuan CSR pada bulan yang dipilih.</span>
+                        </div>
+
+                        {{-- Actions --}}
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="button" class="btn btn-light flex-fill rounded-3 fw-semibold"
+                                data-bs-dismiss="modal" style="font-size: 14px;">
+                                <i class="bi bi-x-lg me-1"></i> Batal
+                            </button>
+                            <button type="submit" class="btn text-white flex-fill rounded-3 fw-bold shadow-sm"
+                                id="btnDownloadExcel"
+                                style="background: linear-gradient(135deg, #16a34a, #15803d); font-size: 14px; transition: all 0.2s;">
+                                <i class="bi bi-download me-1"></i> Download Excel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- =================== END MODAL EXPORT EXCEL =================== --}}
+
+    <script>
+        // Set default bulan to current month when page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            const currentMonth = new Date().getMonth() + 1;
+            const bulanSelect  = document.getElementById('exportBulan');
+            if (bulanSelect) {
+                bulanSelect.value = currentMonth;
+            }
+
+            // Button loading state on submit
+            const form = document.getElementById('formExportCsr');
+            const btn  = document.getElementById('btnDownloadExcel');
+            if (form && btn) {
+                form.addEventListener('submit', function () {
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Mengunduh...';
+                    btn.disabled  = true;
+                    // Re-enable after 4s in case of error
+                    setTimeout(function () {
+                        btn.innerHTML = '<i class="bi bi-download me-1"></i> Download Excel';
+                        btn.disabled  = false;
+                    }, 4000);
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

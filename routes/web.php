@@ -58,6 +58,7 @@ Route::post('/sparepart-needed/pengajuan/approve/{id}', [\App\Http\Controllers\S
 Route::post('/sparepart-needed/pengajuan/reject/{id}', [\App\Http\Controllers\SparepartNeededController::class, 'reject'])->name('sparepart.needed.reject');
 Route::post('/sparepart-needed/pengajuan/accounting-notes/{id}', [\App\Http\Controllers\SparepartNeededController::class, 'updateAccountingNotes'])->name('sparepart.needed.accounting.notes');
 Route::get('/sparepart-needed/pengajuan/print/{id}', [\App\Http\Controllers\SparepartNeededController::class, 'printPengajuanById'])->name('sparepart.needed.pengajuan.print');
+Route::get('/sparepart-needed/pengajuan/export-excel', [\App\Http\Controllers\SparepartNeededController::class, 'exportExcel'])->name('sparepart.needed.pengajuan.export.excel');
 
 
 // --- CSR (Corporate Social Responsibility) ROUTES ---
@@ -69,6 +70,7 @@ Route::get('/csr/print/{id}', [CsrController::class, 'print'])->name('csr.print'
 Route::put('/csr/update/{id}', [CsrController::class, 'update'])->name('csr.update');
 Route::delete('/csr/destroy/{id}', [CsrController::class, 'destroy'])->name('csr.destroy');
 Route::post('/csr/accounting-notes/{id}', [CsrController::class, 'updateAccountingNotes'])->name('csr.accounting.notes');
+Route::get('/csr/export-excel', [CsrController::class, 'exportExcel'])->name('csr.export.excel');
 
 // --- CM (Corrective / Preventive Maintenance) ROUTES ---
 Route::get('/cm', [\App\Http\Controllers\CmController::class, 'index'])->name('cm.index');
@@ -79,6 +81,8 @@ Route::get('/cm/print/{id}', [\App\Http\Controllers\CmController::class, 'print'
 Route::put('/cm/update/{id}', [\App\Http\Controllers\CmController::class, 'update'])->name('cm.update');
 Route::delete('/cm/destroy/{id}', [\App\Http\Controllers\CmController::class, 'destroy'])->name('cm.destroy');
 Route::post('/cm/accounting-notes/{id}', [\App\Http\Controllers\CmController::class, 'updateAccountingNotes'])->name('cm.accounting.notes');
+Route::post('/cm/mark-done/{id}', [\App\Http\Controllers\CmController::class, 'markAsDone'])->name('cm.mark-done');
+Route::get('/cm/export-excel', [\App\Http\Controllers\CmController::class, 'exportExcel'])->name('cm.export.excel');
 
 // --- REMOTE LOG (AJAX store - harus login) ---
 Route::post('/remote-log/store', [RemoteLogController::class, 'store'])->name('remotelog.store')->middleware('auth');
