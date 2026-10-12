@@ -176,7 +176,7 @@
         }
 
         .sign-accounting img {
-            bottom: -30px !important;
+            bottom: -10px !important;
             height: 90px !important;
             max-width: 130px !important;
         }

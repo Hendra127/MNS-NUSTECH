@@ -72,6 +72,10 @@ Route::delete('/csr/destroy/{id}', [CsrController::class, 'destroy'])->name('csr
 Route::post('/csr/accounting-notes/{id}', [CsrController::class, 'updateAccountingNotes'])->name('csr.accounting.notes');
 Route::get('/csr/export-excel', [CsrController::class, 'exportExcel'])->name('csr.export.excel');
 
+// --- SUMMARY KEUANGAN ROUTES ---
+Route::get('/summary-keuangan', [\App\Http\Controllers\SummaryKeuanganController::class, 'index'])->name('summary.keuangan');
+
+
 // --- CM (Corrective / Preventive Maintenance) ROUTES ---
 Route::get('/cm', [\App\Http\Controllers\CmController::class, 'index'])->name('cm.index');
 Route::post('/cm/store', [\App\Http\Controllers\CmController::class, 'store'])->name('cm.store');
@@ -83,6 +87,7 @@ Route::delete('/cm/destroy/{id}', [\App\Http\Controllers\CmController::class, 'd
 Route::post('/cm/accounting-notes/{id}', [\App\Http\Controllers\CmController::class, 'updateAccountingNotes'])->name('cm.accounting.notes');
 Route::post('/cm/mark-done/{id}', [\App\Http\Controllers\CmController::class, 'markAsDone'])->name('cm.mark-done');
 Route::get('/cm/export-excel', [\App\Http\Controllers\CmController::class, 'exportExcel'])->name('cm.export.excel');
+Route::get('/cm/export-pdf', [\App\Http\Controllers\CmController::class, 'exportPdf'])->name('cm.export.pdf');
 
 // --- REMOTE LOG (AJAX store - harus login) ---
 Route::post('/remote-log/store', [RemoteLogController::class, 'store'])->name('remotelog.store')->middleware('auth');

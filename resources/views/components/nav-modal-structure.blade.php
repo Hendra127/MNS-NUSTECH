@@ -106,6 +106,8 @@
                             CSR</a></li>
                     <li><a href="{{ route('cm.index') }}"><i class="bi bi-file-earmark-check me-2"></i> Pengajuan CM</a>
                     </li>
+                    <li><a href="{{ route('summary.keuangan') }}" style="color:#2563eb;font-weight:600;"><i class="bi bi-bar-chart-line-fill me-2"></i> Summary Keuangan</a>
+                    </li>
                 </ul>
             </div>
         </div>

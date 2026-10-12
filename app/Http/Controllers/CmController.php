@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use App\Exports\CmExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class CmController extends Controller
 {
@@ -498,12 +499,14 @@ class CmController extends Controller
     public function exportExcel(Request $request)
     {
         $request->validate([
-            'bulan' => 'required|integer|min:1|max:12',
-            'tahun' => 'required|integer|min:2020|max:2099',
+            'bulan'    => 'required|integer|min:1|max:12',
+            'tahun'    => 'required|integer|min:2020|max:2099',
+            'kategori' => 'nullable|string|in:BMN,SL',
         ]);
 
-        $month = (int) $request->bulan;
-        $year  = (int) $request->tahun;
+        $month    = (int) $request->bulan;
+        $year     = (int) $request->tahun;
+        $kategori = $request->kategori;
 
         $bulanIndo = [
             1  => 'Januari', 2  => 'Februari', 3  => 'Maret',
@@ -512,8 +515,91 @@ class CmController extends Controller
             10 => 'Oktober', 11 => 'November',  12 => 'Desember',
         ];
 
-        $filename = 'CM_' . ($bulanIndo[$month] ?? $month) . '_' . $year . '.xlsx';
+        $katSuffix = $kategori ? '_' . $kategori : '';
+        $filename  = 'CM' . $katSuffix . '_' . ($bulanIndo[$month] ?? $month) . '_' . $year . '.xlsx';
 
-        return Excel::download(new CmExport($month, $year), $filename);
+        return Excel::download(new CmExport($month, $year, $kategori), $filename);
+    }
+
+    // -------------------------------------------------------------------------
+
+    public function exportPdf(Request $request)
+    {
+        $request->validate([
+            'bulan'    => 'required|integer|min:1|max:12',
+            'tahun'    => 'required|integer|min:2020|max:2099',
+            'kategori' => 'nullable|string|in:BMN,SL',
+        ]);
+
+        $month    = (int) $request->bulan;
+        $year     = (int) $request->tahun;
+        $kategori = $request->kategori;
+
+        $bulanIndo = [
+            1  => 'Januari', 2  => 'Februari', 3  => 'Maret',
+            4  => 'April',   5  => 'Mei',       6  => 'Juni',
+            7  => 'Juli',    8  => 'Agustus',   9  => 'September',
+            10 => 'Oktober', 11 => 'November',  12 => 'Desember',
+        ];
+
+        $query = \App\Models\CmPengajuan::whereMonth('created_at', $month)
+            ->whereYear('created_at', $year);
+        if ($kategori) {
+            $query->where('kategori', $kategori);
+        }
+        $data = $query->orderBy('created_at', 'asc')->get();
+
+        // Build base64 logo
+        $logoBase64 = '';
+        $logoPaths = [
+            public_path('assets/img/logo2.jpg'),
+            public_path('assets/img/logonustech.png'),
+        ];
+        foreach ($logoPaths as $p) {
+            if (file_exists($p)) {
+                $ext  = pathinfo($p, PATHINFO_EXTENSION);
+                $mime = ($ext === 'png') ? 'image/png' : 'image/jpeg';
+                $logoBase64 = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($p));
+                break;
+            }
+        }
+
+        // Build base64 TTD images
+        $ttdFiles = [
+            'ttdPemohon'   => 'assets/img/ttd/pemohon.png',
+            'ttdManager'   => 'assets/img/ttd/manager.png',
+            'ttdAccounting'=> 'assets/img/ttd/accounting.png',
+            'ttdDirektur'  => 'assets/img/ttd/direktur.png',
+            'ttdPenasihat' => 'assets/img/ttd/penasihat.png',
+        ];
+        $ttd = [];
+        foreach ($ttdFiles as $key => $rel) {
+            $path = public_path($rel);
+            if (file_exists($path)) {
+                $ttd[$key] = 'data:image/png;base64,' . base64_encode(file_get_contents($path));
+            } else {
+                $ttd[$key] = null;
+            }
+        }
+
+        $monthName = $bulanIndo[$month] ?? $month;
+        $katLabel  = $kategori ? 'KATEGORI ' . $kategori : 'SEMUA KATEGORI';
+
+        $pdf = Pdf::loadView('exports.cm_pdf', array_merge([
+            'data'       => $data,
+            'monthName'  => $monthName,
+            'year'       => $year,
+            'katLabel'   => $katLabel,
+            'logoBase64' => $logoBase64,
+        ], $ttd))
+        ->setPaper('a4', 'landscape')
+        ->setOption('dpi', 150)
+        ->setOption('isHtml5ParserEnabled', true)
+        ->setOption('isRemoteEnabled', false);
+
+        $katSuffix = $kategori ? '_' . $kategori : '';
+        $filename  = 'CM' . $katSuffix . '_' . $monthName . '_' . $year . '.pdf';
+
+        return $pdf->download($filename);
     }
 }

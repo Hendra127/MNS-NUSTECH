@@ -452,10 +452,10 @@
                 @endif
                 <button
                     class="btn btn-success text-white fw-bold d-flex align-items-center gap-2 rounded-pill px-4 py-2 mt-2 shadow-sm"
-                    data-bs-toggle="modal" data-bs-target="#modalExportExcelCm" title="Export ke Excel"
+                    data-bs-toggle="modal" data-bs-target="#modalExportExcelCm" title="Export Excel / PDF"
                     style="background: linear-gradient(135deg, #16a34a, #15803d); border: none; transition: transform 0.2s;"
                     onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                    <i class="bi bi-file-earmark-excel-fill"></i> Export Excel
+                    <i class="bi bi-file-earmark-arrow-down-fill"></i> Export Excel / PDF
                 </button>
             </div>
             <div class="w-100 mt-2 mt-lg-0">
@@ -2092,23 +2092,22 @@
     </script>
     @include('components.nav-modal-structure')
 
-    {{-- ===================== MODAL EXPORT EXCEL CM ===================== --}}
+    {{-- ===================== MODAL EXPORT DATA CM (EXCEL / PDF) ===================== --}}
     <div class="modal fade" id="modalExportExcelCm" tabindex="-1" aria-labelledby="modalExportExcelCmLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 460px;">
             <div class="modal-content border-0 shadow-lg" style="border-radius: 18px; overflow: hidden;">
                 {{-- Header --}}
                 <div class="modal-header border-0 text-white py-4 px-4"
-                    style="background: linear-gradient(135deg, #16a34a, #15803d);">
+                    style="background: linear-gradient(135deg, #1e40af, #1d4ed8);">
                     <div class="d-flex align-items-center gap-3">
                         <div style="width: 44px; height: 44px; background: rgba(255,255,255,0.2);
                             border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                            <i class="bi bi-file-earmark-excel-fill" style="font-size: 1.4rem;"></i>
+                            <i class="bi bi-file-earmark-arrow-down-fill" style="font-size: 1.4rem;"></i>
                         </div>
                         <div>
                             <h5 class="modal-title mb-0 fw-bold" id="modalExportExcelCmLabel">Export Data CM</h5>
-                            <small style="opacity: 0.85; font-size: 12px;">Pilih bulan dan tahun yang ingin
-                                di-export</small>
+                            <small style="opacity: 0.85; font-size: 12px;">Pilih periode, kategori & format file unduhan</small>
                         </div>
                     </div>
                     <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal"
@@ -2124,10 +2123,10 @@
                             {{-- Bulan --}}
                             <div class="col-7">
                                 <label class="form-label fw-semibold text-dark" style="font-size: 13px;">
-                                    <i class="bi bi-calendar-month me-1 text-success"></i> Bulan
+                                    <i class="bi bi-calendar-month me-1 text-primary"></i> Bulan
                                 </label>
                                 <select name="bulan" id="exportBulanCm" class="form-select shadow-sm"
-                                    style="border-radius: 10px; border: 1.5px solid #d1fae5; font-size: 14px; padding: 10px 14px;">
+                                    style="border-radius: 10px; border: 1.5px solid #bfdbfe; font-size: 14px; padding: 10px 14px;">
                                     <option value="1">Januari</option>
                                     <option value="2">Februari</option>
                                     <option value="3">Maret</option>
@@ -2146,35 +2145,52 @@
                             {{-- Tahun --}}
                             <div class="col-5">
                                 <label class="form-label fw-semibold text-dark" style="font-size: 13px;">
-                                    <i class="bi bi-calendar3 me-1 text-success"></i> Tahun
+                                    <i class="bi bi-calendar3 me-1 text-primary"></i> Tahun
                                 </label>
                                 <select name="tahun" id="exportTahunCm" class="form-select shadow-sm"
-                                    style="border-radius: 10px; border: 1.5px solid #d1fae5; font-size: 14px; padding: 10px 14px;">
+                                    style="border-radius: 10px; border: 1.5px solid #bfdbfe; font-size: 14px; padding: 10px 14px;">
                                     @for($y = date('Y'); $y >= 2020; $y--)
                                         <option value="{{ $y }}" {{ $y == date('Y') ? 'selected' : '' }}>{{ $y }}</option>
                                     @endfor
+                                </select>
+                            </div>
+
+                            {{-- Kategori --}}
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-dark" style="font-size: 13px;">
+                                    <i class="bi bi-tag-fill me-1 text-primary"></i> Kategori
+                                </label>
+                                <select name="kategori" id="exportKategoriCm" class="form-select shadow-sm"
+                                    style="border-radius: 10px; border: 1.5px solid #bfdbfe; font-size: 14px; padding: 10px 14px;">
+                                    <option value="">Semua Kategori</option>
+                                    <option value="BMN">🏛️ BMN (Barang Milik Negara)</option>
+                                    <option value="SL">📋 SL (Sewa Layanan)</option>
                                 </select>
                             </div>
                         </div>
 
                         {{-- Info box --}}
                         <div class="mt-3 p-3 rounded-3 d-flex align-items-start gap-2"
-                            style="background: #ecfdf5; border: 1px solid #a7f3d0; font-size: 12.5px; color: #065f46;">
-                            <i class="bi bi-info-circle-fill mt-1 flex-shrink-0" style="color: #059669;"></i>
-                            <span>File Excel akan diunduh secara otomatis berisi seluruh data pengajuan CM pada bulan
-                                yang dipilih.</span>
+                            style="background: #eff6ff; border: 1px solid #bfdbfe; font-size: 12.5px; color: #1e3a8a;">
+                            <i class="bi bi-info-circle-fill mt-1 flex-shrink-0" style="color: #2563eb;"></i>
+                            <span>Pilih unduh sebagai file <b>Excel (.xlsx)</b> atau dokumen cetak <b>PDF (.pdf)</b> lengkap dengan Kop dan Tanda Tangan resmi.</span>
                         </div>
 
-                        {{-- Actions --}}
+                        {{-- Actions: Excel and PDF Buttons --}}
                         <div class="d-flex gap-2 mt-4">
-                            <button type="button" class="btn btn-light flex-fill rounded-3 fw-semibold"
+                            <button type="button" class="btn btn-light rounded-3 fw-semibold px-3"
                                 data-bs-dismiss="modal" style="font-size: 14px;">
                                 <i class="bi bi-x-lg me-1"></i> Batal
                             </button>
-                            <button type="submit" class="btn text-white flex-fill rounded-3 fw-bold shadow-sm"
+                            <button type="button" class="btn text-white flex-fill rounded-3 fw-bold shadow-sm"
                                 id="btnDownloadExcelCm"
-                                style="background: linear-gradient(135deg, #16a34a, #15803d); font-size: 14px; transition: all 0.2s;">
-                                <i class="bi bi-download me-1"></i> Download Excel
+                                style="background: linear-gradient(135deg, #16a34a, #15803d); font-size: 13.5px; transition: all 0.2s;">
+                                <i class="bi bi-file-earmark-excel-fill me-1"></i> Excel (.xlsx)
+                            </button>
+                            <button type="button" class="btn text-white flex-fill rounded-3 fw-bold shadow-sm"
+                                id="btnDownloadPdfCm"
+                                style="background: linear-gradient(135deg, #dc2626, #b91c1c); font-size: 13.5px; transition: all 0.2s;">
+                                <i class="bi bi-file-earmark-pdf-fill me-1"></i> PDF (.pdf)
                             </button>
                         </div>
                     </form>
@@ -2182,7 +2198,7 @@
             </div>
         </div>
     </div>
-    {{-- =================== END MODAL EXPORT EXCEL CM =================== --}}
+    {{-- =================== END MODAL EXPORT DATA CM =================== --}}
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -2191,16 +2207,35 @@
             const bulanSelect = document.getElementById('exportBulanCm');
             if (bulanSelect) bulanSelect.value = currentMonth;
 
-            // Loading state on submit
+            // Handle Excel & PDF Export
             const form = document.getElementById('formExportCm');
-            const btn = document.getElementById('btnDownloadExcelCm');
-            if (form && btn) {
-                form.addEventListener('submit', function () {
-                    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Mengunduh...';
-                    btn.disabled = true;
+            const btnExcel = document.getElementById('btnDownloadExcelCm');
+            const btnPdf = document.getElementById('btnDownloadPdfCm');
+
+            if (form && btnExcel && btnPdf) {
+                btnExcel.addEventListener('click', function () {
+                    form.action = "{{ route('cm.export.excel') }}";
+                    btnExcel.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Unduh...';
+                    btnExcel.disabled = true;
+                    btnPdf.disabled = true;
+                    form.submit();
                     setTimeout(function () {
-                        btn.innerHTML = '<i class="bi bi-download me-1"></i> Download Excel';
-                        btn.disabled = false;
+                        btnExcel.innerHTML = '<i class="bi bi-file-earmark-excel-fill me-1"></i> Excel (.xlsx)';
+                        btnExcel.disabled = false;
+                        btnPdf.disabled = false;
+                    }, 4000);
+                });
+
+                btnPdf.addEventListener('click', function () {
+                    form.action = "{{ route('cm.export.pdf') }}";
+                    btnPdf.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Unduh...';
+                    btnPdf.disabled = true;
+                    btnExcel.disabled = true;
+                    form.submit();
+                    setTimeout(function () {
+                        btnPdf.innerHTML = '<i class="bi bi-file-earmark-pdf-fill me-1"></i> PDF (.pdf)';
+                        btnPdf.disabled = false;
+                        btnExcel.disabled = false;
                     }, 4000);
                 });
             }
